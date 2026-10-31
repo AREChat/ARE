@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' https:; frame-src https://drive.google.com https://www.youtube.com https://www.youtube-nocookie.com; connect-src 'self'; manifest-src 'self'; worker-src 'self'; font-src 'self' data:; base-uri 'none'; form-action 'none'; object-src 'none'">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#0b1020">
+<title>ARE QUEST 〜そういうときは、AREだ！〜</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="stylesheet" href="./game.css">
+</head>
+<body>
+<div id="qolLoad" style="position:fixed;inset:0;z-index:99998;background:#0b1020;color:#ffd86b;display:flex;align-items:center;justify-content:center;font:bold 20px sans-serif;transition:opacity .4s">⏳ よみこみ中…</div>
+<div id="stage">
+  <div id="bg"></div>
+  <canvas id="cv" width="1280" height="720" aria-label="ゲーム画面"></canvas>
+  <div id="ui"></div>
+  <div id="pad">
+    <div id="dp"><button class="u" data-k="up" aria-label="上">▲</button><button class="d" data-k="down" aria-label="下">▼</button><button class="l" data-k="left" aria-label="左">◀</button><button class="r" data-k="right" aria-label="右">▶</button></div>
+    <div id="ab"><button class="b" data-k="menu" aria-label="メニュー">メニュー</button><button class="a" data-k="ok" aria-label="話す・調べる・決定">A</button></div>
+  </div>
+  <div id="top"><button type="button" id="btnFs">全画面</button><button type="button" id="btnVoice">声：オン</button><button type="button" id="btnBgm">BGM：オン</button><button type="button" id="btnQuit">✖ おわる</button></div>
+  <div id="toast" class="win"></div>
+  <div id="flash"></div>
+</div>
+<div id="rot"><div>📱 よこむきに すると<br>もっと 大きく 遊べるよ！</div><button type="button" id="rotOk">このまま あそぶ</button></div>
+<script src="../protect.js"></script>
+<script src="./protect-game.js"></script>
+<script src="./hash.js"></script>
+<script src="./cheat-table.js"></script>
+<script src="./data.js"></script>
+<script src="./data2.js"></script>
+<script src="./maps.js"></script>
+<script src="./story.js"></script>
+<script src="./maps2.js"></script>
+<script src="./story2.js"></script>
+<script src="./world2.js"></script>
+<script src="./data3.js"></script>
+<script src="./core.js"></script>
+<script src="./ui.js"></script>
+<script src="./field.js"></script>
+<script src="./battle.js"></script>
+<script src="./pack.js"></script>
+<script src="./pack-mon.js"></script>
+<script src="./pack-meta.js"></script>
+<script src="./pack-codes.js"></script>
+<script src="./pack-ui.js"></script>
+<script src="./extra.js"></script>
+<script src="./job.js"></script>
+<script src="./titles.js"></script>
+<script src="./replay-codes.js"></script>
+<script src="./extra2.js"></script>
+<script src="./episodes.js"></script>
+<script src="./karasu.js"></script>
+<script src="./gamepad.js"></script>
+<script src="./lucky.js"></script>
+<script src="./pack-casino.js"></script>
+<script src="./typing2.js"></script>
+<script src="./shooter2.js"></script>
+<script src="./bgm.js"></script>
+<script src="./yarisugi.js"></script>
+<script src="./yh1.js"></script>
+<script src="./yh2.js"></script>
+<script src="./yh3.js"></script>
+<script src="./yh4.js"></script>
+<script src="./yh-end.js"></script>
+<script src="./dk.js"></script>
+<script src="./dk1.js"></script>
+<script src="./dk2.js"></script>
+<script src="./dk3.js"></script>
+<script src="./dk-end.js"></script>
+<script src="./ld.js"></script>
+<script src="./kn.js"></script>
+<script src="./wn.js"></script>
+<script src="./us.js"></script>
+<script src="./ld-end.js"></script>
+<script src="./sub.js"></script>
+<script src="./ssa.js"></script>
+<script src="./ssb.js"></script>
+<script src="./ssc.js"></script>
+<script src="./sse.js"></script>
+<script src="./ssf.js"></script>
+<script src="./ssg.js"></script>
+<script src="./ssh.js"></script>
+<script src="./ssi.js"></script>
+<script src="./ssj.js"></script>
+<script src="./sub-end.js"></script>
+<script src="./yarisugi-codes.js"></script>
+<script src="./yh-codes.js"></script>
+<script src="./cheat-reset.js"></script>
+<script src="./qol.js"></script>
+<script src="./boot.js"></script>
+<script src="../shared/are-guard.js"></script>
+<script src="../shared/are-common.js"></script>
+</body>
+</html>
