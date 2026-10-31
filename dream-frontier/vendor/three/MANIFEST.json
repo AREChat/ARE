@@ -1,0 +1,21 @@
+{
+  "name": "three",
+  "version": "0.160.0",
+  "license": "MIT",
+  "source": "npm registry: three@0.160.0（npm pack）",
+  "tarballIntegrity": "sha512-DLU8lc0zNIPkM7rH5/e1Ks1Z8tWCGRq6g8mPowdDJpw1CFBJMU7UoJjC6PefXW7z//SSl0b2+GCw14LB+uDhng==",
+  "verifiedAgainstRegistry": true,
+  "fetchedAt": "2026-10-26T09:49:39.514Z",
+  "files": [
+    {
+      "path": "build/three.module.js",
+      "sha256": "76dea8151bc9352aef3528b4262e249b2604f62543828328db978d060d61a495",
+      "bytes": 1272972
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "852e0e8699169bf9f6fdc6bda3e682d078dcbc738b5d33e74df594721bff271d",
+      "bytes": 1081
+    }
+  ]
+}

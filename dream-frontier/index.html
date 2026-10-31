@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>ドリーム・フロンティア</title>
+<meta name="description" content="一人称で あそぶ、オリジナルの 3D テーマパーク RPG。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/style.css">
+<script src="js/boot.js"></script>
+</head>
+<body>
+<canvas id="view"></canvas>
+<div id="hud"><div class="pill">🏅 <span id="hudStamps">0 / 18</span></div><div class="pill">🪙 <span id="hudCoins">0</span></div><div class="pill" id="hudObj"></div></div>
+<div id="areaName"></div><div id="prompt"></div><div id="toast"></div><div id="cross"></div>
+<div id="rideHud"><span id="rideName"></span><span id="rideInfo"></span></div><div id="vehicle"></div><div id="fade"></div>
+<div id="dlg"><div id="dlgName"></div><div id="dlgText"></div></div>
+<div id="modal"></div>
+<div id="touch"><div id="stick"><div id="knob"></div></div><div class="tb" id="bAct" data-btn="act">E</div><div class="tb" id="bExit" data-btn="exit">おりる</div><div class="tb" id="bRun" data-btn="run">はしる</div><div class="tb" id="bMenu" data-btn="menu">メニュー</div></div>
+<div id="engineTag"></div>
+<div id="loading"><h1>ドリーム・フロンティア</h1><p id="loadMsg">よみこみ中…</p><p id="loadEngine" style="font-size:13px;font-weight:600"></p><button id="startBtn">あそぶ！</button><button id="diagBtn" style="display:none;font:inherit;padding:8px 18px;margin-top:6px" onclick="window.__showDiag&&window.__showDiag()">しんだん</button><p style="font-size:12px;opacity:.7;margin-top:12px">うまく はじまらない時は 8びょう後に しんだん画面が でます（URLの おわりに ?diag=1 でも ひらけます）</p></div>
+<script type="module" src="js/main.js"></script>
+<noscript><p style="position:fixed;inset:0;background:#fff;color:#000;z-index:99999;padding:20px">JavaScript を ゆうこうに してください。</p></noscript>
+</body>
+</html>
