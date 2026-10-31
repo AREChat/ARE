@@ -1,0 +1,285 @@
+{
+  "schema_version": 1,
+  "exchange_rate": {
+    "gold_per_coin": 5,
+    "coin_per_gold": 0.2
+  },
+  "games": [
+    {
+      "id": "CAS001",
+      "name": "アイテム神経衰弱",
+      "platforms": [
+        "PC",
+        "スマートフォン"
+      ],
+      "type": "memory_matching",
+      "summary": "裏向きのカードをめくり、同じアイテム同士を揃えると、そのアイテムを獲得できる。",
+      "difficulty_levels": [
+        {
+          "id": "easy",
+          "name": "初級",
+          "pair_count": 6,
+          "coin_reward": 10,
+          "time_limit_seconds": 120
+        },
+        {
+          "id": "normal",
+          "name": "中級",
+          "pair_count": 10,
+          "coin_reward": 40,
+          "time_limit_seconds": 100
+        },
+        {
+          "id": "hard",
+          "name": "上級",
+          "pair_count": 15,
+          "coin_reward": 150,
+          "time_limit_seconds": 90
+        }
+      ],
+      "rules": [
+        "一致したペアのアイテムを報酬として受け取る",
+        "難易度が高いほど基本コイン報酬を増やす",
+        "アイテム報酬とコイン報酬は別々に記録する"
+      ],
+      "fair_play": "開始時にカード配置を作り、途中で配置が変わらないようにする"
+    },
+    {
+      "id": "CAS002",
+      "name": "友披露",
+      "platforms": [
+        "PC",
+        "スマートフォン"
+      ],
+      "type": "大富豪カードゲーム",
+      "summary": "標準的なトランプを使う4人対戦カードゲーム。1人プレイではCPU3人と対戦する。",
+      "players": 4,
+      "human_players_default": 1,
+      "opponents": "CPU3人。相手の手札は表示しない。",
+      "rules": [
+        "カードの強さや階段などの基本ルールは設定可能にする",
+        "スペードの3返しを実装する",
+        "3から12までの数字カードに対応する各種特殊技・効果を利用できる",
+        "カード効果はゲーム内ヘルプで説明する",
+        "1位の報酬はジャックポット級の大量カジノコインとする",
+        "順位に応じて報酬を変える"
+      ],
+      "special_effects": [
+        {
+          "card_value": 3,
+          "name": "3返し",
+          "description": "スペードの3で特定の強い場札を返せるルール"
+        },
+        {
+          "card_value": 3,
+          "name": "3の効果",
+          "description": "ゲーム設定で有効化された3の特殊効果"
+        },
+        {
+          "card_value": 4,
+          "name": "4の効果",
+          "description": "設定された4の特殊効果"
+        },
+        {
+          "card_value": 5,
+          "name": "5の効果",
+          "description": "設定された5の特殊効果"
+        },
+        {
+          "card_value": 6,
+          "name": "6の効果",
+          "description": "設定された6の特殊効果"
+        },
+        {
+          "card_value": 7,
+          "name": "7の効果",
+          "description": "設定された7の特殊効果"
+        },
+        {
+          "card_value": 8,
+          "name": "8切り",
+          "description": "場を流す効果"
+        },
+        {
+          "card_value": 9,
+          "name": "9の効果",
+          "description": "設定された9の特殊効果"
+        },
+        {
+          "card_value": 10,
+          "name": "10の効果",
+          "description": "設定された10の特殊効果"
+        },
+        {
+          "card_value": 11,
+          "name": "11バック",
+          "description": "一定期間カードの強さを逆転させる効果"
+        },
+        {
+          "card_value": 12,
+          "name": "12の効果",
+          "description": "設定された12の特殊効果"
+        }
+      ],
+      "payouts": {
+        "first": 5000,
+        "second": 500,
+        "third": 150,
+        "fourth": 50
+      },
+      "notes": "特殊技はオリジナルの呼び名・効果説明を用意し、既存ゲームの文章や演出を複製しない。"
+    },
+    {
+      "id": "CAS003",
+      "name": "タイピングチャレンジ",
+      "platforms": [
+        "PC"
+      ],
+      "type": "typing",
+      "summary": "表示された文章を正確に入力し、文字数・正確性・速度に応じてコインを獲得する。",
+      "input_method": "keyboard",
+      "scoring": {
+        "base_coins_per_correct_character": 1,
+        "accuracy_bonus_threshold_percent": 95,
+        "accuracy_bonus": 100,
+        "speed_bonus_enabled": true
+      },
+      "difficulty_levels": [
+        {
+          "id": "easy",
+          "name": "初級",
+          "duration_seconds": 30
+        },
+        {
+          "id": "normal",
+          "name": "中級",
+          "duration_seconds": 60
+        },
+        {
+          "id": "hard",
+          "name": "上級",
+          "duration_seconds": 90
+        }
+      ],
+      "rules": [
+        "正しく入力した文字数を記録する",
+        "誤入力は正確性に反映する",
+        "報酬計算はクライアントの表示値だけを信用せず、結果を検証する"
+      ]
+    },
+    {
+      "id": "CAS004",
+      "name": "AREの達人",
+      "platforms": [
+        "PC",
+        "スマートフォン"
+      ],
+      "type": "rhythm_game",
+      "summary": "オリジナル楽曲に合わせて「ドン」「カッ」のリズム入力を行う音楽ゲーム。",
+      "song_count": 13,
+      "song_selection": "13曲からプレイヤーが選択",
+      "difficulty_levels": [
+        {
+          "id": "easy",
+          "name": "初級",
+          "note_density": "低"
+        },
+        {
+          "id": "normal",
+          "name": "中級",
+          "note_density": "中"
+        },
+        {
+          "id": "hard",
+          "name": "上級",
+          "note_density": "高"
+        }
+      ],
+      "controls": {
+        "smartphone": {
+          "don": "画面のドン領域をタッチ",
+          "ka": "画面のカッ領域をタッチ"
+        },
+        "pc": {
+          "don": "Fキー",
+          "ka": "Jキー",
+          "rapid_input": "Enterキー連打は連打ノーツ用"
+        }
+      },
+      "scoring": {
+        "perfect": 100,
+        "good": 60,
+        "miss": 0,
+        "combo_bonus_enabled": true
+      },
+      "songs": [
+        {
+          "id": "SONG01",
+          "title": "AREの朝",
+          "bpm": 100
+        },
+        {
+          "id": "SONG02",
+          "title": "ギアの行進",
+          "bpm": 112
+        },
+        {
+          "id": "SONG03",
+          "title": "コイヌネランドへ",
+          "bpm": 120
+        },
+        {
+          "id": "SONG04",
+          "title": "星空ロード",
+          "bpm": 128
+        },
+        {
+          "id": "SONG05",
+          "title": "タコヤキ祭り",
+          "bpm": 135
+        },
+        {
+          "id": "SONG06",
+          "title": "花咲く丘",
+          "bpm": 95
+        },
+        {
+          "id": "SONG07",
+          "title": "魚たちのパレード",
+          "bpm": 118
+        },
+        {
+          "id": "SONG08",
+          "title": "ARE軍隊訓練曲",
+          "bpm": 145
+        },
+        {
+          "id": "SONG09",
+          "title": "配合研究所",
+          "bpm": 105
+        },
+        {
+          "id": "SONG10",
+          "title": "転生の輝き",
+          "bpm": 132
+        },
+        {
+          "id": "SONG11",
+          "title": "格闘場チャンピオン",
+          "bpm": 150
+        },
+        {
+          "id": "SONG12",
+          "title": "ムテキの行進",
+          "bpm": 125
+        },
+        {
+          "id": "SONG13",
+          "title": "冒険のフィナーレ",
+          "bpm": 140
+        }
+      ],
+      "copyright_guidance": "曲名・譜面・音源・画面演出はオリジナルにする。既存作品の楽曲や譜面を流用しない。"
+    }
+  ]
+}

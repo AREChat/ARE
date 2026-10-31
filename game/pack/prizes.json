@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "currency": "カジノコイン",
+  "exchange_rate": {
+    "gold_per_coin": 5
+  },
+  "prizes": [
+    {
+      "id": "PRZ001",
+      "name": "ムテキの剣",
+      "category": "装備",
+      "coin_cost": 30000,
+      "item_id": "EQP001",
+      "limit": "1回"
+    },
+    {
+      "id": "PRZ002",
+      "name": "ムテキの鎧",
+      "category": "装備",
+      "coin_cost": 30000,
+      "item_id": "EQP002",
+      "limit": "1回"
+    },
+    {
+      "id": "PRZ003",
+      "name": "ムテキの盾",
+      "category": "装備",
+      "coin_cost": 25000,
+      "item_id": "EQP003",
+      "limit": "1回"
+    },
+    {
+      "id": "PRZ004",
+      "name": "ムテキの兜",
+      "category": "装備",
+      "coin_cost": 25000,
+      "item_id": "EQP004",
+      "limit": "1回"
+    },
+    {
+      "id": "PRZ005",
+      "name": "ムテキの腕輪",
+      "category": "装備",
+      "coin_cost": 25000,
+      "item_id": "EQP005",
+      "limit": "1回"
+    },
+    {
+      "id": "PRZ006",
+      "name": "大切な石碑",
+      "category": "収集",
+      "coin_cost": 500,
+      "item_id": "ITM007",
+      "limit": "無制限"
+    },
+    {
+      "id": "PRZ007",
+      "name": "配合の雫",
+      "category": "育成素材",
+      "coin_cost": 1200,
+      "item_id": "ITM023",
+      "limit": "無制限"
+    },
+    {
+      "id": "PRZ008",
+      "name": "スカウト笛",
+      "category": "育成素材",
+      "coin_cost": 800,
+      "item_id": "ITM024",
+      "limit": "無制限"
+    },
+    {
+      "id": "PRZ009",
+      "name": "経験の書",
+      "category": "育成素材",
+      "coin_cost": 1500,
+      "item_id": "ITM016",
+      "limit": "無制限"
+    },
+    {
+      "id": "PRZ010",
+      "name": "虹の結晶",
+      "category": "素材",
+      "coin_cost": 2000,
+      "item_id": "ITM026",
+      "limit": "無制限"
+    },
+    {
+      "id": "PRZ011",
+      "name": "復活の羽",
+      "category": "回復",
+      "coin_cost": 700,
+      "item_id": "ITM020",
+      "limit": "無制限"
+    },
+    {
+      "id": "PRZ012",
+      "name": "幸運チケット",
+      "category": "特殊",
+      "coin_cost": 5000,
+      "item_id": "ITM032",
+      "limit": "無制限"
+    },
+    {
+      "id": "PRZ013",
+      "name": "限定称号・カジノ王",
+      "category": "称号",
+      "coin_cost": 10000,
+      "item_id": null,
+      "limit": "1回"
+    },
+    {
+      "id": "PRZ014",
+      "name": "カジノ限定モンスター契約書",
+      "category": "モンスター",
+      "coin_cost": 18000,
+      "item_id": null,
+      "limit": "1回"
+    },
+    {
+      "id": "PRZ015",
+      "name": "強化装備素材セット",
+      "category": "素材",
+      "coin_cost": 4000,
+      "item_id": null,
+      "limit": "無制限"
+    }
+  ]
+}
