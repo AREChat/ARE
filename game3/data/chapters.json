@@ -1,0 +1,168 @@
+{
+ "version": 1,
+ "title": "月影のあしあと",
+ "chapters": [
+  {
+   "n": 1,
+   "title": "みなと野の春",
+   "lbl": "第1章 1話",
+   "file": "ch/ch001.json",
+   "map": "town"
+  },
+  {
+   "n": 2,
+   "title": "人気者になろう！　その1",
+   "lbl": "第1章 2話",
+   "file": "ch/ch002.json",
+   "map": "town"
+  },
+  {
+   "n": 3,
+   "title": "人気者になろう！　その2",
+   "lbl": "第1章 3話",
+   "file": "ch/ch003.json",
+   "map": "town"
+  },
+  {
+   "n": 4,
+   "title": "人気者になろう！　その3",
+   "lbl": "第1章 4話",
+   "file": "ch/ch004.json",
+   "map": "town"
+  },
+  {
+   "n": 5,
+   "title": "ゲームクラブ、大盛況！",
+   "lbl": "第1章 5話",
+   "file": "ch/ch005.json",
+   "map": "town"
+  },
+  {
+   "n": 6,
+   "title": "体の不自由な人への配慮",
+   "lbl": "第1章 6話",
+   "file": "ch/ch006.json",
+   "map": "town"
+  },
+  {
+   "n": 7,
+   "title": "復帰後、大逆転を起こす!?",
+   "lbl": "第1章 7話",
+   "file": "ch/ch007.json",
+   "map": "town"
+  },
+  {
+   "n": 8,
+   "title": "冬の大波乱！　前編",
+   "lbl": "第1章 8話",
+   "file": "ch/ch008.json",
+   "map": "town"
+  },
+  {
+   "n": 9,
+   "title": "冬の大波乱！　後編",
+   "lbl": "第1章 9話",
+   "file": "ch/ch009.json",
+   "map": "town"
+  },
+  {
+   "n": 10,
+   "title": "今まで、ありがとう！",
+   "lbl": "第1章 10話",
+   "file": "ch/ch010.json",
+   "map": "town"
+  },
+  {
+   "n": 11,
+   "title": "しおかぜ台の風",
+   "lbl": "第2章 1話",
+   "file": "ch/ch011.json",
+   "map": "town"
+  },
+  {
+   "n": 12,
+   "title": "ボードゲーム部の扉",
+   "lbl": "第2章 2話",
+   "file": "ch/ch012.json",
+   "map": "town"
+  },
+  {
+   "n": 13,
+   "title": "ルールをつくる人",
+   "lbl": "第2章 3話",
+   "file": "ch/ch013.json",
+   "map": "town"
+  },
+  {
+   "n": 14,
+   "title": "宿題が終わらない日",
+   "lbl": "第2章 4話",
+   "file": "ch/ch014.json",
+   "map": "town"
+  },
+  {
+   "n": 15,
+   "title": "忘れ物大王",
+   "lbl": "第2章 5話",
+   "file": "ch/ch015.json",
+   "map": "town"
+  },
+  {
+   "n": 16,
+   "title": "部員がたりない！",
+   "lbl": "第2章 6話",
+   "file": "ch/ch016.json",
+   "map": "town"
+  },
+  {
+   "n": 17,
+   "title": "町の遊び場まつり",
+   "lbl": "第2章 7話",
+   "file": "ch/ch017.json",
+   "map": "town"
+  },
+  {
+   "n": 18,
+   "title": "大会の朝",
+   "lbl": "第2章 8話",
+   "file": "ch/ch018.json",
+   "map": "town"
+  },
+  {
+   "n": 19,
+   "title": "負けたあとで",
+   "lbl": "第2章 9話",
+   "file": "ch/ch019.json",
+   "map": "town"
+  },
+  {
+   "n": 20,
+   "title": "つづく道",
+   "lbl": "第2章 10話",
+   "file": "ch/ch020.json",
+   "map": "town"
+  }
+ ],
+ "order": [
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20
+ ]
+}

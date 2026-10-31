@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#101923">
+<meta name="description" content="星の道しるべをたどる、オリジナルの冒険ファンタジーJRPG。探索、仲間、コマンドバトル。">
+<title>GAME6 | 星紡ぎの旅人</title>
+<link rel="stylesheet" href="style.css?v=5">
+</head>
+<body>
+<div class="app-shell">
+  <header class="topbar">
+    <a class="brand" href="./index.html" aria-label="GAME6 ホーム"><span class="brand-mark">✦</span><span>GAME<span class="gold">6</span></span></a>
+    <div class="top-actions"><span class="chapter-pill">第1章　霧灯の丘</span><button id="statsBtn" class="quiet-btn" type="button">📊 記録</button><button id="saveBtn" class="quiet-btn" type="button">保存</button><button id="loadBtn" class="quiet-btn" type="button">読込</button></div>
+  </header>
+
+  <main class="game-layout">
+    <section class="stage-card" aria-label="冒険フィールド">
+      <div class="stage-head"><div><p class="eyebrow">THE WAYFARER'S TALE</p><h1>星紡ぎの旅人</h1></div><div class="weather"><span class="weather-dot"></span>薄明 / 風速 2</div></div>
+      <div class="world" id="world" role="application" aria-label="フィールド。移動ボタンで探索できます">
+        <div class="sky-orb"></div><div class="far-mountain m1"></div><div class="far-mountain m2"></div><div class="far-mountain m3"></div>
+        <div class="sunbeam"></div><div class="hill hill-back"></div><div class="hill hill-front"></div>
+        <div class="path"></div><div class="ruin ruin-left"><span></span><span></span><span></span></div><div class="ruin ruin-right"><span></span><span></span><span></span></div>
+        <div class="tree tree-a"><i></i><b></b></div><div class="tree tree-b"><i></i><b></b></div><div class="tree tree-c"><i></i><b></b></div>
+        <div class="field-label"><span class="pin">⌖</span><span id="locationName">霧灯の丘</span></div>
+        <div class="player-token" id="playerToken" aria-label="旅人"><div class="token-cape"></div><div class="token-body"></div><div class="token-head"></div><div class="token-shine"></div></div>
+        <div class="interactable chest" id="chest" role="button" tabindex="0" aria-label="古い宝箱を調べる"><span>✧</span><b></b></div>
+        <div class="interactable waystone" id="waystone" role="button" tabindex="0" aria-label="星の石碑を調べる"><span>✦</span></div>
+        <div class="zone-tint"></div><div class="vignette"></div><div class="zone-badge" id="zoneBadge"></div>
+      </div>
+      <div class="field-controls"><div class="move-pad" aria-label="移動操作"><button data-move="up" aria-label="上へ">↑</button><div><button data-move="left" aria-label="左へ">←</button><button data-move="down" aria-label="下へ">↓</button><button data-move="right" aria-label="右へ">→</button></div></div><div class="field-hint"><span class="keycap">W A S D</span> または矢印キーで移動 <span class="hint-divider">·</span> 光る場所を調べよう</div><button id="exploreBtn" class="gold-btn">周囲を調べる <span>↗</span></button></div>
+    </section>
+
+    <aside class="side-column">
+      <section class="panel-card hero-card"><div class="hero-top"><div class="hero-avatar"><span>✧</span><div class="avatar-cape"></div><div class="avatar-face"></div></div><div class="hero-meta"><p class="eyebrow">旅人 / 剣士見習い</p><h2 id="heroName">主人公</h2><p class="level">LEVEL <b id="levelText">1</b> <span>·</span> 旅のはじまり</p></div><span class="status-mark">●</span></div><div class="stat-line"><div><span>HP</span><b id="hpText">42 / 42</b></div><div class="bar hp"><i id="hpBar" style="width:100%"></i></div></div><div class="stat-line"><div><span>MP</span><b id="mpText">18 / 18</b></div><div class="bar mp"><i id="mpBar" style="width:100%"></i></div></div><div class="hero-stats"><div><span>攻撃</span><b id="atkText">8</b></div><div><span>防御</span><b id="defText">5</b></div><div><span>経験値</span><b id="xpText">0 / 20</b></div></div></section>
+
+      <section class="panel-card party-card"><div class="section-heading"><h3>旅の仲間</h3><span class="tiny-count">01 / 03</span></div><div class="party-member"><div class="party-avatar companion">風</div><div class="party-info"><b>仲間を探しています</b><span>次の町で出会いがあるかも</span></div><span class="lock-icon">◇</span></div></section>
+
+      <section class="panel-card quest-card"><div class="section-heading"><h3>旅の目的</h3><span class="quest-symbol">✦</span></div><p class="quest-title">消えた星明かり</p><p class="quest-desc">丘の石碑に触れ、夜空から消えた星の謎を探ろう。</p><div class="quest-progress"><span id="questStatus">進行中</span><span id="questPercent">0 / 2</span></div><div class="quest-track"><i id="questBar" style="width:0%"></i></div><button class="text-button" id="questBtn">目的を確認 <span>→</span></button></section>
+
+      <section class="panel-card inventory-card"><div class="section-heading"><h3>持ちもの</h3><button id="bagBtn" class="text-button">バッグ <span>↗</span></button></div><div class="inventory-grid"><div class="item-slot"><span class="item-icon potion">✿</span><b>木の実薬</b><small id="potionCount">× 2</small></div><div class="item-slot"><span class="item-icon crystal">✧</span><b>星砂</b><small id="starCount">× 0</small></div><div class="item-slot"><span class="item-icon coin">◉</span><b>ルーン銭</b><small id="coinCount">× 12</small></div></div></section>
+    </aside>
+  </main>
+
+  <section class="lower-layout"><section class="panel-card log-card"><div class="section-heading"><h3>旅の記録</h3><span class="live-dot">● LIVE</span></div><div id="log" class="log-list" aria-live="polite"><p><time>12:00</time><span>風が丘を渡り、遠くの石碑が淡く光っている。</span></p><p><time>12:00</time><span>「星紡ぎの旅人」の物語が始まった。</span></p></div></section><section class="panel-card action-card"><div class="section-heading"><h3>行動</h3><span class="eyebrow">FIELD COMMAND</span></div><div class="action-grid"><button id="talkBtn" class="action-button"><span>◌</span><b>話す</b><small>周囲の気配</small></button><button id="battleBtn" class="action-button"><span>⚔</span><b>戦う</b><small>野生の魔物</small></button><button id="restBtn" class="action-button"><span>☾</span><b>休む</b><small>HP・MPを回復</small></button><button id="mapBtn" class="action-button"><span>⌖</span><b>地図</b><small>旅の道筋</small></button></div></section></section>
+
+  <footer><span>GAME6 <span class="footer-dot">✦</span> オリジナルファンタジーRPG</span><span>冒険の記録はこのブラウザに保存できます</span></footer>
+</div>
+
+<div class="modal-backdrop" id="modal" hidden><section class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><button class="modal-close" id="modalClose" aria-label="閉じる">×</button><p class="eyebrow" id="modalEyebrow">FIELD EVENT</p><h2 id="modalTitle">旅の記録</h2><div id="modalBody" class="modal-body"></div><div id="modalActions" class="modal-actions"></div></section></div>
+<div class="title-screen" id="title"><div class="title-box"><div class="title-star">✦</div><h1>星紡ぎの旅人</h1><p class="title-sub">GAME6</p>
+  <label class="title-name">主人公の名前 <input id="titleName" type="text" maxlength="8" value="主人公" autocomplete="off"></label>
+  <label class="title-name">モンスターが出る 回数 <select id="titleEnc"><option value="0">少なめ</option><option value="1" selected>ふつう</option><option value="2">多め</option></select></label>
+  <p style="font-size:13px;opacity:.8;margin:6px 0">キーボード：矢印キー／WASD で 移動、画面の ボタンでも 遊べます。</p>
+  <div class="title-btns"><button id="titleStart" class="primary" type="button">はじめから</button><button id="titleContinue" type="button">つづきから</button></div>
+  <p class="title-foot"><a href="../login.html">⬅ もどる</a></p></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="game.js?v=5" defer></script>
+<script src="../shared/are-guard.js"></script>
+<script src="../shared/are-pad.js"></script>
+<script src="../shared/are-common.js"></script>
+</body>
+</html>

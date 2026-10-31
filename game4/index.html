@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>ARE CARD 〜そういうときは、AREだ！〜</title>
+<meta name="description" content="3Dの盤面で遊ぶカードバトル（土台版）。デッキを選んでCPUと対戦。ログイン不要・無料。">
+<meta property="og:title" content="ARE CARD 〜そういうときは、AREだ！〜">
+<meta property="og:image" content="https://arechat.github.io/ARE/game4/img/thumb.webp">
+<link rel="icon" type="image/webp" href="img/icon.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700;900&family=Kaisei+Decol:wght@700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="ui">
+  <div id="hudTop"><div class="pbox" id="foeBox"><b id="foeName">CPU</b><span id="foeHp">♥ 20</span><span id="foeLamp">💡 0/0</span><span id="foeHand">🂠 0</span></div></div>
+  <div id="guide" hidden></div><div id="badges"></div><div id="floaters"></div>
+  <div id="hudBottom">
+    <div class="pbox" id="meBox"><b id="meName">あなた</b><span id="meHp">♥ 20</span><span id="meLamp">💡 0/0</span><span id="meAre" title="AREだ！">❗</span></div>
+    <div id="msg"></div>
+    <div class="btns"><button id="btnEnd">ターン終了</button><button id="btnHelp" class="sub">❓あそびかた</button><button id="btnLog" class="sub" type="button">📜ログ</button><button id="btnSort" class="sub" type="button">🔀ならべかえ</button><button id="btnMenu" class="sub">メニュー</button></div>
+  </div>
+  <div id="hand"></div>
+  <div id="detail" hidden></div>
+  <div id="banner" hidden></div>
+  <section id="menu" class="screen">
+    <div class="panel">
+      <h1>ARE CARD</h1><h2>〜そういうときは、AREだ！〜</h2>
+      <p class="sub">3Dの盤面で遊ぶカードバトル（土台版）</p>
+      <div id="deckList"></div>
+      <div class="row"><label>つよさ <select id="level"><option value="0">やさしい</option><option value="1" selected>ふつう</option><option value="2">つよい</option></select></label>
+      <label><input type="checkbox" id="chkSnd" checked> おと</label> <label>音量 <input type="range" id="sndVol" min="0" max="100" style="width:90px"></label> <label>アニメ <select id="animSpeed"><option value="0.6">ゆっくり</option><option value="1" selected>ふつう</option><option value="2">はやい</option></select></label></div>
+      <button id="btnStart" class="big">対戦開始</button>
+      <button id="btnGuide" class="sub" type="button">❓ あそびかたを みる（やさしい説明）</button>
+      <p class="foot"><span id="rec"></span></p>
+      <p class="foot"><a href="../game3/index.html">ARE QUEST 3</a>　<a href="../game2/index.html">ARE QUEST 2</a>　<a href="../game/index.html">ARE QUEST</a>　<a href="../dream-frontier/index.html">ドリームフロンティア</a></p>
+    </div>
+  </section>
+  <section id="result" class="screen" hidden><div class="panel"><h1 id="resTitle"></h1><p id="resText"></p><div class="row"><button id="btnAgain" class="big">もう一度</button><button id="btnToMenu">メニューへ</button></div></div></section>
+  <section id="ask" class="screen" hidden><div class="panel"><h2>ピンチ！</h2><p id="askText"></p><div class="row"><button id="askYes" class="big">そういうときは、AREだ！</button><button id="askNo">つかわない</button></div></div></section>
+  <section id="tuto" class="screen" hidden><div class="panel">
+    <div id="tutoStep" class="tstep"></div><h2 id="tutoT"></h2><div id="tutoBody" class="how"></div>
+    <div class="row"><button id="tutoPrev" class="sub" type="button">◀ まえへ</button><button id="tutoNext" class="big" type="button">つぎへ ▶</button></div>
+    <button id="tutoClose" class="sub" type="button">とじる</button></div></section>
+  <button id="rescueBtn" hidden>⚠ もどす</button>
+</div>
+<script type="module" src="js/main.js"></script>
+<script src="../shared/are-guard.js"></script>
+<script src="../shared/are-pad.js"></script>
+<script src="../shared/are-common.js"></script>
+</body>
+</html>

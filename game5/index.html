@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a1050">
+<title>GAME5 | 推理ゲーム（Windows版・準備中）</title>
+<meta name="description" content="会話と証言から事件を推理する、全10章のオリジナル推理ゲーム（Unreal Engine 5 / C++・Windows PC向け）。現在開発中です。">
+<style>
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(1200px 600px at 50% -10%,#1c2a8a,#0a1050 60%,#050830);color:#eef1ff;font-family:"Hiragino Kaku Gothic ProN","Meiryo",system-ui,sans-serif;line-height:1.75}
+main{max-width:760px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 16px 60px}
+h1{font-size:clamp(26px,6vw,38px);margin:.6em 0 .1em;color:#ffd24a;letter-spacing:.05em}
+h2{font-size:20px;margin:1.6em 0 .4em;border-left:6px solid #ffd24a;padding-left:10px}
+.sub{opacity:.85;margin:0 0 1em}
+.badge{display:inline-block;background:#ffd24a;color:#201400;font-weight:800;border-radius:999px;padding:2px 14px;font-size:14px}
+.card{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.22);border-radius:14px;padding:14px 16px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.grid .card{margin:0}.grid b{color:#ffd24a}
+table{border-collapse:collapse;width:100%;font-size:15px}td,th{border-bottom:1px solid rgba(255,255,255,.18);padding:6px 8px;text-align:left}th{width:9em;opacity:.8;font-weight:600}
+a.btn{display:inline-block;margin:6px 8px 6px 0;padding:10px 18px;border-radius:12px;border:2px solid #cfd8ff;color:#fff;text-decoration:none;background:linear-gradient(180deg,#2a46c8,#1a2c98);font-weight:700}
+a.btn.sub2{background:linear-gradient(180deg,#3a3f5a,#262a40)}
+a.btn[aria-disabled=true]{opacity:.5;pointer-events:none}
+.note{font-size:14px;opacity:.85}
+</style>
+</head>
+<body>
+<main>
+  <span class="badge">🛠 準備中（開発中）</span>
+  <h1>GAME5　推理ゲーム</h1>
+  <p class="sub">会話と証言を集めて、升目（マス目）パズルで事件を解き明かす　全10章のオリジナル推理ゲーム</p>
+
+  <div class="card">
+    <b>⚠ このゲームは ブラウザでは あそべません</b><br>
+    GAME5は <b>Windows パソコン向け</b>のゲーム（Unreal Engine 5 ／ C++ で制作）です。スマホ・ブラウザ上では動きません。
+    完成したら、下の「ダウンロード」から Windows 用のファイルを入手して あそびます。<span class="note">（いまは まだ配布前です）</span>
+  </div>
+
+  <h2>どんなゲーム？</h2>
+  <div class="grid">
+    <div class="card"><b>🗣 会話・証言</b><br>登場人物の話を聞いて、手がかりを集めます。</div>
+    <div class="card"><b>🔲 升目パズル</b><br>2Dのマス目に 答えを入れて 推理します。マスをクリック、または選択肢で回答。</div>
+    <div class="card"><b>🧑 3Dキャラクター</b><br>会話・喜び・驚き・考えこむ表情など、場面に合わせて動きます。</div>
+    <div class="card"><b>📚 全10章</b><br>章ごとに事件と推理問題。クリアすると評価が出ます。やりなおしも可能。</div>
+    <div class="card"><b>💡 ヒント・難易度</b><br>こまったらヒント。難易度は自分で選べます。</div>
+    <div class="card"><b>💾 セーブ</b><br>オートセーブ1枠 ＋ 手動セーブ5枠。</div>
+  </div>
+
+  <h2>ゲーム情報</h2>
+  <div class="card"><table>
+    <tr><th>ジャンル</th><td>推理ゲーム／論理パズル</td></tr>
+    <tr><th>あそぶ場所</th><td>Windows PC（キーボード・マウス）</td></tr>
+    <tr><th>作り方</th><td>Unreal Engine 5 ／ C++ 中心</td></tr>
+    <tr><th>章の数</th><td>全10章</td></tr>
+    <tr><th>料金</th><td>無料の予定</td></tr>
+    <tr><th>状態</th><td>開発中（まだ配布していません）</td></tr>
+  </table></div>
+
+  <h2>ダウンロード</h2>
+  <div class="card">
+    <a class="btn" href="https://github.com/arechat/ARE/releases" target="_blank" rel="noopener">📦 配布ページ（GitHub Releases）</a>
+    <p class="note">完成したら、ここに Windows 用の ZIP ファイルが 置かれます。置かれるまでは ダウンロードできません。</p>
+  </div>
+
+  <h2>ほかの ゲーム（ブラウザで あそべます）</h2>
+  <p>
+    <a class="btn sub2" href="../game/index.html">🗡 ARE QUEST</a>
+    <a class="btn sub2" href="../game2/index.html">📖 ARE QUEST 2</a>
+    <a class="btn sub2" href="../game3/index.html">🌙 ARE QUEST 3</a>
+    <a class="btn sub2" href="../game4/index.html">🃏 ARE CARD</a>
+    <a class="btn sub2" href="../game6/index.html">⭐ GAME6</a>
+  </p>
+  <p><a class="btn sub2" href="../login.html">⬅ もどる</a></p>
+</main>
+</body>
+</html>
