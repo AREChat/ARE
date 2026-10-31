@@ -83,7 +83,7 @@ export class Story{
         const {S, UI} = this.c; const d = this.def;
         S.flags[d.done] = 1; this.log.push(d.n);
         const nx = this.nextOf(d.n);
-        if(nx === undefined){ S.cleared = 1; S.ending = 1; UI.pic && UI.pic(""); this.c.autosave(); await UI.card("ＦＩＮ", "ARE QUEST 3 〜月影のあしあと〜　" + (d.endCard ? d.endCard : "") + "　（つづく）", 3600); this.hud(); UI.toast("🔥 おまけ：原っぱに 5体の ボスが 待っている！（赤い⚔の 目じるし）", 6500); return; }
+        if(nx === undefined){ S.cleared = 1; S.ending = 1; UI.pic && UI.pic(""); this.c.autosave(); await UI.card("ＦＩＮ", "ARE QUEST 3 〜月影のあしあと〜　" + (d.endCard ? d.endCard : "") + (d.final ? "" : "　（つづく）"), 3600); this.hud(); UI.toast("🔥 おまけ：原っぱに 5体の ボスが 待っている！（赤い⚔の 目じるし）", 6500); return; }
         UI.pic && UI.pic("");
         if(d.endCard) await UI.card("第" + (d.endCard.match(/^第(\d+)章/) || [0, ""])[1] + "章　クリア！", d.endCard, 2600);
         else await UI.card(this.label(d.n) + "　クリア！", d.title, 1700);

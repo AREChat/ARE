@@ -1,9 +1,8 @@
 # 機能ロードマップ（T503）
 ## いま（2026-10）
-共通⚙、game1の追加機能、実績ページ、自動チェック(Actions)
+共通⚙、game1の追加機能、実績ページ、自動チェック(Actions)、game3 本編 第21〜100話（最終話まで）
 ## 次
 - 実機確認（iPhone/Android/iPad/Windows）→ `docs/qa-device-checklist.md`
-- game3 の本編 第21話〜（5話ずつ追加）
 - game4 のデッキ編集・カード図鑑
 ## そのあと
 - game3 サブストーリー、専用BGM（ライセンス確認つき）
