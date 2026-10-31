@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+<link rel="icon" href="data:,">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co; media-src 'self' blob: https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.open-meteo.com https://geocoding-api.open-meteo.com; font-src 'self' data:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; manifest-src 'self'">
+<meta name="referrer" content="no-referrer">
+<script src="./guard.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0b1020">
+    <title>ARE | ログイン</title>
+
+    <link rel="stylesheet" href="login.css">
+
+</head>
+
+<body>
+    <div class="background-glow"></div>
+
+    <main class="app">
+        <header class="brand">
+            <div class="brand-logo">A</div>
+            <div>
+                <h1>ARE</h1>
+                <p>REALTIME CHAT</p>
+            </div>
+        </header>
+
+        <!-- ログイン画面 -->
+        <section id="loginView" class="panel">
+            <h2>おかえりなさい</h2>
+            <p class="muted">ログインして会話を始めましょう。</p>
+
+            <form id="loginForm">
+                <label for="loginId">ログインID</label>
+                <input
+                    id="loginId"
+                    name="loginId"
+                    autocomplete="username"
+                    maxlength="80"
+                    required
+                >
+                <p style="font-size:12px;opacity:.8;margin:4px 0 12px">ログインID：登録したときに決めたIDです（表示名とは別です）。</p>
+
+                <label for="loginPassword">パスワード</label>
+                <input
+                    id="loginPassword"
+                    name="password"
+                    type="password"
+                    autocomplete="current-password"
+                    required
+                >
+                <p style="font-size:12px;opacity:.8;margin:4px 0 12px">パスワード：登録したときに決めたパスワードです（復旧コードではありません）。右の目のボタンで、入力内容を表示して確認できます。</p>
+
+                <button id="loginButton" class="primary-button" type="submit">
+                    ログイン
+                </button>
+            </form>
+
+            <div class="button-row">
+                <button id="showRegister" class="button-secondary" type="button">
+                    新規登録
+                </button>
+                <button id="showRecovery" class="button-secondary" type="button">
+                    アカウント復旧
+                </button>
+            </div>
+
+            <p id="loginStatus" class="status-message" role="status" aria-live="polite"></p>
+
+            <div class="button-row" style="margin-top:10px">
+                <a id="openRpg" class="button-secondary" href="./game/index.html" style="display:block;text-align:center;text-decoration:none">
+                    🎮 RPGだけ あそぶ（ログインなし・ずっと無料）
+                </a>
+                <a id="openGame2" class="button-secondary" href="./game2/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
+                    📖 ARE QUEST 2 をあそぶ（ログインなし・無料）
+                </a>
+                <a id="openGame3" class="button-secondary" href="./game3/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
+                    🌙 ARE QUEST 3 〜月影のあしあと〜（ログインなし・無料）
+                </a>
+                <a id="openGame4" class="button-secondary" href="./game4/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
+                    🃏 ARE CARD 〜そういうときは、AREだ！〜（ログインなし・無料）
+                </a>
+                <a id="openGame5" class="button-secondary" href="./game5/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
+                    🔍 GAME5 推理ゲーム（Windows版・準備中）
+                </a>
+                <a id="openGame6" class="button-secondary" href="./game6/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
+                    ⭐ GAME6 星紡ぎの旅人（ログインなし・無料）
+                </a>
+                <a id="openGame7" class="button-secondary" href="./game7/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
+                    🧱 GAME7 ARE BLOCKS（じゃま役／けす役を選べる・ログインなし・無料）
+                </a>
+                <a id="openDream" class="button-secondary" href="./dream-frontier/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
+                    🎡 ドリームフロンティア（ログインなし・無料）
+                </a>
+            </div>
+            <p class="status-message" style="font-size:12px;opacity:.8">RPG『ARE QUEST』『ARE QUEST 2』とテーマパーク『ドリームフロンティア』は、アカウントなし・ポイントなしで遊べます。主人公の名前は「主人公」のままでも、自分で決めてもOKです。</p>
+        </section>
+
+        <!-- ログイン成功後のチャット画面 -->
+
+        <p class="status-message" style="font-size:12px;opacity:.8">ご利用上の注意：運営管理者は、安全管理・不正対策のため会話内容を閲覧でき、バックアップとして保存する場合があります。個人情報や機密情報は送信しないでください。</p>
+        <footer>ARE · CONNECT WITH EVERYONE</footer>
+    </main>
+
+<!-- Supabase、接続設定、共通処理、ログイン画面処理の順に読み込みます -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+    <script src="apikey.js"></script>
+    <script src="system.js"></script>
+    <script src="login.js"></script>
+<script src="./login-games.js"></script>
+<script src="./password-toggle.js"></script>
+<script src="./protect.js"></script>
+</body>
+</html>

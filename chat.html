@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="./icon-192.png">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ARE">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://tile.openstreetmap.org https://*.hf.space https://*.huggingface.co https://huggingface.co; media-src 'self' blob: https://*.supabase.co https://*.hf.space https://*.huggingface.co https://huggingface.co; connect-src 'self' https://cdn.jsdelivr.net https://api.frankfurter.dev https://*.supabase.co wss://*.supabase.co https://api.open-meteo.com https://geocoding-api.open-meteo.com https://huggingface.co https://*.huggingface.co https://*.hf.space wss://*.hf.space; font-src 'self' data:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; manifest-src 'self'">
+<meta name="referrer" content="no-referrer">
+<script src="./guard.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<meta name="theme-color" content="#0b1020">
+<meta name="theme-color" content="#111827">
+<title>ARE | チャット</title>
+<link rel="stylesheet" href="./chat.css">
+</head>
+<body>
+<div class="app" id="app">
+    <nav class="rail" id="rail" aria-label="メインメニュー">
+        <div class="rail-logo">ARE</div>
+        <button class="rail-btn active" data-tab="chats" type="button"><span class="ico">💬</span><span>チャット</span></button>
+        <button class="rail-btn" data-tab="users" type="button"><span class="ico">👥</span><span>ユーザー</span></button>
+        <button class="rail-btn" data-tab="posts" data-feature="posts" type="button"><span class="ico">📷</span><span>投稿</span></button>
+        <button class="rail-btn" data-tab="more" type="button"><span class="ico">🧰</span><span>その他</span></button>
+        <button class="rail-btn" data-tab="me" data-ctx="me" type="button"><span class="ico">👤</span><span>マイページ</span></button>
+    </nav>
+    <aside class="sidebar" id="sidebar" data-tab="chats">
+        <div class="brand">
+            <div><h1>ARE</h1><small>CONNECT YOUR WORLD</small></div>
+            <button class="button-secondary" id="logoutButton" type="button">ログアウト</button>
+        </div>
+        <div class="userbar pane-me" data-ctx="me">
+            <div class="avatar" id="myAvatar">A</div>
+            <div class="user-info"><strong id="myName">読み込み中...</strong><small id="myLoginStatus">接続を確認しています</small></div>
+            <select id="myStatus" class="status-select" aria-label="ステータス"><option value="online">🟢 オンライン</option><option value="busy">🔴 取り込み中</option><option value="away">🟡 待機中</option></select>
+        </div>
+        <div class="sidebar-content">
+            <div class="profile-card pane-me" data-ctx="me"><div class="profile-text" id="profileText"></div><button class="button" id="memoOpenButton" data-feature="memo" type="button">📝 自分専用メモ（Keep）</button><button class="button" id="profileEditButton" data-feature="profile" type="button">✏️ プロフィールを編集</button></div>
+            <div class="profile-card pane-me" id="delCard">
+                <div class="profile-text"><b>アカウントの削除</b><div class="bio" id="delStatus">削除を申請すると、管理者の承認後にアカウントとデータが完全に削除されます（元に戻せません）。</div></div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button-danger" id="delRequestButton" data-feature="account" type="button">アカウント削除を申請</button><button class="button-secondary" id="delCancelButton" type="button" hidden>申請を取り消す</button></div>
+            </div>
+            <div class="profile-card pane-me">
+                <div class="profile-text"><b>会話履歴の保存</b><div class="bio">30日を過ぎた会話は、ZIPファイルとしてこの端末に保存できます（添付ファイルの中身は含まれません）。</div></div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button" id="exportOldButton" data-feature="history" type="button">30日より前をZIP保存</button><button class="button-secondary" id="exportAllButton" data-feature="history" type="button">すべてZIP保存</button></div>
+            </div>
+            <div class="pane pane-more">
+                <div class="section-heading"><h2>🧰 その他</h2></div>
+                <a class="admin-card more-item" href="./help.html" target="_blank" rel="noopener" style="text-decoration:none">📖 操作方法<small class="meta">使い方ガイド（スマホ・パソコン共通）</small></a>
+                <button class="admin-card more-item" data-extra="chatbot" data-feature="extras" type="button">🤖 AIチャットボット<small class="meta">よくある質問に自動で答えます</small></button>
+                <button class="admin-card more-item" data-extra="weather" data-feature="extras" type="button">☀️ 天気予報<small class="meta">地名で検索・7日間の予報</small></button>
+                <button class="admin-card more-item" data-extra="transit" data-feature="extras" type="button">🚆 交通情報<small class="meta">乗換案内・運行状況</small></button>
+            </div>
+            <div class="pane pane-posts">
+                <div class="section-heading"><h2>📷 投稿</h2><select id="postFilter" data-feature="posts" class="status-select" aria-label="表示する投稿"><option value="all">すべて</option><option value="following">フォロー中</option></select><button class="button-secondary" id="postsRefresh" data-feature="posts" type="button">更新</button></div>
+                <div class="post-composer">
+                    <textarea id="postBody" maxlength="500" rows="2" placeholder="いまどうしてる？（500文字まで）"></textarea>
+                    <div class="post-tools"><label class="tool-button">🖼️ 写真<input class="file-input" id="postImage" type="file" accept="image/*"></label><span id="postImageName" class="meta"></span><label class="post-visibility-label">公開範囲<select id="postVisibility" aria-label="投稿の公開範囲"><option value="public">全体公開</option><option value="followers">フォロワーのみ</option><option value="private">自分のみ</option></select></label><button class="button" id="postSubmit" data-feature="posts" type="button">投稿する</button></div>
+                </div>
+                <div id="postFeed" class="post-feed"><div class="empty-list">読み込み中...</div></div>
+                <button class="button-secondary post-more" id="postMore" type="button" hidden>さらに読み込む</button>
+            </div>
+            <button class="button admin-tab pane-me" id="adminTabButton" data-feature="admin" type="button" hidden>🛡️ 管理者パネル <span id="adminBadge" class="badge"></span></button>
+            <p class="me-note pane-me">ご注意：運営管理者は、安全管理・不正対策のため会話内容を閲覧でき、バックアップとして保存する場合があります。個人情報や機密情報は送信しないでください。</p>
+            <p class="security-banner pane-me" id="securityBanner" hidden></p>
+            <label class="me-toggle pane-me"><input type="checkbox" id="readReceiptToggle" checked> 既読を相手に表示する<small>オフにすると、あなたが読んでも相手には「既読」と表示されません。</small></label>
+            <div class="pane pane-users">
+            <div class="section-heading"><h2>🔎 ユーザーを探す</h2><button class="button-secondary" id="toggleHiddenUsers" data-feature="follow" type="button">非表示（0）</button><button class="button-secondary" id="refreshUsersButton" type="button">更新</button></div>
+            <input class="search" id="userSearch" type="search" placeholder="ユーザー名を検索..." autocomplete="off">
+            <div class="user-list" id="recommendedUsers"><div class="empty-list">上の検索バーに名前を入力すると、ユーザーが表示されます。</div></div>
+            </div>
+            <div class="pane pane-chats">
+            <div class="section-heading"><h2>💬 チャット</h2><button class="button-secondary" id="newGroupButton" data-feature="groups" type="button">👥 グループ作成</button><button class="button-secondary" id="refreshRoomsButton" type="button">更新</button></div>
+            <div class="room-list" id="roomList"><div class="empty-list">チャットを読み込んでいます...</div></div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="chat-header">
+            <button class="button-secondary mobile-back" id="backButton" type="button">← 戻る</button>
+            <div class="avatar" id="chatAvatar">💬</div>
+            <div class="person-text"><h2 id="chatTitle">AREへようこそ</h2><p id="chatSubtitle">チャット相手を選択してください</p></div>
+            <button class="button-secondary" id="searchBtn" data-feature="search" type="button" title="メッセージ検索" aria-label="メッセージ検索">🔍</button>
+            <button class="button-secondary" id="blockBtn" data-feature="block" type="button" hidden title="ブロック・ミュート" aria-label="ブロック・ミュート">🚫</button>
+            <button class="button-secondary" id="refreshMessagesButton" type="button" disabled>更新</button>
+        </header>
+
+        <div class="status" id="pageStatus" role="status" aria-live="polite"></div>
+        <button class="pin-bar" id="pinBar" data-feature="pin" type="button" hidden></button>
+
+        <section class="messages" id="messages" aria-live="polite">
+            <div class="welcome"><div class="welcome-icon">✉️</div><h2>会話を始めよう</h2><div>おすすめユーザーを選択するか、既存のチャットを開いてください。</div></div>
+        </section>
+
+        <section class="composer">
+            <div class="typing-line" id="typingLine" aria-live="polite"></div>
+            <div class="composer-tools">
+                <button class="tool-button" id="photoButton" data-feature="camera" type="button">📷 写真</button>
+                <input class="file-input" id="imageInput" type="file" accept="image/*" multiple>
+                <label class="tool-button" for="fileInput">📎 ファイルを選択</label>
+                <input class="file-input" id="fileInput" type="file" multiple accept=".pdf,.docx,.xlsx,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation">
+                <label class="tool-button" for="videoInput">🎬 動画を選択</label>
+                <input class="file-input" id="videoInput" type="file" accept="video/*">
+                <button class="tool-button" id="emojiButton" data-feature="stamps" type="button">😊 絵文字・スタンプ</button>
+                <button class="tool-button" id="voiceButton" data-feature="voice" data-needs-room type="button" disabled>🎤 音声</button>
+                <button class="tool-button" id="voiceCancel" data-feature="voice" type="button" hidden>✖ 録音を取消</button>
+                <button class="tool-button" id="ttlButton" data-feature="timed" data-needs-room type="button" disabled>⏳ 消えるメッセージ</button>
+                <button class="tool-button" id="vsButton" data-feature="vs" data-needs-room type="button" disabled>🎮 対戦</button>
+                <button class="tool-button" id="gifButton" data-feature="misc" data-needs-room type="button" disabled>🎞️ GIF</button>
+                <input class="file-input" id="gifInput" type="file" accept="image/gif">
+                <button class="tool-button" id="summaryButton" data-feature="misc" data-needs-room type="button" disabled>📝 要約して</button>
+                <button class="tool-button" id="locationButton" data-feature="location" type="button">📍 位置情報</button>
+                <button class="tool-button" id="dictateButton" data-feature="ai" type="button">🎙️ 音声入力</button>
+                <button class="tool-button" id="scheduleButton" data-feature="messages" type="button" disabled>🕒 予約送信</button>
+                <span id="attachmentStatus" style="font-size:11px;color:var(--muted)"></span>
+            </div>
+            <div class="schedule-panel" id="schedulePanel" hidden>
+                <label>送信日時 <input type="datetime-local" id="scheduleAt"></label>
+                <button class="button" id="scheduleSubmit" type="button">この日時に予約</button>
+                <button class="button-secondary" id="scheduleClose" type="button">閉じる</button>
+                <div id="scheduleList" class="schedule-list"></div>
+            </div>
+            <div class="composer-bottom">
+                <textarea id="messageInput" maxlength="2000" placeholder="メッセージを入力...（Enterで送信、Shift+Enterで改行）" disabled></textarea>
+                <button class="button" id="sendButton" type="button" disabled>送信</button>
+            </div>
+            <div class="char-count"><span id="charCount">0</span> / 2,000文字</div>
+        </section>
+    </main>
+</div>
+<section class="admin-panel" id="adminPanel" hidden aria-label="管理者パネル">
+    <header><b>🛡️ 管理者パネル</b><span class="admin-note">閲覧・承認の操作はすべて監査ログに記録されます</span>
+        <button class="button-secondary" data-admin-view="rooms" type="button">会話一覧</button>
+        <button class="button-secondary" data-admin-view="requests" type="button">削除申請</button>
+        <button class="button-secondary" data-admin-view="reports" type="button">通報</button>
+        <button class="button-secondary" data-admin-view="ng" type="button">NG制裁</button>
+        <button class="button-secondary" data-admin-view="stats" type="button">利用状況</button>
+        <button class="button-secondary" data-admin-view="announce" type="button">お知らせ</button>
+        <button class="button-secondary" data-admin-view="shop" type="button">ショップ管理</button>
+        <button class="button-secondary" data-admin-view="users" type="button">ユーザー管理</button>
+        <button class="button-secondary" data-admin-view="acctdel" type="button">アカウント削除</button>
+        <button class="button-secondary" data-admin-view="security" type="button">セキュリティ</button>
+        <button class="button-secondary" data-admin-view="backup" type="button">バックアップ</button>
+        <button class="button-secondary" id="adminClose" type="button">閉じる</button></header>
+    <div class="admin-body" id="adminBody"></div>
+</section>
+<section class="admin-panel" id="extraPanel" hidden aria-label="その他"><header><button class="button-secondary" id="extraBack" type="button">← 戻る</button><b id="extraTitle"></b></header><div class="admin-body" id="extraBody"></div></section>
+<div class="modal" id="profileModal" hidden><div class="sheet" id="profileSheet"></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="./apikey.js"></script>
+<script src="./password-toggle.js"></script>
+<script src="./system.js"></script>
+<script src="./chat-qa.js"></script>
+<script src="./extras.js"></script>
+<script src="./chat-base.js"></script>
+<script src="./chat-feat.js"></script>
+<script src="./chat-presence.js"></script>
+<script src="./chat-messages.js"></script>
+<script src="./chat-profile.js"></script>
+<script src="./chat-posts.js"></script>
+<script src="./chat-follow.js"></script>
+<script src="./chat-groups.js"></script>
+<script src="./chat-history.js"></script>
+<script src="./chat-account.js"></script>
+<script src="./chat-admin.js"></script>
+<script src="./chat-admin-users.js"></script>
+<script src="./chat-msgmenu.js"></script>
+<script src="./chat-reply.js"></script>
+<script src="./chat-forward.js"></script>
+<script src="./chat-react.js"></script>
+<script src="./chat-pin.js"></script>
+<script src="./chat-block.js"></script>
+<script src="./chat-search.js"></script>
+<script src="./chat-typing.js"></script>
+<script src="./chat-voice.js"></script>
+<script src="./chat-stamps.js"></script>
+<script src="./chat-mention.js"></script>
+<script src="./qr.js"></script>
+<script src="./chat-tools.js"></script>
+<script src="./chat-story.js"></script>
+<script src="./chat-profile-3d.js"></script>
+<script src="./chat-security.js"></script>
+<script src="./chat-storage-admin.js"></script>
+<script src="./chat-auto-reply.js"></script>
+<script src="./chat-album.js"></script>
+<script src="./chat-imgedit.js"></script>
+<script src="./chat-location.js"></script>
+<script src="./chat-share.js"></script>
+<script src="./chat-games.js"></script>
+<script src="./chat-game-play.js"></script>
+<script src="./chat-planner.js"></script>
+<script src="./chat-prefs.js"></script>
+<script src="./chat-lang.js"></script>
+<script src="./chat-camera.js"></script>
+<script src="./chat-ctx.js"></script>
+<script src="./chat-memo.js"></script>
+<script src="./chat-timed.js"></script>
+<script src="./chat-co2.js"></script>
+<script src="./chat-ai.js"></script>
+<script src="./chat-vs.js"></script>
+<script src="./chat-shogi.js"></script>
+<script src="./chat-esh-dict.js"></script>
+<script src="./chat-vs2.js"></script>
+<script src="./chat-vs-pin.js"></script>
+<script src="./chat-notify.js"></script>
+<script src="./chat-myai.js"></script>
+<script src="./chat-quicksend.js"></script>
+<script src="./chat-avatar.js"></script>
+<script src="./chat-sites.js"></script>
+<script src="./chat-bj.js"></script>
+<script src="./chat-cards.js"></script>
+<script src="./chat-work.js"></script>
+<script src="./chat-thread.js"></script>
+<script src="./chat-misc.js"></script>
+<script src="./chat-health.js"></script>
+<script src="./chat-geo.js"></script>
+<script src="./chat-push.js"></script>
+<script src="./chat-comfort.js"></script>
+<script src="./chat-nick.js"></script>
+<script src="./chat-draw.js"></script>
+<script src="./chat-split.js"></script>
+<script src="./chat-board.js"></script>
+<script src="./chat-livenote.js"></script>
+<script src="./chat-report.js"></script>
+<script src="./chat-live.js"></script>
+<script src="./chat-ocr.js"></script>
+<script src="./chat-contact.js"></script>
+<script src="./chat-self.js"></script>
+<script src="./chat-timer.js"></script>
+<script src="./chat-calc.js"></script>
+<script src="./chat-shop.js"></script>
+<script src="./chat-lock.js"></script>
+<script src="./chat-admin2.js"></script>
+<script src="./chat-fun.js"></script>
+<script src="./chat-rpg.js"></script>
+<script src="./chat-ng.js"></script>
+<script src="./chat-points.js"></script>
+<script src="./chat-quick.js"></script>
+<script src="./chat-ai-studio.js"></script>
+<script src="./chat-main.js"></script>
+<script src="./link-copy.js"></script>
+<script src="./chat-layout.js"></script>
+<script src="./sw-update.js"></script>
+<script src="./protect.js"></script>
+</body>
+</html>

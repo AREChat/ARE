@@ -1,0 +1,230 @@
+"use strict";
+
+// ===== 起動（機能ごとに別々に起動します。1つが壊れても、ほかの機能は動きます） =====
+
+function initPresence(){
+    el.myStatus.value = feat.manual;
+    el.myStatus.addEventListener("change",() => {
+        feat.manual = el.myStatus.value;
+        try{ localStorage.setItem("are_manual_status",feat.manual); }catch(_e){ /* 保存できなくても続ける */ }
+        sendPresence();
+    });
+    el.readReceiptToggle.addEventListener("change",async () => {
+        const wanted = el.readReceiptToggle.checked;
+        try{
+            const result = await requireClient().rpc("set_my_read_receipts",{p_enabled:wanted});
+            if(result.error) throw result.error;
+            showToast(wanted ? "既読を相手に表示します。" : "既読を相手に表示しません。");
+        }catch(error){
+            el.readReceiptToggle.checked = !wanted;
+            showToast(featError(error));
+        }
+    });
+    ["mousemove","keydown","touchstart","click"].forEach((name) => window.addEventListener(name,onActivity,{passive:true}));
+    document.addEventListener("visibilitychange",() => { if(!document.hidden){ onActivity(); markRead(); } });
+    sendPresence();
+    refreshPresence();
+    feat.timers.push(setInterval(sendPresence,30000),setInterval(refreshPresence,30000),setInterval(pollRoom,8000));
+}
+
+function initMessageTools(){
+    el.messages.addEventListener("click",onMessageAction);
+    el.scheduleButton.addEventListener("click",toggleSchedule);
+    el.scheduleClose.addEventListener("click",() => { el.schedulePanel.hidden = true; });
+    el.scheduleSubmit.addEventListener("click",scheduleSend);
+    el.scheduleList.addEventListener("click",onScheduleListClick);
+}
+
+function initProfile(){
+    renderProfileText();
+    el.profileEditButton.addEventListener("click",openProfileEditor);
+    el.profileModal.addEventListener("click",onSheetClick);
+    el.profileModal.addEventListener("change",onSheetChange);
+    el.chatTitle.style.cursor = "pointer";
+    el.chatTitle.addEventListener("click",() => {
+        if(state.currentRoom?.is_group) openGroupInfo();
+        else if(state.currentPartner) openProfileView(state.currentPartner);
+    });
+}
+
+function initPosts(){
+    el.postFilter.addEventListener("change",() => loadPosts(true));
+    el.postsRefresh.addEventListener("click",() => loadPosts(true));
+    el.postMore.addEventListener("click",() => loadPosts(false));
+    el.postSubmit.addEventListener("click",submitPost);
+    el.postFeed.addEventListener("click",onFeedClick);
+    el.postImage.addEventListener("change",() => {
+        feat.postImageFile = el.postImage.files[0] || null;
+        el.postImageName.textContent = feat.postImageFile ? feat.postImageFile.name : "";
+    });
+}
+
+function initFollow(){
+    el.toggleHiddenUsers.addEventListener("click",() => { state.showHidden = !state.showHidden; loadRecommendations(); });
+    loadMyFollowCounts();
+}
+
+function initGroups(){
+    el.newGroupButton.addEventListener("click",openGroupCreator);
+    el.profileModal.addEventListener("click",onGroupAction);
+    el.profileModal.addEventListener("input",onPickInput);
+    el.profileModal.addEventListener("change",onPickChange);
+    el.profileModal.addEventListener("keydown",onGroupKey);
+    acceptGroupInviteFromUrl();
+}
+
+function initHistory(){
+    el.exportOldButton.addEventListener("click",() => exportHistory("old"));
+    el.exportAllButton.addEventListener("click",() => exportHistory("all"));
+    setTimeout(maybePromptExport,4000);
+}
+
+function initAccount(){
+    loadMySettings();
+    el.delRequestButton.addEventListener("click",requestMyDeletion);
+    el.delCancelButton.addEventListener("click",cancelMyDeletion);
+    loadMyDeletion();
+}
+
+function initAdmin(){
+    el.profileModal.addEventListener("click",onDelSheet);
+    el.adminPanel.addEventListener("click",onAcctDelClick);
+    el.adminTabButton.addEventListener("click",() => { el.adminPanel.hidden = false; renderAdmin(); });
+    el.adminClose.addEventListener("click",() => { el.adminPanel.hidden = true; });
+    el.adminPanel.addEventListener("click",(event) => {
+        const view = event.target.closest("[data-admin-view]");
+        if(view){ feat.adminView = view.dataset.adminView; renderAdmin(); return; }
+        onAdminClick(event);
+    });
+    checkAdmin();
+}
+
+function initAdminUsers(){
+    el.profileModal.addEventListener("click",onAdminAction);
+    el.adminPanel.addEventListener("click",onBackupClick);
+}
+
+function initExtras(){
+    if(!window.AREExtras) throw new Error("extras.js が読み込まれていません。");
+}
+
+const FEATURES = [
+    ["sites","よく使うサイト",initSites],
+    ["avatar","アバター",initAvatar],
+    ["quicksend","スクショ・PDFのかんたん送信",initQuickSend],
+    ["myai","マイAI",initMyAi],
+    ["notify","未読バッジ・新着通知",initNotify],
+    ["presence","在席状況・既読",initPresence],
+    ["messages","メッセージの編集・削除申請・予約送信",initMessageTools],
+    ["profile","プロフィール",initProfile],
+    ["posts","投稿",initPosts],
+    ["profile3d","3Dプロフィールカード",initProfile3D],
+    ["security","管理者TOTP認証",initSecurity],
+    ["storage","Storage使用量と整理",initStorageAdmin],
+    ["autoreply","自動応答",initAutoReply],
+    ["follow","フォロー・非表示",initFollow],
+    ["groups","グループチャット",initGroups],
+    ["history","会話履歴のZIP保存",initHistory],
+    ["account","アカウント削除の申請",initAccount],
+    ["admin","管理者パネル",initAdmin],
+    ["adminUsers","アカウントの作成・編集・バックアップ",initAdminUsers],
+    ["extras","チャットボット・天気・交通",initExtras],
+    ["msgmenu","メッセージ操作メニュー",initMsgMenu],
+    ["reply","返信・引用",initReply],
+    ["forward","メッセージの転送",initForward],
+    ["react","絵文字リアクション",initReact],
+    ["pin","メッセージの固定",initPin],
+    ["block","ブロック・ミュート",initBlock],
+    ["search","メッセージ検索",initSearch],
+    ["typing","入力中の表示",initTyping],
+    ["voice","音声メッセージ",initVoice],
+    ["stamps","絵文字・スタンプ",initStamps],
+    ["mention","メンション",initMention],
+    ["tools","ツール入口",initTools],
+    ["aistudio","AI画像・動画生成",initAiStudio],
+    ["push","通知・ホーム画面",initPush],
+    ["drafts","下書きの自動保存",initDrafts],
+    ["phrases","定型文",initPhrases],
+    ["comfort","見やすさ・読み上げ",initA11y],
+    ["jump","未読・日付ジャンプ",initJump],
+    ["stars","スター付きメッセージ",initStars],
+    ["folders","チャットのフォルダ分け",initFolders],
+    ["nick","名前の変更・入力中表示",initNick],
+    ["draw","お絵かき",initDraw],
+    ["mystamp","自作スタンプ",initMyStamp],
+    ["split","割り勘計算",initSplit],
+    ["board","日程調整ボード",initBoard],
+    ["live","ライブ位置共有",initLive],
+    ["ocr","画像の文字読み取り",initOcr],
+    ["contact","連絡先・QR友だち追加",initContact],
+    ["report","通報",initReport],
+    ["diary","日記",initDiary],
+    ["habit","習慣トラッカー",initHabit],
+    ["budget","家計簿",initBudget],
+    ["timer","タイマー",initTimer],
+    ["calc","電卓・換算",initCalc],
+    ["shop","買い物リスト",initShop],
+    ["lock","ロック・自動ログアウト",initLock],
+    ["announce","お知らせ",initAnnounce],
+    ["fun","じゃんけん・ルーレット・あみだ",initFun],
+    ["rpg","ARE 〜そういうときは、AREだ！〜（RPG）",initRpg],
+    ["game2","ARE QUEST 2",initGame2],
+    ["game3","ARE QUEST 3",initGame3],
+    ["game4","ARE CARD",initGame4],
+    ["dream","ドリームフロンティア",initDream],
+    ["ng","NGワード制裁",initNg],
+    ["points","ポイント・AREShop",initPoints],
+    ["story","ストーリー",initStory],
+    ["album","アルバム",initAlbum],
+    ["imgedit","画像編集",initImgEdit],
+    ["location","位置情報",initLocation],
+    ["share","プロフィール共有・QR",initShare],
+    ["games","ゲーム",() => { initGames(); }],
+    ["planner","タスク・カレンダー",initPlanner],
+    ["prefs","表示設定",initPrefs],
+    ["lang","多言語UI",initLang],
+    ["camera","写真・カメラ",initCamera],
+    ["ctx","長押し・右クリックメニュー",initCtx],
+    ["memo","自分専用メモ",initMemo],
+    ["timed","消えるメッセージ",initTimed],
+    ["co2","CO2トラッカー",initCo2],
+    ["ai","会話分析・音声入力・翻訳",initAi],
+    ["vs","対戦ゲーム",initVs],
+    ["vspin","対戦パネル（盤を上に固定）",initVsPin],
+    ["bj","ブラックジャック",initBj],
+    ["cards","手札かくしカードゲーム",initCards],
+    ["work","ワークスペース",initWork],
+    ["thread","スレッド・保存ボタン",initThread],
+    ["misc","GIF・要約・気分テーマ",initMisc],
+    ["mood","気分テーマ画面",function(){}],
+    ["health","ヘルス記録",initHealth],
+    ["geo","場所つきメッセージ",initGeo],
+    ["sched","予定提案",function(){}],
+    ["archive","ストーリーのアーカイブ",() => {}],
+    ["quick","ショートカット・その他の検索・フォロー一覧",initQuick]
+];
+
+function startFeatures(){
+    window.AREHooks = {
+        getRoom:() => state.currentRoom,
+        getPartner:() => state.currentPartner,
+        me:() => ({id:state.user.id,name:profileDisplayName(state.profile)}),
+        rooms:() => state.rooms,
+        refreshRooms:() => loadRooms(),
+        toast:showToast,
+    };
+    FEATURES.forEach((feature) => {
+        try{
+            feature[2]();
+            window.AREFeatures.register(feature[0],feature[1],true);
+        }catch(error){
+            window.AREFeatures.register(feature[0],feature[1],false,error);
+        }
+    });
+    window.AREFeatures.banner();
+}
+
+initialize().catch((error) => {
+    console.error("ARE initialization failed:",error);
+    window.AREFeatures.notify("アプリの起動に失敗しました。ページを再読み込みしてください。");
+});
