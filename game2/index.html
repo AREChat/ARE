@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0a1050">
+<title>ARE QUEST 2 〜AREを入手せよ〜（試作）</title>
+<link rel="icon" type="image/webp" href="img/icon.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Noto+Serif+JP:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<script src="js/guard.js"></script>
+</head>
+<body data-mode="title">
+<div id="app">
+  <canvas id="gl"></canvas>
+  <div id="ui">
+    <div id="autoBadge" hidden>▶▶ AUTO</div>
+    <div id="hud" hidden><div id="hudL"><b id="hudCh"></b><span id="hudObj"></span></div><div id="hudR"><span id="hudGold"></span><span id="hudDbg"></span></div></div>
+    <div id="zoneBadge" hidden></div>
+    <div id="prompt" hidden>💬 話す</div>
+    <div id="floaters"></div>
+    <div id="toast" hidden></div>
+    <div id="dlg" hidden><span class="who" id="dlgWho"></span><div id="dlgText"></div><span class="nx">▼</span><i id="dlgBar"></i>
+      <div class="dlgBtns"><button id="autoBtn" type="button">▶ オート</button><button id="skipBtn" type="button">⏭ スキップ</button></div></div>
+    <div id="menu" class="win" hidden><h3 id="menuTitle"></h3><div id="menuList"></div><div id="menuHint"></div></div>
+    <div id="bt" hidden>
+      <div id="btParty"></div>
+      <div id="btCmd" class="win" hidden></div>
+      <div id="btMsg" class="win"><div class="bi" id="btLog"></div></div>
+    </div>
+    <div id="card" hidden><div><h1 id="cardT"></h1><p id="cardS"></p></div></div>
+    <div id="flash"></div>
+    <div id="wipe" hidden></div>
+    <div id="touch">
+      <div id="stick"><div id="knob"></div></div>
+      <div id="tbtns"><button type="button" data-btn="camL">⟲</button><button type="button" data-btn="camR">⟳</button><button type="button" data-btn="menu">☰</button><button type="button" data-btn="ok" class="big">A</button></div>
+    </div>
+    <div id="rot" hidden>📱 横向きにすると遊びやすいです <button type="button" id="rotX">×</button></div>
+  </div>
+  <div id="title" class="screen"><div class="tbox win">
+    <h1>ARE QUEST 2</h1><p class="sub">〜AREを入手せよ〜</p><p class="tag">3D 試作版（GitHub Pages・無料枠）</p>
+    <label class="nm">主人公の名前 <input id="nameIn" type="text" maxlength="8" value="主人公"></label>
+    <label class="nm">よみがな（声で よむとき用） <input id="yomiIn" type="text" maxlength="16" placeholder="例：たろう（漢字の名前のときに）"></label>
+    <div id="titleBtns"></div>
+    <p class="foot" id="titleFoot"></p><p class="foot"><a href="manual.html" target="_blank" rel="noopener" style="color:#ffd24a">📖 手順書（あそびかた・公開のしかた）</a></p>
+  </div></div>
+  <div id="help" hidden><div class="win"><h3>そうさの せつめい</h3>
+<table>
+<tr><td>うごく</td><td><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> または 矢印キー ／ コントローラー：左スティック・十字キー ／ スマホ：左の丸いスティック</td></tr>
+<tr><td>はしる</td><td><kbd>Shift</kbd>を押しながら ／ コントローラー：Bボタン（Xbox系は右ボタン）を押しながら</td></tr>
+<tr><td>話す・決定</td><td><kbd>Space</kbd> <kbd>Enter</kbd> <kbd>F</kbd> ／ コントローラー：Aボタン ／ スマホ：右下の「A」・文字ボックスをタップ</td></tr>
+<tr><td>もどる・スキップ</td><td><kbd>X</kbd> <kbd>Backspace</kbd> <kbd>Esc</kbd>（メニュー中は戻る、会話中はスキップ）／ コントローラー：Bボタン</td></tr>
+<tr><td>メニュー</td><td><kbd>Esc</kbd> <kbd>Tab</kbd> <kbd>M</kbd> <kbd>I</kbd> ／ コントローラー：＋ または X ／ スマホ：☰</td></tr>
+<tr><td>オート会話</td><td><kbd>V</kbd> ／ コントローラー：Y または − ／ 会話ボックスの「オート」ボタン（ONの間は画面上に AUTO が出ます）</td></tr>
+<tr><td>カメラ</td><td><kbd>Q</kbd> <kbd>E</kbd> ／ マウス・指でドラッグ ／ コントローラー：L・R・ZL・ZR・右スティック</td></tr>
+<tr><td>戦闘</td><td>↑↓で選んで決定。「おまかせ」で自動戦闘（X / Esc で解除）</td></tr>
+</table><p style="text-align:right"><button type="button" id="helpX">とじる</button></p></div></div>
+<div id="fail" class="screen" hidden><div class="tbox win"><h2>ゲームを 起動できませんでした</h2><p>この端末・ブラウザでは3D表示を開始できませんでした。ブラウザを更新するか、別のブラウザ（Chrome・Safari・Edge）でお試しください。</p><pre id="failMsg"></pre></div></div>
+</div>
+<script type="module" src="js/main.js"></script>
+<script src="../shared/are-guard.js"></script>
+<script src="../shared/are-common.js"></script>
+</body>
+</html>

@@ -1,0 +1,416 @@
+{
+ "version": 1,
+ "title": "AREを入手せよ",
+ "chapters": [
+  {
+   "n": 1,
+   "title": "伝説の始まり",
+   "file": "ch/ch01.json",
+   "map": "town"
+  },
+  {
+   "n": 2,
+   "title": "激震が走る",
+   "file": "ch/ch02.json",
+   "map": "town"
+  },
+  {
+   "n": 3,
+   "title": "伝説の秘宝",
+   "file": "ch/ch03.json",
+   "map": "street"
+  },
+  {
+   "n": 4,
+   "title": "見過ごされた神託",
+   "file": "ch/ch04.json",
+   "map": "town"
+  },
+  {
+   "n": 5,
+   "title": "リクエスト招待",
+   "file": "ch/ch05.json",
+   "map": "field"
+  },
+  {
+   "n": 6,
+   "title": "確実な入手経路",
+   "file": "ch/ch06.json",
+   "map": "town"
+  },
+  {
+   "n": 7,
+   "title": "迷惑メールの森",
+   "file": "ch/ch07.json",
+   "map": "field"
+  },
+  {
+   "n": 8,
+   "title": "期限切れ",
+   "file": "ch/ch08.json",
+   "map": "town"
+  },
+  {
+   "n": 9,
+   "title": "悲劇〜チャンスの喪失",
+   "file": "ch/ch09.json",
+   "map": "town"
+  },
+  {
+   "n": 10,
+   "title": "新たなる希望",
+   "file": "ch/ch10.json",
+   "map": "street"
+  },
+  {
+   "n": 11,
+   "title": "古来より伝わる最終手段",
+   "file": "ch/ch11.json",
+   "map": "field"
+  },
+  {
+   "n": 12,
+   "title": "その名は店頭販売",
+   "file": "ch/ch12.json",
+   "map": "street"
+  },
+  {
+   "n": 13,
+   "title": "情報収集",
+   "file": "ch/ch13.json",
+   "map": "town"
+  },
+  {
+   "n": 14,
+   "title": "作戦会議",
+   "file": "ch/ch14.json",
+   "map": "town"
+  },
+  {
+   "n": 15,
+   "title": "決戦の日は発売から2週間後",
+   "file": "ch/ch15.json",
+   "map": "street"
+  },
+  {
+   "n": 16,
+   "title": "ライバルは65人",
+   "file": "ch/ch16.json",
+   "map": "street"
+  },
+  {
+   "n": 17,
+   "title": "前夜の準備",
+   "file": "ch/ch17.json",
+   "map": "town"
+  },
+  {
+   "n": 18,
+   "title": "行列のはじまり",
+   "file": "ch/ch18.json",
+   "map": "street"
+  },
+  {
+   "n": 19,
+   "title": "開店前",
+   "file": "ch/ch19.json",
+   "map": "street"
+  },
+  {
+   "n": 20,
+   "title": "開店ダッシュ",
+   "file": "ch/ch20.json",
+   "map": "street"
+  },
+  {
+   "n": 21,
+   "title": "人混みの中を",
+   "file": "ch/ch21.json",
+   "map": "store"
+  },
+  {
+   "n": 22,
+   "title": "棚の前の攻防",
+   "file": "ch/ch22.json",
+   "map": "store"
+  },
+  {
+   "n": 23,
+   "title": "最後の棚",
+   "file": "ch/ch23.json",
+   "map": "store"
+  },
+  {
+   "n": 24,
+   "title": "そして、ついに…！",
+   "file": "ch/ch24.json",
+   "map": "store"
+  },
+  {
+   "n": 25,
+   "title": "ミッションコンプリート",
+   "file": "ch/ch25.json",
+   "map": "store"
+  },
+  {
+   "n": 26,
+   "title": "伝説の入手",
+   "file": "ch/ch26.json",
+   "map": "street"
+  },
+  {
+   "n": 27,
+   "title": "エピローグ〜教訓その1",
+   "file": "ch/ch27.json",
+   "map": "town"
+  },
+  {
+   "n": 28,
+   "title": "教訓その2",
+   "file": "ch/ch28.json",
+   "map": "street"
+  },
+  {
+   "n": 29,
+   "title": "教訓その3",
+   "file": "ch/ch29.json",
+   "map": "town"
+  },
+  {
+   "n": 30,
+   "title": "あだ名は店人公",
+   "file": "ch/ch30.json",
+   "map": "town"
+  },
+  {
+   "n": 31,
+   "title": "いつもの放課後",
+   "file": "ch/ch31.json",
+   "map": "street",
+   "lbl": "前日譚 第1話"
+  },
+  {
+   "n": 32,
+   "title": "大会へのお誘い",
+   "file": "ch/ch32.json",
+   "map": "street",
+   "lbl": "前日譚 第2話"
+  },
+  {
+   "n": 33,
+   "title": "予選のあとで",
+   "file": "ch/ch33.json",
+   "map": "town",
+   "lbl": "前日譚 第3話"
+  },
+  {
+   "n": 34,
+   "title": "うわさのティザー",
+   "file": "ch/ch34.json",
+   "map": "town",
+   "lbl": "前日譚 第4話"
+  },
+  {
+   "n": 35,
+   "title": "古い店頭販売の作法",
+   "file": "ch/ch35.json",
+   "map": "street",
+   "lbl": "前日譚 第5話"
+  },
+  {
+   "n": 36,
+   "title": "ためる、がまんする",
+   "file": "ch/ch36.json",
+   "map": "town",
+   "lbl": "前日譚 第6話"
+  },
+  {
+   "n": 37,
+   "title": "4人の約束",
+   "file": "ch/ch37.json",
+   "map": "town",
+   "lbl": "前日譚 第7話"
+  },
+  {
+   "n": 38,
+   "title": "前夜",
+   "file": "ch/ch38.json",
+   "map": "home",
+   "lbl": "前日譚 第8話"
+  },
+  {
+   "n": 39,
+   "title": "十年目の朝",
+   "file": "ch/ch39.json",
+   "map": "town",
+   "lbl": "後日譚 第1話"
+  },
+  {
+   "n": 40,
+   "title": "十年目の行列",
+   "file": "ch/ch40.json",
+   "map": "store",
+   "lbl": "後日譚 第2話"
+  },
+  {
+   "n": 41,
+   "title": "十年後のミオ",
+   "file": "ch/ch41.json",
+   "map": "town",
+   "lbl": "後日譚 第3話"
+  },
+  {
+   "n": 42,
+   "title": "あだ名は、いまも",
+   "file": "ch/ch42.json",
+   "map": "town",
+   "lbl": "後日譚 第4話"
+  }
+ ],
+ "bgm": {
+  "13": {
+   "field": "sea",
+   "town": "sea",
+   "street": "sea"
+  },
+  "14": {
+   "field": "sea",
+   "town": "sea",
+   "street": "sea"
+  },
+  "15": {
+   "field": "sea",
+   "town": "sea",
+   "street": "sea"
+  },
+  "19": {
+   "town": "castle",
+   "street": "castle",
+   "store": "castle"
+  },
+  "20": {
+   "town": "castle",
+   "street": "castle",
+   "store": "castle"
+  },
+  "21": {
+   "town": "castle",
+   "street": "castle",
+   "store": "castle"
+  },
+  "22": {
+   "town": "castle",
+   "street": "castle",
+   "store": "castle"
+  },
+  "23": {
+   "town": "demoncastle",
+   "street": "demoncastle",
+   "store": "demoncastle",
+   "field": "demoncastle"
+  },
+  "24": {
+   "town": "demoncastle",
+   "street": "demoncastle",
+   "store": "demoncastle",
+   "field": "demoncastle"
+  },
+  "25": {
+   "town": "demoncastle",
+   "street": "demoncastle",
+   "store": "demoncastle",
+   "field": "demoncastle"
+  },
+  "26": {
+   "town": "demoncastle",
+   "street": "demoncastle",
+   "store": "demoncastle",
+   "field": "demoncastle"
+  }
+ },
+ "encByChapter": [
+  [
+   1,
+   [
+    "poyon",
+    "yorubat"
+   ]
+  ],
+  [
+   7,
+   [
+    "poyon",
+    "yorubat",
+    "masshu"
+   ]
+  ],
+  [
+   13,
+   [
+    "yorubat",
+    "masshu",
+    "oboron"
+   ]
+  ],
+  [
+   19,
+   [
+    "masshu",
+    "oboron",
+    "gantetsu"
+   ]
+  ],
+  [
+   25,
+   [
+    "oboron",
+    "gantetsu",
+    "gantetsu"
+   ]
+  ]
+ ],
+ "order": [
+  31,
+  32,
+  33,
+  34,
+  35,
+  36,
+  37,
+  38,
+  1,
+  2,
+  3,
+  4,
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15,
+  16,
+  17,
+  18,
+  19,
+  20,
+  21,
+  22,
+  23,
+  24,
+  25,
+  26,
+  27,
+  28,
+  29,
+  30,
+  39,
+  40,
+  41,
+  42
+ ]
+}
