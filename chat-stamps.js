@@ -42,7 +42,7 @@ async function onEmojiClick(event){
     if(box.disabled){ showToast("先にチャット相手を選択してください。"); return; }
     const start = box.selectionStart ?? box.value.length, end = box.selectionEnd ?? start;
     const next = box.value.slice(0,start) + pick.dataset.emoji + box.value.slice(end);
-    if(Array.from(next).length > MAX_TEXT_LENGTH){ showToast("メッセージは2,000文字以内で入力してください。"); return; }
+    if(Array.from(next).length > MAX_TEXT_LENGTH){ showToast("メッセージは4,000文字以内で入力してください。"); return; }
     box.value = next;
     const pos = start + pick.dataset.emoji.length;
     box.setSelectionRange(pos,pos);

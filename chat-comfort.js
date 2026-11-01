@@ -15,7 +15,7 @@ function cfWrite(n, v){ try{ localStorage.setItem(cfKey(n), JSON.stringify(v)); 
 // ---------- 下書き ----------
 function cfDraftSave(roomId){
     if(!roomId) return;
-    const t = String(el.messageInput.value || "").slice(0, 2000);
+    const t = String(el.messageInput.value || "").slice(0, 4000);
     if(t.trim()) cf.drafts[roomId] = t; else delete cf.drafts[roomId];
     const ids = Object.keys(cf.drafts);
     if(ids.length > 50) delete cf.drafts[ids[0]];
@@ -82,7 +82,7 @@ async function onPhraseAction(action, node){
         if(action === "send"){ closeSheet(); await sendMessagePayload(buildTextPayload(text), {keepInput:true}); return; }
         const inp = el.messageInput, cur = inp.value;
         const at = typeof inp.selectionStart === "number" ? inp.selectionStart : cur.length;
-        inp.value = (cur.slice(0, at) + text + cur.slice(inp.selectionEnd != null ? inp.selectionEnd : at)).slice(0, 2000);
+        inp.value = (cur.slice(0, at) + text + cur.slice(inp.selectionEnd != null ? inp.selectionEnd : at)).slice(0, 4000);
         try{ if(typeof updateCharCount === "function") updateCharCount(); }catch(_e){}
         inp.dispatchEvent(new Event("input", {bubbles:true}));
         closeSheet(); inp.focus();

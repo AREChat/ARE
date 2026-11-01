@@ -48,20 +48,34 @@ function getLocation(button){
     button.disabled = true;
     const info = $("lcInfo");
     if(info) info.textContent = "取得しています...";
-    navigator.geolocation.getCurrentPosition((pos) => {
-        feat.loc = {lat:Math.round(pos.coords.latitude * 10000) / 10000, lng:Math.round(pos.coords.longitude * 10000) / 10000, acc:Math.round(pos.coords.accuracy || 0)};
-        if($("lcInfo")) $("lcInfo").textContent = "緯度 " + feat.loc.lat.toFixed(4) + " / 経度 " + feat.loc.lng.toFixed(4) + "（誤差 約" + feat.loc.acc + "m）";
+    // 数秒間測り続けて、いちばん誤差の小さい位置を使う（最初の位置は大まかなことが多いため）
+    let best = null, finished = false, wid = null, timer = null;
+    const done = (error) => {
+        if(finished) return; finished = true;
+        if(wid !== null) navigator.geolocation.clearWatch(wid);
+        clearTimeout(timer);
+        button.disabled = false;
+        if(!best){
+            const reason = error && error.code === 1 ? "位置情報の利用が許可されていません。ブラウザ（またはスマホの設定）で、このサイトの位置情報を「許可」にしてください。" : "現在地を取得できませんでした。電波の良い場所で、もう一度お試しください。";
+            if($("lcInfo")) $("lcInfo").textContent = reason;
+            return;
+        }
+        const c = best.coords;
+        feat.loc = {lat:Math.round(c.latitude * 100000) / 100000, lng:Math.round(c.longitude * 100000) / 100000, acc:Math.round(c.accuracy || 0)};
+        const warn = feat.loc.acc > 100 ? " ⚠️ 誤差が大きいです。屋外やWi-Fi・GPSをオンにして「取得し直す」を押すと正確になります。" : "";
+        if($("lcInfo")) $("lcInfo").textContent = "緯度 " + feat.loc.lat.toFixed(5) + " / 経度 " + feat.loc.lng.toFixed(5) + "（誤差 約" + feat.loc.acc + "m）" + warn;
         const map = $("lcMap");
         if(map) map.href = mapLink(feat.loc);
         if($("lcAfter")) $("lcAfter").hidden = false;
-        button.disabled = false;
         button.textContent = "📡 取得し直す";
         updateLocationSendButton();
-    }, (error) => {
-        button.disabled = false;
-        const reason = error && error.code === 1 ? "位置情報の利用が許可されていません。ブラウザ（またはスマホの設定）で、このサイトの位置情報を「許可」にしてください。" : "現在地を取得できませんでした。電波の良い場所でもう一度お試しください。";
-        if($("lcInfo")) $("lcInfo").textContent = reason;
-    }, {enableHighAccuracy:true, timeout:15000, maximumAge:30000});
+    };
+    wid = navigator.geolocation.watchPosition((pos) => {
+        if(!best || (pos.coords.accuracy || 1e9) < (best.coords.accuracy || 1e9)) best = pos;
+        if($("lcInfo")) $("lcInfo").textContent = "測っています... 誤差 約" + Math.round(best.coords.accuracy || 0) + "m";
+        if((best.coords.accuracy || 1e9) <= 20) done();
+    }, (error) => { if(!best || (error && error.code === 1)) done(error); }, {enableHighAccuracy:true, timeout:15000, maximumAge:0});
+    timer = setTimeout(() => done(), 12000);
 }
 
 function updateLocationSendButton(){

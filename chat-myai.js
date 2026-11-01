@@ -202,6 +202,40 @@ function maPaint(){
     const t = $("maTeach"); if(t) t.focus();
 }
 
+// 足し算・引き算・かけ算・わり算・かっこだけを安全に計算する
+function myaiCalc(src){
+    let i = 0;
+    const peek = () => src[i];
+    function num(){
+        if(peek() === "("){ i++; const v = add(); if(peek() !== ")") throw 0; i++; return v; }
+        if(peek() === "-"){ i++; return -num(); }
+        const m = /^[0-9]*\.?[0-9]+/.exec(src.slice(i)); if(!m) throw 0; i += m[0].length; return parseFloat(m[0]);
+    }
+    function mul(){ let v = num(); while(peek() === "*" || peek() === "/"){ const o = src[i++], r = num(); v = o === "*" ? v * r : v / r; } return v; }
+    function add(){ let v = mul(); while(peek() === "+" || peek() === "-"){ const o = src[i++], r = mul(); v = o === "+" ? v + r : v - r; } return v; }
+    try{ const v = add(); return i === src.length && isFinite(v) ? v : null; }catch(_e){ return null; }
+}
+
+// 教えていなくても答えられる内蔵の返事（時刻・日付・計算・あいさつ・使い方）
+function myaiQuickReply(text){
+    const t = String(text).replace(/\s+/g, "");
+    const d = new Date(), wk = "日月火水木金土"[d.getDay()];
+    if(/今何時|なんじ|何時\?|時間(は|を)?(教えて)?[?？]?$|今の時間/.test(t)) return "今は " + d.getHours() + "時" + String(d.getMinutes()).padStart(2, "0") + "分です🕒";
+    if(/今日.*(何日|なんにち|日付|何曜|なんよう)|何曜日|日付/.test(t)) return "今日は " + (d.getMonth() + 1) + "月" + d.getDate() + "日（" + wk + "曜日）です📅";
+    if(/天気|てんき|気温/.test(t)) return "天気は「その他」→「天気・交通」で、都道府県を選んで見られます☀️";
+    if(/電車|交通|遅延|運行/.test(t)) return "電車の運行は「その他」→「天気・交通」から公式ページを開けます🚃";
+    if(/ありがと|感謝/.test(t)) return "どういたしまして😊";
+    if(/おやすみ/.test(t)) return "おやすみなさい🌙 いい夢を！";
+    if(/おはよ/.test(t)) return "おはようございます☀️ 今日もいちにち、がんばりましょう！";
+    if(/使い方|ヘルプ|できること|何ができ/.test(t)) return "「質問＝答え」の形で送ると覚えます。覚えたことは右の欄で確認・削除できます。時刻・日付・かんたんな計算にも答えます🤖";
+    const c = t.replace(/[×x✕＊*]/g, "*").replace(/[÷／]/g, "/").replace(/[＋]/g, "+").replace(/[－ー−]/g, "-").replace(/[＝=？?]+$/, "").replace(/[０-９]/g, (z) => String.fromCharCode(z.charCodeAt(0) - 65248));
+    if(/^[0-9+\-*/().]+$/.test(c) && /[0-9][+\-*/][0-9(]/.test(c) && c.length <= 40){
+        const v = myaiCalc(c);
+        if(v !== null) return c + " ＝ " + Math.round(v * 1e6) / 1e6 + " 🧮";
+    }
+    return "";
+}
+
 async function onMyAiAction(action, node){
     const m = feat.myai;
     try{
@@ -214,10 +248,15 @@ async function onMyAiAction(action, node){
             if(teach){
                 m.log.push({who:"ai", text: myaiLearn(teach[0], teach[1]) ? "覚えました！「" + teach[0].trim() + "」と聞かれたら「" + teach[1].trim() + "」と答えます。" : "覚えられませんでした。"});
             }else{
-                const ans = await myaiAnswer(text);
+                const quick = /何時|なんじ|時間|日付|何日|何曜|[0-9０-９][+＋\-－ー−*×x÷/／][0-9０-９(]/.test(text) ? myaiQuickReply(text) : "";
+                const ans = quick ? {kind:"quick", text:quick, score:1} : await myaiAnswer(text);
                 m.last = {q:text, ans};
-                if(ans) m.log.push({who:"ai", text:ans.text, fact:ans.fact || null, note:(ans.kind === "fact" ? "覚えたこと" : ans.kind === "hist" ? "過去の自分の返事から" : "かんたんQ&A") + "・似ている度 " + Math.round(ans.score * 100) + "%"});
-                else{ m.pending = {q:text}; m.log.push({who:"ai", text:"まだ知りません。教えてもらえますか？"}); }
+                if(ans) m.log.push({who:"ai", text:ans.text, fact:ans.fact || null, note:(ans.kind === "quick" ? "AREbotの内蔵あんさー" : ans.kind === "fact" ? "覚えたこと" : ans.kind === "hist" ? "過去の自分の返事から" : "かんたんQ&A") + "・似ている度 " + Math.round(ans.score * 100) + "%"});
+                else{
+                    const b = myaiQuickReply(text);
+                    if(b) m.log.push({who:"ai", text:b, note:"AREbotの内蔵あんさー"});
+                    else{ m.pending = {q:text}; m.log.push({who:"ai", text:"うーん、まだ知りません🙇 右の欄に答えを教えてもらえますか？（「質問＝答え」の形で送ってもOK）"}); }
+                }
             }
         }else if(action === "good"){
             if(m.last && m.last.ans && m.last.ans.fact){ m.last.ans.fact.n = (m.last.ans.fact.n || 0) + 1; myaiSave(); }

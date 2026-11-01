@@ -40,7 +40,7 @@ function startGame(id){
     const info = GAME_LIST.find((g) => g[0] === id);
     if(!info) return;
     feat.g = {id, over:false};
-    ({janken:startJanken, number:startNumber, tictactoe:startTicTacToe, memory:startMemory, emoji_quiz:startQuiz, shiritori:startShiritori})[id]();
+    ({janken:startJanken, number:startNumber, tictactoe:startTicTacToe, memory:startMemory, emoji_quiz:startQuiz, shiritori:startShiritori, emoji_shiri:startEmojiShiri})[id]();
 }
 
 function gameShow(html){
@@ -60,7 +60,7 @@ async function gameFinish(message, score){
 function gamePlayAction(action, node){
     const g = feat.g;
     if(!g || g.over && action !== "again") return;
-    ({jk:janKenPick, num:numberGuess, ttt:tttPick, mem:memPick, quiz:quizPick, shi:shiritoriSubmit, giveup:shiritoriGiveUp})[action]?.(node);
+    ({jk:janKenPick, num:numberGuess, ttt:tttPick, mem:memPick, quiz:quizPick, shi:shiritoriSubmit, giveup:shiritoriGiveUp, eshi:emojiShiriSubmit, eshigive:emojiShiriGiveUp})[action]?.(node);
 }
 
 // ---------- じゃんけん ----------
@@ -270,4 +270,54 @@ function shiritoriGiveUp(){
     const g = feat.g;
     paintShiritori("ここで終了します。");
     gameFinish(g.count + "回で終了", g.count);
+}
+
+
+// ---------- 絵文字しりとり（CPUが絵文字だけを出す。なんの絵か当てて、その最後の文字から始まることばを答える）----------
+function eshiPool(){ return Array.from(ESH_DICT.keys()).filter((w) => Array.from(w).length >= 2 && lastKana(w) !== "ん"); }
+
+function startEmojiShiri(){
+    const pool = eshiPool(), first = pool[Math.floor(Math.random() * pool.length)];
+    Object.assign(feat.g, {used:new Set([first]), last:first, count:0, life:3, log:[]});
+    paintEmojiShiri("絵文字を見て、なんのことばか考えよう。その最後の文字から始まることばを、ひらがなで答えてね。");
+}
+
+function paintEmojiShiri(message, reveal){
+    const g = feat.g;
+    gameShow('<h4 style="margin:0">🍎 絵文字しりとり　成功：' + g.count + '　ライフ：' + "❤️".repeat(g.life) + '</h4><div class="game-msg">' + message + '</div>' +
+        '<div style="font-size:84px;text-align:center;line-height:1.2" role="img" aria-label="CPUの絵文字">' + escapeHtml(eshiEmoji(g.last)) + '</div>' +
+        (reveal ? '<div class="meta" style="text-align:center">' + escapeHtml(reveal) + '</div>' : '') +
+        '<div class="shi-log">' + g.log.slice(-6).map((l) => escapeHtml(l)).join("<br>") + '</div>' +
+        '<div class="row" style="justify-content:flex-start"><input id="gWord" type="text" maxlength="20" placeholder="ひらがなで入力" style="max-width:180px"><button type="button" class="button" data-t="game:eshi">答える</button><button type="button" class="button-secondary" data-t="game:eshigive">やめる</button></div>' +
+        '<div id="gResult" class="game-result"></div>');
+}
+
+function eshiEmoji(word){ return eshEmojiFor(word) || "❓"; }
+
+function emojiShiriSubmit(){
+    const g = feat.g, word = ($("gWord") ? $("gWord").value : "").trim();
+    if(!/^[ぁ-ゖー]{2,20}$/.test(word)){ showToast("ひらがなで2文字以上を入力してください。"); return; }
+    const need = lastKana(g.last);
+    if(firstKana(word) !== need){
+        g.life--;
+        if(g.life <= 0){ g.log.push("× 正解は「" + g.last + "」→「" + need + "」から"); paintEmojiShiri("ライフがなくなりました…。この絵は「" + g.last + "」でした。", "答え：" + g.last); gameFinish("終了。" + g.count + "回つながりました", g.count); return; }
+        paintEmojiShiri("違うみたい…もう一度考えてみよう。ヒント：この絵は「" + Array.from(g.last)[0] + "」から始まることばです。");
+        return;
+    }
+    if(g.used.has(word)){ showToast("そのことばはもう出ています。"); return; }
+    if(lastKana(word) === "ん"){ g.life = 0; paintEmojiShiri("「ん」で終わってしまいました…負けです。"); gameFinish("「ん」で終了。" + g.count + "回", g.count); return; }
+    if(!eshEmojiFor(word)){ showToast("そのことばは、絵文字の辞書にありません。ほかのことばで答えてね。"); return; }
+    g.used.add(word); g.count++;
+    g.log.push("あなた：" + word + " " + eshEmojiFor(word) + "　（CPUの絵は「" + g.last + "」でした）");
+    if(g.count >= 50){ paintEmojiShiri("すごい！"); gameFinish("50回達成！", 50); return; }
+    const next = eshiPool().filter((w) => !g.used.has(w) && firstKana(w) === lastKana(word));
+    if(!next.length){ paintEmojiShiri("CPUは絵が思いつきません。あなたの勝ち！", "あなたの絵：" + eshEmojiFor(word)); gameFinish("CPUに勝ちました！" + g.count + "回", g.count); return; }
+    g.last = next[Math.floor(Math.random() * next.length)]; g.used.add(g.last);
+    paintEmojiShiri("正解！「" + word + "」" + eshEmojiFor(word) + "　次のCPUの絵はなにかな？");
+}
+
+function emojiShiriGiveUp(){
+    const g = feat.g;
+    paintEmojiShiri("おつかれさま！ この絵は「" + g.last + "」でした。", "答え：" + g.last);
+    gameFinish("やめました。" + g.count + "回つながりました", g.count);
 }

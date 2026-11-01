@@ -18,11 +18,27 @@ function initAlbum(){
     }, true);
 }
 
-async function openAlbum(){
-    if(!state.currentRoom){ showToast("先にチャットを開いてください。"); return; }
-    const entries = state.messages.filter((m) => !m.deleted_at).map((m) => ({message:m, item:parseMessageContent(m.content)})).filter((x) => x.item.type === "image");
-    openSheet(toolHead("🖼️ アルバム", escapeHtml(roomTitle(state.currentRoom)) + " の写真（読み込み済みのメッセージ " + entries.length + " 枚）") +
-        '<div id="abBody"><div class="empty-list">読み込み中...</div></div>' + toolClose());
+function openAlbumPicker(){
+    const rooms = state.rooms || [];
+    openSheet(toolHead("🖼️ アルバム", "どのチャットのアルバムを見ますか？") +
+        (rooms.length ? '<div class="stack">' + rooms.map((r) => '<button type="button" class="admin-card more-item" data-t="album:pick" data-id="' + escapeHtml(r.id) + '">' + escapeHtml(roomTitle(r)) + '</button>').join("") + '</div>' : '<div class="empty-list">チャットがまだありません。</div>') + toolClose());
+}
+
+async function openAlbum(roomId){
+    // チャットを開いていないときは、見たいチャットを選んでもらう
+    const room = roomId ? (state.rooms || []).find((r) => r.id === roomId) : state.currentRoom;
+    if(!room){ openAlbumPicker(); return; }
+    let source;
+    if(state.currentRoom && state.currentRoom.id === room.id) source = state.messages;
+    else{
+        openSheet(toolHead("🖼️ アルバム", "読み込み中...") + toolClose());
+        const res = await requireClient().from(TABLES.messages).select("id,content,created_at,sender_id,deleted_at").eq("room_id", room.id).order("created_at", {ascending:false}).limit(300);
+        if(res.error){ showToast("アルバムを読み込めませんでした。"); return; }
+        source = res.data || [];
+    }
+    const entries = source.filter((m) => !m.deleted_at).map((m) => ({message:m, item:parseMessageContent(m.content)})).filter((x) => x.item.type === "image");
+    openSheet(toolHead("🖼️ アルバム", escapeHtml(roomTitle(room)) + " の写真（" + entries.length + " 枚）") +
+        '<div id="abBody"><div class="empty-list">読み込み中...</div></div>' + toolClose('<button type="button" class="button-secondary" data-t="album:choose">別のチャットを選ぶ</button>'));
     const client = requireClient();
     const paths = entries.map((x) => x.item.path).filter(Boolean);
     const fresh = new Map();
@@ -49,6 +65,8 @@ function paintAlbum(){
 }
 
 function onAlbumAction(action, node){
+    if(action === "pick"){ return openAlbum(node.dataset.id); }
+    if(action === "choose"){ return openAlbumPicker(); }
     if(action === "view"){
         const x = feat.album.items[Number(node.dataset.i)];
         if(!x) return;

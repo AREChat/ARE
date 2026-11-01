@@ -73,7 +73,7 @@ async function ctSend(uid){
 
 // ---------- QRスキャン ----------
 function openQrScan(){
-    openSheet(toolHead("📷 QRで友だち追加", "相手のプロフィールQR（プロフィール → 🔗 プロフィールを共有）を映してください") +
+    openSheet(toolHead("📷 QRで友だち追加（スマホ限定）", "※スマホでの利用をおすすめします（パソコンの内蔵カメラでは読み取りにくいです）。相手のプロフィールQR（プロフィール → 🔗 プロフィールを共有）を映してください") +
         '<video id="ctVideo" playsinline muted style="width:100%;max-height:320px;background:#000;border-radius:12px"></video><canvas id="ctCv" hidden></canvas>' +
         '<div class="admin-card" id="ctSt">カメラを起動しています…</div>' +
         '<div class="row"><label class="button-secondary" for="ctImg" style="padding:10px 14px;border-radius:12px;cursor:pointer">画像から読み取る</label><input id="ctImg" type="file" accept="image/*" hidden><button type="button" class="button-secondary" data-t="ct:stop">閉じる</button></div>');

@@ -35,7 +35,14 @@ function resizeImage(file,maxSide,quality){
     });
 }
 
-function openSheet(html){ el.profileSheet.innerHTML = html; el.profileModal.hidden = false; }
+function openSheet(html){
+    // どの画面にも、右上の「✕」と下の「閉じる」を必ず付ける（押しやすさのため）
+    el.profileSheet.innerHTML = '<button type="button" class="sheet-x" data-pm="close" aria-label="閉じる">✕</button>' + html;
+    if(!el.profileSheet.querySelector('.row [data-pm="close"]')){
+        el.profileSheet.insertAdjacentHTML("beforeend", '<div class="row sheet-auto-close"><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
+    }
+    el.profileModal.hidden = false;
+}
 
 function closeSheet(){ if(typeof stopCamera === "function") stopCamera(); if(window.stopProfile3D) window.stopProfile3D(); el.profileModal.hidden = true; el.profileSheet.innerHTML = ""; feat.avatarBlob = null; }
 

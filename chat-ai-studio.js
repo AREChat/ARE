@@ -83,6 +83,32 @@ async function aiStudioCheckConnection(){
     }
 }
 
+// 日本語の説明を、画像AIが得意な英語の説明に直す（AIは日本語や固有名詞が苦手で、関係ない絵になりやすいため）
+const AI_STUDIO_WORDS = [
+    ["ディズニーランド|ディズニーシー|ディズニー|テーマパーク|遊園地", "a fairy-tale theme park with a pastel castle, fireworks, carousel and happy crowds"],
+    ["東京タワー", "Tokyo Tower at dusk, city skyline"], ["スカイツリー", "Tokyo Skytree, city skyline"], ["富士山", "Mount Fuji with a clear sky"],
+    ["京都|寺|神社", "a traditional Japanese temple in Kyoto, autumn leaves"], ["桜|お花見", "cherry blossoms in full bloom"], ["花火", "fireworks over a summer night sky"],
+    ["海|ビーチ|砂浜", "a sunny tropical beach with blue sea"], ["山", "majestic mountains"], ["森", "a lush green forest"], ["夕焼け|夕日", "a beautiful sunset sky"], ["星空|夜空", "a starry night sky"],
+    ["猫|ねこ|ネコ", "a cute cat"], ["犬|いぬ|イヌ", "a cute dog"], ["ドラゴン|竜", "a majestic dragon"], ["お城|城", "a grand castle"], ["ロボット", "a friendly robot"], ["宇宙", "outer space with planets and stars"],
+    ["電車|新幹線", "a Japanese train at a station"], ["ラーメン", "a bowl of ramen"], ["寿司", "sushi platter"], ["ケーキ", "a decorated cake"], ["街|都市", "a bustling city street"], ["雪", "a snowy landscape"], ["雨", "a rainy scene with reflections"], ["かわいい|可愛い", "cute"], ["きれい|綺麗|美しい", "beautiful"]
+];
+async function aiStudioEnhance(text, mode){
+    let out = text, hit = false;
+    AI_STUDIO_WORDS.forEach((w) => { const re = new RegExp(w[0], "g"); if(re.test(out)){ out = out.replace(re, " " + w[1] + " "); hit = true; } });
+    if(/[\u3040-\u30ff\u4e00-\u9fff]/.test(out)){
+        // 辞書にない日本語は、無料の翻訳サービスで英語にする（失敗したらそのまま使う）
+        try{
+            const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), 6000);
+            const r = await fetch("https://api.mymemory.translated.net/get?langpair=ja|en&q=" + encodeURIComponent(out.slice(0, 400)), {signal:ctl.signal}); clearTimeout(timer);
+            const j = await r.json();
+            const t = j && j.responseData && j.responseData.translatedText;
+            if(t && !/MYMEMORY|QUERY LENGTH/i.test(t)){ out = t; hit = true; }
+        }catch(_e){ /* そのまま */ }
+    }
+    out = out.replace(/\s*[のと、,]\s*(?=[A-Za-z])/g, ", ").replace(/\s+/g, " ").trim();
+    return {text: hit ? out + (mode === "image" ? ", highly detailed, accurate to the description, sharp focus, vivid colors" : ", smooth natural motion") : text, changed: hit};
+}
+
 async function aiStudioGenerate(){
     const button = document.getElementById("aiStudioGenerate");
     const status = document.getElementById("aiStudioStatus");
@@ -98,9 +124,11 @@ async function aiStudioGenerate(){
     status.textContent = "Hugging Faceの無料生成キューに送信しています。混雑時は時間がかかり、利用枠不足や提供側の停止で失敗することがあります。";
     try{
         const client = await aiStudioConnect(AI_STUDIO_SPACES[mode],token);
+        const en = await aiStudioEnhance(prompt, mode);
+        if(en.changed) status.textContent = "AIが理解しやすい英語にしました：" + en.text.slice(0, 160);
         const values = mode === "image"
-            ? [prompt,0,true,512,512,Number(document.getElementById("aiStudioSteps").value)]
-            : [prompt,document.getElementById("aiStudioBase").value,document.getElementById("aiStudioMotion").value,Number(document.getElementById("aiStudioSteps").value)];
+            ? [en.text,0,true,512,512,Number(document.getElementById("aiStudioSteps").value)]
+            : [en.text,document.getElementById("aiStudioBase").value,document.getElementById("aiStudioMotion").value,Number(document.getElementById("aiStudioSteps").value)];
         const response = await client.predict(mode === "image" ? "/infer" : "/generate_image",values);
         status.textContent = "結果を受け取りました。端末へダウンロードしています…";
         await aiStudioShowAndDownload(response,mode);

@@ -8,7 +8,8 @@ const GAME_LIST = [
     ["tictactoe", "⭕", "三目並べ", "CPUと対戦。勝ち3点・引き分け1点（合計で競う）"],
     ["memory", "🃏", "神経衰弱", "少ない手数でペアを全部そろえる"],
     ["emoji_quiz", "🤔", "絵文字クイズ", "10問。正解数がスコア"],
-    ["shiritori", "🔤", "しりとり", "CPUと何往復できるか"]
+    ["shiritori", "🔤", "しりとり", "CPUと何往復できるか"],
+    ["emoji_shiri", "🍎", "絵文字しりとり", "CPUの絵文字を読み取って、しりとりでつなぐ（友だちとの絵しりとりは「対戦ゲーム」）"]
 ];
 
 const GAME_ACHIEVEMENTS = [
@@ -19,7 +20,7 @@ const GAME_ACHIEVEMENTS = [
     ["🃏", "記憶力抜群（80点以上）", (s) => (s.memory?.best || 0) >= 80],
     ["🤔", "絵文字博士（10問全問正解）", (s) => (s.emoji_quiz?.best || 0) >= 10],
     ["🔤", "しりとり10往復", (s) => (s.shiritori?.best || 0) >= 10],
-    ["🏅", "6種類すべてで遊んだ", (s) => GAME_LIST.every((g) => (s[g[0]]?.plays || 0) >= 1)]
+    ["🏅", "すべての種類で遊んだ", (s) => GAME_LIST.every((g) => (s[g[0]]?.plays || 0) >= 1)]
 ];
 
 feat.g = null;

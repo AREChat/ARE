@@ -60,7 +60,25 @@ async function pushEnable(){
     const res = await requireClient().from("push_subscriptions").upsert(row, {onConflict:"endpoint"});
     if(res.error){ try{ await sub.unsubscribe(); }catch(_e){} throw res.error; }
     feat.push.sub = sub;
-    try{ localStorage.setItem("are_push_" + state.user.id, "1"); }catch(_e){}
+    try{ localStorage.setItem("are_push_" + state.user.id, "1"); localStorage.removeItem("are_push_optout_" + state.user.id); }catch(_e){}
+}
+
+// 初期値はオン：自分でオフにしていない人は、最初の操作（タップ）で自動的にオンにする
+// （ブラウザの決まりで、通知の許可は画面を触ったときにしか聞けません）
+let pushAutoTried = false;
+async function pushAutoOn(){
+    if(pushAutoTried || !state.user || feat.push.sub) return;
+    try{ if(localStorage.getItem("are_push_optout_" + state.user.id)) return; }catch(_e){ return; }
+    const st = pushState();
+    if(st !== "off") return;
+    pushAutoTried = true;
+    try{ await pushEnable(); }catch(_e){ /* 断られたら何もしない */ }
+}
+function pushAutoArm(){
+    if(!pushSupported() || (typeof Notification !== "undefined" && Notification.permission === "denied")) return;
+    if(typeof Notification !== "undefined" && Notification.permission === "granted"){ pushAutoOn(); return; }
+    const once = () => { document.removeEventListener("click", once, true); pushAutoOn(); };
+    document.addEventListener("click", once, true);
 }
 
 async function pushDisable(){
@@ -171,7 +189,7 @@ function openPushSettings(){
 
 async function onPushAction(action, node){
     if(action === "on"){ await pushEnable(); showToast("通知をオンにしました。"); openPushSettings(); }
-    else if(action === "off"){ await pushDisable(); showToast("通知をオフにしました。"); openPushSettings(); }
+    else if(action === "off"){ try{ localStorage.setItem("are_push_optout_" + state.user.id, "1"); }catch(_e){} await pushDisable(); showToast("通知をオフにしました。"); openPushSettings(); }
     else if(action === "body"){ await pushSetBody(node.checked); showToast(node.checked ? "本文を表示します。" : "本文を隠します。"); }
     else if(action === "quiet-save"){ await pushSaveQuiet(node); }
     else if(action === "quiet"){ feat.push.quiet.enabled = node.checked; }
@@ -199,6 +217,7 @@ function pushOpenFromUrl(){
 
 function initPush(){
     registerTool("push", onPushAction);
+    setTimeout(() => { if(feat.push.ready) pushAutoArm(); else pushRegister().then(pushAutoArm); }, 2500);
     // ヘッダーの 🔔 ボタン
     const head = document.querySelector(".chat-header");
     const anchor = document.getElementById("refreshMessagesButton");

@@ -84,7 +84,13 @@
     //   誤判定されるため、押された瞬間（処理が走る前）に判定しておく
     var clickInfo = null;
     function isWired(btn) {
-        for (var n = btn; n; n = n.parentElement) { if (handled.has(n)) return true; }
+        // addEventListener で つないだ もの／ onclick に 直接 入れた もの（b.onclick = ... や onclick="..."）／ リンク・フォーム送信 は つながっている
+        for (var n = btn; n; n = n.parentElement) {
+            if (handled.has(n)) return true;
+            if (typeof n.onclick === "function" || (n.getAttribute && n.hasAttribute("onclick"))) return true;
+            if (n.tagName === "A" && n.getAttribute("href")) return true;
+        }
+        if (btn.type === "submit" && btn.form) return true;
         return false;
     }
     document.addEventListener("click", function (e) {

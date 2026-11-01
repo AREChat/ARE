@@ -85,15 +85,44 @@
         $("botForm").addEventListener("submit", (ev) => { ev.preventDefault(); const i = $("botInput"); ask(i.value); i.value = ""; });
     }
 
+    // ---------- 都道府県ごとの天気・運行（Supabase が1時間ごとに集めた結果を表示。取れないときは公式サイトへのリンク）----------
+    const PREF_NAMES = ["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
+    const jmaLink = (code) => (["01", "46", "47"].indexOf(code) >= 0 ? "https://www.jma.go.jp/bosai/forecast/" : "https://www.jma.go.jp/bosai/forecast/#area_type=offices&area_code=" + code + "0000");
+    async function cacheRow(kind, key) {
+        if (typeof requireClient !== "function") throw new Error("no client");
+        const r = await requireClient().from("info_cache").select("payload,ok,source_url,updated_at").eq("kind", kind).eq("key", key).maybeSingle();
+        if (r.error || !r.data) throw new Error("no row");
+        return r.data;
+    }
+    const hhmm = (iso) => { const d = new Date(iso); return (d.getMonth() + 1) + "/" + d.getDate() + " " + d.getHours() + ":" + String(d.getMinutes()).padStart(2, "0"); };
+    function failBox(msg, url, label) { return '<div class="eb-note" style="border:1px solid #d9a;padding:10px;border-radius:10px">' + esc(msg) + (/ため、$/.test(msg) ? '' : '失敗したため、') + 'こちらのリンクから確認してください。<br><a class="eb-btn" style="display:inline-block;margin-top:8px;text-decoration:none" href="' + esc(url) + '" target="_blank" rel="noopener noreferrer">' + esc(label) + '</a></div>'; }
+
     // ---------- 天気予報（Open-Meteo：無料・APIキー不要） ----------
     const WMO = { 0: ["快晴", "☀️"], 1: ["晴れ", "🌤️"], 2: ["一部曇り", "⛅"], 3: ["曇り", "☁️"], 45: ["霧", "🌫️"], 48: ["霧氷", "🌫️"], 51: ["弱い霧雨", "🌦️"], 53: ["霧雨", "🌦️"], 55: ["強い霧雨", "🌧️"], 56: ["着氷性の霧雨", "🌧️"], 57: ["着氷性の霧雨", "🌧️"], 61: ["弱い雨", "🌦️"], 63: ["雨", "🌧️"], 65: ["強い雨", "🌧️"], 66: ["着氷性の雨", "🌧️"], 67: ["着氷性の雨", "🌧️"], 71: ["弱い雪", "🌨️"], 73: ["雪", "❄️"], 75: ["強い雪", "❄️"], 77: ["霧雪", "🌨️"], 80: ["弱いにわか雨", "🌦️"], 81: ["にわか雨", "🌧️"], 82: ["激しいにわか雨", "⛈️"], 85: ["弱いにわか雪", "🌨️"], 86: ["強いにわか雪", "❄️"], 95: ["雷雨", "⛈️"], 96: ["雷雨（ひょう）", "⛈️"], 99: ["激しい雷雨", "⛈️"] };
     const wmo = (c) => WMO[c] || ["不明", "❔"];
     function savedPlace() { try { return JSON.parse(localStorage.getItem("are_weather_place")) || null; } catch (_e) { return null; } }
     function renderWeather() {
         title.textContent = "☀️ 天気予報";
-        body.innerHTML = '<div class="eb-row"><input class="eb-in" id="wCity" placeholder="地名で検索（例：大阪、札幌）" maxlength="40"><button class="eb-btn" id="wSearch" type="button">検索</button><button class="eb-btn sec" id="wGeo" type="button">📍 現在地</button></div><div id="wChoices" class="eb-row"></div><div id="wResult"></div><div class="eb-note">天気データ：Open-Meteo（無料サービス）。現在地は、押したときだけブラウザの許可を得て使います。</div>';
-        const place = savedPlace() || { name: "東京", lat: 35.6895, lon: 139.6917 };
-        show(place);
+        body.innerHTML = '<div class="eb-row"><select class="eb-in" id="wPref" aria-label="都道府県">' + PREF_NAMES.map((n, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + n + '</option>').join("") + '</select></div><div class="eb-note">都道府県を選ぶと、県庁所在地の天気を表示します（1時間ごとに自動更新）。</div><div class="eb-row"><input class="eb-in" id="wCity" placeholder="地名で検索（例：大阪、札幌）" maxlength="40"><button class="eb-btn" id="wSearch" type="button">検索</button><button class="eb-btn sec" id="wGeo" type="button">📍 現在地</button></div><div id="wChoices" class="eb-row"></div><div id="wResult"></div><div class="eb-note">天気データ：Open-Meteo（無料サービス）。現在地は、押したときだけブラウザの許可を得て使います。</div>';
+        const sp = savedPlace();
+        let prefCode = ""; try { prefCode = localStorage.getItem("are_weather_pref") || ""; } catch (_e) { /* 続行 */ }
+        if (!prefCode && !sp) prefCode = "13";
+        if (prefCode) $("wPref").value = prefCode;
+        $("wPref").onchange = () => { try { localStorage.setItem("are_weather_pref", $("wPref").value); localStorage.removeItem("are_weather_place"); } catch (_e) { /* 続行 */ } showPref($("wPref").value); };
+        if (prefCode) showPref(prefCode); else show(sp);
+        async function showPref(code) {
+            const out = $("wResult"); out.textContent = "読み込み中...";
+            try {
+                const row = await cacheRow("weather", code);
+                if (!row.ok || !row.payload || !row.payload.current) throw new Error("bad");
+                if (Date.now() - new Date(row.updated_at).getTime() > 6 * 3600 * 1000) throw new Error("stale");
+                const c = row.payload.current, d = row.payload.daily, w = wmo(c.weather_code);
+                out.innerHTML = '<div class="eb-day" style="margin:8px 0"><div><b>' + esc(row.payload.name) + '</b></div><div class="eb-big">' + w[1] + '</div><div>' + esc(w[0]) + ' ' + Math.round(c.temperature_2m) + '℃（体感 ' + Math.round(c.apparent_temperature) + '℃）</div><div class="eb-note">風 ' + c.wind_speed_10m + ' km/h ・ 更新 ' + hhmm(row.updated_at) + '</div></div>' +
+                    '<div class="eb-grid">' + d.time.map((t, i) => { const x = wmo(d.weather_code[i]), dt = new Date(t + "T00:00:00"); return '<div class="eb-day"><div>' + (dt.getMonth() + 1) + '/' + dt.getDate() + '（' + "日月火水木金土"[dt.getDay()] + '）</div><div class="eb-big" style="font-size:30px">' + x[1] + '</div><div>' + esc(x[0]) + '</div><div>' + Math.round(d.temperature_2m_max[i]) + '℃ / ' + Math.round(d.temperature_2m_min[i]) + '℃</div><div class="eb-note">降水 ' + (d.precipitation_probability_max[i] == null ? "-" : d.precipitation_probability_max[i]) + '%</div></div>'; }).join("") + '</div>';
+            } catch (_e) {
+                out.innerHTML = failBox(PREF_NAMES[Number(code) - 1] + "の天気を取得できませんでした。", jmaLink(code), "気象庁の天気予報を開く");
+            }
+        }
         $("wSearch").onclick = search;
         $("wCity").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.isComposing) search(); });
         $("wGeo").onclick = () => {
@@ -123,15 +152,15 @@
         }
     }
 
-    // ---------- 交通情報（外部の公式・大手サービスへのリンク） ----------
+    // ---------- 交通情報（JR東日本は自動取得。取れないとき・他の地域は公式サイトへのリンク）----------
+    const PREF_REGION = { "01": "hokkaido", "02": "tohoku", "03": "tohoku", "04": "tohoku", "05": "tohoku", "06": "tohoku", "07": "tohoku", "08": "kanto", "09": "kanto", "10": "kanto", "11": "kanto", "12": "kanto", "13": "kanto", "14": "kanto", "15": "shinetsu", "20": "shinetsu", "19": "kanto" };
     function renderTransit() {
         title.textContent = "🚆 交通情報";
-        body.innerHTML = '<div class="eb-note">乗換案内と運行状況は、外部サービスの画面を新しいタブで開きます（ARE の中にはリアルタイム情報を取り込んでいません）。</div>' +
+        body.innerHTML = '<div class="eb-note">都道府県を選ぶと、運行状況を表示します（JR東日本の範囲は1時間ごとに自動更新）。</div>' +
+            '<div class="eb-row"><select class="eb-in" id="tPref" aria-label="都道府県">' + PREF_NAMES.map((n, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + n + '</option>').join("") + '</select></div><div id="tResult"></div>' +
+            '<hr style="border:0;border-top:1px solid #2c3a63;margin:12px 0"><div class="eb-note">乗換案内（外部サービスを新しいタブで開きます）</div>' +
             '<div class="eb-row"><input class="eb-in" id="tFrom" placeholder="出発駅・場所" maxlength="40"><input class="eb-in" id="tTo" placeholder="到着駅・場所" maxlength="40"></div>' +
-            '<div class="eb-row"><button class="eb-btn" id="tYahoo" type="button">Yahoo!乗換案内で検索</button><button class="eb-btn sec" id="tMaps" type="button">Googleマップで検索</button></div>' +
-            '<div class="eb-note" style="margin-top:12px">運行状況（遅延・運休）</div><div class="eb-row">' +
-            '<a class="eb-btn sec" style="display:inline-flex;align-items:center;text-decoration:none" href="https://transit.yahoo.co.jp/diainfo" target="_blank" rel="noopener noreferrer">Yahoo!路線情報（全国）</a>' +
-            '<a class="eb-btn sec" style="display:inline-flex;align-items:center;text-decoration:none" href="https://traininfo.jreast.co.jp/train_info/" target="_blank" rel="noopener noreferrer">JR東日本 運行情報</a></div>';
+            '<div class="eb-row"><button class="eb-btn" id="tYahoo" type="button">Yahoo!乗換案内で検索</button><button class="eb-btn sec" id="tMaps" type="button">Googleマップで検索</button></div>';
         const go = (build) => () => {
             const f = $("tFrom").value.trim(), t = $("tTo").value.trim();
             if (!f || !t) { toast("出発地と到着地を入力してください。"); return; }
@@ -139,6 +168,26 @@
         };
         $("tYahoo").onclick = go((f, t) => "https://transit.yahoo.co.jp/search/result?from=" + f + "&to=" + t);
         $("tMaps").onclick = go((f, t) => "https://www.google.com/maps/dir/?api=1&origin=" + f + "&destination=" + t + "&travelmode=transit");
+        let pc = "13"; try { pc = localStorage.getItem("are_transit_pref") || localStorage.getItem("are_weather_pref") || "13"; } catch (_e) { /* 続行 */ }
+        $("tPref").value = pc;
+        $("tPref").onchange = () => { try { localStorage.setItem("are_transit_pref", $("tPref").value); } catch (_e) { /* 続行 */ } showTransit($("tPref").value); };
+        showTransit(pc);
+        async function showTransit(code) {
+            const out = $("tResult"), name = PREF_NAMES[Number(code) - 1];
+            const region = PREF_REGION[code], links = '<div class="eb-row" style="margin-top:8px"><a class="eb-btn sec" style="text-decoration:none" href="https://transit.yahoo.co.jp/diainfo" target="_blank" rel="noopener noreferrer">Yahoo!路線情報（' + esc(name) + 'の地域）</a><a class="eb-btn sec" style="text-decoration:none" href="https://transit.yahoo.co.jp/diainfo" target="_blank" rel="noopener noreferrer">全国の運行情報</a></div>';
+            if (!region) { out.innerHTML = failBox(name + "の運行状況は自動取得に対応していないため、", "https://transit.yahoo.co.jp/diainfo", "Yahoo!路線情報（全国）を開く"); return; }
+            out.textContent = "読み込み中...";
+            const keys = region === "hokkaido" ? [] : region === "kanto" ? ["jr-kanto", "jr-shinkansen"] : region === "tohoku" ? ["jr-tohoku", "jr-shinkansen"] : ["jr-shinetsu", "jr-shinkansen"];
+            try {
+                if (!keys.length) throw new Error("none");
+                const rows = await Promise.all(keys.map((k) => cacheRow("transit", k)));
+                if (rows.some((r) => !r.ok)) throw new Error("bad");
+                const items = [].concat.apply([], rows.map((r) => r.payload.items || []));
+                out.innerHTML = '<div class="eb-day" style="text-align:left;margin:8px 0"><b>JR東日本の運行状況（' + esc(name) + '周辺）</b>' + (items.length ? '<ul style="margin:6px 0 0 18px">' + items.slice(0, 15).map((t) => '<li>' + esc(t) + '</li>').join("") + '</ul>' : '<div>大きな遅れ・運休の情報は見つかりませんでした。</div>') + '<div class="eb-note">更新 ' + hhmm(rows[0].updated_at) + '（JR東日本のみ。私鉄・地下鉄は下のリンクで確認してください）</div></div>' + links;
+            } catch (_e) {
+                out.innerHTML = failBox(name + "の運行状況を取得できませんでした。", "https://transit.yahoo.co.jp/diainfo", "Yahoo!路線情報を開く") + links;
+            }
+        }
     }
 
     // ---------- 1対1通話（WebRTC。信号のやり取りはSupabase Realtimeの非公開チャンネル） ----------

@@ -9,7 +9,7 @@ const TABLES = Object.freeze({
 
 const STORAGE_BUCKET = "chat-attachments";
 
-const MAX_TEXT_LENGTH = 2000;
+const MAX_TEXT_LENGTH = 4000;
 
 const MAX_IMAGES = 10;
 
@@ -675,7 +675,7 @@ function renderMessages(scrollToBottom){
         const editing = own && feat.editingId === message.id;
 
         const body = editing
-            ? '<div class="bubble edit"><textarea class="edit-box" maxlength="2000">' + escapeHtml(item.text || "") + '</textarea><div class="edit-actions"><button type="button" class="button-secondary" data-act="cancel-edit" data-id="' + id + '">キャンセル</button><button type="button" class="button" data-act="save-edit" data-id="' + id + '">保存</button></div></div>'
+            ? '<div class="bubble edit"><textarea class="edit-box" maxlength="8000">' + escapeHtml(item.text || "") + '</textarea><div class="edit-actions"><button type="button" class="button-secondary" data-act="cancel-edit" data-id="' + id + '">キャンセル</button><button type="button" class="button" data-act="save-edit" data-id="' + id + '">保存</button></div></div>'
             : renderMessageContent(message.content);
 
         let meta = escapeHtml(formatDate(message.created_at));
@@ -715,7 +715,7 @@ async function sendTextMessage(){
     }
 
     if(Array.from(text).length > MAX_TEXT_LENGTH){
-        showToast("メッセージは2,000文字以内で入力してください。");
+        showToast("メッセージは4,000文字以内で入力してください。");
         return;
     }
 

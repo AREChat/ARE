@@ -6,7 +6,7 @@
 //   （オフラインのときだけ控えを使う）→ 更新したのに古い画面のまま、を防ぐ
 // ・新しい版が入ったら、古い控えをすべて消す
 
-const CACHE = "are-v45-20261101";
+const CACHE = "are-v46-20261101";
 
 self.addEventListener("install", () => { self.skipWaiting(); });
 

@@ -35,7 +35,7 @@ async function onMessageAction(event){
         const box = el.messages.querySelector("textarea.edit-box");
         const text = box ? box.value : "";
         if(!text.trim()){ showToast("メッセージを入力してください。"); return; }
-        if(Array.from(text).length > MAX_TEXT_LENGTH){ showToast("メッセージは2,000文字以内で入力してください。"); return; }
+        if(Array.from(text).length > MAX_TEXT_LENGTH){ showToast("メッセージは4,000文字以内で入力してください。"); return; }
         button.disabled = true;
         try{
             const keep = Object.assign({},parseMessageContent(message.content),{type:"text",text});
@@ -78,7 +78,7 @@ async function scheduleSend(){
     if(!state.currentRoom) return;
     const text = el.messageInput.value;
     if(!text.trim()){ showToast("予約するメッセージを入力欄に入力してください。"); return; }
-    if(Array.from(text).length > MAX_TEXT_LENGTH){ showToast("メッセージは2,000文字以内で入力してください。"); return; }
+    if(Array.from(text).length > MAX_TEXT_LENGTH){ showToast("メッセージは4,000文字以内で入力してください。"); return; }
     const when = new Date(el.scheduleAt.value);
     if(isNaN(when.getTime()) || when.getTime() < Date.now() + 45000){ showToast("送信日時は1分以上先を指定してください。"); return; }
     el.scheduleSubmit.disabled = true;

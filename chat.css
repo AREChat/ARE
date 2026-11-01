@@ -616,3 +616,8 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .vspin-body .bubble{max-width:100%;box-shadow:none}
 /* スマホ幅で「その他」タブの検索欄・カードが 右へ16pxはみ出す不具合の修正：左右の余白(16px)ぶんを幅から引く。優先度の高い width:100% に負けないように 書く */
 @media(max-width:700px){button.admin-card.more-item{width:calc(100% - 32px)}.more-search .search{width:calc(100% - 32px)}}
+
+/* どの画面にも付く「✕」ボタン（押しやすい大きさ） */
+#profileSheet .sheet-x{position:sticky;top:0;float:right;z-index:5;width:44px;height:44px;margin:-6px -6px 0 8px;border-radius:50%;border:1px solid var(--border,#ccc);background:var(--panel,#fff);color:inherit;font-size:20px;line-height:1;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+#profileSheet .sheet-auto-close{margin-top:12px}
+@media print{#profileSheet .sheet-x{display:none!important}}
