@@ -41,10 +41,10 @@ function openGame4(){
 function openGame5(){
     const href = "./game5/index.html";
     openSheet(toolHead("🔍 GAME5 推理ゲーム", "会話と証言を集めて、升目（マス目）パズルで事件を解く、全10章のオリジナル推理ゲーム") +
-        '<div class="admin-card">このゲームは ブラウザでは あそべません。ひらいたページの「ダウンロードはこちら」から exe ファイルを入手して、Windows パソコンで あそびます（インストールは いりません）。</div>' +
-        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ ページをひらく</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
+        '<div class="admin-card">ブラウザで すぐ あそべます（ダウンロード不要）。パソコンでは、Windows版（exe）も ページから入手できます（スマホは ブラウザ版のみ）。</div>' +
+        '<div class="row"><a class="button" href="./game5/play/index.html" target="_blank" rel="noopener">▶ ブラウザで あそぶ</a><a class="button-secondary" href="' + escapeHtml(href) + '" target="_blank" rel="noopener" style="text-decoration:none">案内ページ（Windows版）</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
 }
-function initGame5(){ /* ゲーム本体は ./game5/ に独立（配布ページのみ） */ }
+function initGame5(){ /* ゲーム本体は ./game5/play/（ブラウザ版）と Releases の exe（Windows版） */ }
 function initGame3(){ /* ゲーム本体は ./game3/ に独立 */ }
 function initGame4(){ /* ゲーム本体は ./game4/ に独立 */ }
 function initGame2(){ /* ゲーム本体は ./game2/ に独立 */ }
