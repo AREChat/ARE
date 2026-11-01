@@ -265,6 +265,76 @@
    "file": "ch/ch42.json",
    "map": "town",
    "lbl": "後日譚 第4話"
+  },
+  {
+   "n": 43,
+   "title": "十周年まつり、はじめます",
+   "file": "ch/ch43.json",
+   "map": "town",
+   "lbl": "後日譚 第5話"
+  },
+  {
+   "n": 44,
+   "title": "ポスターを貼ろう",
+   "file": "ch/ch44.json",
+   "map": "street",
+   "lbl": "後日譚 第6話"
+  },
+  {
+   "n": 45,
+   "title": "ならんで、まつ",
+   "file": "ch/ch45.json",
+   "map": "store",
+   "lbl": "後日譚 第7話"
+  },
+  {
+   "n": 46,
+   "title": "みんなの おたより",
+   "file": "ch/ch46.json",
+   "map": "town",
+   "lbl": "後日譚 第8話"
+  },
+  {
+   "n": 47,
+   "title": "うめた ほしの かけら",
+   "file": "ch/ch47.json",
+   "map": "field",
+   "lbl": "後日譚 第9話"
+  },
+  {
+   "n": 48,
+   "title": "ゲームづくり教室",
+   "file": "ch/ch48.json",
+   "map": "street",
+   "lbl": "後日譚 第10話"
+  },
+  {
+   "n": 49,
+   "title": "ほしぞらの うた",
+   "file": "ch/ch49.json",
+   "map": "town",
+   "lbl": "後日譚 第11話"
+  },
+  {
+   "n": 50,
+   "title": "ダッシュ王、ふたたび",
+   "file": "ch/ch50.json",
+   "map": "street",
+   "lbl": "後日譚 第12話"
+  },
+  {
+   "n": 51,
+   "title": "まつりの 前の夜",
+   "file": "ch/ch51.json",
+   "map": "town",
+   "lbl": "後日譚 第13話"
+  },
+  {
+   "n": 52,
+   "title": "ARE 十周年まつり",
+   "file": "ch/ch52.json",
+   "map": "town",
+   "lbl": "後日譚 第14話"
   }
  ],
  "bgm": {
@@ -411,6 +481,16 @@
   39,
   40,
   41,
-  42
+  42,
+  43,
+  44,
+  45,
+  46,
+  47,
+  48,
+  49,
+  50,
+  51,
+  52
  ]
 }
