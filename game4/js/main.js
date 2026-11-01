@@ -35,7 +35,7 @@ function guideText(){
     const ready = me.board.some((u) => u && !u.sick && !u.acted && u.atk > 0);
     if(ready) return "① 金色にひかる数字の ユニットを タップ → 相手を こうげき。カードを出すなら 明るい手札を タップ";
     if(canPlay) return "① 手札の 明るいカードを タップして えらぶ（暗いカードは 灯が足りません）";
-    return "出せるカードも 動けるユニットも ありません。「ターン終了」を おそう";
+    return autoOn ? "出せるカードも 動けるユニットも ありません。自動で 相手のターンに なります" : "出せるカードも 動けるユニットも ありません。「ターン終了」を おそう";
 }
 function updateGuide(){ const el = $("guide"); if(!el) return; const t = guideText(); el.textContent = t; el.hidden = !t; }
 // ---------- 盤面の座標 ----------
@@ -195,10 +195,22 @@ function onCanvasClick(x, y){
     }
     sel = null; msg("");
 }
+// ---------- 出せるものが なくなったら 自動でターン終了 ----------
+let autoOn = true; try{ autoOn = localStorage.getItem("areq4_auto") !== "0"; }catch(_e){}
+let autoTimer = 0;
+function checkAutoEnd(){
+    clearTimeout(autoTimer);
+    if(!autoOn || !G || !inMatch || busy || G.over || G.turn !== 0) return;
+    if(G.legal(0).length) return;
+    msg("出せるものが ないので 相手のターンへ…");
+    const g = G;
+    autoTimer = setTimeout(() => { if(G === g && autoOn && inMatch && !busy && !g.over && g.turn === 0 && !g.legal(0).length) endTurn(); }, FAST ? 30 : 1100);
+}
+function syncAutoBtn(){ const b = $("btnAuto"); if(b){ b.textContent = autoOn ? "⏩自動終了：入" : "⏩自動終了：切"; b.classList.toggle("on", autoOn); } }
 async function act(fn){
     if(busy || !G || G.over) return; busy = true; busySince = performance.now(); sel = null; renderHand();
     try{ await fn(); }catch(e){ if(!aborted) console.error(e); }
-    finally{ busy = false; renderHand(); updateHud(); if(G && G.over) showResult(); else if(G && G.turn === 0) msg("あなたの ターン"); }
+    finally{ busy = false; renderHand(); updateHud(); if(G && G.over) showResult(); else if(G && G.turn === 0){ msg("あなたの ターン"); checkAutoEnd(); } }
 }
 async function endTurn(){
     if(busy || !G || G.over || G.turn !== 0) return;
@@ -227,7 +239,7 @@ async function startMatch(){
     $("foeName").textContent = "CPU　" + foeDeck.name; $("meName").textContent = "主人公　" + mine.name; msg("対戦開始！"); updateHud(); renderHand(); Snd.play("battle");
     busy = true; busySince = performance.now();
     try{ await G.start(); if(!G.over && G.turn === 1){ let guard = 0; while(!G.over && G.turn === 1 && guard++ < 3) await cpuTurn(G, 1, {level, after: () => wait(320)}); } }catch(e){ if(!aborted) console.error(e); }
-    busy = false; renderHand(); updateHud(); if(G.over) showResult(); else msg("あなたの ターン");
+    busy = false; renderHand(); updateHud(); if(G.over) showResult(); else { msg("あなたの ターン"); checkAutoEnd(); }
 }
 function lastAttacker(){ if(!G) return null; for(let i = G.log.length - 1; i >= 0; i--){ const e = G.log[i]; if(e.type === "attack"){ const u = G.p[e.p].board[e.slot]; return u || null; } } return null; }
 function showResult(){
@@ -235,7 +247,7 @@ function showResult(){
     $("resTitle").textContent = win ? "しょうり！" : "はいぼく…"; $("resText").textContent = win ? "相手の本拠地を たおした！" : "本拠地が たおされた… 次は デッキを 変えてみよう。"; Snd.play(win ? "win" : "lose"); Snd.se(win ? "win" : "lose");
     setTimeout(() => { $("result").hidden = false; }, FAST ? 10 : 700);
 }
-function toMenu(){ aborted = true; inMatch = false; busy = false; G = null; sel = null; $("result").hidden = true; $("ask").hidden = true; $("menu").hidden = false; $("hand").innerHTML = ""; $("badges").innerHTML = ""; badgePool.length = 0; hintPool.length = 0; msg(""); Snd.play("title"); showRec(); }
+function toMenu(){ clearTimeout(autoTimer); aborted = true; inMatch = false; busy = false; G = null; sel = null; $("result").hidden = true; $("ask").hidden = true; $("menu").hidden = false; $("hand").innerHTML = ""; $("badges").innerHTML = ""; badgePool.length = 0; hintPool.length = 0; msg(""); Snd.play("title"); showRec(); }
 function rescue(){ toMenu(); msg("もどしました"); }
 const RANKS = [[0, "見習い"], [5, "一人前"], [20, "ベテラン"], [50, "名人"], [100, "AREマスター"]];
 function rankOf(w){ let r = RANKS[0][1]; for(const x of RANKS){ if(w >= x[0]) r = x[1]; } return r; }
@@ -250,7 +262,7 @@ function buildMenu(){
 // ---------- はじめてガイド（やさしい あそびかた）----------
 const TUTO = [
   ["① かちかた", '<p>相手の <b>本拠地（HP20）</b>を <b>0</b> にすれば あなたの 勝ち！</p><p>あなたの 本拠地も HP20。0になると まけです。</p><div class="tdia"><div class="r"><i>相手の本拠地 ♥20</i></div><div class="r"><i>相手の場（5マス）</i></div><div class="r"><i class="me">あなたの場（5マス）</i></div><div class="r"><i class="me">あなたの本拠地 ♥20</i></div></div><p>カードを出して 仲間（ユニット）を ならべ、相手の本拠地を こうげきしよう。</p>'],
-  ["② 1ターンの ながれ", '<p>ターンが 始まると <b>カードを1枚ひき</b>、<b>💡灯（ひ）が1つ ふえます</b>（最大10）。</p><p>灯は カードを出す ための おかねです。カード左上の <b>黄色い数字＝コスト</b>。灯が足りれば 出せます。</p><p>やることが なくなったら <b>「ターン終了」ボタン</b>。そうすると 相手（CPU）の ターンです。</p>'],
+  ["② 1ターンの ながれ", '<p>ターンが 始まると <b>カードを1枚ひき</b>、<b>💡灯（ひ）が1つ ふえます</b>（最大10）。</p><p>灯は カードを出す ための おかねです。カード左上の <b>黄色い数字＝コスト</b>。灯が足りれば 出せます。</p><p>やることが なくなったら <b>「ターン終了」ボタン</b>。そうすると 相手（CPU）の ターンです。<br>出せるカードも 動けるユニットも なくなったら <b>自動で 相手のターンに なります</b>（「⏩自動終了」ボタンで 切りかえできます）。</p>'],
   ["③ カードを 出す", '<p><b>(1)</b> 画面下の 手札で <b>明るいカード</b>を タップ（暗いカードは 灯が足りません）。</p><p><b>(2)</b> <b>緑の「＋ここに置く」</b>が 出た マスを タップ。</p><p>🪄<b>じゅもん</b>のカードは 出すと 効果を 使って きえます。対象を えらぶ ときは 赤い <b>🎯</b>を タップ。</p><p>カードを タップすると 右上に くわしい説明が 出ます。</p>'],
   ["④ こうげき", '<p>出した ターンの ユニットは まだ 動けません（<b>速攻</b>は 除く）。次の ターンから こうげきできます。</p><p><b>(1)</b> 数字が <b>金色に光る</b> 自分の ユニットを タップ。</p><p><b>(2)</b> 赤い <b>🎯こうげき</b>が 出た 相手を タップ。</p><p><b>守</b>マークの ユニットが いる間は、その 後ろの ユニットや 本拠地は こうげきできません。先に たおそう！</p>'],
   ["⑤ ことば と AREだ！", '<p>⚔＝こうげき力　♥＝たいりょく　💡＝灯（コスト用）</p><p><b>守</b>＝守り（前に出て みんなを まもる）　<b>速</b>＝速攻（出してすぐ こうげき）</p><p>自分の本拠地HPが <b>10以下</b>で こうげきを 受けるとき、<b>1回だけ</b>「そういうときは、AREだ！」が 使えます。画面に 質問が 出たら <b>ボタンを おすだけ</b>！ 逆転の チャンスです。</p><p>画面の 上の 黄色い ガイドが 「いま なにをするか」を おしえて くれます。</p>']];
@@ -330,6 +342,7 @@ async function boot(){
         const vs = $("sndVol"); if(vs){ vs.value = Math.round(Snd.vol * 100); vs.oninput = () => { Snd.vol = vs.value / 100; Snd.save(); Snd.sync(); }; }
         const sp = $("animSpeed"); if(sp){ sp.value = String(animSpeed); sp.onchange = () => { animSpeed = Number(sp.value) || 1; try{ localStorage.setItem("areq4_speed", String(animSpeed)); }catch(_e){} }; }
         if($("btnLog")) $("btnLog").onclick = showLog;
+        if($("btnAuto")){ syncAutoBtn(); $("btnAuto").onclick = () => { autoOn = !autoOn; try{ localStorage.setItem("areq4_auto", autoOn ? "1" : "0"); }catch(_e){} syncAutoBtn(); Snd.se("ok"); if(autoOn) checkAutoEnd(); else { clearTimeout(autoTimer); updateGuide(); } }; }
         if($("btnSort")) $("btnSort").onclick = () => { if(!G || busy || G.over) return; G.p[0].hand.sort((a, b) => db[a].cost - db[b].cost || String(a).localeCompare(String(b))); sel = null; renderHand(); msg("コストの ひくい じゅんに ならべました"); };
         $("chkSnd").checked = Snd.on; $("chkSnd").onchange = () => { Snd.on = $("chkSnd").checked; Snd.save(); Snd.sync(); };
         $("btnStart").onclick = () => { Snd.se("ok"); startMatch(); }; $("btnAgain").onclick = () => { Snd.se("ok"); startMatch(); }; $("btnToMenu").onclick = () => { Snd.se("cancel"); toMenu(); };
