@@ -153,10 +153,9 @@
     }
 
     // ---------- 交通情報（JR東日本は自動取得。取れないとき・他の地域は公式サイトへのリンク）----------
-    const PREF_REGION = { "01": "hokkaido", "02": "tohoku", "03": "tohoku", "04": "tohoku", "05": "tohoku", "06": "tohoku", "07": "tohoku", "08": "kanto", "09": "kanto", "10": "kanto", "11": "kanto", "12": "kanto", "13": "kanto", "14": "kanto", "15": "shinetsu", "20": "shinetsu", "19": "kanto" };
     function renderTransit() {
         title.textContent = "🚆 交通情報";
-        body.innerHTML = '<div class="eb-note">都道府県を選ぶと、運行状況を表示します（JR東日本の範囲は1時間ごとに自動更新）。</div>' +
+        body.innerHTML = '<div class="eb-note">都道府県を選ぶと運行状況を表示します（東京都は都営交通を1時間ごとに自動更新。そのほかは公式サイトへのリンク）。</div>' +
             '<div class="eb-row"><select class="eb-in" id="tPref" aria-label="都道府県">' + PREF_NAMES.map((n, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + n + '</option>').join("") + '</select></div><div id="tResult"></div>' +
             '<hr style="border:0;border-top:1px solid #2c3a63;margin:12px 0"><div class="eb-note">乗換案内（外部サービスを新しいタブで開きます）</div>' +
             '<div class="eb-row"><input class="eb-in" id="tFrom" placeholder="出発駅・場所" maxlength="40"><input class="eb-in" id="tTo" placeholder="到着駅・場所" maxlength="40"></div>' +
@@ -174,18 +173,22 @@
         showTransit(pc);
         async function showTransit(code) {
             const out = $("tResult"), name = PREF_NAMES[Number(code) - 1];
-            const region = PREF_REGION[code], links = '<div class="eb-row" style="margin-top:8px"><a class="eb-btn sec" style="text-decoration:none" href="https://transit.yahoo.co.jp/diainfo" target="_blank" rel="noopener noreferrer">Yahoo!路線情報（' + esc(name) + 'の地域）</a><a class="eb-btn sec" style="text-decoration:none" href="https://transit.yahoo.co.jp/diainfo" target="_blank" rel="noopener noreferrer">全国の運行情報</a></div>';
-            if (!region) { out.innerHTML = failBox(name + "の運行状況は自動取得に対応していないため、", "https://transit.yahoo.co.jp/diainfo", "Yahoo!路線情報（全国）を開く"); return; }
+            const yahoo = '<div class="eb-row" style="margin-top:8px"><a class="eb-btn sec" style="text-decoration:none" href="https://transit.yahoo.co.jp/diainfo" target="_blank" rel="noopener noreferrer">Yahoo!路線情報（全国）</a></div>';
+            if (code !== "13") {
+                out.innerHTML = '<div class="eb-note" style="border:1px solid #2c3a63;padding:10px;border-radius:10px">' + esc(name) + 'の運行状況は、自動取得に対応していません（無料で使える公式データがあるのは、今のところ東京都の都営交通のみです）。下のリンクで確認してください。</div>' + yahoo;
+                return;
+            }
             out.textContent = "読み込み中...";
-            const keys = region === "hokkaido" ? [] : region === "kanto" ? ["jr-kanto", "jr-shinkansen"] : region === "tohoku" ? ["jr-tohoku", "jr-shinkansen"] : ["jr-shinetsu", "jr-shinkansen"];
             try {
-                if (!keys.length) throw new Error("none");
-                const rows = await Promise.all(keys.map((k) => cacheRow("transit", k)));
-                if (rows.some((r) => !r.ok)) throw new Error("bad");
-                const items = [].concat.apply([], rows.map((r) => r.payload.items || []));
-                out.innerHTML = '<div class="eb-day" style="text-align:left;margin:8px 0"><b>JR東日本の運行状況（' + esc(name) + '周辺）</b>' + (items.length ? '<ul style="margin:6px 0 0 18px">' + items.slice(0, 15).map((t) => '<li>' + esc(t) + '</li>').join("") + '</ul>' : '<div>大きな遅れ・運休の情報は見つかりませんでした。</div>') + '<div class="eb-note">更新 ' + hhmm(rows[0].updated_at) + '（JR東日本のみ。私鉄・地下鉄は下のリンクで確認してください）</div></div>' + links;
+                const row = await cacheRow("transit", "toei");
+                if (!row.ok || !row.payload || !row.payload.lines) throw new Error("bad");
+                if (Date.now() - new Date(row.updated_at).getTime() > 6 * 3600 * 1000) throw new Error("stale");
+                out.innerHTML = '<div class="eb-day" style="text-align:left;margin:8px 0"><b>都営交通の運行状況</b><ul style="margin:6px 0 0 18px;padding:0">' +
+                    row.payload.lines.map((l) => '<li><b>' + esc(l.name) + '</b>：' + esc(l.text) + '</li>').join("") + '</ul>' +
+                    '<div class="eb-note">更新 ' + hhmm(row.updated_at) + '（1時間ごとに自動更新）<br>出典：' + esc(row.payload.credit || "東京都交通局（公共交通オープンデータセンター）") + '</div></div>' +
+                    '<div class="eb-note">JR・私鉄・東京メトロは自動取得に対応していません。下のリンクで確認してください。</div>' + yahoo;
             } catch (_e) {
-                out.innerHTML = failBox(name + "の運行状況を取得できませんでした。", "https://transit.yahoo.co.jp/diainfo", "Yahoo!路線情報を開く") + links;
+                out.innerHTML = failBox("都営交通の運行状況を取得できませんでした。", "https://www.kotsu.metro.tokyo.jp/subway/schedule/", "東京都交通局の運行情報を開く") + yahoo;
             }
         }
     }
