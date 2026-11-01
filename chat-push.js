@@ -185,6 +185,11 @@ function openPushSettings(){
         '<h4 style="margin:12px 0 4px">ミュート中のチャット</h4>' +
         (muted.length ? muted.map((id) => '<div class="row"><span>🔕 ' + escapeHtml(roomNameById(id)) + '</span><button type="button" class="button-secondary" data-t="push:unmute" data-room="' + escapeHtml(id) + '">再開</button></div>').join("") : '<div class="meta">ありません（チャット画面の 🔔 で切り替えます）</div>') +
         toolClose());
+    // 時刻やチェックを変えたら、「保存」を押さなくても、すぐ保存する（反映されない、を防ぐ）
+    const quietSave = () => { pushSaveQuiet().catch((error) => showToast(featError(error))); };
+    el.profileSheet.querySelectorAll("[data-quiet]").forEach((node) => node.addEventListener("change", quietSave));
+    const quietBox = el.profileSheet.querySelector('[data-t="push:quiet"]');
+    if(quietBox) quietBox.addEventListener("change", quietSave);
 }
 
 async function onPushAction(action, node){

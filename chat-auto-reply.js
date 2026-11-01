@@ -12,7 +12,7 @@ function autoReplyKindFields(kind,rule){
     const keyword = kind === "keyword";
     const selectedDays = rule?.days || [0,1,2,3,4,5,6];
     return '<div id="arKeywordFields"' + (keyword ? "" : " hidden") + '><label for="arKeyword">反応する言葉</label><input id="arKeyword" maxlength="80" value="' + escapeHtml(rule?.keyword || "") + '" placeholder="例：おはよう"><label for="arMatchType">判定方法</label><select id="arMatchType"><option value="contains"' + (!rule || rule.match_type === "contains" ? " selected" : "") + '>文章に含まれたら</option><option value="exact"' + (rule?.match_type === "exact" ? " selected" : "") + '>メッセージ全体が一致したら</option></select></div>' +
-        '<div id="arScheduleFields"' + (keyword ? " hidden" : "") + '><div class="row"><label>開始 <input id="arStart" type="time" value="' + escapeHtml(rule?.start_time || "22:00") + '"></label><label>終了 <input id="arEnd" type="time" value="' + escapeHtml(rule?.end_time || "08:00") + '"></label></div><div class="ar-days">' + AUTO_REPLY_DAYS.map(([day,label]) => '<label><input type="checkbox" data-ar-day="' + day + '"' + (selectedDays.includes(day) ? " checked" : "") + '> ' + label + '</label>').join("") + '</div><label for="arTimezone">タイムゾーン</label><input id="arTimezone" maxlength="80" value="' + escapeHtml(rule?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo") + '" placeholder="Asia/Tokyo"></div>';
+        '<div id="arScheduleFields"' + (keyword ? " hidden" : "") + '><div class="row"><label>開始 <input id="arStart" type="time" value="' + escapeHtml(rule?.start_time || "22:00") + '"></label><label>終了 <input id="arEnd" type="time" value="' + escapeHtml(rule?.end_time || "08:00") + '"></label></div><div class="meta" id="arTimeNote">いまの設定：' + escapeHtml(String(rule?.start_time || "22:00").slice(0,5)) + '〜' + escapeHtml(String(rule?.end_time || "08:00").slice(0,5)) + '（時刻の欄をタップすると変えられます）</div><div class="ar-days">' + AUTO_REPLY_DAYS.map(([day,label]) => '<label><input type="checkbox" data-ar-day="' + day + '"' + (selectedDays.includes(day) ? " checked" : "") + '> ' + label + '</label>').join("") + '</div><label for="arTimezone">タイムゾーン</label><input id="arTimezone" maxlength="80" value="' + escapeHtml(rule?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo") + '" placeholder="Asia/Tokyo"></div>';
 }
 
 function openAutoReplyForm(rule){
@@ -21,6 +21,11 @@ function openAutoReplyForm(rule){
     const kindInput = document.getElementById("arKind");
     kindInput.addEventListener("change",() => { const next = kindInput.value; document.getElementById("arKeywordFields").hidden = next !== "keyword"; document.getElementById("arScheduleFields").hidden = next !== "schedule"; });
     document.getElementById("arSave").addEventListener("click",() => saveAutoReply(rule || null));
+    const arNote = () => {
+        const note = document.getElementById("arTimeNote"), a = document.getElementById("arStart"), b = document.getElementById("arEnd");
+        if(note && a && b) note.textContent = "いまの設定：" + (a.value || "--:--") + "〜" + (b.value || "--:--") + "（保存すると、この時間帯に届いたメッセージへ自動で返信します）";
+    };
+    ["arStart","arEnd"].forEach((id) => { const node = document.getElementById(id); if(node) ["input","change"].forEach((type) => node.addEventListener(type,arNote)); });
 }
 
 function autoReplyDescription(rule){
@@ -56,9 +61,12 @@ async function saveAutoReply(rule){
     button.disabled = true;
     try{
         const query = requireClient().from("auto_reply_rules");
-        const result = id ? await query.update(values).eq("id",id).eq("user_id",state.user.id) : await query.insert(Object.assign({user_id:state.user.id},values));
+        const result = id ? await query.update(values).eq("id",id).eq("user_id",state.user.id).select("start_time,end_time") : await query.insert(Object.assign({user_id:state.user.id},values)).select("start_time,end_time");
         if(result.error) throw result.error;
-        showToast(id ? "自動応答を更新しました。" : "自動応答を追加しました。");
+        const saved = Array.isArray(result.data) ? result.data[0] : null;
+        if(id && Array.isArray(result.data) && !result.data.length) throw new Error("保存できませんでした（変更が反映されていません）。もう一度ためしてください。");
+        const when = kind === "schedule" ? "（" + String(saved?.start_time || values.start_time).slice(0,5) + "〜" + String(saved?.end_time || values.end_time).slice(0,5) + "）" : "";
+        showToast((id ? "自動応答を更新しました。" : "自動応答を追加しました。") + when);
         await openAutoReply();
     }catch(error){ showToast(featError(error)); button.disabled = false; }
 }
