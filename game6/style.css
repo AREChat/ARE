@@ -29,3 +29,12 @@
 .modal-panel.fx-hurt{animation:fxhurt .45s}
 @keyframes fxhit{0%,100%{transform:none;filter:none}30%{transform:translateX(10px) scale(1.02);filter:brightness(1.5)}60%{transform:translateX(-6px)}}
 @keyframes fxhurt{0%,100%{transform:none;box-shadow:none}25%{transform:translateX(-12px);box-shadow:0 0 40px 8px rgba(255,60,50,.7)}55%{transform:translateX(9px)}}
+
+#locArt{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
+.world:not(.has-art) #locArt{display:none}
+.world.has-art .sky-orb,.world.has-art .far-mountain,.world.has-art .sunbeam,.world.has-art .hill,.world.has-art .path,.world.has-art .ruin,.world.has-art .tree{display:none}
+.hero-avatar{background:url(img/hero.webp) center top/cover,linear-gradient(150deg,#39494c,#25363b)}
+.hero-avatar>*{display:none}
+.enemy-symbol.has-art{width:132px;height:88px;padding:0;background:none;overflow:hidden}
+.enemy-symbol .foe-art{width:100%;height:100%;object-fit:cover;border-radius:10px;border:2px solid rgba(255,255,255,.85);display:block}
+.title-screen{background:linear-gradient(rgba(10,16,24,.5),rgba(10,16,24,.7)),url(img/title.webp) center/cover,radial-gradient(900px 500px at 50% 20%,#27415a,#101720 70%)}

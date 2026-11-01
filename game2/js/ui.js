@@ -13,13 +13,18 @@ export const UI = {
         $("rotX").addEventListener("click", () => { $("rot").hidden = true; this._rotHidden = true; });
     },
     // ---------- 立ち絵（story の ["pic", "img/xxx.webp"] / ["pic", ""]）----------
-    pic(src){ let e = document.getElementById("storyPic"); if(!src){ if(e) e.hidden = true; return; } if(!e){ e = document.createElement("img"); e.id = "storyPic"; e.alt = ""; e.draggable = false; document.body.appendChild(e); } e.onerror = () => { e.hidden = true; }; e.src = src; e.hidden = false; },
+    pic(src, framed){ let e = document.getElementById("storyPic"); if(!src){ if(e) e.hidden = true; return; } if(!e){ e = document.createElement("img"); e.id = "storyPic"; e.alt = ""; e.draggable = false; document.body.appendChild(e); } e.onerror = () => { e.hidden = true; }; e.classList.toggle("framed", !!framed); e.src = src; e.hidden = false; },
+    // ---------- 話している人の絵を、自動で出す ----------
+    SPEAKER_PICS: {"アキ":"chara_aki","ケン":"chara_ken","ミオ":"chara_mio","__hero":"chara_hero"},
+    speakerPic(who){ const m = this.SPEAKER_PICS; let f = m[who]; if(!f && this.heroName && who && who === this.heroName()) f = m.__hero; if(f){ this.pic("img/" + f + ".webp", false); this._autoPic = 1; } else if(this._autoPic && who){ this.pic(""); this._autoPic = 0; } },
+    // ---------- 戦闘で あらわれた モンスターの 絵 ----------
+    foeCard(ids){ try{ let e = document.getElementById("foeCard"); if(!e){ e = document.createElement("img"); e.id = "foeCard"; e.alt = ""; e.draggable = false; document.body.appendChild(e); } clearTimeout(this._foeT); e.hidden = true; e.onerror = () => { e.hidden = true; }; e.onload = () => { e.hidden = false; }; e.src = "img/mon_" + ids[0] + ".webp"; this._foeT = setTimeout(() => { e.hidden = true; }, 2200); }catch(_e){} },
     // ---------- 会話 ----------
     say(who, text){
         return new Promise((resolve) => {
             const dlg = $("dlg"); this._clearTimers();
             if(this.fast){ resolve(); return; }
-            dlg.hidden = false; $("dlgWho").hidden = !who; $("dlgWho").textContent = who || ""; $("dlgText").textContent = "";
+            dlg.hidden = false; try{ if(who) this.speakerPic(who); }catch(_e){} $("dlgWho").hidden = !who; $("dlgWho").textContent = who || ""; $("dlgText").textContent = "";
             const full = String(text); let i = 0;
             this._dlg = {resolve, full, typing: true};
             if(this.skipping){ this._finishNow(); return; }
@@ -38,7 +43,7 @@ export const UI = {
     toggleAuto(){ this.autoTalk = !this.autoTalk; const b = $("autoBtn"); b.classList.toggle("on", this.autoTalk); b.textContent = this.autoTalk ? "■ オート停止" : "▶ オート"; $("dlg").classList.toggle("auto", this.autoTalk); $("autoBadge").hidden = !this.autoTalk; clearTimeout(this._autoT); const bar = $("dlgBar"); if(bar) bar.style.animation = "none"; if(this.autoTalk) this._armAuto(); this.toast(this.autoTalk ? "オート会話：ON（自動で読み進めます）" : "オート会話：OFF（手動）", 1600); if(this.onAuto) this.onAuto(this.autoTalk); },
     skip(){ this.skipping = true; this.advance(); if(this._dlg) this._finishNow(); },
     stopSkip(){ this.skipping = false; },
-    hideDlg(){ this._clearTimers(); this._dlg = null; $("dlg").hidden = true; },
+    hideDlg(){ this._clearTimers(); this._dlg = null; $("dlg").hidden = true; if(this._autoPic){ this._autoPic = 0; this.pic(""); } },
     dlgOpen(){ return !!this._dlg; },
     _clearTimers(){ clearInterval(this._typeT); clearTimeout(this._autoT); },
     // ---------- メニュー（上下＋決定／タップ）----------

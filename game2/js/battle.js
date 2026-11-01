@@ -136,7 +136,7 @@ export class Battle{
     async run(foeIds, opt){
         const o = opt || {}; this._setup(foeIds, o); if(this.c.autoBattle) this.autoAll = true; this.boss = !!o.boss || this.foes.some((f) => f.d.boss); await this.c.UI.encounterOpen(); if(!this.fast) await this.wait(.5);
         const first = this.foes.map((f) => f.name);
-        this.log(first.join("、") + "があらわれた！"); await this.wait(.9);
+        this.log(first.join("、") + "があらわれた！"); if(!this.fast) this.c.UI.foeCard(this.foes.map((f) => f.id)); await this.wait(.9);
         let result = null;
         while(!result){
             const cmds = this.autoAll ? this._autoCmds() : await this._chooseAll();

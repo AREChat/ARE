@@ -241,8 +241,9 @@ const RANKS = [[0, "見習い"], [5, "一人前"], [20, "ベテラン"], [50, "�
 function rankOf(w){ let r = RANKS[0][1]; for(const x of RANKS){ if(w >= x[0]) r = x[1]; } return r; }
 function showRec(){ const r = rec(); $("rec").textContent = "せんせき　" + r.w + "勝 " + r.l + "敗　ランク：" + rankOf(r.w); }
 function buildMenu(){
+    const DECK_ART = ["deck_flash", "deck_moon", "deck_night"];   // デッキの 顔の 絵（なければ 出ない）
     const dl = $("deckList"); dl.innerHTML = ""; try{ deckIdx = Math.min(D.decks.length - 1, Math.max(0, +(localStorage.getItem("areq4_deck") || 0))); }catch(_e){}
-    D.decks.forEach((d, i) => { const e = document.createElement("div"); e.className = "dk" + (i === deckIdx ? " on" : ""); e.innerHTML = "<b>" + d.name + "</b><small>" + d.desc + "　AREだ！：" + db[d.are].n.replace("そういうときは、AREだ！ ", "") + "</small>"; e.onclick = () => { deckIdx = i; try{ localStorage.setItem("areq4_deck", i); }catch(_e){} dl.querySelectorAll(".dk").forEach((x, j) => x.classList.toggle("on", j === i)); Snd.se("ok"); }; dl.appendChild(e); });
+    D.decks.forEach((d, i) => { const e = document.createElement("div"); e.className = "dk" + (i === deckIdx ? " on" : ""); e.innerHTML = (DECK_ART[i] ? '<img class="dkart" src="img/' + DECK_ART[i] + '.webp" alt="" onerror="this.remove()">' : "") + "<b>" + d.name + "</b><small>" + d.desc + "　AREだ！：" + db[d.are].n.replace("そういうときは、AREだ！ ", "") + "</small>"; e.onclick = () => { deckIdx = i; try{ localStorage.setItem("areq4_deck", i); }catch(_e){} dl.querySelectorAll(".dk").forEach((x, j) => x.classList.toggle("on", j === i)); Snd.se("ok"); }; dl.appendChild(e); });
 }
 
 
