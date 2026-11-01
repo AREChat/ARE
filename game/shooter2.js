@@ -137,7 +137,7 @@ function pkShDraw(g){
     x.textAlign = "center"; x.textBaseline = "middle";
     // ボス
     if(g.boss){ const b = g.boss, im = pkShImg(b.B.img), sh = b.shake > 0 ? (G.rnd() - 0.5) * 8 : 0;
-        if(im.complete && im.naturalWidth){ const h = b.h + 10, w = h * im.naturalWidth / im.naturalHeight; x.drawImage(im, b.x - w / 2 + sh, b.y - h / 2, w, h); b.w = Math.max(70, w * 0.8); }
+        if(im.complete && im.naturalWidth){ const h = b.h + 10, w = h * im.naturalWidth / im.naturalHeight; if(typeof tqIsFramed === "function" && tqIsFramed(b.B.img)) tqDrawFramed(x, im, b.x + sh, b.y, h); else x.drawImage(im, b.x - w / 2 + sh, b.y - h / 2, w, h); b.w = Math.max(70, w * 0.8); }
         else{ x.font = "84px serif"; x.fillText(b.B.e, b.x + sh, b.y); b.w = 100; }
         x.fillStyle = "#333"; x.fillRect(180, 8, 280, 9); x.fillStyle = b.hp / b.max > 0.3 ? "#f87171" : "#fbbf24"; x.fillRect(180, 8, 280 * Math.max(0, b.hp) / b.max, 9);
         x.fillStyle = "#fff"; x.font = "bold 12px sans-serif"; x.fillText(b.B.n + "（あたま ＝ 3ダメージ）", W / 2, 28); }

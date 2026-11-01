@@ -1,6 +1,20 @@
 "use strict";
 // ===== 戦闘（王道RPGふう・みんなで たたかう）／オート戦闘／自動レベル上げ =====
 const IMGC = {};
+// ---- イラスト： ボスの せっけい絵・背景 を えがく ヘルパー ----
+const TQ_ART_FRAMED = ["akuma", "oshi", "rikari", "unknown"];   // 背景つきの 絵は わくで かこんで ひょうじ
+function tqIsFramed(key){ return /^b_/.test(key) || TQ_ART_FRAMED.indexOf(key) >= 0; }
+function tqDrawFramed(g, im, cx, cy, h){
+    const w = h * im.naturalWidth / im.naturalHeight, x = cx - w / 2, y = cy - h / 2, r = Math.min(14, h / 8);
+    g.save(); g.beginPath();
+    if(g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h);
+    g.clip(); g.drawImage(im, x, y, w, h); g.restore();
+    g.save(); g.beginPath(); if(g.roundRect) g.roundRect(x, y, w, h, r); else g.rect(x, y, w, h);
+    g.lineWidth = 3; g.strokeStyle = "rgba(255,255,255,.85)"; g.stroke(); g.restore();
+    return w;
+}
+const BGIMG = {};
+function bgImg(key){ if(!BGIMG[key]){ const im = new Image(); im.onerror = () => { im.bad = 1; }; im.src = "./img/bg_" + key + ".webp"; BGIMG[key] = im; } return BGIMG[key]; }
 function foeImg(key){ if(!IMGC[key]){ const im = new Image(); im.src = "./img/" + key + ".webp"; IMGC[key] = im; } return IMGC[key]; }
 const AUTO_DELAY = [700, 380, 130];
 
@@ -53,6 +67,8 @@ function paintBattle(g, time){
     const b = G.b, bgm = ({sendai:["#8ecae6", "#e0f2e9"], tokyo:["#0b1020", "#1d2b53"], aprt:["#0b1020", "#1d2b53"], tower:["#1e2a4a", "#3a4a7a"], white:["#ffffff", "#e6edf5"], xmas:["#1d3557", "#a8dadc"], base:["#3a2a1a", "#7a5a3a"], labn:["#1b1f3b", "#2c3e70"], future:["#0b132b", "#5bc0be"], lab:["#6b8aa8", "#cfe0ee"], xr:["#2a1b5e", "#c9a7ff"]})[b.foes.find((f) => f.bg) ? b.foes.find((f) => f.bg).bg : G.S.map] || ["#9ad0f5", "#d9f0ff"];
     const gr = g.createLinearGradient(0, 0, 0, 360); gr.addColorStop(0, bgm[0]); gr.addColorStop(1, bgm[1]);
     g.fillStyle = gr; g.fillRect(0, 0, 640, 360);
+    { const bk = b.foes.find((f) => f.bg) ? b.foes.find((f) => f.bg).bg : G.S.map, bi = bgImg(bk);
+      if(bi.complete && bi.naturalWidth && !bi.bad){ const s = Math.max(640 / bi.naturalWidth, 360 / bi.naturalHeight), w = bi.naturalWidth * s, h = bi.naturalHeight * s; g.drawImage(bi, (640 - w) / 2, (360 - h) / 2, w, h); } }
     g.fillStyle = "rgba(0,0,0,.12)"; g.fillRect(0, 250, 640, 110);
     const n = b.foes.length, big = n === 1 ? (b.foes[0].boss ? 130 : 104) : n === 2 ? 84 : n === 3 ? 70 : 58;
     b.foes.forEach((f, i) => {
@@ -61,12 +77,12 @@ function paintBattle(g, time){
         const hit = G.hit && G.hit.idx === i && time < G.hit.until;
         g.save(); if(hit) g.translate((Math.random() - 0.5) * 8, 0);
         g.globalAlpha = hit ? 0.55 : 1;
-        if(f.img){ const im = foeImg(f.img); if(im.complete && im.naturalWidth){ const h = 190, w = h * im.naturalWidth / im.naturalHeight; g.drawImage(im, cx - w / 2, cy - h / 2 + bob + 6, w, h); } }
+        if(f.img){ const im = foeImg(f.img); if(im.complete && im.naturalWidth){ if(tqIsFramed(f.img)){ tqDrawFramed(g, im, cx, cy + bob + 6, n === 1 ? 196 : 120); } else{ const h = 190, w = h * im.naturalWidth / im.naturalHeight; g.drawImage(im, cx - w / 2, cy - h / 2 + bob + 6, w, h); } } }
         else{ g.font = big + "px serif"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillStyle = "#000"; g.fillText(f.e, cx, cy + bob); }
         g.restore();
         g.fillStyle = "rgba(0,0,0,.25)"; g.beginPath(); g.ellipse(cx, 232, f.img ? 40 : big / 2.2, 6, 0, 0, 7); g.fill();
         g.fillStyle = "#1f2937"; g.fillRect(cx - 40, 242, 80, 7); g.fillStyle = f.cur / f.hp > 0.3 ? "#34d399" : "#ef4444"; g.fillRect(cx - 40, 242, 80 * f.cur / f.hp, 7);
-        g.font = "bold 12px sans-serif"; g.fillStyle = "#111"; g.textAlign = "center"; g.textBaseline = "alphabetic"; g.fillText(f.label, cx, 262);
+        g.font = "bold 12px sans-serif"; g.textAlign = "center"; g.textBaseline = "alphabetic"; g.lineJoin = "round"; g.lineWidth = 3.5; g.strokeStyle = "rgba(255,255,255,.92)"; g.strokeText(f.label, cx, 262); g.fillStyle = "#111"; g.fillText(f.label, cx, 262);
         if(f.stun > 0){ g.font = "18px serif"; g.fillText("💫", cx + 30, cy - 40); }
     });
     g.fillStyle = "rgba(0,0,0,.5)"; g.fillRect(250, 342, 140, 9); g.fillStyle = G.S.gauge >= 100 ? "#fbbf24" : "#60a5fa"; g.fillRect(250, 342, 140 * G.S.gauge / 100, 9);

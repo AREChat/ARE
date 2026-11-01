@@ -88,7 +88,7 @@ export const UI = {
     card(title, sub, ms){
         return new Promise((resolve) => {
             if(this.fast){ resolve(); return; }
-            const c = $("card"); $("cardT").textContent = title; $("cardS").textContent = sub || ""; c.hidden = false;
+            const c = $("card"); c.style.backgroundImage = title === "ＦＩＮ" ? "linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.55)),url(img/ending.webp)" : ""; c.style.backgroundSize = "cover"; c.style.backgroundPosition = "center"; $("cardT").textContent = title; $("cardS").textContent = sub || ""; c.hidden = false;
             const end = () => { clearTimeout(tm); this._card = null; c.hidden = true; resolve(); };
             const tm = setTimeout(end, ms || 2400); this._card = end;
         });

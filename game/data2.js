@@ -38,7 +38,7 @@ const TQ_NPCS = [["n001", "亜理紗", "arisa"], ["n002", "タカト", "takato"]
 const TQ_LOOK_OF = {hero:"", haruki:"haruki", akito:"akito", kaito:"kaito", n001:"arisa", n002:"takato", n003:"kanon", n004:"ryota", n005:"yusuke", n006:"yuka", n007:"miyu", n008:"nanami", n009:"hayato", n010:"hana"};
 
 // ---- 顔（会話の立ち絵）：画像があれば画像、なければ見た目から描く ----
-const TQ_PORTRAIT_IMG = {"海斗":"kaito", "亜理紗":"arisa", "玲也":"reiya", "羽奈":"hana", "推し":"oshi", "りかり":"rikari", "ゆうざいくん":"yuzai", "悪魔":"akuma", "？？？":"unknown", "ノイズの王":"unknown"};
+const TQ_PORTRAIT_IMG = {"海斗":"kaito", "亜理紗":"arisa", "玲也":"reiya", "羽奈":"hana", "推し":"oshi", "りかり":"rikari", "ゆうざいくん":"yuzai", "悪魔":"akuma", "？？？":"unknown", "ノイズの王":"unknown", "タカト":"takato", "花音":"kanon", "良太":"ryota", "雄介":"yusuke", "優花":"yuka", "美優":"miyu", "七海":"nanami", "隼人":"hayato"};
 const TQ_PORTRAIT_LOOK = {"アキト":"akito", "ハルキ":"haruki", "ミナ":"mina", "蒼太":"aota", "さえこ":"saeko", "健斗":"kento", "美咲":"misaki", "竜也":"tatsuya", "龍之介":"ryu", "紘":"hiro", "サンタ":"santa", "はるや":"haruya", "ももね":"momone",
     "アナウンくん":"robo", "若いアキト":"youngA", "若いハルキ":"youngH", "後輩":"kouhai", "駅員さん":"ekiin", "牛タン屋さん":"oyaji", "チキン屋さん":"oyaji", "おばちゃん":"obaa", "観光客":"tourist", "子ども":"kid", "会社員":"citizen",
     "通りすがりの人":"citizen", "参加者":"citizenF", "受付":"citizenF", "ARE ユーザー":"citizenF", "ぬいぐるみ王":"teddy", "ノイズの王":"unknown", "タカト":"takato", "花音":"kanon", "良太":"ryota", "雄介":"yusuke", "優花":"yuka", "美優":"miyu", "七海":"nanami", "隼人":"hayato"};
