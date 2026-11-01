@@ -106,7 +106,11 @@ function daifugo(h, ctx, game){
         else if(k === "up"){ const cs = hd.filter((c) => sel.has(c)); if(legal(cs)){ sel.clear(); play(0, cs); cur = Math.min(cur, hands[0].length - 1); } else { ctx.A.se("cancel"); msg = "そのカードは だせません。（おなじ かずの つよい カードを）"; } }
         else if(k === "down"){ if(!field){ msg = "さいしょの ばんは パスできません。"; ctx.A.se("cancel"); } else { sel.clear(); pass(0); } } };
     h.tap = (x, y) => { if(y > 380){ const hd = hands[0]; const sp = Math.min(40, (W - 60) / Math.max(1, hd.length)); const i = Math.floor((x - 20) / sp); if(i >= 0 && i < hd.length){ if(cur === i) h.key("ok"); else cur = i; } } else if(y > 300 && y < 380){ h.key(x < W / 2 ? "up" : "down"); } };
-    h.update = (dt) => { if(h.over) return; wait -= dt; if(turn !== 0 && wait <= 0){ cpu(turn); } h.info(msg); };
+    let ap = 1.1;
+    const canPlay = () => { if(!field) return true; const gp = {}; hands[0].forEach((c) => (gp[c.r] = gp[c.r] || []).push(c)); return Object.values(gp).some((gs) => gs.length >= field.n && gs[0].r > field.r); };
+    h.update = (dt) => { if(h.over) return; wait -= dt; if(turn !== 0 && wait <= 0){ cpu(turn); }
+        if(turn === 0 && !h.over && field && !canPlay()){ const stuck = "だせる カードが ないので、じどうで パスします…"; msg = stuck; ap -= dt; if(ap <= 0){ ap = 1.1; sel.clear(); pass(0); if(msg === stuck) msg = "パスしました。"; } } else ap = 1.1;
+        h.info(msg); };
     h.draw = (g) => {
         for(let p = 1; p < 4; p++){ const x = [0, 20, 130, 240][p]; rr(g, x, 20, 100, 70, 8, turn === p ? "#4c3a99" : "#2b2150", turn === p ? "#ffd43b" : "#fff"); txt(g, names[p], x + 8, 40, {size: 14}); txt(g, "🂠 ×" + hands[p].length, x + 8, 62, {size: 14}); txt(g, shown[p], x + 8, 82, {size: 12, c: "#ffe9a8"}); }
         rr(g, 40, 120, W - 80, 130, 14, "#1d6b43", "#fff"); txt(g, "ば", 55, 142, {size: 12, c: "#bdf"});

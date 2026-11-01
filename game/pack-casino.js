@@ -252,7 +252,14 @@ function pkDfCpu(g, who){
 function pkDfNext(g){
     if(g.phase !== "play") { render(); return; }
     if(g.count > 900){ g.order = [0, 1, 2, 3].sort((a, b) => g.hands[a].length - g.hands[b].length); pkDfEnd(g); return; }
-    if(g.turn === 0){ if(!g.hands[0].length){ g.turn = pkDfNextIdx(g, 0); return pkDfNext(g); } render(); return; }
+    if(g.turn === 0){ if(!g.hands[0].length){ g.turn = pkDfNextIdx(g, 0); return pkDfNext(g); }
+        if(g.field && !pkDfEnum(g, g.hands[0]).length){   // だせる カードが ないときは じどうで パス
+            G.pk.msg = "だせる カードが ないので、じどうで パスします…"; render();
+            const tk = g.token; const goPass = () => { if(G.pk.game !== g || g.token !== tk || g.phase !== "play" || g.turn !== 0) return; pkDfPass(g, 0); g.sel = []; G.pk.msg = "パスしました。"; pkDfNext(g); };
+            if(G.pk.fast) goPass(); else G.pk.tm2 = setTimeout(goPass, 1000);
+            return;
+        }
+        render(); return; }
     render();
     const tok = g.token; const run = () => { if(G.pk.game !== g || g.token !== tok || g.phase !== "play") return; if(g.turn === 0){ pkDfNext(g); return; } const w = g.turn; pkDfCpu(g, w); pkDfNext(g); };
     if(G.pk.fast) run(); else G.pk.tm2 = setTimeout(run, 650);

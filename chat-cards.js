@@ -11,7 +11,7 @@ const CG_GAMES = {
 };
 const CG_SUIT = {S:"♠", H:"♥", D:"♦", C:"♣"};
 const CG_RANK_LABEL = ["", "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-feat.cg = {gid:null, view:null, sel:[], timer:null, busy:false};
+feat.cg = {gid:null, view:null, sel:[], timer:null, busy:false, autoTimer:null};
 
 function initCards(){
     registerTool("cg", onCgAction);
@@ -135,6 +135,31 @@ function paintCg(){
     else if(v.game === "uso") html += cgUsoView(v, me, opp, myTurn, counts, pub);
     else html += cgIndianView(v, me, opp, myTurn, pub);
     box.innerHTML = html + toolClose('');
+    cgAutoPass(v, myTurn);
+}
+
+// 大富豪：出せるカードが1枚もないときは、パスを押さなくても自動でパスします
+function cgTomoCanPlay(hand, f){
+    if(!f || !f.cards) return true;   // 場が空のときは、好きなカードを出せる
+    const n = Number(f.n) || f.cards.length, st = Number(f.strength), count = {};
+    (hand || []).forEach((c) => { const r = c === "JK" ? 0 : Number(c.slice(1)); count[r] = (count[r] || 0) + 1; });
+    return Object.keys(count).some((key) => { const r = Number(key), strength = r === 0 ? 0 : (r === 1 ? 14 : (r === 2 ? 15 : r)); return count[key] >= n && strength > st; });
+}
+
+function cgAutoPass(v, myTurn){
+    const cg = feat.cg;
+    if(cg.autoTimer){ clearTimeout(cg.autoTimer); cg.autoTimer = null; }
+    const f = v.pub && v.pub.field;
+    if(v.game !== "tomo" || !myTurn || v.status !== "playing" || !f || !f.cards || cgTomoCanPlay(v.hand, f)) return;
+    const attempt = (tries) => {
+        cg.autoTimer = setTimeout(async () => {
+            cg.autoTimer = null;
+            if(!$("cgBody") || cg.view !== v) return;   // 画面が変わっていたら、やめる
+            if(cg.busy){ if(tries > 0) attempt(tries - 1); return; }
+            try{ await cgCall("cg_act", {p_game:cg.gid, p_action:"pass", p_arg:{}}); showToast("出せるカードがないので、パスしました。"); }catch(error){ showToast(featError(error)); }
+        }, tries === 4 ? 1200 : 600);
+    };
+    attempt(4);
 }
 
 function cgHandRow(h, selectable, selected){
@@ -154,7 +179,8 @@ function cgTomoView(v, me, opp, myTurn, counts, pub){
     let html = '<div class="meta">' + escapeHtml(vsName(opp)) + ' の手札：' + (counts[opp] || 0) + '枚</div>';
     html += '<div><b>場</b>' + (f && f.cards ? '<div class="bj-hand">' + f.cards.map((c) => cgCard(c, "disabled")).join("") + '</div><div class="meta">' + escapeHtml(vsName(f.by)) + ' が出しました</div>' : '<div class="meta">（なし。好きなカードを出せます）</div>') + '</div>';
     html += '<div><b>あなた</b>の手札（' + (counts[me] || 0) + '枚）' + cgHandRow(v.hand, myTurn, feat.cg.sel) + '</div>';
-    if(myTurn) html += '<div class="row"><button type="button" class="button" data-t="cg:play">選んだカードを出す</button>' + (f && f.cards ? '<button type="button" class="button-secondary" data-t="cg:pass">パス</button>' : "") + '</div><div class="meta">同じ数字を同じ枚数で、場より強く。（パスすると場が流れ、出した人が先攻に）</div>';
+    if(myTurn && f && f.cards && !cgTomoCanPlay(v.hand, f)) html += '<div class="admin-card">出せるカードがないので、自動でパスします…</div>';
+    else if(myTurn) html += '<div class="row"><button type="button" class="button" data-t="cg:play">選んだカードを出す</button>' + (f && f.cards ? '<button type="button" class="button-secondary" data-t="cg:pass">パス</button>' : "") + '</div><div class="meta">同じ数字を同じ枚数で、場より強く。（パスすると場が流れ、出した人が先攻に）</div>';
     return html;
 }
 
