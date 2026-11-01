@@ -38,3 +38,7 @@
 .enemy-symbol.has-art{width:132px;height:88px;padding:0;background:none;overflow:hidden}
 .enemy-symbol .foe-art{width:100%;height:100%;object-fit:cover;border-radius:10px;border:2px solid rgba(255,255,255,.85);display:block}
 .title-screen{background:linear-gradient(rgba(10,16,24,.5),rgba(10,16,24,.7)),url(img/title.webp) center/cover,radial-gradient(900px 500px at 50% 20%,#27415a,#101720 70%)}
+.battle-options button{background:#202d37;border:1px solid #52636a;border-radius:9px;color:#e9edf0;padding:10px 12px;font:inherit;cursor:pointer;transition:border-color .15s,background .15s}
+.battle-options button:hover:not(:disabled),.battle-options button:focus-visible{border-color:#d7b675;background:#2a3b47}
+.battle-options button:disabled{opacity:.45;cursor:not-allowed}
+.battle-options button small{color:#acb8bb}
