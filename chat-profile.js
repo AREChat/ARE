@@ -35,16 +35,26 @@ function resizeImage(file,maxSide,quality){
     });
 }
 
+// どの画面も、「閉じる」ボタンは右上の「✕」1つだけにする（下の「閉じる／とじる」が重なって2つ出るのを防ぐ）。
+// 「キャンセル」など、ほかの意味のボタンは そのまま残す。
+function dedupeSheetClose(sh){
+    if(!sh) return;
+    const re = /^(閉じる|とじる|戻る|もどる|閉)$/;
+    sh.querySelectorAll('[data-pm="close"]:not(.sheet-x),[data-t="ct:stop"],#aiStudioClose').forEach((b) => {
+        if(!re.test((b.textContent || "").trim())) return;
+        const row = b.parentElement;
+        b.remove();
+        if(row && row.classList && row.classList.contains("row") && !row.children.length && !row.textContent.trim()) row.remove();
+    });
+}
+
 function openSheet(html){
-    // どの画面にも、右上の「✕」と下の「閉じる」を必ず付ける（押しやすさのため）
     el.profileSheet.innerHTML = '<button type="button" class="sheet-x" data-pm="close" aria-label="閉じる">✕</button>' + html;
-    if(!el.profileSheet.querySelector('.row [data-pm="close"]')){
-        el.profileSheet.insertAdjacentHTML("beforeend", '<div class="row sheet-auto-close"><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
-    }
+    dedupeSheetClose(el.profileSheet);
     el.profileModal.hidden = false;
 }
 
-function closeSheet(){ if(typeof stopCamera === "function") stopCamera(); if(window.stopProfile3D) window.stopProfile3D(); el.profileModal.hidden = true; el.profileSheet.innerHTML = ""; feat.avatarBlob = null; }
+function closeSheet(){ if(typeof stopCamera === "function") stopCamera(); try{ if(typeof ctStop === "function") ctStop(); if(typeof aiStudioClearPreview === "function") aiStudioClearPreview(); }catch(_e){} if(window.stopProfile3D) window.stopProfile3D(); el.profileModal.hidden = true; el.profileSheet.innerHTML = ""; feat.avatarBlob = null; }
 
 function bigAvatar(profile, ctxUser){
     const url = safeHttpUrl(profile?.avatar_url || "");

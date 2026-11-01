@@ -82,7 +82,7 @@
         var path = location.pathname;
         var isInfo = /\/(terms|privacy|faq|guide|help|credits|changelog|404|manual)(\.html)?$/.test(path);   // 読みものページ（印刷・コピーはOK）
         var isChat = /\/chat(\.html)?$/.test(path);                                                          // チャット：コピー・貼り付け・「印刷」ボタンは必要
-        var isGame = (/\/(game|game2|game3|game4|game6|game7|dream-frontier)\//.test(path) && !/\/game2\/manual/.test(path)) || /\/game5\/play\//.test(path);
+        var isGame = (/\/(game|game2|game3|game4|game6|game7|dream-frontier|daifugo)\//.test(path) && !/\/game2\/manual/.test(path)) || /\/game5\/play\//.test(path);
         function isField(t) { return !!(t && t.nodeType === 1 && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)); }
 
         // 1) ほかの開発者向けキー（F7 キャレット閲覧／名前をつけて保存の別の形）。Ctrl+P（印刷）は、チャット・読みものページ以外で止める
@@ -123,6 +123,18 @@
                     var gs = document.createElement("script");
                     gs.src = new URL("game/protect-game.js", me).href;
                     (document.head || document.documentElement).appendChild(gs);
+                }
+            } catch (_e) { /* 何もしない */ }
+        }
+
+        // 5-2) ゲームの画面：スマホ用の「← もどる」と、端末の「戻る」でブラウザごと閉じない動き（game-back.js）
+        if (isGame && !document.querySelector('script[src*="game-back.js"]')) {
+            try {
+                var me2 = document.currentScript && document.currentScript.src;
+                if (me2) {
+                    var gb = document.createElement("script");
+                    gb.src = new URL("game-back.js", me2).href;
+                    (document.head || document.documentElement).appendChild(gb);
                 }
             } catch (_e) { /* 何もしない */ }
         }

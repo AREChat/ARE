@@ -31,7 +31,7 @@ function openAiStudio(){
     document.getElementById("aiStudioMode").addEventListener("change",aiStudioUpdateMode);
     document.getElementById("aiStudioCheck").addEventListener("click",aiStudioCheckConnection);
     document.getElementById("aiStudioGenerate").addEventListener("click",aiStudioGenerate);
-    document.getElementById("aiStudioClose").addEventListener("click",() => { aiStudioClearPreview(); closeSheet(); });
+    document.getElementById("aiStudioClose")?.addEventListener("click",() => { aiStudioClearPreview(); closeSheet(); });
     aiStudioUpdateMode();
 }
 

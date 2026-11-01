@@ -112,7 +112,7 @@ ACT.dlgok = () => { const v = ($("dlgIn") || {}).value || "", f = G.dlg.fn; G.dl
 // ---------------------------------------------------------------- タイトル
 function viewTitle(){
     G.draft = null;
-    return '<div id="tm" class="win"><button class="opt" data-a="tNew">はじめから</button><button class="opt" data-a="tLoad">つづきから</button><button class="opt" data-a="tHelp">あそびかた</button><button class="opt" data-a="tSet">せってい</button><button class="opt" data-a="tMovie">🎬 しょうかい映像</button>' + (G.installEv ? '<button class="opt" data-a="tInstall">📲 アプリとして インストール</button>' : "") + '<button class="opt" data-a="tCheat">🔑 チート</button><button class="opt" data-a="tQuit">🚪 ゲームをおわる</button></div>' +
+    return '<div id="tm" class="win"><button class="opt" data-a="tNew">はじめから</button><button class="opt" data-a="tLoad">つづきから</button><button class="opt" data-a="tHelp">あそびかた</button><button class="opt" data-a="tSet">せってい</button><button class="opt" data-a="tMovie">🎬 しょうかい映像</button>' + (G.installEv ? '<button class="opt" data-a="tInstall">📲 アプリとして インストール</button>' : "") + '<button class="opt" data-a="tCheat">🔑 チート</button></div>' +
         '<div class="foot">ARE QUEST 〜そういうときは、AREだ！〜　／　タップ・矢印キー+Enter・コントローラー（A=けってい B=もどる）で えらべます</div>';
 }
 ACT.tInstall = () => { const ev = G.installEv; if(!ev) return; try{ ev.prompt(); if(ev.userChoice) ev.userChoice.then(() => { G.installEv = null; if(G.mode === "title") render(); }); }catch(_e){} };

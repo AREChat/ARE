@@ -51,7 +51,7 @@
             if(busy || !sh.firstChild) return;
             busy = true;
             if(!sh.querySelector(".sheet-x")) sh.insertAdjacentHTML("afterbegin", '<button type="button" class="sheet-x" data-pm="close" aria-label="閉じる">✕</button>');
-            if(!sh.querySelector('.row [data-pm="close"]')) sh.insertAdjacentHTML("beforeend", '<div class="row sheet-auto-close"><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
+            try{ if(typeof dedupeSheetClose === "function") dedupeSheetClose(sh); }catch(_e){}   // 閉じるボタンは ✕ の1つだけ
             setTimeout(function(){ busy = false; }, 0);
         }).observe(sh, {childList:true});
     }
