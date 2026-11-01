@@ -213,7 +213,7 @@ function YE(n, c){
     const b = c.boss, bid = m + "_boss";
     yBoss(n, bid, b.name, b.emo, b.img, b.acts, b.say);
     const reward = [["gold", 2000 + n * 700], ["item", "special", 6], ["item", "omamori", 3], rpgN((2000 + n * 700) + "G と スペシャルおにぎり 6こ・ふっかつのおまもり 3こ を てにいれた！"), rpgN("📖 今回の まなび：" + c.learn)];
-    RPG_EV[bid] = YKL(c.pre).concat([["battle", [bid], YKL(c.post).concat(reward, c.end ? YKL(c.end) : [], YKL(yLetter(n)), [["set", "e_" + m], ["run", n === 20 ? "yh_final" : "lab_ret_go"]])]]);
+    RPG_EV[bid] = YKL(c.pre).concat([["battle", [bid], YKL(c.post).concat(reward, c.end ? YKL(c.end) : [], YKL(yLetter(n)), [["set", "e_" + m], ["run", n === 20 ? "yh_final" : n === 30 ? "yh_extra_final" : "lab_ret_go"]])]]);
     RPG_EV[m + "_enter"] = [["if", "!" + m + "_in", [["set", m + "_in"], ["set", "yh_started"]].concat(YKL(c.intro)), []]];
     // --- 地図
     const objs = [yNpc(m + "_hq", Y_GUIDE[0], Y_GUIDE[1], c.guideName || "紘", m + "_hq")];

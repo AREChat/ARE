@@ -4,8 +4,8 @@
     const isYhFlag = (k) => /^(e_)?(yh|dk)\d/.test(k) || k === "yh_started" || k === "e_yh_all" || k === "dk_started" || k === "e_dk_all";
     const _rf = window.tqReplayFlags;
     window.tqReplayFlags = function(){ return _rf.apply(this, arguments).filter((k) => !isYhFlag(k)); };
-    for(let n = 1; n <= 20; n++){
-        TQ_REPLAYS.push({id:"rp_yh" + String(n).padStart(2, "0"), n:"🦸 やりすぎヒーロー伝説 第" + n + "話（クリア前まで）", era:"yh" + n, lv:[45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 99, 99, 99, 99, 99, 99, 99, 99, 99][n - 1] });
+    for(let n = 1; n <= 30; n++){
+        TQ_REPLAYS.push({id:"rp_yh" + String(n).padStart(2, "0"), n:"🦸 やりすぎヒーロー伝説 " + (n > 20 ? "番外編 " : "") + "第" + n + "話（クリア前まで）", era:"yh" + n, lv:[45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95][n - 1] || 99 });
     }
     for(let n = 1; n <= 10; n++) TQ_REPLAYS.push({id:"rp_dk" + String(n).padStart(2, "0"), n:"📖 出来事 第" + n + "話（クリア前まで）", era:"dk" + n, lv:40});
     for(let i = 1; i <= 20; i++) TQ_WARP_IDS[11 + i] = "yh" + i;
