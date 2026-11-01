@@ -172,6 +172,7 @@ const FEATURES = [
     ["game3","ARE QUEST 3",initGame3],
     ["game4","ARE CARD",initGame4],
     ["game5","GAME5 推理ゲーム",initGame5],
+    ["daifugo","大富豪",initDaifugo],
     ["dream","ドリームフロンティア",initDream],
     ["ng","NGワード制裁",initNg],
     ["points","ポイント・AREShop",initPoints],

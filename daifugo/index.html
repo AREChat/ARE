@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"><script src="../protect.js"></script>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b3d2e">
+<title>大富豪 〜本格ルール・全部入り〜 | ARE</title>
+<link rel="stylesheet" href="daifugo.css">
+</head>
+<body>
+<div id="app" aria-live="polite">
+  <header id="bar">
+    <b id="barTitle">👑 大富豪</b>
+    <span id="barInfo"></span>
+    <span class="grow"></span>
+    <button type="button" id="btnHelp" aria-label="あそびかた">❓</button>
+    <button type="button" id="btnSet" aria-label="ルール設定">⚙️</button>
+  </header>
+  <main id="table">
+    <section id="opps"></section>
+    <section id="center">
+      <div id="chips"></div>
+      <div id="field"></div>
+      <div id="msg"></div>
+    </section>
+    <section id="logbox"></section>
+  </main>
+  <footer id="me">
+    <div id="myinfo"></div>
+    <div id="hand"></div>
+    <div id="actions">
+      <button type="button" id="btnPlay" class="primary">出す</button>
+      <button type="button" id="btnPass">パス</button>
+      <button type="button" id="btnSort">並べかえ</button>
+      <button type="button" id="btnHint">ヒント</button>
+    </div>
+  </footer>
+  <div id="overlay" hidden></div>
+</div>
+<script src="daifugo.js"></script>
+</body>
+</html>

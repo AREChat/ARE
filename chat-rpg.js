@@ -44,6 +44,13 @@ function openGame5(){
         '<div class="admin-card">ブラウザで すぐ あそべます（ダウンロード不要）。パソコンでは、Windows版（exe）も ページから入手できます（スマホは ブラウザ版のみ）。</div>' +
         '<div class="row"><a class="button" href="./game5/play/index.html" target="_blank" rel="noopener">▶ ブラウザで あそぶ</a><a class="button-secondary" href="' + escapeHtml(href) + '" target="_blank" rel="noopener" style="text-decoration:none">案内ページ（Windows版）</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
 }
+function openDaifugo(){
+    const href = "./daifugo/index.html";
+    openSheet(toolHead("👑 大富豪（本格ルール・全部入り）", "3〜2の技・縛り（3枚縛りも）・革命・階級・カード交換。ルールは自由に変えられます") +
+        '<div class="admin-card">CPUと3〜6人で対戦。大富豪／富豪／平民／貧民／大貧民と、ラウンドごとのカード交換つき。アカウント・ポイントは不要です。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ あそぶ</a></div>');
+}
+function initDaifugo(){ /* ゲーム本体は ./daifugo/ に独立 */ }
 function initGame5(){ /* ゲーム本体は ./game5/play/（ブラウザ版）と Releases の exe（Windows版） */ }
 function initGame3(){ /* ゲーム本体は ./game3/ に独立 */ }
 function initGame4(){ /* ゲーム本体は ./game4/ に独立 */ }
