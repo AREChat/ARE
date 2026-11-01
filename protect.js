@@ -77,5 +77,62 @@
         }, 1000);
     }
 
+    // ===== 追加の抑止（サイバー攻撃・うっかり操作の対策）。ゲーム・チャットに必要なボタン／キーは そのまま使えます =====
+    (function () {
+        var path = location.pathname;
+        var isInfo = /\/(terms|privacy|faq|guide|help|credits|changelog|404|manual)(\.html)?$/.test(path);   // 読みものページ（印刷・コピーはOK）
+        var isChat = /\/chat(\.html)?$/.test(path);                                                          // チャット：コピー・貼り付け・「印刷」ボタンは必要
+        var isGame = (/\/(game|game2|game3|game4|game6|game7|dream-frontier)\//.test(path) && !/\/game2\/manual/.test(path)) || /\/game5\/play\//.test(path);
+        function isField(t) { return !!(t && t.nodeType === 1 && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.tagName === "SELECT" || t.isContentEditable)); }
+
+        // 1) ほかの開発者向けキー（F7 キャレット閲覧／名前をつけて保存の別の形）。Ctrl+P（印刷）は、チャット・読みものページ以外で止める
+        document.addEventListener("keydown", function (event) {
+            var key = String(event.key || "").toLowerCase(), ctrl = event.ctrlKey || event.metaKey;
+            var block = event.key === "F7" || (ctrl && event.shiftKey && key === "s") ||
+                (ctrl && !event.shiftKey && !event.altKey && key === "p" && !isChat && !isInfo);
+            if (!block) return;
+            event.preventDefault(); event.stopPropagation(); notice();
+        }, true);
+
+        // 2) 印刷：チャット・読みものページ以外は、印刷しても画面の中身が出ない
+        if (!isChat && !isInfo) {
+            var pst = document.createElement("style");
+            pst.textContent = "@media print{html,body{display:none!important}}";
+            (document.head || document.documentElement).appendChild(pst);
+        }
+
+        // 3) ファイルのドロップ：入力欄やファイル選びの上、アプリ自身がうけとる場所（ドロップ受け口）以外では、ブラウザが勝手にファイルを開かないようにする
+        window.addEventListener("dragover", function (e) {
+            if (e.defaultPrevented || isField(e.target)) return;
+            e.preventDefault(); try { e.dataTransfer.dropEffect = "none"; } catch (_e) { /* 何もしない */ }
+        });
+        window.addEventListener("drop", function (e) {
+            if (e.defaultPrevented || isField(e.target)) return;
+            e.preventDefault();
+        });
+
+        // 4) 他のサイトの中に埋め込まれて（フレーム）使われるのを止める（クリックジャッキング対策）。同じサイトの中の埋め込み（game2 のドリームフロンティア表示など）はOK
+        try { if (window.top !== window.self) { void window.top.location.href; } }
+        catch (_e) { document.documentElement.style.display = "none"; }
+
+        // 5) ゲームの画面：コピー・切り取り・文字選択・Ctrl+A・印刷などを止める（入力欄は除く）。game/ は自分で読み込み済み
+        if (isGame && !document.querySelector('script[src*="protect-game.js"]')) {
+            try {
+                var me = document.currentScript && document.currentScript.src;
+                if (me) {
+                    var gs = document.createElement("script");
+                    gs.src = new URL("game/protect-game.js", me).href;
+                    (document.head || document.documentElement).appendChild(gs);
+                }
+            } catch (_e) { /* 何もしない */ }
+        }
+
+        // 6) コンソールの注意書き：「ここに貼って」と言われたコードで、アカウントやデータを盗まれるのを防ぐ
+        try {
+            console.log("%c止まって！", "color:#d33;font-size:34px;font-weight:bold");
+            console.log("%cだれかに「ここにコードを貼って」と言われても、貼らないでください。アカウントやデータを盗まれるおそれがあります。", "font-size:15px");
+        } catch (_e) { /* 何もしない */ }
+    })();
+
     window.AREProtect = { setExempt: function () { /* 管理者も含め、全員が対象です（何もしません） */ } };
 })();

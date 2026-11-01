@@ -96,7 +96,7 @@
         if (e.ctrlKey || e.metaKey || e.shiftKey) return;   // 特別な押し方は ブラウザに まかせる
         e.preventDefault(); e.stopPropagation();
         try { var t = document.createElement("a"); t.href = url; t.target = "_blank"; t.rel = "noopener noreferrer"; t.style.display = "none"; t.dataset.lcDone = "1"; document.body.appendChild(t); t.__lcSkip = true; t.click(); t.remove(); }
-        catch (_e) { try { window.open(url, "_blank"); } catch (_e2) { /* 何もしない */ } }
+        catch (_e) { try { window.open(url, "_blank", "noopener,noreferrer"); } catch (_e2) { /* 何もしない */ } }
     }, true);
 
     // ⑤ 入力欄ではなく「メッセージの文字」の中の URL を、あとから リンクに かえる（ほかの機能が 表示を つくりなおしても だいじょうぶ）

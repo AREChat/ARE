@@ -39,7 +39,7 @@ function tqGuideView(){
         '<div class="card"><b>📖 ここまでの ものがたり</b><div class="meta" style="white-space:pre-wrap">' + esc(story) + '</div></div>' +
         '<div class="card"><b>🎮 そうさ</b><div class="meta">いどう：矢印キー／WASD／十字ボタン　はなす・しらべる：Enter／Z／Aボタン　メニュー：X／M　もどる：Esc／X</div></div>';
     faq.forEach((q) => { h += '<div class="card"><b>Q. ' + esc(q[0]) + '</b><div class="meta">' + esc(q[1]) + '</div></div>'; });
-    h += '<div class="card meta">くわしい てじゅんしょは <a href="../help.html#rpg" target="_blank" style="color:#9fd0ff">help.html の「RPG 手順書」</a> に あります。</div>';
+    h += '<div class="card meta">くわしい てじゅんしょは <a href="../help.html#rpg" target="_blank" rel="noopener noreferrer" style="color:#9fd0ff">help.html の「RPG 手順書」</a> に あります。</div>';
     return h;
 }
 (function(){
