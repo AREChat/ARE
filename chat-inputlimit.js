@@ -31,6 +31,19 @@
         });
     }
 
+    // 1-2) 直す欄（textarea.edit-box）は、あとから作られるので、textarea 全体の value の書きこみでも切る
+    try{
+        Object.defineProperty(HTMLTextAreaElement.prototype, "value", {
+            configurable: true,
+            enumerable: desc.enumerable,
+            get: desc.get,
+            set: function(v){
+                if(isTarget(this)){ var s = String(v == null ? "" : v), c = clip(s); if(c !== s){ warn(); v = c; } }
+                desc.set.call(this, v);
+            }
+        });
+    }catch(_e){ /* 何もしない（入力欄ごとの保護は残る） */ }
+
     // 2) 入力の直前：入れられる文字数を数えて、あふれる分は入れない
     document.addEventListener("beforeinput", function(e){
         var el = e.target;
