@@ -11,7 +11,13 @@ export class Story{
     meta(n){ return this.c.data.chapters.chapters[n - 1]; }
     // 話の順番：前日譚(31〜) → 本編(1〜30) → 後日譚(39〜)。order が無ければ 1〜30
     order(){ const o = this.c.data.chapters.order; return Array.isArray(o) && o.length ? o : Array.from({length: TOTAL}, (_, i) => i + 1); }
-    nextOf(n){ const o = this.order(), i = o.indexOf(n); return i >= 0 ? o[i + 1] : undefined; }
+    nextOf(n){ const o = this.isSub(n) ? this.subOrder() : this.order(), i = o.indexOf(n); return i >= 0 ? o[i + 1] : undefined; }
+    // サブストーリー（外伝）：chapters.json の subOrder に並べる。本編の order / 章番号 / セーブとは別あつかい
+    subOrder(){ const o = this.c.data.chapters.subOrder; return Array.isArray(o) ? o : []; }
+    isSub(n){ return this.subOrder().includes(n); }
+    has(n){ return this.order().includes(n) || this.isSub(n); }
+    // 敵のつよさ・出る敵を決める「めやすの章」。サブは台本の dch（むずかしさ）を使う
+    get ch(){ const d = this.def; return d && d.dch ? d.dch : this.S.chapter; }
     label(n){ const m = this.meta(n) || {}; return m.lbl || ("第" + n + "話"); }
     async load(n){
         if(!this.cache[n]) this.cache[n] = await this.c.jget("data/" + this.meta(n).file);
@@ -83,6 +89,10 @@ export class Story{
         const {S, UI} = this.c; const d = this.def;
         S.flags[d.done] = 1; this.log.push(d.n);
         const nx = this.nextOf(d.n);
+        if(nx === undefined && this.isSub(d.n)){
+            S.subCleared = 1; UI.pic && UI.pic(""); this.c.autosave();
+            await UI.card("サブストーリー　おわり", d.endCard || d.title, 3600); this.hud(); UI.toast("📖 サブストーリー ぜんぶ クリア！ ありがとう！", 5000); return;
+        }
         if(nx === undefined){ S.cleared = 1; S.ending = 1; UI.pic && UI.pic(""); this.c.autosave(); await UI.card("ＦＩＮ", "ARE QUEST 3 〜月影のあしあと〜　" + (d.endCard ? d.endCard : "") + (d.final ? "" : "　（つづく）"), 3600); this.hud(); UI.toast("🔥 おまけ：原っぱに 5体の ボスが 待っている！（赤い⚔の 目じるし）", 6500); return; }
         UI.pic && UI.pic("");
         if(d.endCard) await UI.card("第" + (d.endCard.match(/^第(\d+)章/) || [0, ""])[1] + "章　クリア！", d.endCard, 2600);
