@@ -26,6 +26,14 @@ function openDream(){
         '<div class="admin-card">アカウント・ポイントは不要です。セーブはこの端末のブラウザに保存されます。スマホ・タブレットは横向き推奨。</div>' +
         '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ パークにはいる</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
 }
+function openStudy124(){
+    // 別のサイト（学習サイト study124）へのリンク。ARE のアカウント情報は渡しません
+    const href = "https://arechat.github.io/study124/";
+    openSheet(toolHead("📚 学習サイト（study124）", "プログラミング学習サイト。用語集・クイズ・物語・天気や電車の情報など") +
+        '<div class="admin-card">ARE とは別のサイトです。新しいタブで開きます。学習サイトからも、ARE とゲーム（game1〜game6）へ移れます。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer">▶ 学習サイトをひらく</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
+}
+function initStudy124(){ /* 別のサイトへのリンクだけ。初期化は不要 */ }
 function openGame3(){
     const href = "./game3/index.html";
     openSheet(toolHead("🌙 ARE QUEST 3 〜月影のあしあと〜", "高画質の3D・学園ものRPG。PC推奨（スマホ・タブレットは横向き）") +

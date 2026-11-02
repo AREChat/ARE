@@ -174,6 +174,7 @@ const FEATURES = [
     ["game5","GAME5 推理ゲーム",initGame5],
     ["daifugo","大富豪",initDaifugo],
     ["dream","ドリームフロンティア",initDream],
+    ["study124","学習サイト",initStudy124],
     ["ng","NGワード制裁",initNg],
     ["points","ポイント・AREShop",initPoints],
     ["story","ストーリー",initStory],
