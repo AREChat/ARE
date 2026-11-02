@@ -20,7 +20,15 @@ function teardownTyping(){
 async function setupTyping(roomId){
     const t = feat.typing;
     t.roomId = roomId;
-    try{ if(state.client.realtime && state.client.realtime.setAuth) await state.client.realtime.setAuth(); }catch(_e){ /* 続行 */ }
+    // 入力中の表示は「非公開チャンネル」なので、ログイン中の鍵（アクセストークン）を必ず渡す。
+    // 鍵なしの setAuth() は、この版の supabase-js では鍵を消してしまい、つながらなくなる（Unauthorized）。
+    try{
+        if(state.client.realtime && state.client.realtime.setAuth){
+            const sess = await state.client.auth.getSession();
+            const tk = sess && sess.data && sess.data.session && sess.data.session.access_token;
+            if(tk) await state.client.realtime.setAuth(tk);
+        }
+    }catch(_e){ /* 続行 */ }
     if(t.roomId !== roomId) return;
     t.channel = state.client.channel("typing:" + roomId,{config:{private:true,broadcast:{self:false}}})
         .on("broadcast",{event:"typing"},(message) => {

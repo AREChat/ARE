@@ -330,7 +330,12 @@
     window.AREExtras = {
         async onReady() {
             buildUI();
-            try { await client().realtime.setAuth(); } catch (_e) { /* 自動認証に任せる */ }
+            try {
+                // 通話の合図は非公開チャンネル。鍵なしの setAuth() は鍵を消してしまうので、ログイン中の鍵を渡す。
+                const sess = await client().auth.getSession();
+                const tk = sess && sess.data && sess.data.session && sess.data.session.access_token;
+                if (tk) await client().realtime.setAuth(tk);
+            } catch (_e) { /* 自動認証に任せる */ }
             ensureChannels();
             setInterval(async () => { try { if (hooks().refreshRooms) await hooks().refreshRooms(); } catch (_e) { /* 次回に再試行 */ } ensureChannels(); }, 30000);
             const a = $("callAudioBtn"), v = $("callVideoBtn");
