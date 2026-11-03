@@ -183,10 +183,6 @@ try { if (window.top !== window.self) { window.top.location = window.self.locati
             throw new Error("ログインIDを入力してください。");
         }
 
-        if (!normalizedPhoneNumber && !normalizedContactEmail) {
-            throw new Error("電話番号かメールアドレスのどちらか一方は必ず入力してください。");
-        }
-
         if (!password || String(password).length < 8) {
             throw new Error("パスワードは8文字以上で入力してください。");
         }
