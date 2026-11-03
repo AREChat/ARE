@@ -6,7 +6,7 @@ import {Geo, M4} from "./gl.js";
 
 const shadeC = (hex, k) => { const n = parseInt(hex.slice(1), 16); const f = (v) => Math.max(0, Math.min(255, Math.round(v * k))); return "#" + [f((n >> 16) & 255), f((n >> 8) & 255), f(n & 255)].map((v) => v.toString(16).padStart(2, "0")).join(""); };
 const hashS = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0); };
-export const KINDS = ["slime", "bat", "mushroom", "ghost", "golem", "dragon", "fish", "flower", "robot", "food", "armor", "star", "pad"];
+export const KINDS = ["slime", "bat", "mushroom", "ghost", "golem", "dragon", "fish", "flower", "robot", "food", "armor", "star", "pad", "wraith"];
 
 // 楕円体・コーン・箱を置く小さな道具
 const ell = (g, c, x, y, z, rx, ry, rz, seg, rings) => g.sphere(1, seg || 10, rings || 7, c, M4.mul(M4.T(x, y, z), M4.S(rx, ry, rz)));
@@ -182,6 +182,18 @@ const BUILD = {
             for(const s of [-1, 1]){ ell(g, "#ff9ab0", s * .46, 1.28, .46, .1, .06, .04, 5, 4); ell(g, S.c2, s * .3, .12, .1, .2, .12, .3, 6, 4); g.cyl(.08, .1, .5, 5, S.c2, M4.T(s * .3, .2, .1)); }
         });
         return {top: [0, 2.8, 0], mouth: [0, 1.1, .6], center: [0, 1.4, 0], h: 2.8, fly: false};
+    },
+    wraith(b, S){
+        b.part("body", [0, 0, 0], (g) => {
+            g.cyl(.95, .3, 1.7, 12, shadeC(S.c1, .6), M4.T(0, .1, 0), false);
+            for(let k = 0; k < 7; k++){ const a = k / 7 * 6.283; cone(g, shadeC(S.c1, .5), Math.cos(a) * .75, .02, Math.sin(a) * .7, .26, .55, Math.PI, 0, 4); }
+            ell(g, S.c1, 0, 1.95, 0, .7, .8, .68, 12, 9); cone(g, S.c1, 0, 2.5, -.08, .52, 1.0, -.25, 0, 8);
+            ell(g, "#050508", 0, 1.9, .42, .46, .5, .3, 10, 7);
+            for(const s of [-1, 1]){ ell(g, S.c2, s * .2, 1.95, .62, .09, .13, .05, 6, 5); ell(g, "#ffffff", s * .2, 1.95, .66, .04, .06, .02, 4, 3); }
+        });
+        const arm = (s) => (g) => { g.cyl(.18, .26, 1.0, 7, shadeC(S.c1, .6), M4.mul(M4.T(s * .85, 1.2, .25), M4.RZ(-s * .5)), false); ell(g, "#d8d8e8", s * 1.2, .8, .38, .17, .15, .17, 6, 5); };
+        b.part("armL", [-.8, 1.7, 0], arm(-1)); b.part("armR", [.8, 1.7, 0], arm(1));
+        return {top: [0, 3.0, 0], mouth: [0, 1.7, .5], center: [0, 1.6, 0], h: 3.0, fly: true, alpha: .94};
     },
     pad(b, S){
         b.part("body", [0, 0, 0], (g) => {

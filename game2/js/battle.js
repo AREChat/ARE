@@ -45,7 +45,7 @@ export class Battle{
         const {R, data, S} = this.c; const o = opt || {};
         if(!this.fx){ this.fx = new Fx(R); this.weap = makeWeapons(R); const sg = new Geo(); sg.cyl(.5, .5, .01, 14, [0, 0, 0], M4.T(0, .02, 0)); this.shadow = R.mesh(sg); }
         if(this.back) this.back.dispose(); this.back = buildBackdrop(R, o.ground || "field");
-        const k = foeScale(S.chapter);
+        const k = foeScale(this.c.story ? this.c.story.ch : S.chapter);
         this.foes = foeIds.map((id, i) => {
             const d = data.monsters[id]; const model = monsterModel(R, specOf(Object.assign({id}, d))); const sc = d.size / model.h * .9;
             const hp = Math.round(d.hp * k);
@@ -79,7 +79,7 @@ export class Battle{
     ally(c){ return (c.kind === "e" ? this.foes : this.party).filter((x) => this.alive(x)); }
     allyAll(c){ return c.kind === "e" ? this.foes : this.party; }
     pos(c){ return c.kind === "e" ? this._foeC(c) : this._partyC(c); }
-    lvOf(c){ return c.kind === "e" ? Math.round(this.c.S.chapter * 1.3 + 1) : c.m.lv; }
+    lvOf(c){ return c.kind === "e" ? Math.round((this.c.story ? this.c.story.ch : this.c.S.chapter) * 1.3 + 1) : c.m.lv; }
     _panel(){
         const el = this.c.UI.$("btParty"); el.innerHTML = this.party.map((p) => {
             const maxhp = p.st.maxhp, hp = Math.max(0, p.m.hp); const low = hp > 0 && hp <= maxhp * .25;
@@ -524,7 +524,7 @@ export class Battle{
                 const rk = Math.max(0, RANKS.indexOf(f.rank)); let ch = [.5, .42, .34, .27, .2, .14, .1, .06][rk] + (this.flute ? .25 : 0);
                 if(this.passive.gscout) ch = 1;
                 if(this.c.rnd() < ch){
-                    scouted = true; const lv = Math.max(1, Math.round(S.chapter * 1.3 + rk * 1.5));
+                    scouted = true; const lv = Math.max(1, Math.round((this.c.story ? this.c.story.ch : S.chapter) * 1.3 + rk * 1.5));
                     this.log(f.name + "は なかまに なりたそうに こちらを みている！"); await this.wait(.8);
                     const r = R.add(f.id, lv, "scout"); this.log(r.msg); if(r.ok) this.c.A.se("levelup"); await this.wait(1.0);
                 }

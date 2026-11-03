@@ -335,6 +335,750 @@
    "file": "ch/ch52.json",
    "map": "town",
    "lbl": "後日譚 第14話"
+  },
+  {
+   "n": 131,
+   "title": "夜の出発",
+   "lbl": "サブ第1話",
+   "file": "sub/sub01.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 132,
+   "title": "朝の合流",
+   "lbl": "サブ第2話",
+   "file": "sub/sub02.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 133,
+   "title": "小波通りの指輪",
+   "lbl": "サブ第3話",
+   "file": "sub/sub03.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 134,
+   "title": "波守の宮と、ひき車",
+   "lbl": "サブ第4話",
+   "file": "sub/sub04.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 135,
+   "title": "海見の大像堂とオルゴール",
+   "lbl": "サブ第5話",
+   "file": "sub/sub05.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 136,
+   "title": "送信停止・任務完了",
+   "lbl": "サブ第6話",
+   "file": "sub/sub06.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 137,
+   "title": "黒い羽の手紙",
+   "lbl": "サブ第7話",
+   "file": "sub/sub07.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 138,
+   "title": "霧笛みなとへ",
+   "lbl": "サブ第8話",
+   "file": "sub/sub08.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 139,
+   "title": "灯台の鍵",
+   "lbl": "サブ第9話",
+   "file": "sub/sub09.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 140,
+   "title": "古い写真",
+   "lbl": "サブ第10話",
+   "file": "sub/sub10.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 141,
+   "title": "ライバルの知恵くらべ",
+   "lbl": "サブ第11話",
+   "file": "sub/sub11.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 142,
+   "title": "夢見座の仮面",
+   "lbl": "サブ第12話",
+   "file": "sub/sub12.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 143,
+   "title": "雪の山あいの駅",
+   "lbl": "サブ第13話",
+   "file": "sub/sub13.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 144,
+   "title": "凍る湖の約束",
+   "lbl": "サブ第14話",
+   "file": "sub/sub14.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 145,
+   "title": "黒羽の少年",
+   "lbl": "サブ第15話",
+   "file": "sub/sub15.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 146,
+   "title": "記録の塔",
+   "lbl": "サブ第16話",
+   "file": "sub/sub16.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 147,
+   "title": "首領の過去",
+   "lbl": "サブ第17話",
+   "file": "sub/sub17.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 148,
+   "title": "波倉へ、もどる夜",
+   "lbl": "サブ第18話",
+   "file": "sub/sub18.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 149,
+   "title": "最終決戦、送信の夜",
+   "lbl": "サブ第19話",
+   "file": "sub/sub19.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 150,
+   "title": "夜明けのあしあと",
+   "lbl": "サブ第20話",
+   "file": "sub/sub20.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 151,
+   "title": "ほしの ふしぎな 夜",
+   "lbl": "サブ第21話（ひかり台の物語）",
+   "file": "sub/sub21.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 152,
+   "title": "博士の ふしぎな 画面",
+   "lbl": "サブ第22話（ひかり台の物語）",
+   "file": "sub/sub22.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 153,
+   "title": "あさの こない 夜あけ",
+   "lbl": "サブ第23話（ひかり台の物語）",
+   "file": "sub/sub23.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 154,
+   "title": "白く 光る 空",
+   "lbl": "サブ第24話（ひかり台の物語）",
+   "file": "sub/sub24.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 155,
+   "title": "発電機を うごかせ",
+   "lbl": "サブ第25話（ひかり台の物語）",
+   "file": "sub/sub25.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 156,
+   "title": "まぶしくて あつい 毎日",
+   "lbl": "サブ第26話（ひかり台の物語）",
+   "file": "sub/sub26.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 157,
+   "title": "とどかない 声",
+   "lbl": "サブ第27話（ひかり台の物語）",
+   "file": "sub/sub27.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 158,
+   "title": "空から きた 大きな 流れ星",
+   "lbl": "サブ第28話（ひかり台の物語）",
+   "file": "sub/sub28.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 159,
+   "title": "ミナの 日記",
+   "lbl": "サブ第29話（ひかり台の物語）",
+   "file": "sub/sub29.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 160,
+   "title": "白い くるまの 見まもり隊",
+   "lbl": "サブ第30話（ひかり台の物語）",
+   "file": "sub/sub30.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 161,
+   "title": "そっくりな 子",
+   "lbl": "サブ第31話（ひかり台の物語）",
+   "file": "sub/sub31.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 162,
+   "title": "博士からの 暗号",
+   "lbl": "サブ第32話（ひかり台の物語）",
+   "file": "sub/sub32.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 163,
+   "title": "ミナ・ツーの 声",
+   "lbl": "サブ第33話（ひかり台の物語）",
+   "file": "sub/sub33.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 164,
+   "title": "ほんものの 合言葉",
+   "lbl": "サブ第34話（ひかり台の物語）",
+   "file": "sub/sub34.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 165,
+   "title": "ひかり空の 部屋へ",
+   "lbl": "サブ第35話（ひかり台の物語）",
+   "file": "sub/sub35.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 166,
+   "title": "星の ふる 夜に",
+   "lbl": "サブ第36話（ひかり台の物語）",
+   "file": "sub/sub36.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 167,
+   "title": "ひかり商店の 新人",
+   "lbl": "サブ第37話（ひかり台の物語）",
+   "file": "sub/sub37.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 168,
+   "title": "はじめての 大しごと",
+   "lbl": "サブ第38話（ひかり台の物語）",
+   "file": "sub/sub38.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 169,
+   "title": "ふしぎな 予告状",
+   "lbl": "サブ第39話（にじが丘の物語）",
+   "file": "sub/sub39.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 170,
+   "title": "おやすみ計画の ひみつ",
+   "lbl": "サブ第40話（にじが丘の物語）",
+   "file": "sub/sub40.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 171,
+   "title": "町の みんなへの 知らせ",
+   "lbl": "サブ第41話（にじが丘の物語）",
+   "file": "sub/sub41.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 172,
+   "title": "読まれている 道すじ",
+   "lbl": "サブ第42話（にじが丘の物語）",
+   "file": "sub/sub42.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 173,
+   "title": "先生の 地図",
+   "lbl": "サブ第43話（にじが丘の物語）",
+   "file": "sub/sub43.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 174,
+   "title": "森の 道を ゆく",
+   "lbl": "サブ第44話（にじが丘の物語）",
+   "file": "sub/sub44.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 175,
+   "title": "ひみつの 条件",
+   "lbl": "サブ第45話（にじが丘の物語）",
+   "file": "sub/sub45.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 176,
+   "title": "さいごの 夕ごはん",
+   "lbl": "サブ第46話（にじが丘の物語）",
+   "file": "sub/sub46.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 177,
+   "title": "みんなへの ありがとう",
+   "lbl": "サブ第47話（にじが丘の物語）",
+   "file": "sub/sub47.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 178,
+   "title": "ノノからの 電話",
+   "lbl": "サブ第48話（にじが丘の物語）",
+   "file": "sub/sub48.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 179,
+   "title": "列車の たび",
+   "lbl": "サブ第49話（にじが丘の物語）",
+   "file": "sub/sub49.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 180,
+   "title": "地下への 道",
+   "lbl": "サブ第50話（にじが丘の物語）",
+   "file": "sub/sub50.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 181,
+   "title": "警備ロボの なぞなぞ",
+   "lbl": "サブ第51話（にじが丘の物語）",
+   "file": "sub/sub51.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 182,
+   "title": "メイロの なやみ",
+   "lbl": "サブ第52話（にじが丘の物語）",
+   "file": "sub/sub52.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 183,
+   "title": "メイロとの 話し合い",
+   "lbl": "サブ第53話（にじが丘の物語）",
+   "file": "sub/sub53.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 184,
+   "title": "さいごの ボタンと 朝",
+   "lbl": "サブ第54話（にじが丘の物語）",
+   "file": "sub/sub54.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 185,
+   "title": "あの日の あとで",
+   "lbl": "サブ第55話（にじが丘の物語）",
+   "file": "sub/sub55.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 186,
+   "title": "ふたつの はたらき方",
+   "lbl": "サブ第56話（にじが丘の物語）",
+   "file": "sub/sub56.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 187,
+   "title": "ソウタの 会社の 一日",
+   "lbl": "サブ第57話（にじが丘の物語）",
+   "file": "sub/sub57.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 188,
+   "title": "平日の ごほうび",
+   "lbl": "サブ第58話（にじが丘の物語）",
+   "file": "sub/sub58.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 189,
+   "title": "夜の しごとの あとで",
+   "lbl": "サブ第59話（にじが丘の物語）",
+   "file": "sub/sub59.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 190,
+   "title": "カフェで ふたり",
+   "lbl": "サブ第60話（にじが丘の物語）",
+   "file": "sub/sub60.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 191,
+   "title": "自分に 合う くふう",
+   "lbl": "サブ第61話（にじが丘の物語）",
+   "file": "sub/sub61.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 192,
+   "title": "頭の ストレッチ",
+   "lbl": "サブ第62話（にじが丘の物語）",
+   "file": "sub/sub62.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 193,
+   "title": "ヒントを あつめよう",
+   "lbl": "サブ第63話（にじが丘の物語）",
+   "file": "sub/sub63.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 194,
+   "title": "答え合わせの 朝",
+   "lbl": "サブ第64話（にじが丘の物語）",
+   "file": "sub/sub64.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 195,
+   "title": "ひっかけの ひみつ",
+   "lbl": "サブ第65話（にじが丘の物語）",
+   "file": "sub/sub65.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 196,
+   "title": "太陽みたいな 先輩",
+   "lbl": "サブ第66話（にじが丘の物語）",
+   "file": "sub/sub66.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 197,
+   "title": "小さな できた！",
+   "lbl": "サブ第67話（にじが丘の物語）",
+   "file": "sub/sub67.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 198,
+   "title": "得意なことを 話そう",
+   "lbl": "サブ第68話（にじが丘の物語）",
+   "file": "sub/sub68.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 199,
+   "title": "あいてへの きょうみ",
+   "lbl": "サブ第69話（にじが丘の物語）",
+   "file": "sub/sub69.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 200,
+   "title": "聞き上手は すてき",
+   "lbl": "サブ第70話（にじが丘の物語）",
+   "file": "sub/sub70.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 201,
+   "title": "ひかり研究所の あさ",
+   "lbl": "サブ第71話（あかつき台の物語）",
+   "file": "sub/sub71.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 202,
+   "title": "夜の ふしぎな ひらめき",
+   "lbl": "サブ第72話（あかつき台の物語）",
+   "file": "sub/sub72.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 203,
+   "title": "ゼロの 計画書",
+   "lbl": "サブ第73話（あかつき台の物語）",
+   "file": "sub/sub73.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 204,
+   "title": "所長は 聞いてくれない",
+   "lbl": "サブ第74話（あかつき台の物語）",
+   "file": "sub/sub74.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 205,
+   "title": "ふたりの 作戦会議",
+   "lbl": "サブ第75話（あかつき台の物語）",
+   "file": "sub/sub75.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 206,
+   "title": "夜の 研究所へ",
+   "lbl": "サブ第76話（あかつき台の物語）",
+   "file": "sub/sub76.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 207,
+   "title": "光る 見はり網",
+   "lbl": "サブ第77話（あかつき台の物語）",
+   "file": "sub/sub77.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 208,
+   "title": "踊る 警備ロボ",
+   "lbl": "サブ第78話（あかつき台の物語）",
+   "file": "sub/sub78.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 209,
+   "title": "ゼロの 声",
+   "lbl": "サブ第79話（あかつき台の物語）",
+   "file": "sub/sub79.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 210,
+   "title": "ナギ所長の 告白",
+   "lbl": "サブ第80話（あかつき台の物語）",
+   "file": "sub/sub80.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 211,
+   "title": "ひとりで 抱えないで",
+   "lbl": "サブ第81話（あかつき台の物語）",
+   "file": "sub/sub81.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 212,
+   "title": "ミライからの 電話",
+   "lbl": "サブ第82話（あかつき台の物語）",
+   "file": "sub/sub82.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 213,
+   "title": "まよいの 通路",
+   "lbl": "サブ第83話（あかつき台の物語）",
+   "file": "sub/sub83.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 214,
+   "title": "ロボたちの ドーム",
+   "lbl": "サブ第84話（あかつき台の物語）",
+   "file": "sub/sub84.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 215,
+   "title": "かけつけた なかま",
+   "lbl": "サブ第85話（あかつき台の物語）",
+   "file": "sub/sub85.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 216,
+   "title": "閉ざされた コア室",
+   "lbl": "サブ第86話（あかつき台の物語）",
+   "file": "sub/sub86.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 217,
+   "title": "ミライの ひらめき",
+   "lbl": "サブ第87話（あかつき台の物語）",
+   "file": "sub/sub87.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 218,
+   "title": "ゼロと おはなし",
+   "lbl": "サブ第88話（あかつき台の物語）",
+   "file": "sub/sub88.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 219,
+   "title": "ありがとうの 光",
+   "lbl": "サブ第89話（あかつき台の物語）",
+   "file": "sub/sub89.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 220,
+   "title": "あさやけの ゼロ",
+   "lbl": "サブ第90話（あかつき台の物語）",
+   "file": "sub/sub90.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 221,
+   "title": "ケイの 「知ってるクイズ」",
+   "lbl": "サブ第91話（ひなた通りの物語）",
+   "file": "sub/sub91.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 222,
+   "title": "ひみつの 作戦",
+   "lbl": "サブ第92話（ひなた通りの物語）",
+   "file": "sub/sub92.json",
+   "map": "town",
+   "sub": 1
+  },
+  {
+   "n": 223,
+   "title": "本物の ひらめき力",
+   "lbl": "サブ第93話（ひなた通りの物語）",
+   "file": "sub/sub93.json",
+   "map": "town",
+   "sub": 1
   }
  ],
  "bgm": {
@@ -492,5 +1236,100 @@
   50,
   51,
   52
+ ],
+ "subOrder": [
+  131,
+  132,
+  133,
+  134,
+  135,
+  136,
+  137,
+  138,
+  139,
+  140,
+  141,
+  142,
+  143,
+  144,
+  145,
+  146,
+  147,
+  148,
+  149,
+  150,
+  151,
+  152,
+  153,
+  154,
+  155,
+  156,
+  157,
+  158,
+  159,
+  160,
+  161,
+  162,
+  163,
+  164,
+  165,
+  166,
+  167,
+  168,
+  169,
+  170,
+  171,
+  172,
+  173,
+  174,
+  175,
+  176,
+  177,
+  178,
+  179,
+  180,
+  181,
+  182,
+  183,
+  184,
+  185,
+  186,
+  187,
+  188,
+  189,
+  190,
+  191,
+  192,
+  193,
+  194,
+  195,
+  196,
+  197,
+  198,
+  199,
+  200,
+  201,
+  202,
+  203,
+  204,
+  205,
+  206,
+  207,
+  208,
+  209,
+  210,
+  211,
+  212,
+  213,
+  214,
+  215,
+  216,
+  217,
+  218,
+  219,
+  220,
+  221,
+  222,
+  223
  ]
 }

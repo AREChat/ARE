@@ -108,7 +108,7 @@ function autosave(){ syncSave(); Save.write("auto", ctx.S); }
 async function fight(foeIds, opt){
     const prev = state; state = "busy"; ctx.A.se("encounter"); await ctx.UI.encounterClose(); state = "battle"; document.body.dataset.mode = "battle";
     const ground = ctx.data.maps[ctx.S.map].interior ? "store" : (ctx.S.map === "street" ? "street" : "field");
-    const bossId = foeIds.find((id) => ctx.data.monsters[id].boss); let bgm = "mainbattle"; if(bossId) bgm = ctx.data.monsters[bossId].bgm || ((ctx.S.chapter >= 29 && ctx.S.chapter <= 30) || ctx.S.chapter >= 39 ? "lastboss" : "midboss"); battle.bgm = bgm;
+    const bossId = foeIds.find((id) => ctx.data.monsters[id].boss); let bgm = "mainbattle"; if(bossId) bgm = ctx.data.monsters[bossId].bgm || ((story.ch >= 29 && story.ch <= 30) || story.ch >= 39 ? "lastboss" : "midboss"); battle.bgm = bgm;
     foeIds.forEach((id) => ctx.ranch.noteSeen(id)); const res = await battle.run(foeIds, Object.assign({ground}, opt));
     document.body.dataset.mode = "field"; ctx.UI.stopSkip();
     if(res === "lose"){ await defeat(); }
@@ -123,7 +123,7 @@ async function defeat(){
 function encFor(){
     if(mapDef.id !== "field") return mapDef.enc;
     const base = mapDef.enc; const tbl = ctx.data.chapters.encByChapter; let table = base.table;
-    if(story.def && story.def.enc) table = story.def.enc.table; else if(tbl) for(const [n, t] of tbl) if(ctx.S.chapter >= n) table = t;
+    if(story.def && story.def.enc) table = story.def.enc.table; else if(tbl) for(const [n, t] of tbl) if(story.ch >= n) table = t;
     return Object.assign({}, base, {table});
 }
 // どうぐやで買い物
@@ -161,7 +161,7 @@ function rollEncounter(){
     const z = enc.zone; if(P.x < z[0] || P.x > z[2] || P.z < z[1] || P.z > z[3]) return;
     if(world && world.dangerAt && !world.dangerAt(P.x, P.z)) return;   // 安全地帯（道・町のそば）では出ない
     if(rnd() > enc.rate * EX.encMul()) return;
-    const n = 1 + Math.floor(rnd() * Math.min(3, 1 + S.party.length)); const foes = []; const pool = (mapDef.id === "field" && ctx.data.encpool) ? ctx.data.encpool[S.chapter] : null;
+    const n = 1 + Math.floor(rnd() * Math.min(3, 1 + S.party.length)); const foes = []; const pool = (mapDef.id === "field" && ctx.data.encpool) ? ctx.data.encpool[story.ch] : null;
     for(let i = 0; i < n; i++){ if(pool && pool.length && rnd() < .7) foes.push(pool[Math.floor(rnd() * pool.length)]); else foes.push(enc.table[Math.floor(rnd() * enc.table.length)]); }
     return foes;
 }
@@ -247,11 +247,12 @@ function showHelp(){
 }
 // ---------- タイトル ----------
 async function showTitle(){
-    state = "title"; document.body.dataset.mode = "title"; UI.hideDlg(); $("title").hidden = false; $("hud").hidden = true; $("prompt").hidden = true; $("bt").hidden = true;
+    Save.ns = ""; state = "title"; document.body.dataset.mode = "title"; UI.hideDlg(); $("title").hidden = false; $("hud").hidden = true; $("prompt").hidden = true; $("bt").hidden = true;
     const box = $("titleBtns"); box.innerHTML = ""; const any = Save.slots.some((s) => Save.read(s));
     const mk = (label, fn, dis) => { const b = document.createElement("button"); b.type = "button"; b.textContent = label; b.disabled = !!dis; b.addEventListener("click", fn); box.appendChild(b); return b; };
     mk("はじめから", () => startNew());
     mk("つづきから", () => continueGame(), !any);
+    mk("📖 サブストーリー（外伝）", () => subMenu());
     mk("そうさの せつめい", () => showHelp());
     const fb = mk("🔄 がめんの むき：" + FLIP[cfg.flip || "none"] + "（絵がさかさまなら押す）", () => { fb.textContent = "🔄 がめんの むき：" + nextFlip() + "（絵がさかさまなら押す）"; });
     mk("🗡️ ARE QUEST（1）へ", () => { location.href = "../game/index.html"; });
@@ -262,19 +263,32 @@ async function showTitle(){
 }
 function hideTitle(){ $("title").hidden = true; $("hud").hidden = false; document.body.dataset.mode = "field"; }
 async function startNew(chapter){
+    Save.ns = chapter && story.isSub(chapter) ? "sub" : "";
     delete (ctx.S || {}).ending;
     const name = ($("nameIn").value || "主人公").trim().slice(0, 8) || "主人公"; ctx.S = newState(name); { const y = ($("yomiIn") ? $("yomiIn").value : "").normalize("NFKC").replace(/\s+/g, ""); ctx.S.yomi = /^[ぁ-ゖァ-ヺー・]{1,16}$/.test(y) ? y : ""; } initState(); hideTitle(); ctx.A.se("ok"); state = "busy";
-    const first = story.order()[0];
+    const first = Save.ns === "sub" ? story.subOrder()[0] : story.order()[0];
     if(chapter && chapter !== first) await prepareAt(chapter);
     await enterGame(chapter || first, true);
 }
 // 話えらび：その話までに仲間になるはずのメンバーと、それらしいレベルで始める
 async function prepareAt(n){
     const S = ctx.S, D = ctx.data;
-    const ord = story.order(), idx = Math.max(0, ord.indexOf(n));
+    const ord = story.isSub(n) ? story.subOrder() : story.order(), idx = Math.max(0, ord.indexOf(n));
     for(const i of ord.slice(0, idx)){ const d = await story.load(i); const seek = (ops) => { for(const o of ops){ if(!Array.isArray(o)) continue; if(o[0] === "join" && !S.party.some((m) => m.id === o[1])) S.party.push(newMember(o[1], D.members, 1)); for(const x of o) if(Array.isArray(x) && Array.isArray(x[0])) seek(x); } }; for(const nn of d.npcs) seek(nn.talk); seek(d.onStart || []); }
     const lv = Math.max(1, Math.round(1 + idx * 0.85)); for(const m of S.party){ m.lv = lv; m.exp = 0; learnCheck(m, D.members); const st = statsOf(m, D.members); m.hp = st.maxhp; m.mp = st.maxmp; }
     S.gold = 30 + idx * 40; S.inv.yakusou = 3 + Math.floor(idx / 3);
+}
+// サブストーリー（外伝）：本編とは別のセーブ領域（本編のセーブは そのまま）
+async function subMenu(){
+    const t = $("title"); t.hidden = true; const ord = story.subOrder();
+    const sv = (() => { const w = Save.ns; Save.ns = "sub"; const any = Save.slots.some((s) => Save.read(s)); Save.ns = w; return any; })();
+    const r = await UI.menu("📖 サブストーリー（全" + ord.length + "話）", [{label: "はじめから（第1話）"}, {label: "つづきから", meta: "サブストーリー用の セーブ", disabled: !sv}, {label: "話を えらぶ"}], {cancel: true}); t.hidden = false;
+    if(r === 0) await startNew(ord[0]);
+    else if(r === 1) await continueGame("sub");
+    else if(r === 2){
+        t.hidden = true; const list = ord.map((i) => ({label: story.label(i), meta: story.meta(i).title}));
+        const q = await UI.menu("どの話から はじめますか？", list, {cancel: true}); t.hidden = false; if(q >= 0) await startNew(ord[q]);
+    }
 }
 async function chapterSelect(){
     const t = $("title"); t.hidden = true;
@@ -282,10 +296,11 @@ async function chapterSelect(){
     const r = await UI.menu("どの話から はじめますか？", list, {cancel: true}); t.hidden = false;
     if(r >= 0) await startNew(ord[r]);
 }
-async function continueGame(){
+async function continueGame(ns){
+    Save.ns = ns === "sub" ? "sub" : "";
     const t = $("title"); t.hidden = true;
     const list = Save.slots.map((s) => { const d = Save.read(s); return {label: s === "auto" ? "オートセーブ" : "スロット" + s, meta: Save.label(d), disabled: !d}; });
-    const r = await UI.menu("どれを つづけますか？", list, {cancel: true}); t.hidden = false; if(r < 0) return;
+    const r = await UI.menu("どれを つづけますか？", list, {cancel: true}); t.hidden = false; if(r < 0){ Save.ns = ""; return; }
     const d = Save.read(Save.slots[r]); if(!d) return;
     ctx.S = d; initState(); hideTitle(); state = "busy"; await enterGame(d.chapter, false);
 }
