@@ -103,7 +103,7 @@ python3 -m http.server 8000      # または  npx serve  /  VS Code の Live Ser
 公式 Three.js を おく（任意）：`node tools/fetch-three.mjs`（Node.js 18+ と インターネット が ひつよう）
 
 ## GitHub Pages で 公開する（無料）
-いまの サイト（`https://sakai-tomohiko124.github.io/ARE/`）に **サブフォルダとして 追加**する 方法が かんたんです。
+いまの サイト（`https://arechat.github.io/ARE/`）に **サブフォルダとして 追加**する 方法が かんたんです。
 
 1. リポジトリ `ARE` の 中に `dream-frontier/` フォルダごと アップロード（`game2/` と **同じ 階層**）。
    - `.github` と `.nojekyll` は 隠しファイルです。**単独で 公開する時だけ** 必要（サブフォルダの 場合 `.github/workflows` は リポジトリの 直下に ないと 動きません）。
