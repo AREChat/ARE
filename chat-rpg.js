@@ -27,9 +27,9 @@ function openDream(){
         '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ パークにはいる</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
 }
 function openStudy124(){
-    // 別のサイト（学習サイト study124）へのリンク。ARE のアカウント情報は渡しません
+    // 別のサイト（学習サイト LearnLab124）へのリンク。ARE のアカウント情報は渡しません
     const href = "https://arechat.github.io/LearnLab124/";
-    openSheet(toolHead("📚 学習サイト（study124）", "プログラミング学習サイト。用語集・クイズ・物語・天気や電車の情報など") +
+    openSheet(toolHead("📚 学習サイト（LearnLab124）", "プログラミング学習サイト。用語集・クイズ・物語・天気や電車の情報など") +
         '<div class="admin-card">ARE とは別のサイトです。新しいタブで開きます。学習サイトからも、ARE とゲーム（game1〜game6）へ移れます。</div>' +
         '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer">▶ 学習サイトをひらく</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
 }
