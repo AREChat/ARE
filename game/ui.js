@@ -308,7 +308,7 @@ function viewCheat(){
         '<div class="row"><button class="btn" data-a="cGo">けってい</button><button class="btn sub" data-a="cBack">もどる</button></div>' +
         '<div id="cMsg" style="white-space:pre-wrap;margin-top:1cqw;min-height:5cqw;color:' + (G.cheatOk ? "var(--ok)" : "#ffd1d1") + '">' + esc(G.cheatMsg || "") + '</div>' +
         (on.length ? '<div class="chips">' + on.map((k) => '<span class="chip">ON：' + esc(names[k] || k) + '</span>').join("") + '</div>' : "") +
-        '<div class="meta">ヒント：コードは 開発者(なぞひこ)だけが しっている。…でも、答えは 意外と たんじゅん。</div></div>';
+        '<div class="meta">ヒント：コードは 開発者だけが しっている。…でも、答えは 意外と たんじゅん。</div></div>';
 }
 ACT.cGo = () => {
     const v = ($("cInput") || {}).value || ""; if(!v.trim()) return;
