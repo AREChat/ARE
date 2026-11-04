@@ -628,3 +628,13 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .copy-text:focus-visible{outline:2px solid #6aa7ff;outline-offset:2px;border-radius:4px}
 #copyToast{position:fixed;left:50%;bottom:calc(88px + env(safe-area-inset-bottom));transform:translate(-50%,8px);padding:10px 18px;border-radius:999px;background:rgba(30,30,30,.92);color:#fff;font-size:14px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:9999}
 #copyToast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ===== 時刻えらび（おやすみ時間・自動応答）：「時」「分」を選んで「決定」ボタンで確定する ===== */
+.tp-box{display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--panel2)}
+.tp-row{display:flex;align-items:center;gap:6px;flex-wrap:nowrap}
+.tp-row .tp-label{flex:0 0 3.4em;font-size:14px;color:var(--text)}
+.tp-row select{flex:1 1 0;min-width:0;max-width:110px;min-height:44px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--text);padding:6px 8px;font:inherit;font-size:16px}
+.tp-row .tp-unit{flex:0 0 auto;font-size:14px;color:var(--muted)}
+.tp-note{line-height:1.5}
+.tp-note.tp-dirty{font-weight:700;color:var(--text)}
+.tp-ok{width:100%;min-height:48px;font-size:16px;font-weight:700}

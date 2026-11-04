@@ -25,6 +25,26 @@ export class Controls{
         let mx = (k.KeyD ? 1 : 0) - (k.KeyA ? 1 : 0) + dz(this.stick.x), my = (k.KeyW || k.ArrowUp ? 1 : 0) - (k.KeyS || k.ArrowDown ? 1 : 0) - dz(this.stick.y);
         const turn = ((k.ArrowRight ? 1 : 0) - (k.ArrowLeft ? 1 : 0)) * .035;
         const o = {mx: Math.max(-1, Math.min(1, mx)), my: Math.max(-1, Math.min(1, my)), lx: this.lx + turn, ly: this.ly, run: !!(k.ShiftLeft || k.ShiftRight || k.run), act: !!(P.KeyE || P.Space || P.Enter || P.act || (P.Click && this.wantClickAct)), act2: !!(P.KeyQ || P.KeyX || P.exit), esc: !!(P.Escape || P.KeyM || P.menu), looking: !!(this.locked || this.drag || this.touchLook), anyDown: !!(k.KeyE || k.Space || k.Enter || k.act || this.fireDown)};
+        // ゲームパッド（Switch Proコン ほか）：左スティック／十字キー＝いどう　右スティック＝みまわし　A(Nintendoは右・他は下)＝はなす／のる　B＝はしる　X＝おりる　＋＝メニュー
+        try{
+            const pads = (navigator.getGamepads && navigator.getGamepads()) || []; const prev = this._gpPrev || {}; const cur = {};
+            for(const gp of pads){
+                if(!gp || !gp.connected) continue;
+                const b = (i) => !!(gp.buttons[i] && gp.buttons[i].pressed), ax = gp.axes || [];
+                const nin = /057e|nintendo|pro controller|switch/i.test(gp.id || ""), OK = nin ? 1 : 0, NO = nin ? 0 : 1;
+                const gx = Math.abs(ax[0] || 0) > .18 ? ax[0] : 0, gy = Math.abs(ax[1] || 0) > .18 ? ax[1] : 0, rx = Math.abs(ax[2] || 0) > .2 ? ax[2] : 0, ry = Math.abs(ax[3] || 0) > .2 ? ax[3] : 0;
+                o.mx = Math.max(-1, Math.min(1, o.mx + gx + (b(15) ? 1 : 0) - (b(14) ? 1 : 0)));
+                o.my = Math.max(-1, Math.min(1, o.my - gy + (b(12) ? 1 : 0) - (b(13) ? 1 : 0)));
+                o.lx += rx * .045; o.ly += ry * .03;
+                if(b(NO) || b(10)) o.run = true;
+                cur.ok = cur.ok || b(OK); cur.x = cur.x || b(nin ? 3 : 2); cur.plus = cur.plus || b(9);
+            }
+            if(cur.ok && !prev.ok){ o.act = true; o.anyDown = true; }
+            if(cur.ok) o.anyDown = true;
+            if(cur.x && !prev.x) o.act2 = true;
+            if(cur.plus && !prev.plus) o.esc = true;
+            this._gpPrev = cur;
+        }catch(_e){}
         this.lx = 0; this.ly = 0; this.pressed = {}; return o;
     }
 }

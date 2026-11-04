@@ -62,6 +62,9 @@ async function main(){
     const go = () => { if(started) return; started = true; Snd.resume(); Snd.startBgm(); Snd.setBgm(game.bgmKey()); $("loading").classList.add("off"); window.__dfStarted = true; last = performance.now(); document.querySelector(".pill") && 0; if(!game.sv.played && !game.count()) ui.say("ナビ", ["ようこそ、ドリーム・フロンティアへ！", "パークには " + ATTRACTIONS.length + "この アトラクションが あるよ。ぜんぶ のって スタンプを あつめよう！", "ふわふわ ういている ほしが つぎの もくてきちへ あんないするよ。まずは 広場の みんなに はなしかけてみよう。"]); game.zone = null; };
     btn.onclick = go; addEventListener("keydown", (e) => { if(!started && (e.code === "Enter" || e.code === "Space")) go(); });
     if(params.get("auto") === "1") go();
+    // ゲームパッド：Aボタン（下・右）か＋で「あそぶ！」
+    const padStart = () => { if(started) return; try{ for(const gp of (navigator.getGamepads && navigator.getGamepads()) || []){ if(gp && gp.connected && ((gp.buttons[0] && gp.buttons[0].pressed) || (gp.buttons[1] && gp.buttons[1].pressed) || (gp.buttons[9] && gp.buttons[9].pressed))){ go(); return; } } }catch(_e){} requestAnimationFrame(padStart); };
+    padStart();
     window.__dfBoot = "ready";
 }
 main().catch((e) => { console.error(e); window.__bootErrors && window.__bootErrors.push("起動エラー: " + (e && e.message)); setLoad("起動に しっぱいしました：" + ((e && e.message) || e)); const l = $("loadEngine"); if(l) l.textContent = "→ 画面の 「しんだん」ボタンで げんいんを しらべられます"; const b = $("diagBtn"); if(b) b.style.display = "inline-block"; setTimeout(() => window.__showDiag && window.__showDiag(), 400); });
