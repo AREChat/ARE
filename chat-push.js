@@ -115,13 +115,21 @@ async function pushSetBody(on){
 async function pushSaveQuiet(node){
     const box = el.profileSheet;
     const enabled = Boolean(box.querySelector('[data-t="push:quiet"]')?.checked);
-    const start = box.querySelector('[data-quiet="start"]')?.value || "22:00";
-    const end = box.querySelector('[data-quiet="end"]')?.value || "08:00";
+    const start = tpValue(box, "quiet-start") || feat.push.quiet.start || "22:00";
+    const end = tpValue(box, "quiet-end") || feat.push.quiet.end || "08:00";
+    if(start === end){ showToast("開始と終了が同じ時刻です。ちがう時刻にしてください。"); return; }
     const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo";
-    const result = await requireClient().from("notification_preferences").upsert({user_id:state.user.id,quiet_enabled:enabled,quiet_start:start,quiet_end:end,timezone,updated_at:new Date().toISOString()},{onConflict:"user_id"});
-    if(result.error) throw result.error;
+    const button = box.querySelector('[data-t="push:quiet-save"]');
+    if(button) button.disabled = true;
+    try{
+        const result = await requireClient().from("notification_preferences").upsert({user_id:state.user.id,quiet_enabled:enabled,quiet_start:start,quiet_end:end,timezone,updated_at:new Date().toISOString()},{onConflict:"user_id"});
+        if(result.error) throw result.error;
+    }finally{
+        if(button) button.disabled = false;
+    }
     feat.push.quiet = {enabled,start,end,timezone};
-    showToast(enabled ? "おやすみ時間を保存しました。" : "おやすみ時間をオフにしました。");
+    tpNote(box.querySelector("[data-quiet-note]"), start, end, true, enabled ? "この時間は通知を送りません" : "いまはオフです");
+    showToast(enabled ? "おやすみ時間を " + start + "〜" + end + " に決定しました。" : "おやすみ時間はオフです（時刻 " + start + "〜" + end + " は保存しました）。");
 }
 
 // ===== ミュート =====
@@ -180,16 +188,20 @@ function openPushSettings(){
             ? '<button type="button" data-t="push:off">通知をオフにする</button><button type="button" class="button-secondary" data-t="push:test">テスト通知</button>'
             : '<button type="button" data-t="push:on"' + (st === "unsupported" || st === "denied" ? " disabled" : "") + '>通知をオンにする</button>') + '</div>' +
         '<label class="row" style="gap:8px"><input type="checkbox" data-t="push:body"' + (feat.push.showBody ? " checked" : "") + '> 通知に本文を表示する（オフだと「新しいメッセージ」とだけ表示）</label>' +
-        '<h4 style="margin:12px 0 4px">おやすみ時間</h4><label class="row" style="gap:8px"><input type="checkbox" data-t="push:quiet"' + (feat.push.quiet.enabled ? " checked" : "") + '> この時間はプッシュ通知を送らない</label><div class="row"><label>開始 <input type="time" data-quiet="start" value="' + escapeHtml(feat.push.quiet.start) + '"></label><label>終了 <input type="time" data-quiet="end" value="' + escapeHtml(feat.push.quiet.end) + '"></label><button type="button" class="button-secondary" data-t="push:quiet-save">保存</button></div><div class="meta">端末のタイムゾーン：' + escapeHtml(feat.push.quiet.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo") + '</div>' +
+        '<h4 style="margin:12px 0 4px">おやすみ時間</h4><label class="row" style="gap:8px"><input type="checkbox" data-t="push:quiet"' + (feat.push.quiet.enabled ? " checked" : "") + '> この時間はプッシュ通知を送らない</label>' +
+        '<div class="tp-box">' + tpHtml("quiet-start", "開始", feat.push.quiet.start, "22:00") + tpHtml("quiet-end", "終了", feat.push.quiet.end, "08:00") +
+        '<div class="meta tp-note" data-quiet-note></div><button type="button" class="button tp-ok" data-t="push:quiet-save">決定</button></div>' +
+        '<div class="meta">端末のタイムゾーン：' + escapeHtml(feat.push.quiet.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo") + '</div>' +
         '<h4 style="margin:12px 0 4px">ホーム画面に追加</h4>' + install +
         '<h4 style="margin:12px 0 4px">ミュート中のチャット</h4>' +
         (muted.length ? muted.map((id) => '<div class="row"><span>🔕 ' + escapeHtml(roomNameById(id)) + '</span><button type="button" class="button-secondary" data-t="push:unmute" data-room="' + escapeHtml(id) + '">再開</button></div>').join("") : '<div class="meta">ありません（チャット画面の 🔔 で切り替えます）</div>') +
         toolClose());
-    // 時刻やチェックを変えたら、「保存」を押さなくても、すぐ保存する（反映されない、を防ぐ）
-    const quietSave = () => { pushSaveQuiet().catch((error) => showToast(featError(error))); };
-    el.profileSheet.querySelectorAll("[data-quiet]").forEach((node) => node.addEventListener("change", quietSave));
+    // 時刻は、「決定」ボタンを押したときに保存する。チェック（オン／オフ）は、押したらすぐ保存する
+    const quietNote = () => tpNote(el.profileSheet.querySelector("[data-quiet-note]"), tpValue(el.profileSheet, "quiet-start"), tpValue(el.profileSheet, "quiet-end"), false);
+    tpNote(el.profileSheet.querySelector("[data-quiet-note]"), feat.push.quiet.start, feat.push.quiet.end, true, feat.push.quiet.enabled ? "この時間は通知を送りません" : "いまはオフです");
+    tpBind(el.profileSheet, ["quiet-start", "quiet-end"], quietNote);
     const quietBox = el.profileSheet.querySelector('[data-t="push:quiet"]');
-    if(quietBox) quietBox.addEventListener("change", quietSave);
+    if(quietBox) quietBox.addEventListener("change", () => { pushSaveQuiet().catch((error) => showToast(featError(error))); });
 }
 
 async function onPushAction(action, node){

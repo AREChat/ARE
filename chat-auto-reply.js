@@ -12,7 +12,7 @@ function autoReplyKindFields(kind,rule){
     const keyword = kind === "keyword";
     const selectedDays = rule?.days || [0,1,2,3,4,5,6];
     return '<div id="arKeywordFields"' + (keyword ? "" : " hidden") + '><label for="arKeyword">反応する言葉</label><input id="arKeyword" maxlength="80" value="' + escapeHtml(rule?.keyword || "") + '" placeholder="例：おはよう"><label for="arMatchType">判定方法</label><select id="arMatchType"><option value="contains"' + (!rule || rule.match_type === "contains" ? " selected" : "") + '>文章に含まれたら</option><option value="exact"' + (rule?.match_type === "exact" ? " selected" : "") + '>メッセージ全体が一致したら</option></select></div>' +
-        '<div id="arScheduleFields"' + (keyword ? " hidden" : "") + '><div class="row"><label>開始 <input id="arStart" type="time" value="' + escapeHtml(rule?.start_time || "22:00") + '"></label><label>終了 <input id="arEnd" type="time" value="' + escapeHtml(rule?.end_time || "08:00") + '"></label></div><div class="meta" id="arTimeNote">いまの設定：' + escapeHtml(String(rule?.start_time || "22:00").slice(0,5)) + '〜' + escapeHtml(String(rule?.end_time || "08:00").slice(0,5)) + '（時刻の欄をタップすると変えられます）</div><div class="ar-days">' + AUTO_REPLY_DAYS.map(([day,label]) => '<label><input type="checkbox" data-ar-day="' + day + '"' + (selectedDays.includes(day) ? " checked" : "") + '> ' + label + '</label>').join("") + '</div><label for="arTimezone">タイムゾーン</label><input id="arTimezone" maxlength="80" value="' + escapeHtml(rule?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo") + '" placeholder="Asia/Tokyo"></div>';
+        '<div id="arScheduleFields"' + (keyword ? " hidden" : "") + '><div class="tp-box">' + tpHtml("ar-start", "開始", rule?.start_time, "22:00") + tpHtml("ar-end", "終了", rule?.end_time, "08:00") + '<div class="meta tp-note" id="arTimeNote"></div><button type="button" class="button-secondary tp-ok" id="arTimeOk">決定</button></div><div class="ar-days">' + AUTO_REPLY_DAYS.map(([day,label]) => '<label><input type="checkbox" data-ar-day="' + day + '"' + (selectedDays.includes(day) ? " checked" : "") + '> ' + label + '</label>').join("") + '</div><label for="arTimezone">タイムゾーン</label><input id="arTimezone" maxlength="80" value="' + escapeHtml(rule?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo") + '" placeholder="Asia/Tokyo"></div>';
 }
 
 function openAutoReplyForm(rule){
@@ -21,11 +21,16 @@ function openAutoReplyForm(rule){
     const kindInput = document.getElementById("arKind");
     kindInput.addEventListener("change",() => { const next = kindInput.value; document.getElementById("arKeywordFields").hidden = next !== "keyword"; document.getElementById("arScheduleFields").hidden = next !== "schedule"; });
     document.getElementById("arSave").addEventListener("click",() => saveAutoReply(rule || null));
-    const arNote = () => {
-        const note = document.getElementById("arTimeNote"), a = document.getElementById("arStart"), b = document.getElementById("arEnd");
-        if(note && a && b) note.textContent = "いまの設定：" + (a.value || "--:--") + "〜" + (b.value || "--:--") + "（保存すると、この時間帯に届いたメッセージへ自動で返信します）";
-    };
-    ["arStart","arEnd"].forEach((id) => { const node = document.getElementById(id); if(node) ["input","change"].forEach((type) => node.addEventListener(type,arNote)); });
+    // 時刻は「時」「分」を選んで、「決定」ボタンで決める（決めたあと、下の「保存」でルールを保存する）
+    const arPaint = (decided, extra) => tpNote(document.getElementById("arTimeNote"), tpValue(el.profileSheet,"ar-start"), tpValue(el.profileSheet,"ar-end"), decided, extra);
+    arPaint(true, rule ? "いまの設定" : "はじめの設定。変えるときは、時・分を選んで「決定」を押します");
+    tpBind(el.profileSheet, ["ar-start","ar-end"], () => arPaint(false));
+    document.getElementById("arTimeOk").addEventListener("click",() => {
+        const start = tpValue(el.profileSheet,"ar-start"), end = tpValue(el.profileSheet,"ar-end");
+        if(start === end){ showToast("開始と終了が同じ時刻です。ちがう時刻にしてください。"); return; }
+        arPaint(true, "あとは下の「保存」を押してください");
+        showToast("時間を " + start + "〜" + end + " に決めました。下の「保存」で確定します。");
+    });
 }
 
 function autoReplyDescription(rule){
@@ -54,7 +59,7 @@ async function saveAutoReply(rule){
         values.keyword = document.getElementById("arKeyword").value.trim(); values.match_type = document.getElementById("arMatchType").value; values.start_time = null; values.end_time = null; values.days = null; values.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo";
         if(!values.keyword){ showToast("反応する言葉を入力してください。"); return; }
     }else{
-        values.keyword = null; values.match_type = "contains"; values.start_time = document.getElementById("arStart").value; values.end_time = document.getElementById("arEnd").value; values.days = [...el.profileSheet.querySelectorAll("[data-ar-day]:checked")].map((node) => Number(node.dataset.arDay)); values.timezone = document.getElementById("arTimezone").value.trim();
+        values.keyword = null; values.match_type = "contains"; values.start_time = tpValue(el.profileSheet,"ar-start"); values.end_time = tpValue(el.profileSheet,"ar-end"); values.days = [...el.profileSheet.querySelectorAll("[data-ar-day]:checked")].map((node) => Number(node.dataset.arDay)); values.timezone = document.getElementById("arTimezone").value.trim();
         if(!values.start_time || !values.end_time || values.start_time === values.end_time || !values.days.length){ showToast("開始・終了時刻と曜日を確認してください。"); return; }
         try{ new Intl.DateTimeFormat("ja-JP",{timeZone:values.timezone}).format(); }catch(_error){ showToast("タイムゾーンを確認してください（例：Asia/Tokyo）。"); return; }
     }
