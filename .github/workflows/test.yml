@@ -1,0 +1,73 @@
+name: 自動テスト
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# 同時に複数の掃除が走らないようにする
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: 構文チェック (JS / JSON)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: JavaScript の構文チェック
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            node --check "$f" || { echo "::error file=$f::構文エラー"; fail=1; }
+          done < <(git ls-files '*.js' '*.mjs')
+          exit $fail
+
+      - name: JSON の形式チェック
+        run: |
+          fail=0
+          while IFS= read -r f; do
+            node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" "$f" \
+              || { echo "::error file=$f::JSON が壊れています"; fail=1; }
+          done < <(git ls-files '*.json' '*.webmanifest')
+          exit $fail
+
+  cleanup:
+    name: Actions 履歴の掃除 (10件以上で最新1件だけ残す)
+    needs: test
+    if: always() && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+      THRESHOLD: 10
+    steps:
+      - name: 古い実行履歴を削除
+        run: |
+          total=$(gh api "repos/$REPO/actions/runs?per_page=1" --jq '.total_count')
+          echo "現在の履歴件数: $total"
+          if [ "$total" -lt "$THRESHOLD" ]; then
+            echo "$THRESHOLD 件未満なので何もしません"
+            exit 0
+          fi
+          # 新しい順に並ぶので、先頭(最新)1件を残し、実行中の自分自身も残す
+          gh api --paginate "repos/$REPO/actions/runs?per_page=100" --jq '.workflow_runs[].id' \
+            | tail -n +2 \
+            | while read -r id; do
+                [ "$id" = "$GITHUB_RUN_ID" ] && continue
+                if gh api -X DELETE "repos/$REPO/actions/runs/$id" >/dev/null 2>&1; then
+                  echo "削除: $id"
+                else
+                  echo "スキップ(実行中など): $id"
+                fi
+              done
