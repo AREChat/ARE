@@ -235,6 +235,11 @@ function updateCharCount(){
 
 async function initialize(){
     cacheElements();
+    // 左のメニュー（チャット・ユーザー・投稿・その他・マイページ）は、読み込み中でも切りかえられるよう、最初につなぐ
+    el.rail.addEventListener("click",(event) => {
+        const tab = event.target.closest("[data-tab]");
+        if(tab) setTab(tab.dataset.tab);
+    });
 
     try{
         if(!window.ARESystem || !window.AREAuth){
@@ -303,10 +308,6 @@ function bindEvents(){
     el.fileInput.addEventListener("change",() => handleFiles(el.fileInput.files,"file"));
     el.videoInput.addEventListener("change",() => handleFiles(el.videoInput.files,"video"));
     el.backButton.addEventListener("click",() => el.app.classList.remove("chat-open"));
-    el.rail.addEventListener("click",(event) => {
-        const tab = event.target.closest("[data-tab]");
-        if(tab) setTab(tab.dataset.tab);
-    });
     if(window.visualViewport){
         const mobile = window.matchMedia("(max-width:700px)");
         const fit = () => {
