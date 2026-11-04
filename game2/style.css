@@ -29,7 +29,7 @@ button:disabled{opacity:.45}
 #btParty .pb .nm{color:#ffe9a8;text-align:left;margin-bottom:.1em}#btParty .pb .r{display:flex;justify-content:space-between;gap:.6em}#btParty .pb .r b{font-weight:normal;color:#9ad}
 #btParty .pb .bar{position:absolute;left:.45em;right:.45em;bottom:.2em;height:.28em;margin:0;background:#112;border:0;border-radius:.2em}#btParty .pb.low .r:nth-child(2){color:#fc6}#btParty .pb.ko .nm,#btParty .pb.ko .r:nth-child(2){color:#f66}#btParty .pb.ko{opacity:.8}
 #btParty .bar i{display:block;height:100%;background:linear-gradient(90deg,#3c6,#6e8);border-radius:.2em}
-#btCmd{position:absolute;left:calc(var(--safe-l) + 1.2%);right:auto;top:calc(var(--safe-t) + 2%);min-width:9em;pointer-events:auto;padding:.4em .5em}#btCmd button{display:block;width:100%;text-align:left;background:transparent;border:.12em solid transparent;min-height:42px;padding:.1em .6em}#btCmd button.sel{background:rgba(255,255,255,.18);border-color:var(--gold)}#btCmd .who{color:var(--gold);padding:0 .3em .2em}
+#btCmd{position:absolute;left:calc(var(--safe-l) + 1.2%);right:auto;top:auto;bottom:calc(var(--safe-b) + 2% + 6.2em);min-width:9em;pointer-events:auto;padding:.4em .5em}#btCmd button{display:block;width:100%;text-align:left;background:transparent;border:.12em solid transparent;min-height:42px;padding:.1em .6em}#btCmd button.sel{background:rgba(255,255,255,.18);border-color:var(--gold)}#btCmd .who{color:var(--gold);padding:0 .3em .2em}
 #btMsg{position:absolute;left:calc(var(--safe-l) + 1.2%);right:calc(var(--safe-r) + 1.2%);bottom:calc(var(--safe-b) + 2%);padding:.35em .9em;line-height:1.55}
 #btMsg .bi{height:4.65em;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;white-space:pre-wrap}
 #card{position:absolute;inset:0;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;pointer-events:auto;animation:cardin .5s}#card h1{font-size:1.9em;margin:.2em;color:var(--gold);letter-spacing:.05em}#card p{opacity:.85;margin:.3em}@keyframes cardin{from{opacity:0}}
@@ -67,7 +67,7 @@ kbd{background:#223;border:1px solid #9ab;border-radius:.3em;padding:0 .35em;fon
 @keyframes swirlIn{from{transform:scale(1) rotate(0)}to{transform:scale(1.5) rotate(10deg)}}
 body.encounter #gl{animation:swirlIn .55s ease-in forwards}
 /* 長い じゅもん／とくぎ リスト：スクロール＋2列めやす */
-#btCmdList.long{max-height:calc(100vh - var(--safe-t) - 19em);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
+#btCmdList.long{max-height:calc(100vh - var(--safe-t) - var(--safe-b) - 14em);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
 #btCmdList.long button{display:flex;justify-content:space-between;gap:1em;white-space:nowrap}
 #btCmdList.long button .meta{opacity:.8;font-size:.85em}
 #btCmd:has(#btCmdList.long){min-width:13em}
@@ -106,3 +106,8 @@ body.bangshake #app{animation:bshake .62s linear}
 #storyPic.framed{width:min(34vw,300px);height:auto;max-width:none;object-fit:cover;border:3px solid rgba(255,255,255,.85);border-radius:14px;bottom:26%}
 #foeCard{position:fixed;right:2%;top:12%;width:min(36vw,320px);aspect-ratio:3/2;object-fit:cover;border:3px solid rgba(255,255,255,.9);border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.55);pointer-events:none;z-index:7;animation:picIn .35s ease}
 #foeCard[hidden]{display:none}
+/* 戦闘コマンドは、主人公のHP・MPの左に出す（左上の「もどる」ボタンと重ならない） */
+#btParty{padding-left:10.8em;box-sizing:border-box}
+#bt:has(#btCmdList.long) #btParty{padding-left:15.9em}
+@media (max-width:640px){#btParty .pb{min-width:5.2em;padding:.25em .4em .5em}#btParty{gap:.3em}}
+@media (max-width:520px){#btParty{padding-left:0}#bt:has(#btCmdList.long) #btParty{padding-left:0}#btCmd{bottom:calc(var(--safe-b) + 2% + 6.2em + 5.2em)}}

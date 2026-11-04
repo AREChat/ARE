@@ -59,12 +59,13 @@ export const UI = {
             if(o.titleEl) o.titleEl.textContent = o.title || "";
             if(o.hintEl) o.hintEl.textContent = o.hint || "";
             container.innerHTML = "";
+            const t0 = performance.now(); // 前の画面を押した指が、次の画面の同じ位置を押してしまうのを防ぐ（0.25秒）
             let sel = Math.max(0, Math.min(items.length - 1, o.index || 0)); while(items[sel] && items[sel].disabled && sel < items.length - 1) sel++;
             const btns = items.map((it, i) => {
                 const b = document.createElement("button"); b.type = "button"; b.disabled = !!it.disabled;
                 const l = document.createElement("span"); l.textContent = it.label; b.appendChild(l);
                 if(it.meta){ const m = document.createElement("span"); m.className = "meta"; m.textContent = it.meta; b.appendChild(m); }
-                b.addEventListener("click", () => { if(!b.disabled) done(i); });
+                b.addEventListener("click", () => { if(!b.disabled && performance.now() - t0 > 250) done(i); });
                 container.appendChild(b); return b;
             });
             const paint = () => btns.forEach((b, i) => b.classList.toggle("sel", i === sel));
