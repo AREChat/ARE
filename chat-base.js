@@ -608,6 +608,9 @@ function renderMessageContent(content){
     const item = parseMessageContent(content);
 
     if(item.type === "text"){
+        // 「/c 本文」は タップでコピーできる吹き出しにする（chat-copy.js）
+        const copyBody = (window.AREChatCopy && !item.stamp) ? window.AREChatCopy.parse(item.text) : null;
+        if(copyBody !== null) return '<div class="bubble">' + window.AREChatCopy.render(copyBody) + '</div>';
         const escaped = escapeHtml(item.text || "");
         const html = (window.AREText && typeof window.AREText.format === "function") ? window.AREText.format(escaped,item) : escaped;
         return '<div class="bubble' + (item.stamp ? ' stamp' : '') + '">' + html + '</div>';
