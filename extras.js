@@ -155,7 +155,7 @@
     // ---------- 交通情報（JR東日本は自動取得。取れないとき・他の地域は公式サイトへのリンク）----------
     function renderTransit() {
         title.textContent = "🚆 交通情報";
-        body.innerHTML = '<div class="eb-note">都道府県を選ぶと運行状況を表示します（東京都は都営交通を1時間ごとに自動更新。そのほかは公式サイトへのリンク）。</div>' +
+        body.innerHTML = '<div class="eb-note">都道府県を選ぶと運行状況を表示します（東京都は都営交通を1時間ごとに自動更新。全国どこでも、選んだ地域のJR各社などの公式サイトへすぐ移動できます）。</div>' +
             '<div class="eb-row"><select class="eb-in" id="tPref" aria-label="都道府県">' + PREF_NAMES.map((n, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + n + '</option>').join("") + '</select></div><div id="tResult"></div>' +
             '<hr style="border:0;border-top:1px solid #2c3a63;margin:12px 0"><div class="eb-note">乗換案内（外部サービスを新しいタブで開きます）</div>' +
             '<div class="eb-row"><input class="eb-in" id="tFrom" placeholder="出発駅・場所" maxlength="40"><input class="eb-in" id="tTo" placeholder="到着駅・場所" maxlength="40"></div>' +
@@ -173,9 +173,23 @@
         showTransit(pc);
         async function showTransit(code) {
             const out = $("tResult"), name = PREF_NAMES[Number(code) - 1];
-            const yahoo = '<div class="eb-row" style="margin-top:8px"><a class="eb-btn sec" style="text-decoration:none" href="https://transit.yahoo.co.jp/diainfo" target="_blank" rel="noopener noreferrer">Yahoo!路線情報（全国）</a></div>';
+            const n = Number(code);
+            const JR = {
+                hk: ["JR北海道", "https://www3.jrhokkaido.co.jp/webunkou/"],
+                e: ["JR東日本", "https://traininfo.jreast.co.jp/train_info/"],
+                c: ["JR東海", "https://traininfo.jr-central.co.jp/zairaisen/"],
+                w: ["JR西日本", "https://trafficinfo.westjr.co.jp/"],
+                s: ["JR四国", "https://www.jr-shikoku.co.jp/03_info/"],
+                k: ["JR九州", "https://www.jrkyushu.co.jp/"]
+            };
+            const jrKeys = n === 1 ? ["hk"] : n <= 15 ? ["e"] : n <= 18 ? ["w"] : n === 19 ? ["e", "c"] : n === 20 ? ["e", "c", "w"] : n <= 24 ? ["c"] : n <= 35 ? ["w"] : n <= 39 ? ["s"] : n <= 46 ? ["k"] : [];
+            const links = jrKeys.map((k) => JR[k]);
+            if (n === 47) links.push(["沖縄都市モノレール（ゆいレール）", "https://www.yui-rail.co.jp/"]);
+            const btn = (l) => '<a class="eb-btn sec" style="text-decoration:none" href="' + l[1] + '" target="_blank" rel="noopener noreferrer">' + esc(l[0]) + 'の運行情報</a>';
+            const yahoo = '<div class="eb-note" style="margin-top:8px">' + esc(name) + 'の運行情報（公式サイトを新しいタブで開きます）</div><div class="eb-row">' + links.map(btn).join("") +
+                '<a class="eb-btn sec" style="text-decoration:none" href="https://transit.yahoo.co.jp/diainfo" target="_blank" rel="noopener noreferrer">私鉄・地下鉄ほか（Yahoo!路線情報・全国）</a></div>';
             if (code !== "13") {
-                out.innerHTML = '<div class="eb-note" style="border:1px solid #2c3a63;padding:10px;border-radius:10px">' + esc(name) + 'の運行状況は、自動取得に対応していません（無料で使える公式データがあるのは、今のところ東京都の都営交通のみです）。下のリンクで確認してください。</div>' + yahoo;
+                out.innerHTML = '<div class="eb-note" style="border:1px solid #2c3a63;padding:10px;border-radius:10px">' + esc(name) + 'の運行状況は、このアプリの中では表示できません。無料で公開されている鉄道会社の公式データが、今のところ東京都の都営交通だけのためです。下のボタンで、各社の公式サイトを確認してください。</div>' + yahoo;
                 return;
             }
             out.textContent = "読み込み中...";
@@ -186,7 +200,7 @@
                 out.innerHTML = '<div class="eb-day" style="text-align:left;margin:8px 0"><b>都営交通の運行状況</b><ul style="margin:6px 0 0 18px;padding:0">' +
                     row.payload.lines.map((l) => '<li><b>' + esc(l.name) + '</b>：' + esc(l.text) + '</li>').join("") + '</ul>' +
                     '<div class="eb-note">更新 ' + hhmm(row.updated_at) + '（1時間ごとに自動更新）<br>出典：' + esc(row.payload.credit || "東京都交通局（公共交通オープンデータセンター）") + '</div></div>' +
-                    '<div class="eb-note">JR・私鉄・東京メトロは自動取得に対応していません。下のリンクで確認してください。</div>' + yahoo;
+                    '<div class="eb-note">JR・私鉄・東京メトロはこのアプリ内では表示できません。下のボタンで公式サイトを確認してください。</div>' + yahoo;
             } catch (_e) {
                 out.innerHTML = failBox("都営交通の運行状況を取得できませんでした。", "https://www.kotsu.metro.tokyo.jp/subway/schedule/", "東京都交通局の運行情報を開く") + yahoo;
             }
