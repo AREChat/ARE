@@ -1,0 +1,1507 @@
+{
+  "schema_version": 1,
+  "level_cap": 99,
+  "count": 100,
+  "quests": [
+    {
+      "id": "QST001",
+      "name": "冒険者の依頼・討伐01",
+      "type": "討伐",
+      "description": "討伐に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "討伐",
+        "target_count": 1
+      },
+      "reward": {
+        "gold": 100,
+        "item_id": "ITM001"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST002",
+      "name": "ギルドの課題・収集02",
+      "type": "収集",
+      "description": "収集に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "収集",
+        "target_count": 2
+      },
+      "reward": {
+        "gold": 135,
+        "item_id": "ITM002"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST003",
+      "name": "町人のお願い・スカウト03",
+      "type": "スカウト",
+      "description": "スカウトに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "スカウト",
+        "target_count": 3
+      },
+      "reward": {
+        "gold": 170,
+        "item_id": "ITM003"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST004",
+      "name": "研究者の調査・配合04",
+      "type": "配合",
+      "description": "配合に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "配合",
+        "target_count": 4
+      },
+      "reward": {
+        "gold": 205,
+        "item_id": "ITM004"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST005",
+      "name": "格闘場の挑戦・探索05",
+      "type": "探索",
+      "description": "探索に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "探索",
+        "target_count": 5
+      },
+      "reward": {
+        "gold": 240,
+        "item_id": "ITM005"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST006",
+      "name": "冒険者の依頼・格闘場06",
+      "type": "格闘場",
+      "description": "格闘場に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "格闘場",
+        "target_count": 6
+      },
+      "reward": {
+        "gold": 275,
+        "item_id": "ITM006"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST007",
+      "name": "ギルドの課題・転生07",
+      "type": "転生",
+      "description": "転生に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "転生",
+        "target_count": 7
+      },
+      "reward": {
+        "gold": 310,
+        "item_id": "ITM007"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST008",
+      "name": "町人のお願い・ドロップ08",
+      "type": "ドロップ",
+      "description": "ドロップに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "ドロップ",
+        "target_count": 8
+      },
+      "reward": {
+        "gold": 345,
+        "item_id": "ITM008"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST009",
+      "name": "研究者の調査・カジノ09",
+      "type": "カジノ",
+      "description": "カジノに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "カジノ",
+        "target_count": 9
+      },
+      "reward": {
+        "gold": 380,
+        "item_id": "ITM009"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST010",
+      "name": "格闘場の挑戦・イベント10",
+      "type": "イベント",
+      "description": "イベントに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "イベント",
+        "target_count": 10
+      },
+      "reward": {
+        "gold": 415,
+        "item_id": "ITM010"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST011",
+      "name": "冒険者の依頼・討伐11",
+      "type": "討伐",
+      "description": "討伐に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "討伐",
+        "target_count": 1
+      },
+      "reward": {
+        "gold": 450,
+        "item_id": "ITM011"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST012",
+      "name": "ギルドの課題・収集12",
+      "type": "収集",
+      "description": "収集に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "収集",
+        "target_count": 2
+      },
+      "reward": {
+        "gold": 485,
+        "item_id": "ITM012"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST013",
+      "name": "町人のお願い・スカウト13",
+      "type": "スカウト",
+      "description": "スカウトに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "スカウト",
+        "target_count": 3
+      },
+      "reward": {
+        "gold": 520,
+        "item_id": "ITM013"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST014",
+      "name": "研究者の調査・配合14",
+      "type": "配合",
+      "description": "配合に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "配合",
+        "target_count": 4
+      },
+      "reward": {
+        "gold": 555,
+        "item_id": "ITM014"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST015",
+      "name": "格闘場の挑戦・探索15",
+      "type": "探索",
+      "description": "探索に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "探索",
+        "target_count": 5
+      },
+      "reward": {
+        "gold": 590,
+        "item_id": "ITM015"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST016",
+      "name": "冒険者の依頼・格闘場16",
+      "type": "格闘場",
+      "description": "格闘場に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "格闘場",
+        "target_count": 6
+      },
+      "reward": {
+        "gold": 625,
+        "item_id": "ITM016"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST017",
+      "name": "ギルドの課題・転生17",
+      "type": "転生",
+      "description": "転生に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "転生",
+        "target_count": 7
+      },
+      "reward": {
+        "gold": 660,
+        "item_id": "ITM017"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST018",
+      "name": "町人のお願い・ドロップ18",
+      "type": "ドロップ",
+      "description": "ドロップに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "ドロップ",
+        "target_count": 8
+      },
+      "reward": {
+        "gold": 695,
+        "item_id": "ITM018"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST019",
+      "name": "研究者の調査・カジノ19",
+      "type": "カジノ",
+      "description": "カジノに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "カジノ",
+        "target_count": 9
+      },
+      "reward": {
+        "gold": 730,
+        "item_id": "ITM019"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST020",
+      "name": "格闘場の挑戦・イベント20",
+      "type": "イベント",
+      "description": "イベントに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "イベント",
+        "target_count": 10
+      },
+      "reward": {
+        "gold": 765,
+        "item_id": "ITM020"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST021",
+      "name": "冒険者の依頼・討伐21",
+      "type": "討伐",
+      "description": "討伐に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "討伐",
+        "target_count": 1
+      },
+      "reward": {
+        "gold": 800,
+        "item_id": "ITM021"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST022",
+      "name": "ギルドの課題・収集22",
+      "type": "収集",
+      "description": "収集に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "収集",
+        "target_count": 2
+      },
+      "reward": {
+        "gold": 835,
+        "item_id": "ITM022"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST023",
+      "name": "町人のお願い・スカウト23",
+      "type": "スカウト",
+      "description": "スカウトに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "スカウト",
+        "target_count": 3
+      },
+      "reward": {
+        "gold": 870,
+        "item_id": "ITM023"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST024",
+      "name": "研究者の調査・配合24",
+      "type": "配合",
+      "description": "配合に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "配合",
+        "target_count": 4
+      },
+      "reward": {
+        "gold": 905,
+        "item_id": "ITM024"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST025",
+      "name": "格闘場の挑戦・探索25",
+      "type": "探索",
+      "description": "探索に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "探索",
+        "target_count": 5
+      },
+      "reward": {
+        "gold": 940,
+        "item_id": "ITM025"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST026",
+      "name": "冒険者の依頼・格闘場26",
+      "type": "格闘場",
+      "description": "格闘場に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "格闘場",
+        "target_count": 6
+      },
+      "reward": {
+        "gold": 975,
+        "item_id": "ITM026"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST027",
+      "name": "ギルドの課題・転生27",
+      "type": "転生",
+      "description": "転生に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "転生",
+        "target_count": 7
+      },
+      "reward": {
+        "gold": 1010,
+        "item_id": "ITM027"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST028",
+      "name": "町人のお願い・ドロップ28",
+      "type": "ドロップ",
+      "description": "ドロップに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "ドロップ",
+        "target_count": 8
+      },
+      "reward": {
+        "gold": 1045,
+        "item_id": "ITM028"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST029",
+      "name": "研究者の調査・カジノ29",
+      "type": "カジノ",
+      "description": "カジノに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "カジノ",
+        "target_count": 9
+      },
+      "reward": {
+        "gold": 1080,
+        "item_id": "ITM029"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST030",
+      "name": "格闘場の挑戦・イベント30",
+      "type": "イベント",
+      "description": "イベントに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "イベント",
+        "target_count": 10
+      },
+      "reward": {
+        "gold": 1115,
+        "item_id": "ITM030"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST031",
+      "name": "冒険者の依頼・討伐31",
+      "type": "討伐",
+      "description": "討伐に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "討伐",
+        "target_count": 1
+      },
+      "reward": {
+        "gold": 1150,
+        "item_id": "ITM031"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST032",
+      "name": "ギルドの課題・収集32",
+      "type": "収集",
+      "description": "収集に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "収集",
+        "target_count": 2
+      },
+      "reward": {
+        "gold": 1185,
+        "item_id": "ITM032"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST033",
+      "name": "町人のお願い・スカウト33",
+      "type": "スカウト",
+      "description": "スカウトに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "スカウト",
+        "target_count": 3
+      },
+      "reward": {
+        "gold": 1220,
+        "item_id": "ITM033"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST034",
+      "name": "研究者の調査・配合34",
+      "type": "配合",
+      "description": "配合に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "配合",
+        "target_count": 4
+      },
+      "reward": {
+        "gold": 1255,
+        "item_id": "ITM034"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST035",
+      "name": "格闘場の挑戦・探索35",
+      "type": "探索",
+      "description": "探索に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "探索",
+        "target_count": 5
+      },
+      "reward": {
+        "gold": 1290,
+        "item_id": "ITM035"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST036",
+      "name": "冒険者の依頼・格闘場36",
+      "type": "格闘場",
+      "description": "格闘場に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "格闘場",
+        "target_count": 6
+      },
+      "reward": {
+        "gold": 1325,
+        "item_id": "ITM036"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST037",
+      "name": "ギルドの課題・転生37",
+      "type": "転生",
+      "description": "転生に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "転生",
+        "target_count": 7
+      },
+      "reward": {
+        "gold": 1360,
+        "item_id": "ITM037"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST038",
+      "name": "町人のお願い・ドロップ38",
+      "type": "ドロップ",
+      "description": "ドロップに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "ドロップ",
+        "target_count": 8
+      },
+      "reward": {
+        "gold": 1395,
+        "item_id": "ITM038"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST039",
+      "name": "研究者の調査・カジノ39",
+      "type": "カジノ",
+      "description": "カジノに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "カジノ",
+        "target_count": 9
+      },
+      "reward": {
+        "gold": 1430,
+        "item_id": "ITM039"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST040",
+      "name": "格闘場の挑戦・イベント40",
+      "type": "イベント",
+      "description": "イベントに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "イベント",
+        "target_count": 10
+      },
+      "reward": {
+        "gold": 1465,
+        "item_id": "ITM040"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST041",
+      "name": "冒険者の依頼・討伐41",
+      "type": "討伐",
+      "description": "討伐に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "討伐",
+        "target_count": 1
+      },
+      "reward": {
+        "gold": 1500,
+        "item_id": "ITM041"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST042",
+      "name": "ギルドの課題・収集42",
+      "type": "収集",
+      "description": "収集に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "収集",
+        "target_count": 2
+      },
+      "reward": {
+        "gold": 1535,
+        "item_id": "ITM042"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST043",
+      "name": "町人のお願い・スカウト43",
+      "type": "スカウト",
+      "description": "スカウトに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "スカウト",
+        "target_count": 3
+      },
+      "reward": {
+        "gold": 1570,
+        "item_id": "ITM043"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST044",
+      "name": "研究者の調査・配合44",
+      "type": "配合",
+      "description": "配合に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "配合",
+        "target_count": 4
+      },
+      "reward": {
+        "gold": 1605,
+        "item_id": "ITM044"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST045",
+      "name": "格闘場の挑戦・探索45",
+      "type": "探索",
+      "description": "探索に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "探索",
+        "target_count": 5
+      },
+      "reward": {
+        "gold": 1640,
+        "item_id": "ITM045"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST046",
+      "name": "冒険者の依頼・格闘場46",
+      "type": "格闘場",
+      "description": "格闘場に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "格闘場",
+        "target_count": 6
+      },
+      "reward": {
+        "gold": 1675,
+        "item_id": "ITM046"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST047",
+      "name": "ギルドの課題・転生47",
+      "type": "転生",
+      "description": "転生に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "転生",
+        "target_count": 7
+      },
+      "reward": {
+        "gold": 1710,
+        "item_id": "ITM047"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST048",
+      "name": "町人のお願い・ドロップ48",
+      "type": "ドロップ",
+      "description": "ドロップに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "ドロップ",
+        "target_count": 8
+      },
+      "reward": {
+        "gold": 1745,
+        "item_id": "ITM048"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST049",
+      "name": "研究者の調査・カジノ49",
+      "type": "カジノ",
+      "description": "カジノに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "カジノ",
+        "target_count": 9
+      },
+      "reward": {
+        "gold": 1780,
+        "item_id": "ITM049"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST050",
+      "name": "格闘場の挑戦・イベント50",
+      "type": "イベント",
+      "description": "イベントに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "イベント",
+        "target_count": 10
+      },
+      "reward": {
+        "gold": 1815,
+        "item_id": "ITM050"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST051",
+      "name": "冒険者の依頼・討伐51",
+      "type": "討伐",
+      "description": "討伐に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "討伐",
+        "target_count": 1
+      },
+      "reward": {
+        "gold": 1850,
+        "item_id": "ITM051"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST052",
+      "name": "ギルドの課題・収集52",
+      "type": "収集",
+      "description": "収集に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "収集",
+        "target_count": 2
+      },
+      "reward": {
+        "gold": 1885,
+        "item_id": "ITM052"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST053",
+      "name": "町人のお願い・スカウト53",
+      "type": "スカウト",
+      "description": "スカウトに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "スカウト",
+        "target_count": 3
+      },
+      "reward": {
+        "gold": 1920,
+        "item_id": "ITM053"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST054",
+      "name": "研究者の調査・配合54",
+      "type": "配合",
+      "description": "配合に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "配合",
+        "target_count": 4
+      },
+      "reward": {
+        "gold": 1955,
+        "item_id": "ITM054"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST055",
+      "name": "格闘場の挑戦・探索55",
+      "type": "探索",
+      "description": "探索に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "探索",
+        "target_count": 5
+      },
+      "reward": {
+        "gold": 1990,
+        "item_id": "ITM055"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST056",
+      "name": "冒険者の依頼・格闘場56",
+      "type": "格闘場",
+      "description": "格闘場に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "格闘場",
+        "target_count": 6
+      },
+      "reward": {
+        "gold": 2025,
+        "item_id": "ITM056"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST057",
+      "name": "ギルドの課題・転生57",
+      "type": "転生",
+      "description": "転生に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "転生",
+        "target_count": 7
+      },
+      "reward": {
+        "gold": 2060,
+        "item_id": "ITM057"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST058",
+      "name": "町人のお願い・ドロップ58",
+      "type": "ドロップ",
+      "description": "ドロップに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "ドロップ",
+        "target_count": 8
+      },
+      "reward": {
+        "gold": 2095,
+        "item_id": "ITM058"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST059",
+      "name": "研究者の調査・カジノ59",
+      "type": "カジノ",
+      "description": "カジノに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "カジノ",
+        "target_count": 9
+      },
+      "reward": {
+        "gold": 2130,
+        "item_id": "ITM059"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST060",
+      "name": "格闘場の挑戦・イベント60",
+      "type": "イベント",
+      "description": "イベントに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "イベント",
+        "target_count": 10
+      },
+      "reward": {
+        "gold": 2165,
+        "item_id": "ITM060"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST061",
+      "name": "冒険者の依頼・討伐61",
+      "type": "討伐",
+      "description": "討伐に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "討伐",
+        "target_count": 1
+      },
+      "reward": {
+        "gold": 2200,
+        "item_id": "ITM061"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST062",
+      "name": "ギルドの課題・収集62",
+      "type": "収集",
+      "description": "収集に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "収集",
+        "target_count": 2
+      },
+      "reward": {
+        "gold": 2235,
+        "item_id": "ITM062"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST063",
+      "name": "町人のお願い・スカウト63",
+      "type": "スカウト",
+      "description": "スカウトに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "スカウト",
+        "target_count": 3
+      },
+      "reward": {
+        "gold": 2270,
+        "item_id": "ITM063"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST064",
+      "name": "研究者の調査・配合64",
+      "type": "配合",
+      "description": "配合に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "配合",
+        "target_count": 4
+      },
+      "reward": {
+        "gold": 2305,
+        "item_id": "ITM064"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST065",
+      "name": "格闘場の挑戦・探索65",
+      "type": "探索",
+      "description": "探索に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "探索",
+        "target_count": 5
+      },
+      "reward": {
+        "gold": 2340,
+        "item_id": "ITM065"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST066",
+      "name": "冒険者の依頼・格闘場66",
+      "type": "格闘場",
+      "description": "格闘場に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "格闘場",
+        "target_count": 6
+      },
+      "reward": {
+        "gold": 2375,
+        "item_id": "ITM066"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST067",
+      "name": "ギルドの課題・転生67",
+      "type": "転生",
+      "description": "転生に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "転生",
+        "target_count": 7
+      },
+      "reward": {
+        "gold": 2410,
+        "item_id": "ITM067"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST068",
+      "name": "町人のお願い・ドロップ68",
+      "type": "ドロップ",
+      "description": "ドロップに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "ドロップ",
+        "target_count": 8
+      },
+      "reward": {
+        "gold": 2445,
+        "item_id": "ITM068"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST069",
+      "name": "研究者の調査・カジノ69",
+      "type": "カジノ",
+      "description": "カジノに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "カジノ",
+        "target_count": 9
+      },
+      "reward": {
+        "gold": 2480,
+        "item_id": "ITM069"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST070",
+      "name": "格闘場の挑戦・イベント70",
+      "type": "イベント",
+      "description": "イベントに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "イベント",
+        "target_count": 10
+      },
+      "reward": {
+        "gold": 2515,
+        "item_id": "ITM070"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST071",
+      "name": "冒険者の依頼・討伐71",
+      "type": "討伐",
+      "description": "討伐に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "討伐",
+        "target_count": 1
+      },
+      "reward": {
+        "gold": 2550,
+        "item_id": "ITM071"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST072",
+      "name": "ギルドの課題・収集72",
+      "type": "収集",
+      "description": "収集に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "収集",
+        "target_count": 2
+      },
+      "reward": {
+        "gold": 2585,
+        "item_id": "ITM072"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST073",
+      "name": "町人のお願い・スカウト73",
+      "type": "スカウト",
+      "description": "スカウトに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "スカウト",
+        "target_count": 3
+      },
+      "reward": {
+        "gold": 2620,
+        "item_id": "ITM073"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST074",
+      "name": "研究者の調査・配合74",
+      "type": "配合",
+      "description": "配合に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "配合",
+        "target_count": 4
+      },
+      "reward": {
+        "gold": 2655,
+        "item_id": "ITM074"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST075",
+      "name": "格闘場の挑戦・探索75",
+      "type": "探索",
+      "description": "探索に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "探索",
+        "target_count": 5
+      },
+      "reward": {
+        "gold": 2690,
+        "item_id": "ITM075"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST076",
+      "name": "冒険者の依頼・格闘場76",
+      "type": "格闘場",
+      "description": "格闘場に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "格闘場",
+        "target_count": 6
+      },
+      "reward": {
+        "gold": 2725,
+        "item_id": "ITM076"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST077",
+      "name": "ギルドの課題・転生77",
+      "type": "転生",
+      "description": "転生に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "転生",
+        "target_count": 7
+      },
+      "reward": {
+        "gold": 2760,
+        "item_id": "ITM077"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST078",
+      "name": "町人のお願い・ドロップ78",
+      "type": "ドロップ",
+      "description": "ドロップに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "ドロップ",
+        "target_count": 8
+      },
+      "reward": {
+        "gold": 2795,
+        "item_id": "ITM078"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST079",
+      "name": "研究者の調査・カジノ79",
+      "type": "カジノ",
+      "description": "カジノに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "カジノ",
+        "target_count": 9
+      },
+      "reward": {
+        "gold": 2830,
+        "item_id": "ITM079"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST080",
+      "name": "格闘場の挑戦・イベント80",
+      "type": "イベント",
+      "description": "イベントに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "イベント",
+        "target_count": 10
+      },
+      "reward": {
+        "gold": 2865,
+        "item_id": "ITM080"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST081",
+      "name": "冒険者の依頼・討伐81",
+      "type": "討伐",
+      "description": "討伐に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "討伐",
+        "target_count": 1
+      },
+      "reward": {
+        "gold": 2900,
+        "item_id": "ITM081"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST082",
+      "name": "ギルドの課題・収集82",
+      "type": "収集",
+      "description": "収集に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "収集",
+        "target_count": 2
+      },
+      "reward": {
+        "gold": 2935,
+        "item_id": "ITM082"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST083",
+      "name": "町人のお願い・スカウト83",
+      "type": "スカウト",
+      "description": "スカウトに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "スカウト",
+        "target_count": 3
+      },
+      "reward": {
+        "gold": 2970,
+        "item_id": "ITM083"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST084",
+      "name": "研究者の調査・配合84",
+      "type": "配合",
+      "description": "配合に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "配合",
+        "target_count": 4
+      },
+      "reward": {
+        "gold": 3005,
+        "item_id": "ITM084"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST085",
+      "name": "格闘場の挑戦・探索85",
+      "type": "探索",
+      "description": "探索に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "探索",
+        "target_count": 5
+      },
+      "reward": {
+        "gold": 3040,
+        "item_id": "ITM085"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST086",
+      "name": "冒険者の依頼・格闘場86",
+      "type": "格闘場",
+      "description": "格闘場に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "格闘場",
+        "target_count": 6
+      },
+      "reward": {
+        "gold": 3075,
+        "item_id": "ITM086"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST087",
+      "name": "ギルドの課題・転生87",
+      "type": "転生",
+      "description": "転生に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "転生",
+        "target_count": 7
+      },
+      "reward": {
+        "gold": 3110,
+        "item_id": "ITM087"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST088",
+      "name": "町人のお願い・ドロップ88",
+      "type": "ドロップ",
+      "description": "ドロップに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "ドロップ",
+        "target_count": 8
+      },
+      "reward": {
+        "gold": 3145,
+        "item_id": "ITM088"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST089",
+      "name": "研究者の調査・カジノ89",
+      "type": "カジノ",
+      "description": "カジノに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "カジノ",
+        "target_count": 9
+      },
+      "reward": {
+        "gold": 3180,
+        "item_id": "ITM089"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST090",
+      "name": "格闘場の挑戦・イベント90",
+      "type": "イベント",
+      "description": "イベントに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "イベント",
+        "target_count": 10
+      },
+      "reward": {
+        "gold": 3215,
+        "item_id": "ITM090"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST091",
+      "name": "冒険者の依頼・討伐91",
+      "type": "討伐",
+      "description": "討伐に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "討伐",
+        "target_count": 1
+      },
+      "reward": {
+        "gold": 3250,
+        "item_id": "ITM091"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST092",
+      "name": "ギルドの課題・収集92",
+      "type": "収集",
+      "description": "収集に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "収集",
+        "target_count": 2
+      },
+      "reward": {
+        "gold": 3285,
+        "item_id": "ITM092"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST093",
+      "name": "町人のお願い・スカウト93",
+      "type": "スカウト",
+      "description": "スカウトに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "スカウト",
+        "target_count": 3
+      },
+      "reward": {
+        "gold": 3320,
+        "item_id": "ITM093"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST094",
+      "name": "研究者の調査・配合94",
+      "type": "配合",
+      "description": "配合に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "配合",
+        "target_count": 4
+      },
+      "reward": {
+        "gold": 3355,
+        "item_id": "ITM094"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST095",
+      "name": "格闘場の挑戦・探索95",
+      "type": "探索",
+      "description": "探索に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "探索",
+        "target_count": 5
+      },
+      "reward": {
+        "gold": 3390,
+        "item_id": "ITM095"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST096",
+      "name": "冒険者の依頼・格闘場96",
+      "type": "格闘場",
+      "description": "格闘場に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "格闘場",
+        "target_count": 6
+      },
+      "reward": {
+        "gold": 3425,
+        "item_id": "ITM096"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST097",
+      "name": "ギルドの課題・転生97",
+      "type": "転生",
+      "description": "転生に関するオリジナルクエスト。",
+      "objective": {
+        "kind": "転生",
+        "target_count": 7
+      },
+      "reward": {
+        "gold": 3460,
+        "item_id": "ITM097"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST098",
+      "name": "町人のお願い・ドロップ98",
+      "type": "ドロップ",
+      "description": "ドロップに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "ドロップ",
+        "target_count": 8
+      },
+      "reward": {
+        "gold": 3495,
+        "item_id": "ITM098"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "QST099",
+      "name": "研究者の調査・カジノ99",
+      "type": "カジノ",
+      "description": "カジノに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "カジノ",
+        "target_count": 9
+      },
+      "reward": {
+        "gold": 3530,
+        "item_id": "ITM099"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "QST100",
+      "name": "格闘場の挑戦・イベント100",
+      "type": "イベント",
+      "description": "イベントに関するオリジナルクエスト。",
+      "objective": {
+        "kind": "イベント",
+        "target_count": 10
+      },
+      "reward": {
+        "gold": 3565,
+        "item_id": "ITM100"
+      },
+      "repeatable": false
+    }
+  ]
+}

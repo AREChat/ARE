@@ -1,0 +1,66 @@
+"use strict";
+// RPG「ARE 〜そういうときは、AREだ！〜」ランチャー。ゲーム本体は ./game/ にあります（別ページで全画面）。
+function openRpg(){
+    let nm = "";
+    try{ nm = Array.from(String(profileDisplayName(state.profile) || "").replace(/\s+/g, "")).slice(0, 8).join(""); }catch(_e){}
+    try{ if(nm) localStorage.setItem("tq_suggest_name", nm); else localStorage.removeItem("tq_suggest_name"); }catch(_e){}
+    const href = "./game/index.html";   // 名前は URL に のせない（URLから個人情報が もれないように）
+    openSheet(toolHead("🗡️ ARE 〜そういうときは、AREだ！〜", "王道ふうの2D RPG。セーブ3つ・自動戦闘・自動レベル上げ。スマホ・タブレットは横向き推奨、パソコンは大きな画面で") +
+        '<div class="admin-card">プロフィールの名前「' + escapeHtml(nm || "主人公") + '」を主人公の名前に使えます（ゲーム内で変更もOK）。セーブはこの端末のブラウザに保存されます。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ ゲームをひらく</a><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
+}
+function initRpg(){ /* ゲーム本体は ./game/ に独立。チャット側の初期化は不要 */ }
+
+// ---- ARE QUEST 2（./game2/）と ドリームフロンティア（./dream-frontier/）のランチャー ----
+function openGame2(){
+    let nm = "";
+    try{ nm = Array.from(String(profileDisplayName(state.profile) || "").replace(/\s+/g, "")).slice(0, 8).join(""); }catch(_e){}
+    const href = "./game2/index.html";   // 名前は URL に のせない
+    openSheet(toolHead("📖 ARE QUEST 2", "ストーリー重視の3D・RPG。前日譚から後日談まで52話。スマホ・タブレットは横向き推奨") +
+        '<div class="admin-card">セーブはこの端末のブラウザに保存されます。ゲーム内からRPG『ARE QUEST』やドリームフロンティアにも行けます。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ ゲームをひらく</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
+}
+function openDream(){
+    const href = "./dream-frontier/index.html";
+    openSheet(toolHead("🎡 ドリームフロンティア", "3Dのテーマパーク。18のライド・アトラクションをめぐってスタンプを集めよう") +
+        '<div class="admin-card">アカウント・ポイントは不要です。セーブはこの端末のブラウザに保存されます。スマホ・タブレットは横向き推奨。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ パークにはいる</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
+}
+function openStudy124(){
+    // 別のサイト（学習サイト LearnLab124）へのリンク。ARE のアカウント情報は渡しません
+    const href = "https://arechat.github.io/LearnLab124/";
+    openSheet(toolHead("📚 学習サイト（LearnLab124）", "プログラミング学習サイト。用語集・クイズ・物語・天気や電車の情報など") +
+        '<div class="admin-card">ARE とは別のサイトです。新しいタブで開きます。学習サイトからも、ARE とゲーム（game1〜game6）へ移れます。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener noreferrer">▶ 学習サイトをひらく</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
+}
+function initStudy124(){ /* 別のサイトへのリンクだけ。初期化は不要 */ }
+function openGame3(){
+    const href = "./game3/index.html";
+    openSheet(toolHead("🌙 ARE QUEST 3 〜月影のあしあと〜", "高画質の3D・学園ものRPG。PC推奨（スマホ・タブレットは横向き）") +
+        '<div class="admin-card">セーブはこの端末のブラウザに保存されます。アカウント・ポイントは不要です。ゲーム内の「ひみつのコード」で、チートコードも使えます。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ ゲームをひらく</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
+}
+function openGame4(){
+    const href = "./game4/index.html";
+    openSheet(toolHead("🃏 ARE CARD 〜そういうときは、AREだ！〜", "3Dの盤面で遊ぶカードバトル（土台版）") +
+        '<div class="admin-card">デッキを組んでCPUと対戦。セーブはこの端末のブラウザに保存されます。アカウント・ポイントは不要です。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ ゲームをひらく</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
+}
+function openGame5(){
+    const href = "./game5/index.html";
+    openSheet(toolHead("🔍 GAME5 推理ゲーム", "会話と証言を集めて、升目（マス目）パズルで事件を解く、全10章のオリジナル推理ゲーム") +
+        '<div class="admin-card">ブラウザで すぐ あそべます（ダウンロード不要）。パソコンでは、Windows版（exe）も ページから入手できます（スマホは ブラウザ版のみ）。</div>' +
+        '<div class="row"><a class="button" href="./game5/play/index.html" target="_blank" rel="noopener">▶ ブラウザで あそぶ</a><a class="button-secondary" href="' + escapeHtml(href) + '" target="_blank" rel="noopener" style="text-decoration:none">案内ページ（Windows版）</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
+}
+function openDaifugo(){
+    const href = "./daifugo/index.html";
+    openSheet(toolHead("👑 大富豪（本格ルール・全部入り）", "3〜2の技・縛り（3枚縛りも）・革命・階級・カード交換。ルールは自由に変えられます") +
+        '<div class="admin-card">CPUと3〜6人で対戦。大富豪／富豪／平民／貧民／大貧民と、ラウンドごとのカード交換つき。アカウント・ポイントは不要です。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ あそぶ</a></div>');
+}
+function initDaifugo(){ /* ゲーム本体は ./daifugo/ に独立 */ }
+function initGame5(){ /* ゲーム本体は ./game5/play/（ブラウザ版）と Releases の exe（Windows版） */ }
+function initGame3(){ /* ゲーム本体は ./game3/ に独立 */ }
+function initGame4(){ /* ゲーム本体は ./game4/ に独立 */ }
+function initGame2(){ /* ゲーム本体は ./game2/ に独立 */ }
+function initDream(){ /* ゲーム本体は ./dream-frontier/ に独立 */ }

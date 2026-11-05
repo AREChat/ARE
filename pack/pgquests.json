@@ -1,0 +1,1706 @@
+{
+  "schema_version": 1,
+  "count": 100,
+  "quests": [
+    {
+      "id": "PGQ001",
+      "name": "クリア後の依頼001",
+      "category": "討伐",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う討伐の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "討伐",
+        "count": 1
+      },
+      "reward": {
+        "gold": 500,
+        "casino_coins": 50,
+        "item_id": "ITM001"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "PGQ002",
+      "name": "クリア後の依頼002",
+      "category": "探索",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う探索の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "探索",
+        "count": 2
+      },
+      "reward": {
+        "gold": 575,
+        "casino_coins": 60,
+        "item_id": "ITM002"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ003",
+      "name": "クリア後の依頼003",
+      "category": "収集",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う収集の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "収集",
+        "count": 3
+      },
+      "reward": {
+        "gold": 650,
+        "casino_coins": 70,
+        "item_id": "ITM003"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ004",
+      "name": "クリア後の依頼004",
+      "category": "スカウト",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うスカウトの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "スカウト",
+        "count": 4
+      },
+      "reward": {
+        "gold": 725,
+        "casino_coins": 80,
+        "item_id": "ITM004"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ005",
+      "name": "クリア後の依頼005",
+      "category": "配合",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う配合の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "配合",
+        "count": 5
+      },
+      "reward": {
+        "gold": 800,
+        "casino_coins": 90,
+        "item_id": "ITM005"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ006",
+      "name": "クリア後の依頼006",
+      "category": "格闘場",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う格闘場の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "格闘場",
+        "count": 6
+      },
+      "reward": {
+        "gold": 875,
+        "casino_coins": 100,
+        "item_id": "ITM006"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ007",
+      "name": "クリア後の依頼007",
+      "category": "転生",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う転生の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "転生",
+        "count": 7
+      },
+      "reward": {
+        "gold": 950,
+        "casino_coins": 110,
+        "item_id": "ITM007"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ008",
+      "name": "クリア後の依頼008",
+      "category": "ドロップ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うドロップの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "ドロップ",
+        "count": 8
+      },
+      "reward": {
+        "gold": 1025,
+        "casino_coins": 120,
+        "item_id": "ITM008"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ009",
+      "name": "クリア後の依頼009",
+      "category": "カジノ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うカジノの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "カジノ",
+        "count": 9
+      },
+      "reward": {
+        "gold": 1100,
+        "casino_coins": 130,
+        "item_id": "ITM009"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ010",
+      "name": "クリア後の依頼010",
+      "category": "音楽ゲーム",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う音楽ゲームの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "音楽ゲーム",
+        "count": 10
+      },
+      "reward": {
+        "gold": 1175,
+        "casino_coins": 140,
+        "item_id": "ITM010"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ011",
+      "name": "クリア後の依頼011",
+      "category": "討伐",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う討伐の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "討伐",
+        "count": 11
+      },
+      "reward": {
+        "gold": 1250,
+        "casino_coins": 150,
+        "item_id": "ITM011"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "PGQ012",
+      "name": "クリア後の依頼012",
+      "category": "探索",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う探索の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "探索",
+        "count": 12
+      },
+      "reward": {
+        "gold": 1325,
+        "casino_coins": 160,
+        "item_id": "ITM012"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ013",
+      "name": "クリア後の依頼013",
+      "category": "収集",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う収集の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "収集",
+        "count": 1
+      },
+      "reward": {
+        "gold": 1400,
+        "casino_coins": 170,
+        "item_id": "ITM013"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ014",
+      "name": "クリア後の依頼014",
+      "category": "スカウト",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うスカウトの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "スカウト",
+        "count": 2
+      },
+      "reward": {
+        "gold": 1475,
+        "casino_coins": 180,
+        "item_id": "ITM014"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ015",
+      "name": "クリア後の依頼015",
+      "category": "配合",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う配合の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "配合",
+        "count": 3
+      },
+      "reward": {
+        "gold": 1550,
+        "casino_coins": 190,
+        "item_id": "ITM015"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ016",
+      "name": "クリア後の依頼016",
+      "category": "格闘場",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う格闘場の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "格闘場",
+        "count": 4
+      },
+      "reward": {
+        "gold": 1625,
+        "casino_coins": 200,
+        "item_id": "ITM016"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ017",
+      "name": "クリア後の依頼017",
+      "category": "転生",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う転生の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "転生",
+        "count": 5
+      },
+      "reward": {
+        "gold": 1700,
+        "casino_coins": 210,
+        "item_id": "ITM017"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ018",
+      "name": "クリア後の依頼018",
+      "category": "ドロップ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うドロップの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "ドロップ",
+        "count": 6
+      },
+      "reward": {
+        "gold": 1775,
+        "casino_coins": 220,
+        "item_id": "ITM018"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ019",
+      "name": "クリア後の依頼019",
+      "category": "カジノ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うカジノの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "カジノ",
+        "count": 7
+      },
+      "reward": {
+        "gold": 1850,
+        "casino_coins": 230,
+        "item_id": "ITM019"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ020",
+      "name": "クリア後の依頼020",
+      "category": "音楽ゲーム",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う音楽ゲームの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "音楽ゲーム",
+        "count": 8
+      },
+      "reward": {
+        "gold": 1925,
+        "casino_coins": 240,
+        "item_id": "ITM020"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ021",
+      "name": "クリア後の依頼021",
+      "category": "討伐",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う討伐の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "討伐",
+        "count": 9
+      },
+      "reward": {
+        "gold": 2000,
+        "casino_coins": 250,
+        "item_id": "ITM021"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "PGQ022",
+      "name": "クリア後の依頼022",
+      "category": "探索",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う探索の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "探索",
+        "count": 10
+      },
+      "reward": {
+        "gold": 2075,
+        "casino_coins": 260,
+        "item_id": "ITM022"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ023",
+      "name": "クリア後の依頼023",
+      "category": "収集",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う収集の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "収集",
+        "count": 11
+      },
+      "reward": {
+        "gold": 2150,
+        "casino_coins": 270,
+        "item_id": "ITM023"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ024",
+      "name": "クリア後の依頼024",
+      "category": "スカウト",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うスカウトの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "スカウト",
+        "count": 12
+      },
+      "reward": {
+        "gold": 2225,
+        "casino_coins": 280,
+        "item_id": "ITM024"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ025",
+      "name": "クリア後の依頼025",
+      "category": "配合",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う配合の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "配合",
+        "count": 1
+      },
+      "reward": {
+        "gold": 2300,
+        "casino_coins": 290,
+        "item_id": "ITM025"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ026",
+      "name": "クリア後の依頼026",
+      "category": "格闘場",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う格闘場の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "格闘場",
+        "count": 2
+      },
+      "reward": {
+        "gold": 2375,
+        "casino_coins": 300,
+        "item_id": "ITM026"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ027",
+      "name": "クリア後の依頼027",
+      "category": "転生",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う転生の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "転生",
+        "count": 3
+      },
+      "reward": {
+        "gold": 2450,
+        "casino_coins": 310,
+        "item_id": "ITM027"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ028",
+      "name": "クリア後の依頼028",
+      "category": "ドロップ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うドロップの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "ドロップ",
+        "count": 4
+      },
+      "reward": {
+        "gold": 2525,
+        "casino_coins": 320,
+        "item_id": "ITM028"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ029",
+      "name": "クリア後の依頼029",
+      "category": "カジノ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うカジノの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "カジノ",
+        "count": 5
+      },
+      "reward": {
+        "gold": 2600,
+        "casino_coins": 330,
+        "item_id": "ITM029"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ030",
+      "name": "クリア後の依頼030",
+      "category": "音楽ゲーム",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う音楽ゲームの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "音楽ゲーム",
+        "count": 6
+      },
+      "reward": {
+        "gold": 2675,
+        "casino_coins": 340,
+        "item_id": "ITM030"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ031",
+      "name": "クリア後の依頼031",
+      "category": "討伐",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う討伐の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "討伐",
+        "count": 7
+      },
+      "reward": {
+        "gold": 2750,
+        "casino_coins": 350,
+        "item_id": "ITM031"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "PGQ032",
+      "name": "クリア後の依頼032",
+      "category": "探索",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う探索の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "探索",
+        "count": 8
+      },
+      "reward": {
+        "gold": 2825,
+        "casino_coins": 360,
+        "item_id": "ITM032"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ033",
+      "name": "クリア後の依頼033",
+      "category": "収集",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う収集の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "収集",
+        "count": 9
+      },
+      "reward": {
+        "gold": 2900,
+        "casino_coins": 370,
+        "item_id": "ITM033"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ034",
+      "name": "クリア後の依頼034",
+      "category": "スカウト",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うスカウトの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "スカウト",
+        "count": 10
+      },
+      "reward": {
+        "gold": 2975,
+        "casino_coins": 380,
+        "item_id": "ITM034"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ035",
+      "name": "クリア後の依頼035",
+      "category": "配合",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う配合の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "配合",
+        "count": 11
+      },
+      "reward": {
+        "gold": 3050,
+        "casino_coins": 390,
+        "item_id": "ITM035"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ036",
+      "name": "クリア後の依頼036",
+      "category": "格闘場",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う格闘場の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "格闘場",
+        "count": 12
+      },
+      "reward": {
+        "gold": 3125,
+        "casino_coins": 400,
+        "item_id": "ITM036"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ037",
+      "name": "クリア後の依頼037",
+      "category": "転生",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う転生の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "転生",
+        "count": 1
+      },
+      "reward": {
+        "gold": 3200,
+        "casino_coins": 410,
+        "item_id": "ITM037"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ038",
+      "name": "クリア後の依頼038",
+      "category": "ドロップ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うドロップの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "ドロップ",
+        "count": 2
+      },
+      "reward": {
+        "gold": 3275,
+        "casino_coins": 420,
+        "item_id": "ITM038"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ039",
+      "name": "クリア後の依頼039",
+      "category": "カジノ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うカジノの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "カジノ",
+        "count": 3
+      },
+      "reward": {
+        "gold": 3350,
+        "casino_coins": 430,
+        "item_id": "ITM039"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ040",
+      "name": "クリア後の依頼040",
+      "category": "音楽ゲーム",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う音楽ゲームの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "音楽ゲーム",
+        "count": 4
+      },
+      "reward": {
+        "gold": 3425,
+        "casino_coins": 440,
+        "item_id": "ITM040"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ041",
+      "name": "クリア後の依頼041",
+      "category": "討伐",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う討伐の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "討伐",
+        "count": 5
+      },
+      "reward": {
+        "gold": 3500,
+        "casino_coins": 450,
+        "item_id": "ITM041"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "PGQ042",
+      "name": "クリア後の依頼042",
+      "category": "探索",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う探索の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "探索",
+        "count": 6
+      },
+      "reward": {
+        "gold": 3575,
+        "casino_coins": 460,
+        "item_id": "ITM042"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ043",
+      "name": "クリア後の依頼043",
+      "category": "収集",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う収集の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "収集",
+        "count": 7
+      },
+      "reward": {
+        "gold": 3650,
+        "casino_coins": 470,
+        "item_id": "ITM043"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ044",
+      "name": "クリア後の依頼044",
+      "category": "スカウト",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うスカウトの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "スカウト",
+        "count": 8
+      },
+      "reward": {
+        "gold": 3725,
+        "casino_coins": 480,
+        "item_id": "ITM044"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ045",
+      "name": "クリア後の依頼045",
+      "category": "配合",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う配合の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "配合",
+        "count": 9
+      },
+      "reward": {
+        "gold": 3800,
+        "casino_coins": 490,
+        "item_id": "ITM045"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ046",
+      "name": "クリア後の依頼046",
+      "category": "格闘場",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う格闘場の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "格闘場",
+        "count": 10
+      },
+      "reward": {
+        "gold": 3875,
+        "casino_coins": 500,
+        "item_id": "ITM046"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ047",
+      "name": "クリア後の依頼047",
+      "category": "転生",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う転生の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "転生",
+        "count": 11
+      },
+      "reward": {
+        "gold": 3950,
+        "casino_coins": 510,
+        "item_id": "ITM047"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ048",
+      "name": "クリア後の依頼048",
+      "category": "ドロップ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うドロップの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "ドロップ",
+        "count": 12
+      },
+      "reward": {
+        "gold": 4025,
+        "casino_coins": 520,
+        "item_id": "ITM048"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ049",
+      "name": "クリア後の依頼049",
+      "category": "カジノ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うカジノの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "カジノ",
+        "count": 1
+      },
+      "reward": {
+        "gold": 4100,
+        "casino_coins": 530,
+        "item_id": "ITM049"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ050",
+      "name": "クリア後の依頼050",
+      "category": "音楽ゲーム",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う音楽ゲームの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "音楽ゲーム",
+        "count": 2
+      },
+      "reward": {
+        "gold": 4175,
+        "casino_coins": 540,
+        "item_id": "ITM050"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ051",
+      "name": "クリア後の依頼051",
+      "category": "討伐",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う討伐の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "討伐",
+        "count": 3
+      },
+      "reward": {
+        "gold": 4250,
+        "casino_coins": 550,
+        "item_id": "ITM051"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "PGQ052",
+      "name": "クリア後の依頼052",
+      "category": "探索",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う探索の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "探索",
+        "count": 4
+      },
+      "reward": {
+        "gold": 4325,
+        "casino_coins": 560,
+        "item_id": "ITM052"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ053",
+      "name": "クリア後の依頼053",
+      "category": "収集",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う収集の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "収集",
+        "count": 5
+      },
+      "reward": {
+        "gold": 4400,
+        "casino_coins": 570,
+        "item_id": "ITM053"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ054",
+      "name": "クリア後の依頼054",
+      "category": "スカウト",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うスカウトの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "スカウト",
+        "count": 6
+      },
+      "reward": {
+        "gold": 4475,
+        "casino_coins": 580,
+        "item_id": "ITM054"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ055",
+      "name": "クリア後の依頼055",
+      "category": "配合",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う配合の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "配合",
+        "count": 7
+      },
+      "reward": {
+        "gold": 4550,
+        "casino_coins": 590,
+        "item_id": "ITM055"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ056",
+      "name": "クリア後の依頼056",
+      "category": "格闘場",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う格闘場の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "格闘場",
+        "count": 8
+      },
+      "reward": {
+        "gold": 4625,
+        "casino_coins": 600,
+        "item_id": "ITM056"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ057",
+      "name": "クリア後の依頼057",
+      "category": "転生",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う転生の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "転生",
+        "count": 9
+      },
+      "reward": {
+        "gold": 4700,
+        "casino_coins": 610,
+        "item_id": "ITM057"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ058",
+      "name": "クリア後の依頼058",
+      "category": "ドロップ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うドロップの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "ドロップ",
+        "count": 10
+      },
+      "reward": {
+        "gold": 4775,
+        "casino_coins": 620,
+        "item_id": "ITM058"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ059",
+      "name": "クリア後の依頼059",
+      "category": "カジノ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うカジノの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "カジノ",
+        "count": 11
+      },
+      "reward": {
+        "gold": 4850,
+        "casino_coins": 630,
+        "item_id": "ITM059"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ060",
+      "name": "クリア後の依頼060",
+      "category": "音楽ゲーム",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う音楽ゲームの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "音楽ゲーム",
+        "count": 12
+      },
+      "reward": {
+        "gold": 4925,
+        "casino_coins": 640,
+        "item_id": "ITM060"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ061",
+      "name": "クリア後の依頼061",
+      "category": "討伐",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う討伐の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "討伐",
+        "count": 1
+      },
+      "reward": {
+        "gold": 5000,
+        "casino_coins": 650,
+        "item_id": "ITM061"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "PGQ062",
+      "name": "クリア後の依頼062",
+      "category": "探索",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う探索の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "探索",
+        "count": 2
+      },
+      "reward": {
+        "gold": 5075,
+        "casino_coins": 660,
+        "item_id": "ITM062"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ063",
+      "name": "クリア後の依頼063",
+      "category": "収集",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う収集の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "収集",
+        "count": 3
+      },
+      "reward": {
+        "gold": 5150,
+        "casino_coins": 670,
+        "item_id": "ITM063"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ064",
+      "name": "クリア後の依頼064",
+      "category": "スカウト",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うスカウトの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "スカウト",
+        "count": 4
+      },
+      "reward": {
+        "gold": 5225,
+        "casino_coins": 680,
+        "item_id": "ITM064"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ065",
+      "name": "クリア後の依頼065",
+      "category": "配合",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う配合の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "配合",
+        "count": 5
+      },
+      "reward": {
+        "gold": 5300,
+        "casino_coins": 690,
+        "item_id": "ITM065"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ066",
+      "name": "クリア後の依頼066",
+      "category": "格闘場",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う格闘場の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "格闘場",
+        "count": 6
+      },
+      "reward": {
+        "gold": 5375,
+        "casino_coins": 700,
+        "item_id": "ITM066"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ067",
+      "name": "クリア後の依頼067",
+      "category": "転生",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う転生の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "転生",
+        "count": 7
+      },
+      "reward": {
+        "gold": 5450,
+        "casino_coins": 710,
+        "item_id": "ITM067"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ068",
+      "name": "クリア後の依頼068",
+      "category": "ドロップ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うドロップの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "ドロップ",
+        "count": 8
+      },
+      "reward": {
+        "gold": 5525,
+        "casino_coins": 720,
+        "item_id": "ITM068"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ069",
+      "name": "クリア後の依頼069",
+      "category": "カジノ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うカジノの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "カジノ",
+        "count": 9
+      },
+      "reward": {
+        "gold": 5600,
+        "casino_coins": 730,
+        "item_id": "ITM069"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ070",
+      "name": "クリア後の依頼070",
+      "category": "音楽ゲーム",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う音楽ゲームの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "音楽ゲーム",
+        "count": 10
+      },
+      "reward": {
+        "gold": 5675,
+        "casino_coins": 740,
+        "item_id": "ITM070"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ071",
+      "name": "クリア後の依頼071",
+      "category": "討伐",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う討伐の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "討伐",
+        "count": 11
+      },
+      "reward": {
+        "gold": 5750,
+        "casino_coins": 750,
+        "item_id": "ITM071"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "PGQ072",
+      "name": "クリア後の依頼072",
+      "category": "探索",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う探索の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "探索",
+        "count": 12
+      },
+      "reward": {
+        "gold": 5825,
+        "casino_coins": 760,
+        "item_id": "ITM072"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ073",
+      "name": "クリア後の依頼073",
+      "category": "収集",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う収集の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "収集",
+        "count": 1
+      },
+      "reward": {
+        "gold": 5900,
+        "casino_coins": 770,
+        "item_id": "ITM073"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ074",
+      "name": "クリア後の依頼074",
+      "category": "スカウト",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うスカウトの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "スカウト",
+        "count": 2
+      },
+      "reward": {
+        "gold": 5975,
+        "casino_coins": 780,
+        "item_id": "ITM074"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ075",
+      "name": "クリア後の依頼075",
+      "category": "配合",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う配合の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "配合",
+        "count": 3
+      },
+      "reward": {
+        "gold": 6050,
+        "casino_coins": 790,
+        "item_id": "ITM075"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ076",
+      "name": "クリア後の依頼076",
+      "category": "格闘場",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う格闘場の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "格闘場",
+        "count": 4
+      },
+      "reward": {
+        "gold": 6125,
+        "casino_coins": 800,
+        "item_id": "ITM076"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ077",
+      "name": "クリア後の依頼077",
+      "category": "転生",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う転生の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "転生",
+        "count": 5
+      },
+      "reward": {
+        "gold": 6200,
+        "casino_coins": 810,
+        "item_id": "ITM077"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ078",
+      "name": "クリア後の依頼078",
+      "category": "ドロップ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うドロップの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "ドロップ",
+        "count": 6
+      },
+      "reward": {
+        "gold": 6275,
+        "casino_coins": 820,
+        "item_id": "ITM078"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ079",
+      "name": "クリア後の依頼079",
+      "category": "カジノ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うカジノの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "カジノ",
+        "count": 7
+      },
+      "reward": {
+        "gold": 6350,
+        "casino_coins": 830,
+        "item_id": "ITM079"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ080",
+      "name": "クリア後の依頼080",
+      "category": "音楽ゲーム",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う音楽ゲームの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "音楽ゲーム",
+        "count": 8
+      },
+      "reward": {
+        "gold": 6425,
+        "casino_coins": 840,
+        "item_id": "ITM080"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ081",
+      "name": "クリア後の依頼081",
+      "category": "討伐",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う討伐の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "討伐",
+        "count": 9
+      },
+      "reward": {
+        "gold": 6500,
+        "casino_coins": 850,
+        "item_id": "ITM081"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "PGQ082",
+      "name": "クリア後の依頼082",
+      "category": "探索",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う探索の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "探索",
+        "count": 10
+      },
+      "reward": {
+        "gold": 6575,
+        "casino_coins": 860,
+        "item_id": "ITM082"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ083",
+      "name": "クリア後の依頼083",
+      "category": "収集",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う収集の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "収集",
+        "count": 11
+      },
+      "reward": {
+        "gold": 6650,
+        "casino_coins": 870,
+        "item_id": "ITM083"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ084",
+      "name": "クリア後の依頼084",
+      "category": "スカウト",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うスカウトの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "スカウト",
+        "count": 12
+      },
+      "reward": {
+        "gold": 6725,
+        "casino_coins": 880,
+        "item_id": "ITM084"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ085",
+      "name": "クリア後の依頼085",
+      "category": "配合",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う配合の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "配合",
+        "count": 1
+      },
+      "reward": {
+        "gold": 6800,
+        "casino_coins": 890,
+        "item_id": "ITM085"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ086",
+      "name": "クリア後の依頼086",
+      "category": "格闘場",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う格闘場の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "格闘場",
+        "count": 2
+      },
+      "reward": {
+        "gold": 6875,
+        "casino_coins": 900,
+        "item_id": "ITM086"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ087",
+      "name": "クリア後の依頼087",
+      "category": "転生",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う転生の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "転生",
+        "count": 3
+      },
+      "reward": {
+        "gold": 6950,
+        "casino_coins": 910,
+        "item_id": "ITM087"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ088",
+      "name": "クリア後の依頼088",
+      "category": "ドロップ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うドロップの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "ドロップ",
+        "count": 4
+      },
+      "reward": {
+        "gold": 7025,
+        "casino_coins": 920,
+        "item_id": "ITM088"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ089",
+      "name": "クリア後の依頼089",
+      "category": "カジノ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うカジノの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "カジノ",
+        "count": 5
+      },
+      "reward": {
+        "gold": 7100,
+        "casino_coins": 930,
+        "item_id": "ITM089"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ090",
+      "name": "クリア後の依頼090",
+      "category": "音楽ゲーム",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う音楽ゲームの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "音楽ゲーム",
+        "count": 6
+      },
+      "reward": {
+        "gold": 7175,
+        "casino_coins": 940,
+        "item_id": "ITM090"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ091",
+      "name": "クリア後の依頼091",
+      "category": "討伐",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う討伐の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "討伐",
+        "count": 7
+      },
+      "reward": {
+        "gold": 7250,
+        "casino_coins": 950,
+        "item_id": "ITM091"
+      },
+      "repeatable": true
+    },
+    {
+      "id": "PGQ092",
+      "name": "クリア後の依頼092",
+      "category": "探索",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う探索の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "探索",
+        "count": 8
+      },
+      "reward": {
+        "gold": 7325,
+        "casino_coins": 960,
+        "item_id": "ITM092"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ093",
+      "name": "クリア後の依頼093",
+      "category": "収集",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う収集の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "収集",
+        "count": 9
+      },
+      "reward": {
+        "gold": 7400,
+        "casino_coins": 970,
+        "item_id": "ITM093"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ094",
+      "name": "クリア後の依頼094",
+      "category": "スカウト",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うスカウトの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "スカウト",
+        "count": 10
+      },
+      "reward": {
+        "gold": 7475,
+        "casino_coins": 980,
+        "item_id": "ITM094"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ095",
+      "name": "クリア後の依頼095",
+      "category": "配合",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う配合の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "配合",
+        "count": 11
+      },
+      "reward": {
+        "gold": 7550,
+        "casino_coins": 990,
+        "item_id": "ITM095"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ096",
+      "name": "クリア後の依頼096",
+      "category": "格闘場",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う格闘場の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "格闘場",
+        "count": 12
+      },
+      "reward": {
+        "gold": 7625,
+        "casino_coins": 1000,
+        "item_id": "ITM096"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ097",
+      "name": "クリア後の依頼097",
+      "category": "転生",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う転生の依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "転生",
+        "count": 1
+      },
+      "reward": {
+        "gold": 7700,
+        "casino_coins": 1010,
+        "item_id": "ITM097"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ098",
+      "name": "クリア後の依頼098",
+      "category": "ドロップ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うドロップの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "ドロップ",
+        "count": 2
+      },
+      "reward": {
+        "gold": 7775,
+        "casino_coins": 1020,
+        "item_id": "ITM098"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ099",
+      "name": "クリア後の依頼099",
+      "category": "カジノ",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行うカジノの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "カジノ",
+        "count": 3
+      },
+      "reward": {
+        "gold": 7850,
+        "casino_coins": 1030,
+        "item_id": "ITM099"
+      },
+      "repeatable": false
+    },
+    {
+      "id": "PGQ100",
+      "name": "クリア後の依頼100",
+      "category": "音楽ゲーム",
+      "unlock_condition": "通常ストーリーをクリア",
+      "description": "クリア後エリアで行う音楽ゲームの依頼。既存の本編ストーリーには影響しない。",
+      "objective": {
+        "type": "音楽ゲーム",
+        "count": 4
+      },
+      "reward": {
+        "gold": 7925,
+        "casino_coins": 1040,
+        "item_id": "ITM100"
+      },
+      "repeatable": false
+    }
+  ]
+}
