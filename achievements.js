@@ -5,7 +5,7 @@
   const rd = (k) => { try{ return JSON.parse(localStorage.getItem(k) || "null"); }catch(_e){ return null; } };
   // game1 の称号の名前表を、titles.js から 取り出す（計算部分は 呼ばないので ダミーで 足りる）
   window.G = {S:{f:{}, party:[], cx:{}, kills:0, lv:1}}; window.tqJ = () => ({mast:[], tried:[], learned:{}}); window.tqMemCount = () => 0; window.tqAutoSave = () => {}; window.ACT = {}; window.render = () => {};
-  const s = document.createElement("script"); s.src = "./game/titles.js";
+  const s = document.createElement("script"); s.src = "https://arechat.github.io/game/game/titles.js";
   function done(){
     let h = "";
     // ---- game1 ----

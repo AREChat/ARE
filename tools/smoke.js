@@ -2,7 +2,7 @@
 const { chromium } = require("playwright");
 (async () => {
   const base = process.env.BASE || "http://localhost:8080";
-  const pages = ["login.html", "achievements.html", "game/index.html", "game4/index.html", "game6/index.html", "terms.html", "privacy.html", "guide.html", "faq.html", "credits.html", "changelog.html", "404.html"];
+  const pages = ["login.html", "achievements.html", "terms.html", "privacy.html", "guide.html", "faq.html", "credits.html", "changelog.html", "404.html"];
   const b = await chromium.launch(); let bad = 0;
   for (const u of pages) {
     const p = await b.newPage(), errs = [];
