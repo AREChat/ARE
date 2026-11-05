@@ -1,5 +1,5 @@
 /* ARE ゲームパッド（Switch Proコン ほか）で メニューを そうさする ぶひん（クラシックscript）
-   十字キー／左スティック：ボタンを えらぶ（えらぶものが ないとき上下は スクロール）　右スティック：スクロール　L/R：タブきりかえ　A(Switch は 右)：おす　B：もどる（Esc）　+：メニュー（Esc）
+   十字キー／左スティック：ボタンを えらぶ（えらぶものが ないとき上下は スクロール）　右スティック：スクロール　L/R：タブきりかえ　ZL/ZR：1画面ずつスクロール　−：いちばん上へ　A(Switch は 右)：おす　B：もどる（Esc）　+：メニュー（Esc）
    ※ゲームが じぶんで パッドに たいおうしている ばあいは window.ARE_PAD_OFF = true で オフにできます。 */
 (function(){
     if(window.__arePad || !navigator.getGamepads) return; window.__arePad = 1;
@@ -40,6 +40,9 @@
         if(edge("plus", !!(b[9] && b[9].pressed))) key("Escape");
         if(edge("l", !!(b[4] && b[4].pressed))) tabStep(-1);
         if(edge("r", !!(b[5] && b[5].pressed))) tabStep(1);
+        if(edge("zl", !!(b[6] && b[6].pressed))) scrollY(-Math.round(innerHeight * 0.8));   // ZL：1画面ぶん上へ
+        if(edge("zr", !!(b[7] && b[7].pressed))) scrollY(Math.round(innerHeight * 0.8));    // ZR：1画面ぶん下へ
+        if(edge("minus", !!(b[8] && b[8].pressed))) { try{ window.scrollTo(0, 0); }catch(_e){} }   // −：いちばん上へ
     }
     addEventListener("gamepadconnected", function(){ var L = list(); if(!cur && L.length) setCur(L[0]); });
     requestAnimationFrame(poll);
