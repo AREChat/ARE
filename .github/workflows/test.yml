@@ -26,6 +26,11 @@ jobs:
         with:
           node-version: 22
 
+      - name: チャットの JS をまとめた chat.bundle.js が最新か
+        run: |
+          npm i --no-save terser@5.51.2
+          node tools/build-bundle.js --check
+
       - name: JavaScript の構文チェック
         run: |
           fail=0

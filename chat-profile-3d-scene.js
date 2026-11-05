@@ -1,4 +1,4 @@
-import * as THREE from "./dream-frontier/vendor/three/build/three.module.js";
+import * as THREE from "./vendor/three/three.module.js";
 
 const defaultLook = {shape:"round",skin:"#f4c9a5",hair:"#38271e",shirt:"#536dfe",background:"#1f2a44"};
 let renderer = null, scene = null, camera = null, actor = null, frame = 0;
