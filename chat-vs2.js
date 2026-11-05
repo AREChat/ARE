@@ -4,7 +4,7 @@
 // ・ヒット＆ブロー／絵しりとりは、答えがメッセージの中に入っているため、技術的には読めてしまいます（みんなで遊ぶ用）。
 
 VS_GAMES.gomoku = {name:"五目並べ", icon:"⚫", desc:"15×15。縦・横・斜めに5つそろえたら勝ち", marks:["⚫", "⚪"]};
-VS_GAMES.chess = {name:"チェス", icon:"♞", desc:"ふつうのルール（キャスリング・アンパッサン・プロモーション・チェックメイト）", marks:["白", "黒"]};
+VS_GAMES.chess = {name:"チェス", icon:"♞", desc:"ふつうのチェス。王をにげられなくしたら勝ち（特別な動きもすべて対応）", marks:["白", "黒"]};
 VS_GAMES.hb = {name:"ヒット＆ブロー", icon:"🎯", desc:"4けたの数字（重なりなし）を先に当てた人の勝ち", marks:["①", "②"]};
 VS_GAMES.assoc = {name:"連想ゲーム", icon:"💭", desc:"前のことばから連想することばを交互に。何語続くか挑戦（協力）", marks:["①", "②"]};
 VS_GAMES.esh = {name:"絵しりとり", icon:"🖍️", desc:"ことばを絵で描いて、相手が当てる。当てたら、次の絵を描く", marks:["①", "②"]};
@@ -13,7 +13,7 @@ const VS2 = {gomoku:1, chess:1, hb:1, assoc:1, esh:1};
 function vs2Resign(S, sender){
     const idx = S.players.indexOf(sender);
     if(idx < 0 || S.over) return;
-    S.over = true; S.winner = 1 - idx; S.reason = "投了";
+    S.over = true; S.winner = 1 - idx; S.reason = "終了";
 }
 
 // ---------- 五目並べ ----------
@@ -44,11 +44,11 @@ VS_ENGINES.gomoku = {
         else S.turn = 1 - S.turn;
     },
     view:(S, ctx) => '<div class="vs-gm">' + S.cells.map((v, i) => '<button type="button" class="vs-gm-c' + (i === S.last ? " last" : "") + (S.line && S.line.includes(i) ? " win" : "") + '"' + (v === -1 && ctx.myTurn ? ' data-vs="' + ctx.gid + '" data-i="' + i + '" aria-label="' + (Math.floor(i / GM_N) + 1) + '行' + (i % GM_N + 1) + '列"' : " disabled") + '>' + (v === -1 ? "" : ctx.marks[v]) + '</button>').join("") + '</div>' + vs2ResignBtn(S, ctx),
-    moveText:(item) => item.kind === "resign" ? "投了しました" : (Math.floor(Number(item.i) / GM_N) + 1) + "行" + (Number(item.i) % GM_N + 1) + "列に置きました"
+    moveText:(item) => item.kind === "resign" ? "終了しました" : (Math.floor(Number(item.i) / GM_N) + 1) + "行" + (Number(item.i) % GM_N + 1) + "列に置きました"
 };
 function vs2ResignBtn(S, ctx){
     const me = state.user.id;
-    return !S.over && S.players.includes(me) && S.players[1] !== null ? '<div class="row"><button type="button" class="button-secondary" data-vs="' + ctx.gid + '" data-k="resign">投了</button></div>' : "";
+    return !S.over && S.players.includes(me) && true ? '<div class="row"><button type="button" class="button-secondary" data-vs="' + ctx.gid + '" data-k="resign">終了</button></div>' : "";
 }
 
 // ---------- チェス ----------
@@ -163,7 +163,7 @@ VS_ENGINES.chess = {
         S.cells = n.cells; S.castle = n.castle; S.ep = n.ep; S.half = n.half; S.last = {from:m.from, to:m.to}; S.moves++;
         S.turn = 1 - S.turn;
         S.check = chAttacked(S.cells, chKing(S.cells, S.turn), mover);
-        if(!chLegal(S, S.turn).length){ S.over = true; if(S.check){ S.winner = mover; S.reason = "チェックメイト"; } else { S.winner = -1; S.reason = "ステイルメイト（引き分け）"; } }
+        if(!chLegal(S, S.turn).length){ S.over = true; if(S.check){ S.winner = mover; S.reason = "王をにげられなくしました"; } else { S.winner = -1; S.reason = "動かせる駒がなく引き分け"; } }
         else if(chInsufficient(S.cells)){ S.over = true; S.reason = "駒が足りず引き分け"; }
         else if(S.half >= 100){ S.over = true; S.reason = "50手ルールで引き分け"; }
     },
@@ -182,7 +182,7 @@ VS_ENGINES.chess = {
         }).join("");
         return '<div class="vs-ch">' + cellsHtml + '</div>' + (S.check && !S.over ? '<div class="vs-status"><b>チェック！</b></div>' : "") + '<div class="meta">' + S.moves + '手目' + (S.last ? '　直前：' + chSquare(S.last.from) + '→' + chSquare(S.last.to) : "") + (myIdx >= 0 ? '　あなたは' + (myIdx === 0 ? "白" : "黒") : "") + '</div>' + vs2ResignBtn(S, ctx);
     },
-    moveText:(item) => { if(item.kind === "resign") return "投了しました"; const d = chDecode(item.i); return d ? chSquare(d.from) + " → " + chSquare(d.to) + (d.promo ? "（" + CH_NAME[d.promo] + "に昇格）" : "") : "指しました"; }
+    moveText:(item) => { if(item.kind === "resign") return "終了しました"; const d = chDecode(item.i); return d ? chSquare(d.from) + " → " + chSquare(d.to) + (d.promo ? "（" + CH_NAME[d.promo] + "に昇格）" : "") : "指しました"; }
 };
 let chSel = null;
 function chessSelect(gid, value){
@@ -246,7 +246,7 @@ VS_ENGINES.hb = {
         if(ctx.myTurn) html += '<form class="row" data-vsform="' + ctx.gid + '" style="flex-wrap:nowrap"><input type="text" inputmode="numeric" maxlength="4" pattern="\\d{4}" placeholder="例：0123" aria-label="予想する4けた" style="flex:1;min-width:0"><button type="submit" class="button">予想</button></form>';
         return html + vs2ResignBtn(S, ctx);
     },
-    moveText:(item) => item.kind === "resign" ? "投了しました" : "予想：" + String(item.i)
+    moveText:(item) => item.kind === "resign" ? "終了しました" : "予想：" + String(item.i)
 };
 
 // ---------- 連想ゲーム（協力）----------
@@ -317,7 +317,7 @@ VS_ENGINES.esh = {
         }
         return html + '<form class="row" data-vsform="' + ctx.gid + '" style="flex-wrap:nowrap"><input type="text" maxlength="20" placeholder="なんの絵？（ひらがな）" aria-label="答え" style="flex:1;min-width:0"><button type="submit" class="button">答える</button></form><div class="meta">あと' + (5 - S.tries) + '回まで</div><button type="button" class="button-secondary" data-vs="' + ctx.gid + '" data-k="giveup">降参（答えを見る）</button>' + vs2ResignBtn(S, ctx);
     },
-    moveText:(item) => item.kind === "draw" ? "絵を描きました" : item.kind === "guess" ? "答え：「" + String(item.i || "") + "」" : item.kind === "giveup" ? "降参しました" : "投了しました"
+    moveText:(item) => item.kind === "draw" ? "絵を描きました" : item.kind === "guess" ? "答え：「" + String(item.i || "") + "」" : item.kind === "giveup" ? "降参しました" : "終了しました"
 };
 
 // ---------- 操作（chat-vs.js の vsAction を拡張）----------
@@ -326,7 +326,7 @@ vsAction = async function(gid, kind, value){
     const S = vsCompute(gid);
     if(!S || !VS2[S.game] || !state.currentRoom) return vsActionOrig.apply(this, arguments);
     if(kind === "sel"){ if(S.game === "chess") chessSelect(gid, value); return; }
-    if(kind === "resign"){ if(!confirm("投了しますか？")) return; return sendMessagePayload({type:"game", game:S.game, gid, kind:"resign"}); }
+    if(kind === "resign"){ if(!confirm(vsEndConfirmText(S))) return; return sendMessagePayload({type:"game", game:S.game, gid, kind:"resign"}); }
     if(S.over) return;
     if(!vsMyTurn(S)){ showToast("いまは相手の番です。"); return; }
     const send = (extra) => sendMessagePayload(Object.assign({type:"game", game:S.game, gid, kind}, extra));

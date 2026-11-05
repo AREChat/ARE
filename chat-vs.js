@@ -51,6 +51,8 @@ async function onVsAction(action, node){
     const game = node.dataset.g;
     if(!VS_GAMES[game]) return;
     if(!state.currentRoom){ showToast("先にチャットを開いてください。"); return; }
+    if(typeof cgFreshenForGuard === "function") await cgFreshenForGuard();
+    if(gameBusyBlocked()) return;
     closeSheet();
     const gid = (self.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(16).slice(2)).replace(/[^0-9a-z-]/gi, "").slice(0, 36);
     const payload = {type:"game", game, gid, kind:"start"};
@@ -298,6 +300,63 @@ function vsRevMoves(cells, player){
     return out;
 }
 
+// ---- 終了（どのゲームでも途中で終われる）／ ほかのゲームを始めるときのチェック ----
+
+/** 「終了」を押したときの処理。相手がいる2人対戦は相手の勝ち。相手がまだいない・協力・すごろくは、勝ち負けなしで終わる */
+function vsResign(S, sender){
+    if(S.over) return;
+    const idx = S.players.indexOf(sender);
+    if(idx < 0) return;
+    const E = VS_ENGINES[S.game];
+    const noWinner = (E && E.score) || S.game === "sugo" || S.players.length !== 2 || S.players.some((p) => p === null);
+    S.over = true; S.reason = "終了"; S.winner = noWinner ? -1 : 1 - idx;
+}
+function vsEndConfirmText(S){
+    const E = VS_ENGINES[S.game];
+    const noWinner = (E && E.score) || S.game === "sugo" || S.players.length !== 2 || S.players.some((p) => p === null);
+    return noWinner ? "このゲームを終了しますか？" : "このゲームを終了しますか？（終了すると、相手の勝ちになります）";
+}
+// 「終了」ボタンを自分で持っていないゲームには、ここで共通のボタンを足す
+const VS_GENERIC_END = {ttt:1, c4:1, rev:1, sugo:1, mem:1};
+function vsEndButton(S, gid){
+    if(S.over || !VS_GENERIC_END[S.game] || !S.players.includes(state.user.id)) return "";
+    return '<div class="row"><button type="button" class="button-secondary" data-vs="' + gid + '" data-k="resign">終了</button></div>';
+}
+
+/** いま自分が遊んでいる（終わっていない）対戦を探す。なければ null */
+function vsActiveGame(){
+    if(!state.currentRoom || !state.user) return null;
+    let checked = 0;
+    for(let i = state.messages.length - 1; i >= 0 && checked < 12; i--){
+        const m = state.messages[i];
+        if(!m.content || m.content.indexOf('"start"') < 0) continue;
+        const item = parseMessageContent(m.content);
+        if(!item || item.type !== "game" || item.kind !== "start" || !item.gid || !VS_ENGINES[item.game]) continue;
+        checked++;
+        let S = null;
+        try{ S = vsCompute(item.gid); }catch(_e){ S = null; }
+        if(!S || S.over) continue;
+        if(S.players.includes(state.user.id) || S.starter === state.user.id) return {name:(VS_GAMES[item.game] || {}).name || "ゲーム"};
+    }
+    return null;
+}
+/** ほかのゲームを始める前の確認。遊んでいるゲームがあれば、エラーを出して true を返す（＝始めない） */
+function gameBusyBlocked(){
+    let name = "";
+    const vs = vsActiveGame();
+    if(vs) name = vs.name;
+    else{
+        const cg = feat.cg && feat.cg.view;
+        if(cg && cg.status !== "done" && (cg.players || []).includes(state.user.id) && !(feat.cg.ended && feat.cg.ended[feat.cg.gid]))
+            name = (typeof CG_GAMES !== "undefined" && CG_GAMES[cg.game] ? CG_GAMES[cg.game].name : "カードゲーム");
+    }
+    if(!name) return false;
+    const msg = "いま「" + name + "」のゲーム中です。ほかのゲームを始めるときは、先にいまのゲームを終了してください（ゲームの「終了」ボタン）。";
+    showToast(msg);
+    try{ setStatus(msg, "error"); }catch(_e){ /* 何もしない */ }
+    return true;
+}
+
 // ---- 盤面の計算 ----
 
 function vsCompute(gid){
@@ -312,6 +371,7 @@ function vsCompute(gid){
     else S.players[0] = S.starter;
     list.forEach((x) => {
         if(S.over || x.item.kind === "start") return;
+        if(x.item.kind === "resign"){ vsResign(S, x.m.sender_id); return; }   // 「終了」はどのゲームも共通の処理
         E.apply(S, x.item, x.m.sender_id, S.starter);
     });
     return S;
@@ -343,17 +403,17 @@ function renderGameBubble(item){
     if(item.game === "sugo" && S.phase === "join") status = "参加者をぼしゅう中";
     else if(S.over){
         if(E.score) status = E.score(S) + (S.reason ? "（" + S.reason + "）" : "");
-        else status = S.winner >= 0 ? marks[S.winner] + " " + vsName(S.players[S.winner]) + " の勝ち！" : "引き分け";
+        else status = S.winner >= 0 ? marks[S.winner] + " " + vsName(S.players[S.winner]) + " の勝ち！" : (S.reason === "終了" ? "ゲームを終了しました" : "引き分け");
     }else if(S.players[S.turn] === null) status = "次は " + marks[S.turn] + "（相手の番：先に打つと後手になります）";
     else status = "次は " + marks[S.turn] + " " + vsName(S.players[S.turn]) + " の番";
-    return '<div class="bubble vs-bubble"><b>' + info.icon + ' ' + escapeHtml(info.name) + '</b> <span class="meta">' + escapeHtml(vsName(S.starter)) + ' が開始</span>' + E.view(S, ctx) + '<div class="vs-status">' + escapeHtml(status) + '</div></div>';
+    return '<div class="bubble vs-bubble"><b>' + info.icon + ' ' + escapeHtml(info.name) + '</b> <span class="meta">' + escapeHtml(vsName(S.starter)) + ' が開始</span>' + E.view(S, ctx) + vsEndButton(S, item.gid) + '<div class="vs-status">' + escapeHtml(status) + '</div></div>';
 }
 
 async function vsAction(gid, kind, value){
     if(kind === "sel" || kind === "selhand"){ if(typeof shogiSelect === "function") shogiSelect(gid, kind, value); return; }
-    if(kind === "resign" && !confirm("投了しますか？")) return;
     const S = vsCompute(gid);
     if(!S || !state.currentRoom) return;
+    if(kind === "resign" && !confirm(vsEndConfirmText(S))) return;
     if(kind === "move" || kind === "roll"){
         if(S.over) return;
         if(!vsMyTurn(S)){ showToast("いまは相手の番です。"); return; }

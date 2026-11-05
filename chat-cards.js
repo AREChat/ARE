@@ -6,12 +6,12 @@
 const CG_GAMES = {
     baba:{name:"ババ抜き", icon:"🃏", desc:"2人。同じ数字はペアで捨てる。ジョーカーを持ったままだと負け"},
     tomo:{name:"トモヒロウ（大富豪）", icon:"👑", desc:"2人。強いカードを出して先に手札を空にする。3<…<K<A<2"},
-    indian:{name:"インディアンポーカー", icon:"🎴", desc:"相手のカードだけ見える。5ラウンド、コイン10枚から"},
+    indian:{name:"インディアンポーカー", icon:"🎴", desc:"相手のカードだけ見える。5回戦、コイン10枚から"},
     uso:{name:"ウソダロウ（ダウト）", icon:"🤥", desc:"伏せて出して「A,2,3…」と言い張る。うそだと思ったらダウト！"}
 };
 const CG_SUIT = {S:"♠", H:"♥", D:"♦", C:"♣"};
 const CG_RANK_LABEL = ["", "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-feat.cg = {gid:null, view:null, sel:[], timer:null, busy:false, autoTimer:null};
+feat.cg = {ended:{}, gid:null, view:null, sel:[], timer:null, busy:false, autoTimer:null};
 
 function initCards(){
     registerTool("cg", onCgAction);
@@ -48,11 +48,20 @@ async function onCgAction(action, node){
     if(action === "start"){
         const game = node.dataset.g;
         if(!CG_GAMES[game] || !state.currentRoom){ showToast("先にチャットを開いてください。"); return; }
+        await cgFreshenForGuard();
+        if(gameBusyBlocked()) return;
         const result = await requireClient().rpc("cg_create", {p_room_id:state.currentRoom.id, p_game:game});
         if(result.error) throw result.error;
         const gid = result.data;
         await sendMessagePayload({type:"game", game:"cg", cg:game, gid, kind:"start"});
         await openCg(gid);
+        return;
+    }
+    if(action === "end"){
+        if(!confirm("このゲームを終了しますか？（手札かくしのゲームは、相手の画面ではそのまま続きます）")) return;
+        if(cg.gid) cg.ended[cg.gid] = true;
+        stopCgTimer(); closeSheet();
+        showToast("ゲームを終了しました。ほかのゲームを始められます。");
         return;
     }
     if(action === "join"){ await cgCall("cg_join", {p_game:cg.gid}); return; }
@@ -82,6 +91,13 @@ async function cgCall(fn, args){
         cg.view = result.data;
         paintCg();
     }finally{ cg.busy = false; }
+}
+
+/** ほかのゲームを始める前に、カードゲームの最新の状態を取り直す（もう終わっていたのに「ゲーム中」と出ないように） */
+async function cgFreshenForGuard(){
+    const cg = feat.cg;
+    if(!cg.gid) return;
+    try{ const r = await requireClient().rpc("cg_view", {p_game:cg.gid}); if(!r.error && r.data) cg.view = r.data; }catch(_e){ /* 取れなければ、前の状態のまま */ }
 }
 
 function stopCgTimer(){ if(feat.cg.timer){ clearInterval(feat.cg.timer); feat.cg.timer = null; } }
@@ -120,7 +136,7 @@ function paintCg(){
     if(v.status === "waiting"){
         html += isPlayer ? '<div class="admin-card">相手が参加するのを待っています…（チャットの「参加・続きを見る」から入ってもらってください）</div>'
             : '<div class="admin-card">2人用です。参加しますか？</div><div class="row"><button type="button" class="button" data-t="cg:join">参加する</button></div>';
-        box.innerHTML = html + toolClose('');
+        box.innerHTML = html + toolClose(isPlayer ? '<button type="button" class="button-secondary" data-t="cg:end">終了</button>' : '');
         return;
     }
     if(v.status === "done"){
@@ -134,7 +150,7 @@ function paintCg(){
     else if(v.game === "tomo") html += cgTomoView(v, me, opp, myTurn, counts, pub);
     else if(v.game === "uso") html += cgUsoView(v, me, opp, myTurn, counts, pub);
     else html += cgIndianView(v, me, opp, myTurn, pub);
-    box.innerHTML = html + toolClose('');
+    box.innerHTML = html + toolClose(isPlayer && v.status !== "done" ? '<button type="button" class="button-secondary" data-t="cg:end">終了</button>' : '');
     cgAutoPass(v, myTurn);
 }
 
