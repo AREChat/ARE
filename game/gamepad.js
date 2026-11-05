@@ -7,8 +7,8 @@
         try{ if(window.tqBgmStop) tqBgmStop(); if(window.tqSpeakStop) tqSpeakStop(); }catch(_e){}
         try{ if(document.fullscreenElement) document.exitFullscreen(); }catch(_e){}
         try{ window.close(); }catch(_e){}
-        // ブラウザの決まりで 閉じられない場合は、ホーム（ログイン画面）へ もどる
-        setTimeout(() => { try{ location.href = "../login.html"; }catch(_e){} }, 350);
+        // ブラウザの決まりで 閉じられない場合は、サーバー版はログイン画面へ／exe・file:// 版はゲーム選択へ もどる
+        setTimeout(() => { try{ location.href = (location.protocol === "file:") ? "../game5/index.html" : "../login.html"; }catch(_e){} }, 350);
     }
     ACT.tQuit = ACT.quit = () => {
         const inGame = !!(G.S && G.mode !== "title");
