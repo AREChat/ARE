@@ -1,14 +1,24 @@
 "use strict";
-// ===== ARE サービスワーカー（簡易版）=====
+// ===== ARE サービスワーカー（速さ重視版）=====
 // ・GET 以外（POST/HEAD など）は一切さわらない → 「Cache.put: Request method 'POST' is unsupported」を防ぐ
 // ・Supabase など他のサイトへの通信にはさわらない
-// ・自分のサイトのファイルは「ネット優先」：つながるときは常に最新を取得し、成功したものだけ控えを保存する
-//   （オフラインのときだけ控えを使う）→ 更新したのに古い画面のまま、を防ぐ
+// ・HTML（画面の骨組み）は「ネット優先」：つながるときは常に最新を取得（オフラインのときだけ控えを使う）
+// ・JS / CSS / 画像などは「控え先・裏で更新」：控えがあればすぐ表示し、裏で最新を取り直して次回に備える
+//   → 2回目以降の表示が速い。更新したのに古い画面のまま、を防ぐために、更新したら下の CACHE の数字を1つ上げる
+//     （数字を上げると古い控えがまとめて消えて、全部が新しく入れ替わる）
+// ・chat.bundle.js?v=… のように ?v= が付いたファイルは、中身が変わると URL も変わるので、控えをそのまま使う（再確認しない）
+// ・ゲームの別フォルダ（game2/ など）は、これまでどおりネット優先（この sw.js の控え先方式は、ルートのチャット用ファイルだけ）
+// ・version.json は常にネット優先（更新確認に使うため）
 // ・新しい版が入ったら、古い控えをすべて消す
 
-const CACHE = "are-v62-20261105";
+const CACHE = "are-v63-20261105";
+const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
 
 self.addEventListener("install", () => { self.skipWaiting(); });
+
+self.addEventListener("message", (event) => {
+    if(event.data && event.data.type === "SKIP_WAITING") self.skipWaiting();
+});
 
 self.addEventListener("activate", (event) => {
     event.waitUntil((async () => {
@@ -17,6 +27,47 @@ self.addEventListener("activate", (event) => {
         await self.clients.claim();
     })());
 });
+
+// ※ response.clone() は、画面にわたす前（同期的）に行う。あとからだと本文が使用ずみで失敗する
+function putCopy(request, response){
+    if(response && response.status === 200 && response.type === "basic"){
+        let copy;
+        try{ copy = response.clone(); }catch(_e){ return Promise.resolve(); }
+        return caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
+    }
+    return Promise.resolve();
+}
+
+// ネット優先（HTML・version.json など）
+async function networkFirst(request){
+    try{
+        const response = await fetch(request, {cache: "no-cache"});
+        putCopy(request, response);
+        return response;
+    }catch(error){
+        const cached = await caches.match(request);
+        if(cached) return cached;
+        if(request.mode === "navigate"){
+            const home = await caches.match("./index.html");
+            if(home) return home;
+        }
+        throw error;
+    }
+}
+
+// 控え先・裏で更新（JS / CSS / 画像など）
+async function cacheFirst(event, request, revalidate){
+    const cached = await caches.match(request);
+    if(cached){
+        if(revalidate){
+            event.waitUntil(fetch(request, {cache: "no-cache"}).then((response) => putCopy(request, response)).catch(() => {}));
+        }
+        return cached;
+    }
+    const response = await fetch(request);
+    putCopy(request, response);
+    return response;
+}
 
 self.addEventListener("fetch", (event) => {
     const request = event.request;
@@ -27,24 +78,19 @@ self.addEventListener("fetch", (event) => {
     if(request.headers.has("range")) return;
     if(url.pathname.indexOf("/game/") !== -1) return;   // RPG（/game/）は ゲーム専用の sw.js が担当する（チャットの控えと まぜない）
 
-    event.respondWith((async () => {
-        try{
-            const response = await fetch(request, {cache:"no-cache"});
-            if(response && response.status === 200 && response.type === "basic"){
-                const copy = response.clone();
-                caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
-            }
-            return response;
-        }catch(error){
-            const cached = await caches.match(request);
-            if(cached) return cached;
-            if(request.mode === "navigate"){
-                const home = await caches.match("./index.html");
-                if(home) return home;
-            }
-            throw error;
-        }
-    })());
+    const path = url.pathname;
+    // ゲーム・大富豪などの別フォルダ（game2/ game3/ … dream-frontier/ daifugo/）は、これまでどおり「ネット優先」（控えはオフライン用）
+    if(/\/(game[0-9]+|dream-frontier|daifugo)\//.test(path)){
+        event.respondWith(networkFirst(request));
+        return;
+    }
+    const isPage = request.mode === "navigate" || /\.html$/i.test(path) || /\/$/.test(path);
+    if(isPage || /\/version\.json$/i.test(path) || !STATIC_RE.test(path)){
+        event.respondWith(networkFirst(request));
+        return;
+    }
+    // ?v=… 付きは中身が変わると URL も変わる → 控えをそのまま使う
+    event.respondWith(cacheFirst(event, request, !url.searchParams.has("v")));
 });
 
 // ===== プッシュ通知（サーバーの send-push 関数から届く）=====
