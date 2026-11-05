@@ -42,7 +42,8 @@
     function move(dx, dy){
         var L = list();
         if(!L.length){   // 画面に押せるものが ひとつも ない（ボタンが 下のほうに ある ページ）→ スクロールして さがす
-            if(dy && scrollMove(dy)){ L = list(); if(L.length) setCur(dy > 0 ? L[0] : L[L.length - 1]); }
+            var d0 = dy || dx;   // 左右キーでも 同じ（右＝下へ、左＝上へ スクロール）
+            if(d0 && scrollMove(d0)){ L = list(); if(L.length) setCur(d0 > 0 ? L[0] : L[L.length - 1]); }
             return;
         }
         if(!cur || !document.contains(cur)){ setCur(L[0]); return; }
