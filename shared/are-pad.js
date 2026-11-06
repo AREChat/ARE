@@ -58,7 +58,7 @@
     }
     function reselect(dir){ var L = list(); if(L.length && L.indexOf(cur) < 0) setCur(dir > 0 ? L[0] : L[L.length - 1]); }
     function pageMove(dir){ if(scrollMove(dir)) reselect(dir); }
-    function toTop(){ var s, n = 0, moved = false; while(n++ < 5 && (s = scroller(-1))){ s.scrollTop = 0; moved = true; } if(moved) reselect(-1); }
+    function toTop(){ var s, n = 0, moved = false; while(n++ < 5 && (s = scroller(-1))){ s.scrollTop = 0; moved = true; } if(moved) reselect(1); }   // いちばん上へ行ったので、えらぶのも いちばん上の ボタン（下のほうを えらぶと、画面が少し下へ ずれてしまう）
     function key(k){ ["keydown", "keyup"].forEach(function(t){ var ev = new KeyboardEvent(t, {key: k, code: k, bubbles: true}); (document.activeElement || document).dispatchEvent(ev); window.dispatchEvent(ev); }); }
     function edge(id, on){ var was = hold[id]; hold[id] = on; return on && !was; }
     function poll(){
