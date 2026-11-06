@@ -229,17 +229,6 @@
     "id": 19
   },
   {
-    "type": "true-false",
-    "question": "AREの運営管理者は、安全管理のために会話内容を閲覧できる場合がある。",
-    "options": [
-      "〇",
-      "×"
-    ],
-    "answer": "〇",
-    "explanation": "操作ガイドの安全に関する注意に明記されています。",
-    "id": 20
-  },
-  {
     "type": "multiple-choice",
     "question": "会話履歴のZIP保存に含まれるものとして、ガイドに合っているのはどれ？",
     "options": [
