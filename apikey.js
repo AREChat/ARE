@@ -9,7 +9,8 @@
         functions: Object.freeze({
             register: "register-user",
             login: "login-user",
-            recovery: "recover-account"
+            recovery: "recover-account",
+            guest: "guest-start"
         }),
         requestTimeoutMs: 20000
     });
