@@ -1,6 +1,6 @@
 /* ARE ゲームパッド（Switch Proコン ほか）で メニューを そうさする ぶひん（クラシックscript）
    十字キー／左スティック：ボタンを えらぶ（画面の外に つづくときは じどうで スクロール）　右スティック：スクロール
-   A(Switch は 右)：おす　B：もどる（Esc）　+：メニュー（Esc）
+   A(Switch は 右)：おす　B：もどる（Esc）　+：メニュー（Esc）　ZL／ZR：1画面ぶん 上／下へ スクロール　−：いちばん上へ
    ※ゲームが じぶんで パッドに たいおうしている ばあいは window.ARE_PAD_OFF = true で オフにできます。 */
 (function(){
     if(window.__arePad || !navigator.getGamepads) return; window.__arePad = 1;
@@ -56,6 +56,9 @@
             L = list(); best = L.length ? pick(L, dx, dy) : null; if(best) setCur(best);
         }
     }
+    function reselect(dir){ var L = list(); if(L.length && L.indexOf(cur) < 0) setCur(dir > 0 ? L[0] : L[L.length - 1]); }
+    function pageMove(dir){ if(scrollMove(dir)) reselect(dir); }
+    function toTop(){ var s, n = 0, moved = false; while(n++ < 5 && (s = scroller(-1))){ s.scrollTop = 0; moved = true; } if(moved) reselect(-1); }
     function key(k){ ["keydown", "keyup"].forEach(function(t){ var ev = new KeyboardEvent(t, {key: k, code: k, bubbles: true}); (document.activeElement || document).dispatchEvent(ev); window.dispatchEvent(ev); }); }
     function edge(id, on){ var was = hold[id]; hold[id] = on; return on && !was; }
     function poll(){
@@ -73,6 +76,9 @@
             if(cur && !pick1){ try{ cur.click(); }catch(_e){} }
         }
         var sy = ax[3] || 0; if(Math.abs(sy) > .5){ var sc2 = scroller(sy > 0 ? 1 : -1); if(sc2) scrollBy(sc2, sy * 16); }   // 右スティック：スクロール
+        if(edge("zl", !!(b[6] && b[6].pressed))) pageMove(-1);   // ZL：1画面ぶん上へ
+        if(edge("zr", !!(b[7] && b[7].pressed))) pageMove(1);    // ZR：1画面ぶん下へ
+        if(edge("minus", !!(b[8] && b[8].pressed))) toTop();     // −：いちばん上へ
         if(edge("b", !!(b[0] && b[0].pressed))) key("Escape");
         if(edge("plus", !!(b[9] && b[9].pressed))) key("Escape");
     }
