@@ -22,6 +22,28 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "./recovery.html";
     });
 
+    const guestButton = document.getElementById("startGuest");
+    if (guestButton) {
+        guestButton.addEventListener("click", async () => {
+            if (guestButton.disabled) return;
+            if (!window.AREAuth || typeof window.AREAuth.guestStart !== "function") {
+                showStatus("お試しの機能を読み込めませんでした。ページを再読み込みしてください。", true);
+                return;
+            }
+            guestButton.disabled = true;
+            showStatus("お試しを用意しています...");
+            try {
+                const result = await window.AREAuth.guestStart();
+                const user = result?.user || result?.session?.user;
+                if (!user?.id) throw new Error("お試しの開始に失敗しました。もう一度お試しください。");
+                window.location.replace(chatUrl);
+            } catch (error) {
+                showStatus(error?.message || "お試しを始められませんでした。時間をおいてもう一度お試しください。", true);
+                guestButton.disabled = false;
+            }
+        });
+    }
+
     elements.form.addEventListener("submit", async (event) => {
         event.preventDefault();
         if (elements.button.disabled) return;

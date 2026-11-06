@@ -95,3 +95,4 @@ chat-main.js
 link-copy.js
 chat-layout.js
 sw-update.js
+chat-guest.js

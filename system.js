@@ -169,6 +169,21 @@ try { if (window.top !== window.self) { window.top.location = window.self.locati
         };
     }
 
+    async function guestStart() {
+        const config = getConfig();
+        const name = config.functions && config.functions.guest;
+        if (!name) throw new Error("お試し開始用のEdge Function名が未設定です。apikey.jsのfunctions.guestを設定してください。");
+        const result = await callFunction(name, {});
+        const accessToken = result.accessToken || result.access_token;
+        const refreshToken = result.refreshToken || result.refresh_token;
+        if (!accessToken || !refreshToken) {
+            throw new Error("お試しの開始に失敗しました。時間をおいてもう一度お試しください。");
+        }
+        const sessionResult = await getClient().auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+        if (sessionResult.error) throw sessionResult.error;
+        return { ...result, session: sessionResult.data.session, user: sessionResult.data.user || result.user || null };
+    }
+
     async function register(displayName, loginId, password, phoneNumber, contactEmail) {
         const normalizedDisplayName = String(displayName || "").trim();
         const normalizedLoginId = String(loginId || "").trim();
@@ -566,6 +581,7 @@ try { if (window.top !== window.self) { window.top.location = window.self.locati
         register: register,
         recover: recover,
         logout: logout,
+        guestStart: guestStart,
         getSession: getSession,
         getCurrentUser: getCurrentUser,
         requireSession: requireSession,

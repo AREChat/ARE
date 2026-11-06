@@ -166,6 +166,9 @@ function getErrorMessage(error){
         return "この機能は未実装です（サーバー側の準備ができていません）。";
     }
     const message = error?.message || String(error || "不明なエラー");
+    if(/guest_limit/.test(message)){
+        return "お試しアカウントは、管理者以外の人には5件までしかメッセージを送れません。登録すると制限なく使えます。";
+    }
     if(/row-level security|permission denied|not allowed|42501/i.test(message)){
         return "データベースのアクセス権限で拒否されました。SupabaseのRLSポリシーを確認してください。";
     }
