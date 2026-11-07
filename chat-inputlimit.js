@@ -44,6 +44,16 @@
         });
     }catch(_e){ /* 何もしない（入力欄ごとの保護は残る） */ }
 
+    // 1-3) setRangeText（範囲の置きかえ）でも、4,000文字を超えたら切る
+    try{
+        var srt = HTMLTextAreaElement.prototype.setRangeText;
+        HTMLTextAreaElement.prototype.setRangeText = function(){
+            var r = srt.apply(this, arguments);
+            if(isTarget(this) && cp(getV(this)) > LIMIT){ warn(); setV(this, clip(getV(this))); }
+            return r;
+        };
+    }catch(_e){ /* 何もしない */ }
+
     // 2) 入力の直前：入れられる文字数を数えて、あふれる分は入れない
     document.addEventListener("beforeinput", function(e){
         var el = e.target;
