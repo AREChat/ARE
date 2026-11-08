@@ -10,7 +10,7 @@
 // ・version.json は常にネット優先（更新確認に使うため）
 // ・新しい版が入ったら、古い控えをすべて消す
 
-const CACHE = "are-v72-20261108";
+const CACHE = "are-v73-20261108";
 const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
 
 self.addEventListener("install", () => { self.skipWaiting(); });

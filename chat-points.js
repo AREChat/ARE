@@ -1,5 +1,5 @@
 "use strict";
-// ===== ポイント・AREShop・お試し期間(90日)・スパム凍結 =====
+// ===== ポイント・AREShop・お試し期間(365日)・スパム凍結 =====
 // ポイントの計算・購入・スパム判定はサーバー側（Supabase）で行います。この画面は表示と入口の案内です。
 // 注意：機能の「ロック」は画面側の制限です（データを守るサーバーの規則とは別）。仕様どおりの“案内”であり、厳密な課金防御ではありません。
 Object.assign(FEAT_ERRORS, {
@@ -12,7 +12,8 @@ const PT_PACKS = {
     pack_life:{name:"くらしパック", price:300, features:["diary","habit","budget","timer","calc","shop","health","co2","memo","planner","sched","geo","split","board"]},
     pack_create:{name:"つくるパック", price:300, features:["story","album","imgedit","draw","mystamp","avatar","ocr","live","location","archive"]},
     pack_fun:{name:"あそぶパック", price:400, features:["games","vs","bj","cards","fun"]},
-    pack_smart:{name:"かしこいパック", price:400, features:["myai","ai","work"]}
+    pack_smart:{name:"かしこいパック", price:400, features:["myai","ai","work","screen","aistudio"]},
+    pack_adventure:{name:"ぼうけんパック", price:500, features:["rpg","game2","game3","game4","game5","dream","daifugo"]}
 };
 const pt = {acc:null, items:[], tab:"video", timer:null, spamEnd:0, spamTimer:null, ready:false, confirm:null};
 
@@ -22,7 +23,6 @@ const AREAccess = {
     trialActive(){ return !!(pt.acc && pt.acc.trial_active); },
     owns(key){ return !!(pt.acc && (pt.acc.owned || []).includes(key)); },
     needFor(feature){
-        if(feature === "rpg" || feature === "game2" || feature === "game3" || feature === "game4" || feature === "dream") return null;   // RPGは ずっと無料（ポイント不要）
         for(const k in PT_PACKS){ if(PT_PACKS[k].features.includes(feature)) return k; }
         return null;
     },
@@ -117,12 +117,11 @@ function ptPaintCard(err){
 // ---------- 入口が閉じているときの案内 ----------
 function ptLockDialog(feature){
     const need = AREAccess.needFor(feature);
-    const rpg = feature === "rpg";
     const pk = PT_PACKS[need];
-    openSheet(toolHead("🔒 " + escapeHtml(ptLabel(feature)), rpg ? "お試し期間（90日）が終わったため、この冒険は 1000円 と交換すると遊べます" : "お試し期間（90日）が終わったため、ポイントで解放します") +
-        '<div class="admin-card">' + (rpg ? 'RPG「そういうときは、AREだ！」：<b>1000円</b>' : escapeHtml(pk ? pk.name : "") + '：<b>' + (pk ? pk.price : "") + '円</b>で解放') +
+    openSheet(toolHead("🔒 " + escapeHtml(ptLabel(feature)), "お試し期間（365日）が終わったため、ポイントで解放します（解放したものは ずっと使えます）") +
+        '<div class="admin-card">' + escapeHtml(pk ? pk.name : "") + '：<b>' + (pk ? pk.price : "") + '円</b>で解放' +
         '<div class="meta">いまのポイント：' + (pt.acc ? pt.acc.points : 0) + '円</div></div>' +
-        '<div class="row"><button type="button" class="button" data-t="pt:shop" data-tab="' + (rpg ? "rpg" : "pack") + '">AREShopへ</button><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
+        '<div class="row"><button type="button" class="button" data-t="pt:shop" data-tab="pack">AREShopへ</button><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
 }
 
 // ---------- AREShop ----------
