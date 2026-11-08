@@ -15,7 +15,7 @@ function initRpg(){ /* ゲーム本体は ./game/ に独立。チャット側の
 function openGame2(){
     let nm = "";
     try{ nm = Array.from(String(profileDisplayName(state.profile) || "").replace(/\s+/g, "")).slice(0, 8).join(""); }catch(_e){}
-    const href = "https://arechat.github.io/game/game2/index.html";   // 名前は URL に のせない
+    const href = "https://arechat.github.io/game/game2/quest2/index.html";   // 名前は URL に のせない
     openSheet(toolHead("📖 ARE QUEST 2", "ストーリー重視の3D・RPG。前日譚から後日談まで52話。スマホ・タブレットは横向き推奨") +
         '<div class="admin-card">セーブはこの端末のブラウザに保存されます。ゲーム内からRPG『ARE QUEST』やドリームフロンティアにも行けます。</div>' +
         '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ ゲームをひらく</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
@@ -35,13 +35,13 @@ function openStudy124(){
 }
 function initStudy124(){ /* 別のサイトへのリンクだけ。初期化は不要 */ }
 function openGame3(){
-    const href = "https://arechat.github.io/game/game3/index.html";
+    const href = "https://arechat.github.io/game/game2/quest3/index.html";
     openSheet(toolHead("🌙 ARE QUEST 3 〜月影のあしあと〜", "高画質の3D・学園ものRPG。PC推奨（スマホ・タブレットは横向き）") +
         '<div class="admin-card">セーブはこの端末のブラウザに保存されます。アカウント・ポイントは不要です。ゲーム内の「ひみつのコード」で、チートコードも使えます。</div>' +
         '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ ゲームをひらく</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
 }
 function openGame4(){
-    const href = "https://arechat.github.io/game/game4/index.html";
+    const href = "https://arechat.github.io/game/game4/card/index.html";
     openSheet(toolHead("🃏 ARE CARD 〜そういうときは、AREだ！〜", "3Dの盤面で遊ぶカードバトル（土台版）") +
         '<div class="admin-card">デッキを組んでCPUと対戦。セーブはこの端末のブラウザに保存されます。アカウント・ポイントは不要です。</div>' +
         '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ ゲームをひらく</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
