@@ -1,7 +1,7 @@
 "use strict";
 // ===== 対戦パネル：いま遊んでいる対戦の盤を、画面の上に固定して表示する =====
 // 盤は会話の上のほうに残り、「○○に置きました」は下に積まれていく。→ スクロールしなくても 盤が見えて そのまま打てるようにする。
-feat.vsPin = {panel:null, gid:"", open:true};
+feat.vsPin = {panel:null, gid:"", open:false};   // はじめは たたんだ状態（「ゲームプレイ中」の1行だけ）。「ひらく」で盤を出す
 
 function vsPinFind(){
     if(typeof vsCompute !== "function" || !state.currentRoom) return "";
@@ -33,10 +33,11 @@ function vsPinPaint(){
     const item = parseMessageContent(startMsg.content);
     const body = v.panel.querySelector(".vspin-body");
     const keep = body ? body.scrollTop : 0;
+    if(v.gid !== gid) v.open = false;   // あたらしい対戦は、いつも たたんだ状態から
     v.gid = gid; v.panel.hidden = false;
     let html = "";
     try{ html = renderGameBubble(item, true); }catch(error){ console.error("[ARE vs pin]", error); v.panel.hidden = true; return; }
-    v.panel.innerHTML = '<div class="vspin-head"><b>🎮 いま対戦中</b><button type="button" class="button-secondary vspin-toggle" aria-expanded="' + (v.open ? "true" : "false") + '">' + (v.open ? "たたむ" : "ひらく") + '</button></div><div class="vspin-body"' + (v.open ? "" : " hidden") + '>' + html + '</div>';
+    v.panel.innerHTML = '<div class="vspin-head"><b>🎮 ゲームプレイ中</b>' + ((VS_GAMES[item.game] && VS_GAMES[item.game].name) ? '<span class="meta">' + escapeHtml(VS_GAMES[item.game].name) + '</span>' : '') + '<button type="button" class="button-secondary vspin-toggle" aria-expanded="' + (v.open ? "true" : "false") + '">' + (v.open ? "たたむ" : "ひらく") + '</button></div><div class="vspin-body"' + (v.open ? "" : " hidden") + '>' + html + '</div>';
     const nb = v.panel.querySelector(".vspin-body"); if(nb) nb.scrollTop = keep;
 }
 

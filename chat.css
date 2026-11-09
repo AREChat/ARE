@@ -610,7 +610,8 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 /* 対戦パネル（盤を画面の上に固定） */
 .vspin{flex:0 0 auto;max-height:52vh;overflow:hidden;display:flex;flex-direction:column;background:var(--panel);border-bottom:2px solid var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.18);z-index:3}
 .vspin[hidden]{display:none}
-.vspin-head{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 12px}
+.vspin-head{display:flex;justify-content:flex-start;align-items:center;gap:8px;padding:6px 12px}
+.vspin-head .vspin-toggle{margin-left:auto}
 .vspin-toggle{padding:4px 12px;font-size:13px}
 .vspin-body{overflow:auto;padding:0 12px 8px;-webkit-overflow-scrolling:touch}
 .vspin-body .bubble{max-width:100%;box-shadow:none}
