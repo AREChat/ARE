@@ -110,7 +110,7 @@ async function openAdminRoom(roomId,title){
 async function renderAdminUsers(client){
     const result = await client.rpc("admin_list_profiles");
     if(result.error) throw result.error;
-    el.adminBody.innerHTML = '<div class="row"><button class="button" id="adminCreateUser" type="button">＋ 新規アカウントを作成</button></div><div class="row"><button class="button-secondary" data-bulk="all" type="button">全員を選ぶ／解除</button><button class="button-secondary" data-bulk="noname" type="button">名前なし（「ユーザー」）だけ選ぶ</button><button class="button-danger" data-bulk="del" id="adminBulkDel" type="button" disabled>選んだユーザーを削除（0人）</button></div><div class="admin-card meta">復旧コードを失くした利用者に対する再発行です。必ず本人確認を行ってから実行してください。新しいコードは画面に1回だけ表示され、保存されません。旧コードは無効になり、利用者本人にも再発行の通知が表示されます。</div>' +
+    el.adminBody.innerHTML = '<div class="row"><button class="button" id="adminCreateUser" type="button">＋ 新規アカウントを作成</button></div><div class="row"><button class="button-secondary" data-bulk="all" type="button">全員を選ぶ／解除</button><button class="button-secondary" data-bulk="noname" type="button">名前なし（「ユーザー」）だけ選ぶ</button><button class="button-secondary" data-bulk="orphan" type="button">削除ずみユーザーの残りチャットを消す</button><button class="button-danger" data-bulk="del" id="adminBulkDel" type="button" disabled>選んだユーザーを削除（0人）</button></div><div class="admin-card meta">復旧コードを失くした利用者に対する再発行です。必ず本人確認を行ってから実行してください。新しいコードは画面に1回だけ表示され、保存されません。旧コードは無効になり、利用者本人にも再発行の通知が表示されます。</div>' +
         (result.data.length ? result.data.map((u) =>
             '<div class="admin-card">' + (u.is_admin ? '' : '<label class="row" style="gap:6px;align-items:center"><input type="checkbox" data-selu="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '"> <span class="meta">選ぶ（まとめて削除）</span></label>') + '<b>' + escapeHtml(u.display_name || "ユーザー") + '</b> <span class="meta">ID：' + escapeHtml(u.login_id || "-") + (u.last_seen_at ? ' ・最終オンライン：' + escapeHtml(formatDate(u.last_seen_at)) : '') + '</span>' +
             '<div class="row"><button class="button-secondary" data-contact="' + escapeHtml(u.user_id) + '" type="button">連絡先を表示（閲覧は記録されます）</button></div>' + (u.is_admin ? '<div class="meta">管理者アカウント（再発行不可）</div>' : '<div class="row"><button class="button-secondary" data-edituser="' + escapeHtml(u.user_id) + '" type="button">編集</button><button class="button-secondary" data-reissue="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '" type="button">復旧コードを再発行</button><button class="button-danger" data-deluser="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '" type="button">アカウントを削除</button></div>') + '</div>').join("")
@@ -169,6 +169,7 @@ async function onAdminClick(event){
         boxes.forEach((c) => { c.checked = c.dataset.name === "ユーザー"; }); updateBulkCount();
         showToast(selectedUsers().length + "人を選びました。内容を確かめてから「選んだユーザーを削除」を押してください。"); return;
     }
+    if(target.dataset.bulk === "orphan") return orphanSheet();
     if(target.dataset.bulk === "del"){ const list = selectedUsers(); if(list.length) bulkDeleteSheet(list); return; }
     if(target.dataset.deluser) return deleteAccount(target.dataset.deluser,target.dataset.name);
     if(target.dataset.reissue) return reissueRecovery(target.dataset.reissue,target.dataset.name);
@@ -188,6 +189,34 @@ async function onAdminClick(event){
             showToast(approve ? "削除しました。" : "却下しました。");
             refreshAdminBadge(); renderAdmin();
         }catch(error){ target.disabled = false; showToast(featError(error)); }
+    }
+}
+
+// すでに消えたユーザーの「チャットだけ残っている」ものを、管理者が消す（確認は「はい」1回）
+async function orphanSheet(){
+    let n = 0;
+    try{
+        const r = await requireClient().rpc("admin_orphan_chat_count");
+        if(r.error) throw r.error; n = Number(r.data) || 0;
+    }catch(error){ showToast("調べられませんでした：" + featError(error)); return; }
+    if(n === 0){ showToast("消えたユーザーの残りチャットは ありません。"); return; }
+    openSheet('<h3 style="margin:0">⚠️ 削除ずみユーザーの残りチャット</h3><div><b>' + n + '件</b>の部屋（と中のメッセージ）を完全に消します。</div>' +
+        '<div class="meta">すでにアカウントが無い人とのチャット、その人のメッセージ・参加情報が対象です。元に戻せません。</div>' +
+        '<div id="bdMsg" class="meta" role="status"></div>' +
+        '<div class="row" style="justify-content:stretch"><button type="button" class="button-danger" data-bd="orphan">はい、削除する</button><button type="button" class="button-secondary" data-pm="close">やめる</button></div>');
+}
+async function runOrphanPurge(){
+    el.profileSheet.querySelectorAll("button").forEach((x) => { x.disabled = true; });
+    const msg = document.getElementById("bdMsg"); if(msg) msg.textContent = "削除しています…";
+    try{
+        const r = await requireClient().rpc("admin_purge_orphan_chat");
+        if(r.error) throw r.error;
+        const row = (r.data && r.data[0]) || {};
+        closeSheet(); showToast("消しました：部屋 " + (row.rooms_deleted || 0) + "件・メッセージ " + (row.messages_deleted || 0) + "件");
+        renderAdmin();
+    }catch(error){
+        el.profileSheet.querySelectorAll("button").forEach((x) => { x.disabled = false; });
+        showToast(featError(error));
     }
 }
 
@@ -297,7 +326,7 @@ function onAcctDelClick(event){
 
 async function onDelSheet(event){
     const bd = event.target.closest("[data-bd]");
-    if(bd) return runBulkDelete(bd);
+    if(bd) return bd.dataset.bd === "orphan" ? runOrphanPurge() : runBulkDelete(bd);
     const dr = event.target.closest("[data-dr]");
     if(dr) return submitDeleteRequest(dr);
     const b = event.target.closest("[data-d]");
