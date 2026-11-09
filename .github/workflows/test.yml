@@ -31,6 +31,11 @@ jobs:
           npm i --no-save terser@5.51.2
           node tools/build-bundle.js --check
 
+      - name: オフライン用の一覧(precache.json)が最新か（ファイルを足す・消す・変えたら `node tools/gen-precache.js` を実行）
+        run: |
+          node tools/gen-precache.js
+          git diff --exit-code -- precache.json precache-manifest.js
+
       - name: JavaScript の構文チェック
         run: |
           fail=0
