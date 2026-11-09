@@ -63,8 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error("ログイン結果からユーザー情報を取得できませんでした。");
             }
             elements.password.value = "";
+            try { window.areIntruder && window.areIntruder.ok("login"); } catch (_e) {}
             window.location.replace(chatUrl);
         } catch (error) {
+            try { window.areIntruder && window.areIntruder.miss("login"); } catch (_e) {}
             showStatus(error?.message || "ログインに失敗しました。", true);
             elements.button.disabled = false;
         }

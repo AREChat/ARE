@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (e) { status(e.message, true); }
     }
 
-    // 追加認証（TOTP）：管理者の判定には もう使いません（管理者はTomohikoのアカウントだけ・ログインだけで使える）。
+    // 追加認証（TOTP）：管理者の判定には もう使いません（管理者は専用アカウントだけ・ログインだけで使える）。
     // 呼び出し元(ログイン処理)は そのまま使えるよう、空の案内を返す関数だけ残しています。
     async function ensureAal2() { return ""; }
 

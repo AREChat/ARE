@@ -56,8 +56,8 @@ function lkShow(){
         const now = Date.now(), msg = lk.ov.querySelector("#lkMsg");
         if(now < lk.until){ msg.textContent = Math.ceil((lk.until - now) / 1000) + "秒待ってからやり直してください。"; return; }
         const ok = (await lkHash(pin.value, lk.cfg.salt)) === lk.cfg.hash;
-        if(ok){ lk.fails = 0; lk.ov.hidden = true; lk.ov.innerHTML = ""; lk.last = Date.now(); return; }
-        lk.fails++; pin.value = "";
+        if(ok){ try{ window.areIntruder && window.areIntruder.ok("pin"); }catch(_e){} lk.fails = 0; lk.ov.hidden = true; lk.ov.innerHTML = ""; lk.last = Date.now(); return; }
+        lk.fails++; pin.value = ""; try{ window.areIntruder && window.areIntruder.miss("pin"); }catch(_e){}
         if(lk.fails % 5 === 0){ lk.until = Date.now() + 30000; msg.textContent = "続けて間違えました。30秒待ってください。"; }
         else msg.textContent = "PIN がちがいます（" + lk.fails + "回）。";
     };

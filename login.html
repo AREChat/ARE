@@ -66,6 +66,16 @@
                     ログイン
                 </button>
             </form>
+            <details id="intruderBox" style="margin:10px 0;font-size:13px">
+                <summary>🛡 3回まちがえたら 内カメラで 記録する（この端末の中だけ）</summary>
+                <p style="opacity:.85;margin:6px 0">ふだん使っている端末の ロック（PIN）や ログインを 3回以上 まちがえたとき、ブラウザの カメラ許可が すでに あれば、内カメラで 1枚 記録します。写真は <b>この端末の中だけ</b>・最大5枚・7日で 自動削除。サーバーには 送りません。家族や お子さんが まちがえた ときにも 撮れてしまうので、必要な人だけ オンに してください。</p>
+                <label><input type="checkbox" id="intruderOn"> 記録する（初期は オフ）</label>
+                <div id="intruderMsg" style="margin:4px 0;opacity:.85"></div>
+                <button type="button" class="button-secondary" id="intruderView">記録を見る</button>
+                <button type="button" class="button-secondary" id="intruderClear">ぜんぶ消す</button>
+                <div id="intruderList" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+            </details>
+
 
             <div class="button-row">
                 <button id="showRegister" class="button-secondary" type="button">
@@ -89,26 +99,17 @@
                 <a id="openRpg" class="button-secondary" href="https://arechat.github.io/game/game/index.html" style="display:block;text-align:center;text-decoration:none">
                     🎮 RPGだけ あそぶ（ログインなし・ずっと無料）
                 </a>
-                <a id="openGame2" class="button-secondary" href="https://arechat.github.io/game/game2/quest2/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
-                    📖 ARE QUEST 2 をあそぶ（ログインなし・無料）
+                <a id="openGame2" class="button-secondary" href="https://arechat.github.io/game/game2/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
+                    📖🌙 ARE QUEST 2 ・ 3（AREを入手せよ／月影のあしあと・ログインなし・無料）
                 </a>
-                <a id="openGame3" class="button-secondary" href="https://arechat.github.io/game/game2/quest3/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
-                    🌙 ARE QUEST 3 〜月影のあしあと〜（ログインなし・無料）
-                </a>
-                <a id="openGame4" class="button-secondary" href="https://arechat.github.io/game/game4/card/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
-                    🃏 ARE CARD 〜そういうときは、AREだ！〜（ログインなし・無料）
+                <a id="openGame4" class="button-secondary" href="https://arechat.github.io/game/game4/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
+                    🃏⭐ GAME4 ARE CARD ＋ 星紡ぎの旅人（カードバトルとRPG・ログインなし・無料）
                 </a>
                 <a id="openGame5" class="button-secondary" href="https://arechat.github.io/game/game5/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
-                    🔍 GAME5 推理ゲーム（ブラウザで あそべます）
+                    🔎🧱 GAME5 推理ゲーム ＋ ブロックパズル（落ちものゲーム・ブラウザで あそべます）
                 </a>
                 <a id="openDaifugo" class="button-secondary" href="./daifugo/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
                     👑 大富豪（本格ルール・全部入り）
-                </a>
-                <a id="openGame6" class="button-secondary" href="https://arechat.github.io/game/game4/starweaver/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
-                    ⭐ GAME6 星紡ぎの旅人（ログインなし・無料）
-                </a>
-                <a id="openGame7" class="button-secondary" href="https://arechat.github.io/game/game5/blocks/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
-                    🧱 GAME7 ARE BLOCKS（じゃま役／けす役を選べる・ログインなし・無料）
                 </a>
                 <a id="openDream" class="button-secondary" href="https://arechat.github.io/game/dream-frontier/index.html" style="display:block;text-align:center;text-decoration:none;margin-top:8px">
                     🎡 ドリームフロンティア（ログインなし・無料）
@@ -126,13 +127,15 @@
     </main>
 
 <!-- Supabase、接続設定、共通処理、ログイン画面処理の順に読み込みます -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-    <script src="apikey.js"></script>
-    <script src="system.js"></script>
-    <script src="login.js"></script>
-<script src="./login-games.js"></script>
-<script src="./password-toggle.js"></script>
-<script src="./protect.js"></script>
-<script src="shared/are-pad.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+    <script defer src="apikey.js"></script>
+    <script defer src="system.js"></script>
+    <script defer src="shared/are-intruder.js"></script>
+<script defer src="login-intruder.js"></script>
+<script defer src="login.js"></script>
+<script defer src="./login-games.js"></script>
+<script defer src="./password-toggle.js"></script>
+<script defer src="./protect.js"></script>
+<script defer src="shared/are-pad.js"></script>
 </body>
 </html>
