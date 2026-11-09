@@ -5,8 +5,8 @@
 // ・フォロワー／フォロー中を押すと、一覧が開きます（チャットを始める・フォロー解除もできます）
 
 const QK_MAX = 7;
-const QK_DEFAULT = ["tool:rpg", "tab:chats", "shop", "search:more", "follow"];
-const QK_LABEL = {rpg:"RPGゲーム", games:"ミニゲーム", prefs:"表示設定・言語"};
+const QK_DEFAULT = ["tool:study124", "tool:games", "shop", "search:more"];
+const QK_LABEL = {rpg:"RPGゲーム", games:"ゲーム", study124:"学習アプリ", prefs:"表示設定・言語"};
 const QK_ALIAS = {
     rpg:"げーむ ゲーム rpg ぼうけん 冒険 あれ are", games:"げーむ ゲーム あそび 遊び", cards:"ゲーム トランプ ばばぬき", bj:"ゲーム トランプ かじの",
     budget:"お金 かけいぼ 家計 しゅうし 収支 支出 収入", diary:"にっき 日記 きおく", weather:"てんき 天気 あめ 雨 気温 予報", transit:"でんしゃ 電車 のりかえ 乗換 鉄道 交通",
