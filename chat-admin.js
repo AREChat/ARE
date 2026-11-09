@@ -110,11 +110,21 @@ async function openAdminRoom(roomId,title){
 async function renderAdminUsers(client){
     const result = await client.rpc("admin_list_profiles");
     if(result.error) throw result.error;
-    el.adminBody.innerHTML = '<div class="row"><button class="button" id="adminCreateUser" type="button">＋ 新規アカウントを作成</button></div><div class="admin-card meta">復旧コードを失くした利用者に対する再発行です。必ず本人確認を行ってから実行してください。新しいコードは画面に1回だけ表示され、保存されません。旧コードは無効になり、利用者本人にも再発行の通知が表示されます。</div>' +
+    el.adminBody.innerHTML = '<div class="row"><button class="button" id="adminCreateUser" type="button">＋ 新規アカウントを作成</button></div><div class="row"><button class="button-secondary" data-bulk="all" type="button">全員を選ぶ／解除</button><button class="button-danger" data-bulk="del" id="adminBulkDel" type="button" disabled>選んだユーザーを削除（0人）</button></div><div class="admin-card meta">復旧コードを失くした利用者に対する再発行です。必ず本人確認を行ってから実行してください。新しいコードは画面に1回だけ表示され、保存されません。旧コードは無効になり、利用者本人にも再発行の通知が表示されます。</div>' +
         (result.data.length ? result.data.map((u) =>
-            '<div class="admin-card"><b>' + escapeHtml(u.display_name || "ユーザー") + '</b> <span class="meta">ID：' + escapeHtml(u.login_id || "-") + (u.last_seen_at ? ' ・最終オンライン：' + escapeHtml(formatDate(u.last_seen_at)) : '') + '</span>' +
+            '<div class="admin-card">' + (u.is_admin ? '' : '<label class="row" style="gap:6px;align-items:center"><input type="checkbox" data-selu="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '"> <span class="meta">選ぶ（まとめて削除）</span></label>') + '<b>' + escapeHtml(u.display_name || "ユーザー") + '</b> <span class="meta">ID：' + escapeHtml(u.login_id || "-") + (u.last_seen_at ? ' ・最終オンライン：' + escapeHtml(formatDate(u.last_seen_at)) : '') + '</span>' +
             '<div class="row"><button class="button-secondary" data-contact="' + escapeHtml(u.user_id) + '" type="button">連絡先を表示（閲覧は記録されます）</button></div>' + (u.is_admin ? '<div class="meta">管理者アカウント（再発行不可）</div>' : '<div class="row"><button class="button-secondary" data-edituser="' + escapeHtml(u.user_id) + '" type="button">編集</button><button class="button-secondary" data-reissue="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '" type="button">復旧コードを再発行</button><button class="button-danger" data-deluser="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '" type="button">アカウントを削除</button></div>') + '</div>').join("")
             : '<div class="empty-list">ユーザーがいません。</div>');
+    el.adminBody.onchange = updateBulkCount;
+}
+
+function selectedUsers(){
+    return Array.from(el.adminBody.querySelectorAll("input[data-selu]:checked")).map((c) => ({uid:c.dataset.selu,name:c.dataset.name}));
+}
+function updateBulkCount(){
+    const b = document.getElementById("adminBulkDel"); if(!b) return;
+    const n = selectedUsers().length;
+    b.disabled = n === 0; b.textContent = "選んだユーザーを削除（" + n + "人）";
 }
 
 async function reissueRecovery(userId,name){
@@ -150,6 +160,11 @@ async function onAdminClick(event){
     }
     if(target.id === "adminCreateUser") return openCreateUser();
     if(target.dataset.edituser) return openEditUser(target.dataset.edituser);
+    if(target.dataset.bulk === "all"){
+        const boxes = Array.from(el.adminBody.querySelectorAll("input[data-selu]"));
+        const on = boxes.some((c) => !c.checked); boxes.forEach((c) => { c.checked = on; }); updateBulkCount(); return;
+    }
+    if(target.dataset.bulk === "del"){ const list = selectedUsers(); if(list.length) bulkDeleteSheet(list); return; }
     if(target.dataset.deluser) return deleteAccount(target.dataset.deluser,target.dataset.name);
     if(target.dataset.reissue) return reissueRecovery(target.dataset.reissue,target.dataset.name);
     if(target.dataset.copycode){
@@ -171,12 +186,49 @@ async function onAdminClick(event){
     }
 }
 
-function deleteAccount(userId,name){
-    feat.reqTarget = {uid:userId,name:name};
-    openSheet('<h3 style="margin:0">アカウント削除の申請</h3><div><b>' + escapeHtml(name) + '</b> さんの削除申請を作成します。作成後に「アカウント削除」タブで承認すると完全に削除されます。</div>' +
-        '<label for="drReason">削除の理由（2文字以上・記録されます）</label><textarea id="drReason" rows="3" maxlength="300"></textarea>' +
-        '<div id="drErr" class="meta" style="color:#ff8a8a" role="alert"></div>' +
-        '<div class="row" style="justify-content:stretch"><button type="button" class="button-danger" data-dr="submit">申請を作成</button><button type="button" class="button-secondary" data-pm="close">やめる</button></div>');
+function deleteAccount(userId,name){ bulkDeleteSheet([{uid:userId,name:name}]); }
+
+// 管理者が消すとき：確認は「はい」の1回だけ（1人でも、まとめてでも同じ）。本人が自分で消す場合は、これまでの手順（下の onDelSheet）のまま
+function bulkDeleteSheet(list){
+    feat.bulkList = list;
+    const names = list.slice(0, 30).map((u) => escapeHtml(u.name)).join("、") + (list.length > 30 ? " ほか" + (list.length - 30) + "人" : "");
+    openSheet('<h3 style="margin:0">⚠️ ' + list.length + '人のアカウントを削除します</h3><div><b>' + names + '</b></div>' +
+        '<div class="meta">アカウント、投稿、チャットの履歴・メッセージ、1対1の会話、追跡ログがすべて消えます。元に戻せません。</div>' +
+        '<div id="bdMsg" class="meta" role="status"></div>' +
+        '<div class="row" style="justify-content:stretch"><button type="button" class="button-danger" data-bd="yes">はい、削除する</button><button type="button" class="button-secondary" data-pm="close">やめる</button></div>');
+}
+
+async function runBulkDelete(button){
+    const list = feat.bulkList || [], msg = document.getElementById("bdMsg");
+    if(!list.length) return;
+    el.profileSheet.querySelectorAll("button").forEach((x) => { x.disabled = true; });
+    let ok = 0; const bad = [];
+    for(let i = 0; i < list.length; i++){
+        const u = list[i];
+        if(msg) msg.textContent = "削除しています… " + (i + 1) + " / " + list.length + "（" + u.name + "）";
+        try{
+            let reqId = u.reqId, reason = u.reason;
+            if(!reqId){
+                let q = await requireClient().rpc("admin_list_account_deletion_requests");
+                if(q.error) throw q.error;
+                let r = (q.data || []).find((x) => x.user_id === u.uid);
+                if(!r){
+                    const c = await requireClient().rpc("admin_request_account_deletion",{p_user_id:u.uid,p_reason:"管理者による削除"});
+                    if(c.error) throw c.error;
+                    q = await requireClient().rpc("admin_list_account_deletion_requests");
+                    if(q.error) throw q.error;
+                    r = (q.data || []).find((x) => x.user_id === u.uid);
+                }
+                if(!r) throw new Error("削除の手続きを作れませんでした。");
+                reqId = r.id; reason = r.reason;
+            }
+            await window.ARESystem.callAuthenticatedFunction("admin-delete-user",{requestId:reqId,userId:u.uid,confirmName:u.name,reason:(reason && reason.length >= 5) ? reason : "管理者による削除"});
+            ok++;
+        }catch(error){ bad.push(u.name + "：" + (error?.message || featError(error))); }
+    }
+    feat.bulkList = null; closeSheet();
+    showToast(bad.length ? ok + "人を削除しました。削除できなかった人：" + bad.join(" / ") : ok + "人のアカウントを削除しました。");
+    renderAdmin(); refreshAdminBadge();
 }
 
 async function submitDeleteRequest(button){
@@ -212,7 +264,7 @@ async function renderAdminAcctDel(client){
         (result.data.length ? result.data.map((r) =>
             '<div class="admin-card"><b>' + escapeHtml(r.display_name || "ユーザー") + '</b> <span class="meta">ID：' + escapeHtml(r.login_id || "-") + ' ・ ' + (r.requested_by_admin ? '管理者が申請' : '本人が申請') + ' ・ ' + escapeHtml(formatDate(r.created_at)) + '</span>' +
             '<div class="meta">理由：' + escapeHtml(r.reason || "（記載なし）") + '</div><div class="row">' +
-            '<button class="button-danger" data-acctdel="approve" data-id="' + escapeHtml(r.id) + '" data-uid="' + escapeHtml(r.user_id) + '" data-name="' + escapeHtml(r.display_name || "") + '" data-reason="' + escapeHtml(r.reason || "") + '" type="button">承認して完全削除</button>' +
+            '<button class="button-danger" data-acctdel="approve" data-byadmin="' + (r.requested_by_admin ? "1" : "0") + '" data-id="' + escapeHtml(r.id) + '" data-uid="' + escapeHtml(r.user_id) + '" data-name="' + escapeHtml(r.display_name || "") + '" data-reason="' + escapeHtml(r.reason || "") + '" type="button">承認して完全削除</button>' +
             '<button class="button-secondary" data-acctdel="reject" data-id="' + escapeHtml(r.id) + '" type="button">却下</button></div></div>').join("")
             : '<div class="empty-list">承認待ちのアカウント削除申請はありません。</div>');
 }
@@ -230,6 +282,7 @@ function onAcctDelClick(event){
         });
         return;
     }
+    if(b.dataset.byadmin === "1"){ bulkDeleteSheet([{uid:b.dataset.uid,name:b.dataset.name,reqId:b.dataset.id,reason:b.dataset.reason}]); return; }   // 管理者が出した申請は「はい」1回だけ
     feat.delTarget = {id:b.dataset.id,uid:b.dataset.uid,name:b.dataset.name,reason:b.dataset.reason};
     openSheet('<h3 style="margin:0">⚠️ アカウントの完全削除</h3><div><b>' + escapeHtml(b.dataset.name) + '</b> さんのアカウント、投稿、1対1の会話、添付ファイル、追跡ログを完全に削除します。元に戻せません。</div>' +
         '<label for="delConfirmName">確認のため、表示名「' + escapeHtml(b.dataset.name) + '」をそのまま入力してください</label><input id="delConfirmName" type="text" autocomplete="off">' +
@@ -238,6 +291,8 @@ function onAcctDelClick(event){
 }
 
 async function onDelSheet(event){
+    const bd = event.target.closest("[data-bd]");
+    if(bd) return runBulkDelete(bd);
     const dr = event.target.closest("[data-dr]");
     if(dr) return submitDeleteRequest(dr);
     const b = event.target.closest("[data-d]");
