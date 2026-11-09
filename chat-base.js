@@ -399,7 +399,7 @@ async function loadRooms(){
 
         const roomIds = [...new Set((membershipResult.data || []).map((row) => row.room_id).filter(Boolean))];
         if(!roomIds.length){
-            state.rooms = [];
+            state.rooms = []; state.allRooms = [];
             renderRooms();
             return;
         }
@@ -421,12 +421,13 @@ async function loadRooms(){
         }
 
         profiles.forEach((p) => feat.known.set(p.id,p));
-        state.rooms = roomRows.map((room) => {
+        state.allRooms = roomRows.map((room) => {
             const memberIds = (membersResult.data || []).filter((row) => row.room_id === room.id).map((row) => row.user_id);
             const partnerId = room.is_group ? null : (memberIds.find((id) => id !== state.user.id) || null);
             const partner = room.is_group ? null : (profiles.find((profile) => profile.id === partnerId) || null);
-            return {...room,partner,partnerId,memberIds};
+            return {...room,partner,partnerId,memberIds,orphan:!room.is_group && !partner};   // 相手のアカウントがすでに無いチャット
         });
+        state.rooms = state.allRooms.filter((room) => !room.orphan || feat.isAdmin);   // 削除ずみユーザーとのチャットは、管理者以外には 出さない（他の画面の一覧にも出ない）
 
         renderRooms();
     }catch(error){
@@ -438,14 +439,16 @@ async function loadRooms(){
 }
 
 function renderRooms(){
-    if(!state.rooms.length){
+    // 削除ずみユーザーとのチャットは、管理者にだけ見せる（ほかの人には表示しない）
+    const rooms = state.rooms.filter((room) => !room.orphan || feat.isAdmin);
+    if(!rooms.length){
         el.roomList.innerHTML = '<div class="empty-list">まだチャットがありません。<br>おすすめユーザーから相手を選ぶか、グループを作成してください。</div>';
         return;
     }
 
-    el.roomList.innerHTML = state.rooms.map((room) => {
+    el.roomList.innerHTML = rooms.map((room) => {
         const group = Boolean(room.is_group);
-        const name = group ? (room.name || "グループ") : profileDisplayName(room.partner);
+        const name = group ? (room.name || "グループ") : (room.orphan ? "削除ずみユーザー" : profileDisplayName(room.partner));
         const avatar = group ? "" : safeHttpUrl(room.partner?.avatar_url || room.partner?.avatarUrl || "");
         const avatarHtml = group
             ? '<div class="avatar">👥</div>'

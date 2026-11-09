@@ -12,6 +12,7 @@ async function checkAdmin(){
     try{ const result = await requireClient().rpc("is_current_user_admin"); feat.isAdmin = result.data === true; }
     catch(_e){ feat.isAdmin = false; }
     el.adminTabButton.hidden = !feat.isAdmin;
+    try{ if(state.allRooms){ state.rooms = state.allRooms.filter((room) => !room.orphan || feat.isAdmin); renderRooms(); } }catch(_e){}   // 管理者かどうかが分かったら、一覧を作り直す（削除ずみユーザーのチャットの 表示・非表示）
     // 管理者アカウントなのに TOTP（追加認証）がまだ → 管理者機能は ふさがれている。案内を出して 認証の画面へ つなぐ
     if(!feat.isAdmin){
         try{
@@ -192,6 +193,35 @@ async function onAdminClick(event){
     }
 }
 
+// 開いているチャットが「削除ずみユーザーとのチャット」なら、管理者にだけ 🗑 削除 ボタンを出す
+function initOrphanButton(){
+    const b = document.getElementById("orphanDelBtn");
+    if(!b || b.dataset.ready) return; b.dataset.ready = "1";
+    addRoomHook((room) => { b.hidden = !(feat.isAdmin && room && room.orphan); });
+    b.addEventListener("click",() => {
+        const room = state.currentRoom; if(!room || !room.orphan || !feat.isAdmin) return;
+        feat.orphanRoom = room.id;
+        openSheet('<h3 style="margin:0">⚠️ このチャットを削除します</h3><div>すでにアカウントが無いユーザーとのチャットです。<b>メッセージもすべて</b>消えます。</div>' +
+            '<div class="meta">元に戻せません。</div><div id="bdMsg" class="meta" role="status"></div>' +
+            '<div class="row" style="justify-content:stretch"><button type="button" class="button-danger" data-bd="orphanroom">はい、削除する</button><button type="button" class="button-secondary" data-pm="close">やめる</button></div>');
+    });
+}
+async function runOrphanRoomDelete(){
+    const id = feat.orphanRoom; if(!id) return;
+    el.profileSheet.querySelectorAll("button").forEach((x) => { x.disabled = true; });
+    try{
+        const r = await requireClient().rpc("admin_delete_orphan_room",{p_room_id:id});
+        if(r.error) throw r.error;
+        feat.orphanRoom = null; closeSheet();
+        state.rooms = state.rooms.filter((x) => x.id !== id); if(state.allRooms) state.allRooms = state.allRooms.filter((x) => x.id !== id);
+        if(state.currentRoom && state.currentRoom.id === id){ try{ el.app.classList.remove("chat-open"); }catch(_e){} state.currentRoom = null; }
+        renderRooms(); showToast("チャットを削除しました。");
+    }catch(error){
+        el.profileSheet.querySelectorAll("button").forEach((x) => { x.disabled = false; });
+        showToast(featError(error));
+    }
+}
+
 // すでに消えたユーザーの「チャットだけ残っている」ものを、管理者が消す（確認は「はい」1回）
 async function orphanSheet(){
     let n = 0;
@@ -326,7 +356,7 @@ function onAcctDelClick(event){
 
 async function onDelSheet(event){
     const bd = event.target.closest("[data-bd]");
-    if(bd) return bd.dataset.bd === "orphan" ? runOrphanPurge() : runBulkDelete(bd);
+    if(bd) return bd.dataset.bd === "orphanroom" ? runOrphanRoomDelete() : (bd.dataset.bd === "orphan" ? runOrphanPurge() : runBulkDelete(bd));
     const dr = event.target.closest("[data-dr]");
     if(dr) return submitDeleteRequest(dr);
     const b = event.target.closest("[data-d]");

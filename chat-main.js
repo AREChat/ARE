@@ -97,6 +97,7 @@ function initAdmin(){
         onAdminClick(event);
     });
     checkAdmin();
+    initOrphanButton();
 }
 
 function initAdminUsers(){
