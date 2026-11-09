@@ -9,6 +9,13 @@
 --          where o.room_id = r.id and not private.is_admin_user(o.user_id)) < 2;
 
 -- ② 実行
+-- 「消えたユーザー」＝ ログイン用のアカウント(auth.users)が無い、または プロフィールが無い人
+create or replace function private.is_gone_user_v1(p_user uuid)
+returns boolean
+language sql stable security definer set search_path = ''
+as $$ select not exists (select 1 from auth.users u where u.id = p_user) or not exists (select 1 from public.profiles p where p.id = p_user) $$;
+revoke all on function private.is_gone_user_v1(uuid) from public, anon, authenticated;
+
 create or replace function private.purge_orphan_chat_v1()
 returns table (rooms_deleted int, members_deleted int, messages_deleted int, profiles_deleted int)
 language plpgsql security definer set search_path = ''
@@ -17,9 +24,10 @@ declare v_rooms uuid[]; v_msgs text[]; v_orph text[]; a int := 0; b int := 0; c 
 begin
   -- 消えたユーザーがいて、ふつうの参加者が 2人未満しか残っていない部屋（1対1・管理者だけ・空）→ 部屋ごと消す
   select coalesce(array_agg(r.id), '{}') into v_rooms from public.chat_rooms r
-  where exists (select 1 from public.chat_room_members m where m.room_id = r.id and not exists (select 1 from auth.users u where u.id = m.user_id))
-    and (select count(*) from public.chat_room_members o join auth.users u on u.id = o.user_id
-         where o.room_id = r.id and not private.is_admin_user(o.user_id)) < 2;
+  where (r.is_group is not true)
+    and exists (select 1 from public.chat_room_members m where m.room_id = r.id and private.is_gone_user_v1(m.user_id))
+    and (select count(*) from public.chat_room_members o
+         where o.room_id = r.id and not private.is_gone_user_v1(o.user_id) and not private.is_admin_user(o.user_id)) < 2;
   a := cardinality(v_rooms);
 
   -- 消す部屋の中のメッセージ ＋ 消えたユーザーが送ったメッセージ

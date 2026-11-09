@@ -10,9 +10,10 @@ declare n integer;
 begin
   if not public.is_current_user_admin() then raise exception 'forbidden'; end if;
   select count(*) into n from public.chat_rooms r
-  where exists (select 1 from public.chat_room_members m where m.room_id = r.id and not exists (select 1 from auth.users u where u.id = m.user_id))
-    and (select count(*) from public.chat_room_members o join auth.users u on u.id = o.user_id
-         where o.room_id = r.id and not private.is_admin_user(o.user_id)) < 2;
+  where (r.is_group is not true)
+    and exists (select 1 from public.chat_room_members m where m.room_id = r.id and private.is_gone_user_v1(m.user_id))
+    and (select count(*) from public.chat_room_members o
+         where o.room_id = r.id and not private.is_gone_user_v1(o.user_id) and not private.is_admin_user(o.user_id)) < 2;
   return n;
 end $$;
 
@@ -40,11 +41,11 @@ begin
   if not public.is_current_user_admin() then raise exception 'forbidden'; end if;
   -- 「消えたユーザーがいる」か「ふつうの参加者が いない」部屋だけ消せる（生きているユーザー同士のチャットは消せない）
   if not exists (select 1 from public.chat_rooms r where r.id = p_room_id
-      and (exists (select 1 from public.chat_room_members m where m.room_id = r.id and not exists (select 1 from auth.users u where u.id = m.user_id))
-           or not exists (select 1 from public.chat_room_members o join auth.users u on u.id = o.user_id
-                          where o.room_id = r.id and not private.is_admin_user(o.user_id)))
-      and (select count(*) from public.chat_room_members o join auth.users u on u.id = o.user_id
-           where o.room_id = r.id and not private.is_admin_user(o.user_id)) < 2) then
+      and (r.is_group is not true)
+      and (exists (select 1 from public.chat_room_members m where m.room_id = r.id and private.is_gone_user_v1(m.user_id))
+           or not exists (select 1 from public.chat_room_members o where o.room_id = r.id and not private.is_gone_user_v1(o.user_id) and not private.is_admin_user(o.user_id)))
+      and (select count(*) from public.chat_room_members o
+           where o.room_id = r.id and not private.is_gone_user_v1(o.user_id) and not private.is_admin_user(o.user_id)) < 2) then
     raise exception 'not an orphan room';
   end if;
   select coalesce(array_agg(x.id::text), '{}') into v_msgs from public.messages x where x.room_id = p_room_id;
