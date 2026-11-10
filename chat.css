@@ -632,3 +632,10 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .tp-note{line-height:1.5}
 .tp-note.tp-dirty{font-weight:700;color:var(--text)}
 .tp-ok{width:100%;min-height:48px;font-size:16px;font-weight:700}
+/* 長い文章の折りたたみ（chat-longtext.js） */
+.bubble[data-lt="c"],.bubble[data-lt="o"]{-webkit-user-select:text;user-select:text}
+.bubble .lt-full{-webkit-user-select:text;user-select:text;cursor:text}
+.lt-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.lt-btn{font:inherit;font-size:13px;font-weight:700;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel2,#1b2a52);color:inherit;cursor:pointer}
+.lt-btn:hover{filter:brightness(1.15)}
+.lt-copy{opacity:.9}
