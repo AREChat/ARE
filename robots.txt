@@ -2,4 +2,4 @@ User-agent: *
 Disallow: /admin.html
 Disallow: /chat.html
 Disallow: /game/
-Sitemap: https://arechat.github.io/ARE/sitemap.xml
+Sitemap: https://arechat.github.io/AREDA/sitemap.xml
