@@ -639,3 +639,7 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .lt-btn{font:inherit;font-size:13px;font-weight:700;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel2,#1b2a52);color:inherit;cursor:pointer}
 .lt-btn:hover{filter:brightness(1.15)}
 .lt-copy{opacity:.9}
+
+/* 日付の区切り */
+.date-sep{align-self:center;text-align:center;margin:10px 0 4px;position:relative;width:100%}
+.date-sep span{display:inline-block;font-size:12px;font-weight:700;padding:3px 14px;border-radius:999px;background:var(--panel2,#1b2a52);color:var(--muted,#a9b6e0);border:1px solid var(--line)}

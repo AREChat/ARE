@@ -120,6 +120,23 @@ function shortName(value){
     return Array.from(name)[0] || "A";
 }
 
+// 日付の区切り（その日のはじめのメッセージの前に「今日」「昨日」「11月9日（月）」を出す）
+function dayKey(value){
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? "" : d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
+}
+function dateSeparator(value){
+    const d = new Date(value);
+    if(Number.isNaN(d.getTime())) return "";
+    const w = "日月火水木金土"[d.getDay()], now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const day = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const diff = Math.round((today - day) / 86400000);
+    const md = (d.getMonth() + 1) + "月" + d.getDate() + "日（" + w + "）";
+    const label = diff === 0 ? "今日　" + md : diff === 1 ? "昨日　" + md : (d.getFullYear() === now.getFullYear() ? md : d.getFullYear() + "年" + md);
+    return '<div class="date-sep" role="separator"><span>' + escapeHtml(label) + '</span></div>';
+}
+
 function formatDate(value){
     if(!value) return "";
     const date = new Date(value);
@@ -669,7 +686,7 @@ function renderMessages(scrollToBottom){
     const stick = scrollToBottom || (el.messages.scrollHeight - prevTop - el.messages.clientHeight < 80);
     const readAt = feat.partnerReadAt ? new Date(feat.partnerReadAt).getTime() : 0;
 
-    el.messages.innerHTML = state.messages.map((message) => {
+    el.messages.innerHTML = state.messages.map((message, msgIdx) => {
         const own = message.sender_id === state.user.id;
         const profile = own ? state.profile : (feat.known.get(message.sender_id) || state.currentPartner);
         const name = own ? "あなた" : profileDisplayName(profile);
@@ -702,7 +719,8 @@ function renderMessages(scrollToBottom){
                 '</div>';
         }
 
-        return '<article class="message-row' + (own ? ' own' : '') + '" data-mid="' + id + '">' +
+        const sep = (msgIdx === 0 || dayKey(state.messages[msgIdx - 1].created_at) !== dayKey(message.created_at)) ? dateSeparator(message.created_at) : "";
+        return sep + '<article class="message-row' + (own ? ' own' : '') + '" data-mid="' + id + '">' +
             avatar +
             '<div class="message-body"><div class="message-sender">' + escapeHtml(name) + '</div>' +
             body + '<div class="message-time">' + meta + '</div>' + actions + '</div></article>';
