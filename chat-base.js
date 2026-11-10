@@ -137,6 +137,15 @@ function dateSeparator(value){
     return '<div class="date-sep" role="separator"><span>' + escapeHtml(label) + '</span></div>';
 }
 
+// 投稿・コメント用：日付と曜日つきの時刻（例：11月11日（水）11:11。去年以前は年も出す）
+function formatDateTime(value){
+    if(!value) return "";
+    const d = new Date(value);
+    if(Number.isNaN(d.getTime())) return "";
+    const y = d.getFullYear() !== new Date().getFullYear() ? d.getFullYear() + "年" : "";
+    return y + (d.getMonth() + 1) + "月" + d.getDate() + "日（" + "日月火水木金土"[d.getDay()] + "）" + formatDate(value);
+}
+
 function formatDate(value){
     if(!value) return "";
     const date = new Date(value);
