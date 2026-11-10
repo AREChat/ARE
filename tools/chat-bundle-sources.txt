@@ -97,3 +97,4 @@ chat-layout.js
 sw-update.js
 chat-guest.js
 chat-longtext.js
+chat-offlinegame.js

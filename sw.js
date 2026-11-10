@@ -11,7 +11,7 @@
 // ・新しい版が入ったら、古い控えをすべて消す
 
 importScripts("precache-manifest.js", "sw-core.js");
-const CACHE = "are-v81-20261111";
+const CACHE = "are-v82-20261111";
 // オフライン用: 画面の骨組み（html/js/css/json）を 最初に まとめて保存 / 画像・音楽は「オフライン準備」ボタンで are-media に保存（sw-core.js）
 const core = self.areCore({shell: CACHE, root: "./", precache: true, fetch: false});
 const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
