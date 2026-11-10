@@ -2,6 +2,7 @@
 // ===== 電波がないとき・とても弱いとき：暇つぶしゲーム（OFFLINE PARADISE）への案内 =====
 // ・ネットが切れた／2G なみに遅いとき、画面の下に「🎰 暇つぶしゲーム」のボタンを出します（✕で閉じられます）。
 // ・ネットが戻ったら、自動で消えます。ゲームは AREChat/game の game7（電波がなくても遊べます）。
+// ・data-lc-done は、link-copy.js が このリンクの後ろに「📋コピー」ボタンを足さないための目印です（足すと、せまい画面で案内がつぶれます）。
 (function(){
     var URL = "https://arechat.github.io/game/game7/index.html";
     var el = null, closed = false;
@@ -16,7 +17,7 @@
         if(closed || el || !document.body) return;
         el = document.createElement("div"); el.id = "areOfflineGame";
         el.setAttribute("role", "status");
-        el.innerHTML = '<span>' + (w === "off" ? "✈ 電波がないみたい…" : "📶 電波が弱いみたい…") + '</span><a href="' + URL + '" target="_blank" rel="noopener">🎰 暇つぶしゲームで待つ</a><button type="button" aria-label="閉じる">✕</button>';
+        el.innerHTML = '<span>' + (w === "off" ? "✈ 電波がないみたい…" : "📶 電波が弱いみたい…") + '</span><a href="' + URL + '" target="_blank" rel="noopener" data-lc-done="1">🎰 暇つぶしゲームで待つ</a><button type="button" aria-label="閉じる">✕</button>';
         el.querySelector("button").onclick = function(){ closed = true; if(el){ el.remove(); el = null; } };
         document.body.appendChild(el);
     }
