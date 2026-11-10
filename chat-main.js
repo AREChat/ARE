@@ -173,6 +173,8 @@ const FEATURES = [
     ["game3","ARE QUEST 3",initGame3],
     ["game4","ARE CARD",initGame4],
     ["game5","GAME5 推理ゲーム",initGame5],
+    ["game6","推理ゲーム2（マトリックス）",initGame6],
+    ["game7","OFFLINE PARADISE",initGame7],
     ["daifugo","大富豪",initDaifugo],
     ["dream","ドリームフロンティア",initDream],
     ["study124","学習サイト",initStudy124],

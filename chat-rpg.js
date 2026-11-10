@@ -60,6 +60,20 @@ function openDaifugo(){
 }
 function initDaifugo(){ /* ゲーム本体は ./daifugo/ に独立 */ }
 function initGame5(){ /* ゲーム本体は ./game5/play/（ブラウザ版）と Releases の exe（Windows版） */ }
+function openGame6(){
+    const href = "https://arechat.github.io/game/game6/index.html";
+    openSheet(toolHead("🕵 推理ゲーム2（マトリックス）", "表に ○ と × をつけて、事件の犯人を推理する。全10章×10話") +
+        '<div class="admin-card">登場人物は100人。「はい／いいえ」の答えで事件が変わります。右上で難しさも選べます。ブラウザで すぐ あそべます（アカウント・ポイントは不要です）。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ あそぶ</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
+}
+function openGame7(){
+    const href = "https://arechat.github.io/game/game7/index.html";
+    openSheet(toolHead("🎰 OFFLINE PARADISE", "電波がなくても あそべる、暇つぶしの豪華ミニゲーム") +
+        '<div class="admin-card">ルーレットで選ばれる5つのミニゲーム（ダッシュ・お城づくり・ダンジョン・ビート・コイン集め）。コインと図鑑はぜんぶ共通。通信が回復するとジャックポット！ アカウント・ポイントは不要です。</div>' +
+        '<div class="row"><a class="button" href="' + escapeHtml(href) + '" target="_blank" rel="noopener">▶ あそぶ</a><button type="button" class="button-secondary" data-pm="close">とじる</button></div>');
+}
+function initGame6(){ /* ゲーム本体は AREChat/game の game6 */ }
+function initGame7(){ /* ゲーム本体は AREChat/game の game7 */ }
 function initGame3(){ /* ゲーム本体は ./game3/ に独立 */ }
 function initGame4(){ /* ゲーム本体は ./game4/ に独立 */ }
 function initGame2(){ /* ゲーム本体は ./game2/ に独立 */ }
