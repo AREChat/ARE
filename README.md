@@ -1,4 +1,4 @@
-> **AREDA（チャットアプリ）**：2026-11-05、旧 `AREChat/ARE` からチャットアプリの部分を移しました。ゲーム（game・game2〜game7・dream-frontier）は `AREChat/game` にあります。旧 `AREChat/ARE` は、運用中のためそのままです。
+> **ARE（チャットアプリ）**：2026-11-11、リポジトリ名を `AREDA` から `ARE` に変更しました（旧 `AREChat/ARE` は削除ずみ）。公開アドレスは `https://arechat.github.io/ARE/` です。ゲーム（game・game2〜game7・dream-frontier）は `AREChat/game` にあります。
 
 # ARE（アレ）— みんなで使えるチャットアプリ
 
