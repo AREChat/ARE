@@ -34,7 +34,7 @@ function updateTtlButton(){
 function openTtlSheet(){
     openSheet(toolHead("⏳ 消えるメッセージ", "選んだ時間がたつと、このあと送るメッセージが自動で見えなくなります。チャットを切り替えるとオフに戻ります。") +
         '<div class="cam-choose">' + TTL_OPTIONS.map((o) => '<button type="button" class="admin-card more-item' + (o[0] === feat.ttl ? " on" : "") + '" data-t="ttl:set" data-s="' + o[0] + '">' + (o[0] === feat.ttl ? "✔ " : "") + escapeHtml(o[1]) + '</button>').join("") + '</div>' +
-        '<div class="meta">※管理者は安全管理のため、消えたあとも確認できる場合があります。</div>' + toolClose());
+        toolClose());
 }
 
 function onTtlAction(action, node){
