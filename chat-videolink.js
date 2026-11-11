@@ -123,7 +123,7 @@ function uploadVideoWithProgress(client, path, file, mime, onText){
 // ・window.ARE_CONFIG.videoUploadUrl（GASのウェブアプリのURL）が入っているときだけ使います。
 // ・start（ログイン確認＋アップロード口の発行）→ ブラウザからドライブへ直接アップロード（16MBずつ・失敗したらやり直し）→ finish（全員が見られる設定＋リンク）。
 // ・進み具合（％）と、のこり時間の目安を出しながら、動画を1本ずつ順番に処理します。うまくいかない動画は、リンクを貼る画面に切りかえます。
-const dq = {cancel:false, running:false};
+const dq = {cancel:false, running:false, again:false};
 const DRIVE_CHUNK = 64 * 256 * 1024;   // 16MB（Googleの決まりで 256KB の倍数）
 
 function driveUploadUrl(){
@@ -192,8 +192,9 @@ function driveProgressSheet(nth, total, name, size){
 }
 
 async function runDriveQueue(){
-    if(dq.running) return;
-    dq.running = true; dq.cancel = false;
+    // 「やめる」を押した直後は、前の1本がまだ後始末中のことがある。そのとき新しく選んだ動画が消えないよう、終わりしだい続けて始める
+    if(dq.running){ dq.again = true; return; }
+    dq.running = true; dq.cancel = false; dq.again = false;
     try{
         while(vl.index < vl.queue.length && !dq.cancel){
             const cur = vl.queue[vl.index], file = cur.file, total = vl.queue.length, nth = vl.index + 1;
@@ -213,6 +214,7 @@ async function runDriveQueue(){
                     setBar(pct);
                     setText("アップロード中 " + pct + "%（" + formatAttachmentSize(sent) + " / " + formatAttachmentSize(file.size) + "）" + (left ? " ・ のこり" + videoWaitLabel(left) + "（目安）" : " ・ 時間を計測中…"));
                 });
+                if(dq.cancel) throw new Error("やめました。");
                 setBar(100); setText("リンクを作っています…");
                 const f = await gasCall({action:"finish", fileId:id});
                 link = f.link; retention = f.retentionDays || retention;
@@ -233,5 +235,6 @@ async function runDriveQueue(){
     }finally{
         dq.running = false;
     }
+    if(dq.again){ dq.again = false; if(vl.queue.length && vl.index < vl.queue.length){ runDriveQueue(); return; } }
     if(vl.index >= vl.queue.length){ vl.queue = []; vl.index = 0; }
 }

@@ -78,6 +78,14 @@ async function onPostShareAction(action, node){
 async function openSharedPostFromUrl(){
     let id = "";
     try{ id = new URLSearchParams(location.search).get("p") || ""; }catch(_e){}
+    if(!id){
+        // ログインの前に開いた共有リンクを、ログイン後に開く（chat-base.js の redirectToIndex が覚えたもの・30分まで）
+        try{
+            const saved = JSON.parse(sessionStorage.getItem("are_pending_post") || "null");
+            sessionStorage.removeItem("are_pending_post");
+            if(saved && saved.id && Date.now() - Number(saved.t || 0) < 30 * 60 * 1000) id = String(saved.id);
+        }catch(_e){}
+    }
     if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return;
     try{ history.replaceState(null, "", location.pathname); }catch(_e){}
     const client = requireClient();

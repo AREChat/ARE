@@ -313,7 +313,13 @@ async function initialize(){
 }
 
 function redirectToIndex(){
-    const invite = new URLSearchParams(location.search).get("invite");
+    const params = new URLSearchParams(location.search);
+    const invite = params.get("invite");
+    // 共有された投稿のリンク（?p=）をログインの前に開いたとき：ログインしたあとに、その投稿を開けるよう覚えておく（30分だけ・この画面だけ）
+    const shared = params.get("p");
+    if(shared && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(shared)){
+        try{ sessionStorage.setItem("are_pending_post", JSON.stringify({id:shared, t:Date.now()})); }catch(_e){}
+    }
     window.location.replace("./index.html" + (invite ? "?invite=" + encodeURIComponent(invite) : ""));
 }
 
