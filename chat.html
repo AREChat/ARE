@@ -42,7 +42,7 @@
             <div class="profile-card pane-me" data-ctx="me"><div class="profile-text" id="profileText"></div><button class="button" id="memoOpenButton" data-feature="memo" type="button">📝 自分専用メモ（Keep）</button><button class="button" id="profileEditButton" data-feature="profile" type="button">✏️ プロフィールを編集</button></div>
             <div class="profile-card pane-me" id="delCard">
                 <div class="profile-text"><b>アカウントの削除</b><div class="bio" id="delStatus">削除を申請すると、管理者の承認後にアカウントとデータが完全に削除されます（元に戻せません）。</div></div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button-danger" id="delRequestButton" data-feature="account" type="button">アカウント削除を申請</button><button class="button-secondary" id="delCancelButton" type="button" hidden>申請を取り消す</button></div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button-danger" id="delRequestButton" data-feature="account" type="button" disabled>アカウント削除を申請</button><button class="button-secondary" id="delCancelButton" type="button" hidden>申請を取り消す</button></div>
             </div>
             <div class="profile-card pane-me">
                 <div class="profile-text"><b>会話履歴の保存</b><div class="bio">30日を過ぎた会話は、ZIPファイルとしてこの端末に保存できます（添付ファイルの中身は含まれません）。</div></div>
@@ -156,7 +156,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=52ab83dd26"></script>
+<script defer src="./chat.bundle.js?v=e956b592b2"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

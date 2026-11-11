@@ -25,6 +25,8 @@ async function loadMySettings(){
 // ===== プロフィール / ステータスメッセージ / 投稿 / アカウント削除 =====
 
 async function loadMyDeletion(){
+    // 読み込みが終わるまで、押せないようにする（押しても反応しなかったため）
+    el.delRequestButton.disabled = true; el.delCancelButton.disabled = true;
     try{
         const r = await requireClient().from("account_deletion_requests").select("id,status,created_at").eq("status","pending").maybeSingle();
         const pending = !r.error && r.data;
@@ -32,6 +34,7 @@ async function loadMyDeletion(){
         el.delCancelButton.hidden = !pending;
         el.delStatus.textContent = pending ? "削除を申請中です（" + formatDate(r.data.created_at) + "）。管理者の承認後に、アカウントとデータが完全に削除されます。" : "削除を申請すると、管理者の承認後にアカウントとデータが完全に削除されます（元に戻せません）。";
     }catch(_e){}
+    el.delRequestButton.disabled = false; el.delCancelButton.disabled = false;
 }
 
 async function requestMyDeletion(){
