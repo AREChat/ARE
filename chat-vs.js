@@ -391,7 +391,8 @@ function renderGameBubble(item){
     if(!info || !E) return '<div class="bubble">🎮 対戦</div>';
     if(item.kind !== "start"){
         let text = "手を打ちました";
-        try{ text = E.moveText(item); }catch(_e){ /* そのまま */ }
+        if(item.kind === "resign") text = "終了しました";
+        else try{ text = E.moveText(item); }catch(_e){ /* そのまま */ }
         return '<div class="bubble vs-move">' + info.icon + ' ' + escapeHtml(info.name) + '：' + escapeHtml(text) + '</div>';
     }
     const S = vsCompute(item.gid);
