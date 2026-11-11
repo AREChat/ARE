@@ -12,6 +12,9 @@
             recovery: "recover-account",
             guest: "guest-start"
         }),
+        // 大きい動画を Googleドライブに置いてリンクにする GAS ウェブアプリのURL（https://script.google.com/macros/s/…/exec）。
+        // 空のままなら、動画のリンクを自分で貼る画面になります。
+        videoUploadUrl: "",
         requestTimeoutMs: 20000
     });
 })();
