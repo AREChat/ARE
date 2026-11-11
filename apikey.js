@@ -14,7 +14,7 @@
         }),
         // 大きい動画を Googleドライブに置いてリンクにする GAS ウェブアプリのURL（https://script.google.com/macros/s/…/exec）。
         // 空のままなら、動画のリンクを自分で貼る画面になります。
-        videoUploadUrl: "",
+        videoUploadUrl: "https://script.google.com/macros/s/AKfycbw5pEChZI4haKvsbFDUgnPHkTHb_oMGSAq_GlcogQ7XGN-yBLF2W5W1SrlXTGed15DsPg/exec",
         requestTimeoutMs: 20000
     });
 })();
