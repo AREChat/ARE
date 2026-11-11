@@ -322,6 +322,11 @@ function bindEvents(){
     el.refreshUsersButton.addEventListener("click",loadRecommendations);
     el.refreshRoomsButton.addEventListener("click",loadRooms);
     el.refreshMessagesButton.addEventListener("click",() => loadMessages(true));
+    // 再生や全画面が終わったら、ためておいた描き直しを行う（renderMessages を参照）
+    ["pause","ended"].forEach((type) => el.messages.addEventListener(type,flushDeferredRender,true));
+    document.addEventListener("fullscreenchange",flushDeferredRender);
+    document.addEventListener("webkitfullscreenchange",flushDeferredRender);
+    el.messages.addEventListener("webkitendfullscreen",flushDeferredRender,true);
     let searchTimer = null;
     el.userSearch.addEventListener("input",() => {
         state.searchText = el.userSearch.value.trim().toLocaleLowerCase();
@@ -686,6 +691,23 @@ function renderMessageContent(content){
     return '<div class="bubble"><div class="attachment"><a class="file-card" href="' + safeUrl + '" target="_blank" rel="noopener noreferrer" download="' + safeName + '"><span class="file-icon">📄</span><span><span class="file-name">' + safeName + '</span>' + size + '</span></a></div></div>';
 }
 
+function mediaBusyInMessages(){
+    try{
+        const fs = document.fullscreenElement || document.webkitFullscreenElement;
+        if(fs && (el.messages.contains(fs) || fs.tagName === "VIDEO")) return true;
+        return Array.prototype.some.call(el.messages.querySelectorAll("video,audio"), (m) => (!m.paused && !m.ended) || m.webkitDisplayingFullscreen);
+    }catch(_e){ return false; }
+}
+
+function flushDeferredRender(){
+    if(!state.renderPending) return;
+    setTimeout(() => {
+        if(!state.renderPending || mediaBusyInMessages()) return;
+        const p = state.renderPending; state.renderPending = null;
+        renderMessages(p.scroll);
+    }, 400);
+}
+
 function renderMessages(scrollToBottom){
     const nowMs = Date.now();
     state.messages = state.messages.filter((m) => !m.expires_at || new Date(m.expires_at).getTime() > nowMs);
@@ -693,6 +715,14 @@ function renderMessages(scrollToBottom){
         el.messages.innerHTML = '<div class="welcome"><div class="welcome-icon">✉️</div><h2>最初のメッセージを送ろう</h2><div>メッセージやファイルを送信すると、ここに表示されます。</div></div>';
         return;
     }
+
+    // 動画・音声を再生中／全画面で見ているあいだは、一覧を作り直さない（作り直すと、再生が止まって全画面も解除されるため）。
+    // 終わったら（止めた・全画面を閉じた）、ためておいた分をまとめて描く。
+    if(mediaBusyInMessages()){
+        state.renderPending = {scroll:!!scrollToBottom || !!(state.renderPending && state.renderPending.scroll)};
+        return;
+    }
+    state.renderPending = null;
 
     const prevTop = el.messages.scrollTop;
     const stick = scrollToBottom || (el.messages.scrollHeight - prevTop - el.messages.clientHeight < 80);
