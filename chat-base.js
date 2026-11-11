@@ -103,6 +103,7 @@ function cacheElements(){
 }
 
 function safeHttpUrl(value){
+    if(!String(value || "").trim()) return "";   // 空のときに「いま開いているページ（chat.html）」を返すと、アイコンが壊れた画像になるため
     try{
         const u = new URL(String(value || ""), window.location.href);
         return u.protocol === "https:" ? u.href : "";
