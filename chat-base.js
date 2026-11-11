@@ -835,6 +835,7 @@ async function handleFiles(fileList,kind){
         return;
     }
 
+    const tooBigVideos = [];   // 大きすぎて送れない動画（あとで「リンクで送る」画面を出す）
     for(const file of files){
         let uploadFile = file;
         if(kind === "image"){
@@ -845,14 +846,14 @@ async function handleFiles(fileList,kind){
         }
         if(kind === "video"){
             if(file.size > MAX_VIDEO_BYTES){
-                showToast("動画は1本50MB以下にしてください。");
+                tooBigVideos.push({file, reason:"size"});
                 continue;
             }
 
             try{
                 const duration = await getVideoDuration(file);
                 if(duration > MAX_VIDEO_SECONDS){
-                    showToast(file.name + " は5分を超えているため送信できません。");
+                    tooBigVideos.push({file, reason:"long"});
                     continue;
                 }
             }catch(error){
@@ -868,6 +869,7 @@ async function handleFiles(fileList,kind){
     }
 
     clearFileInputs();
+    if(tooBigVideos.length && typeof openVideoLinkSheet === "function") openVideoLinkSheet(tooBigVideos[0].file, tooBigVideos[0].reason, tooBigVideos.length);
 }
 
 function clearFileInputs(){
@@ -931,7 +933,11 @@ async function uploadAndSend(file,kind,originalBytes){
         await sendMessagePayload(payload);
     }catch(error){
         console.error("Attachment upload error:",error);
-        setStatus(getErrorMessage(error),"error");
+        if(kind === "video" && typeof openVideoLinkSheet === "function" && typeof videoLinkErrorIsSize === "function" && videoLinkErrorIsSize(error)){
+            openVideoLinkSheet(file, "upload");
+        }else{
+            setStatus(getErrorMessage(error),"error");
+        }
     }finally{
         el.app.classList.remove("loading");
         el.attachmentStatus.textContent = "";

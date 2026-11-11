@@ -192,6 +192,7 @@ const FEATURES = [
     ["ctx","長押し・右クリックメニュー",initCtx],
     ["memo","自分専用メモ",initMemo],
     ["timed","消えるメッセージ",initTimed],
+    ["vlink","大きい動画をリンクで送る",initVideoLink],
     ["co2","CO2トラッカー",initCo2],
     ["ai","会話分析・音声入力・翻訳",initAi],
     ["vs","対戦ゲーム",initVs],

@@ -91,6 +91,7 @@ chat-points.js
 chat-quick.js
 chat-ai-studio.js
 chat-back.js
+chat-videolink.js
 chat-main.js
 link-copy.js
 chat-layout.js
