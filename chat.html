@@ -105,7 +105,7 @@
                 <label class="tool-button" for="fileInput">📎 ファイルを選択</label>
                 <input class="file-input" id="fileInput" type="file" multiple accept=".pdf,.docx,.xlsx,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation">
                 <label class="tool-button" for="videoInput">🎬 動画を選択</label>
-                <input class="file-input" id="videoInput" type="file" accept="video/*">
+                <input class="file-input" id="videoInput" type="file" accept="video/*" multiple>
                 <button class="tool-button" id="emojiButton" data-feature="stamps" type="button">😊 絵文字・スタンプ</button>
                 <button class="tool-button" id="voiceButton" data-feature="voice" data-needs-room type="button" disabled>🎤 音声</button>
                 <button class="tool-button" id="voiceCancel" data-feature="voice" type="button" hidden>✖ 録音を取消</button>
@@ -156,7 +156,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=d33a58f3f1"></script>
+<script defer src="./chat.bundle.js?v=c39c60cf52"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

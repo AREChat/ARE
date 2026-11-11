@@ -19,6 +19,8 @@ const MAX_FILE_BYTES = 50 * 1024 * 1024;
 
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
+const MAX_VIDEOS_AT_ONCE = 5;   // 動画をまとめて選べる本数（1本ずつ順番に送る）
+
 function formatAttachmentSize(bytes){
     const size = Number(bytes) || 0;
     if(size < 1024) return Math.round(size) + "B";
@@ -802,8 +804,8 @@ async function handleFiles(fileList,kind){
         return;
     }
 
-    if(kind === "video" && files.length > 1){
-        showToast("動画は一度に1本ずつ送信してください。");
+    if(kind === "video" && files.length > MAX_VIDEOS_AT_ONCE){
+        showToast("動画は一度に最大" + MAX_VIDEOS_AT_ONCE + "本まで選べます。");
         clearFileInputs();
         return;
     }
@@ -865,11 +867,11 @@ async function handleFiles(fileList,kind){
             continue;
         }
 
-        await uploadAndSend(uploadFile,kind,file.size);
+        await uploadAndSend(uploadFile,kind,file.size, files.length > 1 ? (files.indexOf(file) + 1) + " / " + files.length + " 本目" : "");
     }
 
     clearFileInputs();
-    if(tooBigVideos.length && typeof openVideoLinkSheet === "function") openVideoLinkSheet(tooBigVideos[0].file, tooBigVideos[0].reason, tooBigVideos.length);
+    if(tooBigVideos.length && typeof openVideoLinkSheet === "function") openVideoLinkSheet(null, "", tooBigVideos);
 }
 
 function clearFileInputs(){
@@ -897,9 +899,10 @@ function getVideoDuration(file){
     });
 }
 
-async function uploadAndSend(file,kind,originalBytes){
+async function uploadAndSend(file,kind,originalBytes,nthLabel){
     const sizeLabel = formatAttachmentSize(file.size) + (originalBytes !== undefined && originalBytes !== file.size ? "（元 " + formatAttachmentSize(originalBytes) + "）" : "");
-    el.attachmentStatus.textContent = file.name + " ・ " + sizeLabel + " ・ アップロード中...";
+    const nthPrefix = nthLabel ? "[" + nthLabel + "] " : "";
+    el.attachmentStatus.textContent = nthPrefix + file.name + " ・ " + sizeLabel + " ・ アップロード中...";
     el.app.classList.add("loading");
 
     try{
@@ -908,11 +911,20 @@ async function uploadAndSend(file,kind,originalBytes){
         const ext = fileExt(file);
         const objectPath = state.currentRoom.id + "/" + state.user.id + "/" + crypto.randomUUID() + (ext ? "." + ext : "");
 
-        const uploadResult = await client.storage.from(STORAGE_BUCKET).upload(objectPath,file,{
+        // 動画は、進み具合と「あと何秒」を表示しながらアップロードする（chat-videolink.js）。ほかは今までどおり。
+        const plainUpload = () => client.storage.from(STORAGE_BUCKET).upload(objectPath,file,{
             cacheControl:"3600",
             contentType:resolveMime(file),
             upsert:false
         });
+        let uploadResult;
+        if(kind === "video" && typeof uploadVideoWithProgress === "function"){
+            uploadResult = await uploadVideoWithProgress(client,objectPath,file,resolveMime(file),(text) => { el.attachmentStatus.textContent = nthPrefix + file.name + " ・ " + sizeLabel + " ・ " + text; });
+            // 進み具合つきの送り方でうまくいかなかった（容量エラー以外）ときは、今までの送り方でもう一度試す
+            if(uploadResult.error && !(typeof videoLinkErrorIsSize === "function" && videoLinkErrorIsSize(uploadResult.error))) uploadResult = await plainUpload();
+        }else{
+            uploadResult = await plainUpload();
+        }
 
         if(uploadResult.error) throw uploadResult.error;
 
