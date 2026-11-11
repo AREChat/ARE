@@ -153,7 +153,7 @@ html,body{height:100%}
  .me-note{padding:0 16px}
  .mobile-back{display:inline-flex;align-items:center;min-height:44px;padding:8px 12px}
  .chat-header{min-height:60px;padding:calc(8px + env(safe-area-inset-top)) 12px 8px;gap:10px}
- #refreshMessagesButton{display:none}
+ #refreshMessagesButton{padding:6px 10px;min-height:36px;font-size:13px}
  .messages{padding:12px 10px;gap:10px}
  .message-row{max-width:90%}.message-row.own .message-avatar{display:none}
  .bubble{font-size:15px}

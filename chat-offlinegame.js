@@ -20,7 +20,19 @@
         el.innerHTML = '<span>' + (w === "off" ? "✈ 電波がないみたい…" : "📶 電波が弱いみたい…") + '</span><a href="' + URL + '" target="_blank" rel="noopener" data-lc-done="1">🎰 暇つぶしゲームで待つ</a><button type="button" aria-label="閉じる">✕</button>';
         el.querySelector("button").onclick = function(){ closed = true; if(el){ el.remove(); el = null; } };
         document.body.appendChild(el);
+        place();
     }
+    // 入力欄（ボタンが並ぶ段）の真上に置く。高さが変わる端末でも重ならないようにする
+    function place(){
+        if(!el) return;
+        var c = document.querySelector(".composer");
+        if(c && c.offsetParent !== null){
+            var r = c.getBoundingClientRect();
+            if(r.height > 0) el.style.bottom = Math.max(8, Math.round(window.innerHeight - r.top + 8)) + "px";
+        }
+    }
+    try{ var cc = document.querySelector(".composer"); if(cc && window.ResizeObserver) new ResizeObserver(place).observe(cc); }catch(_e){}
+    window.addEventListener("resize", place); window.addEventListener("orientationchange", place);
     window.addEventListener("offline", paint); window.addEventListener("online", paint);
     try{ if(navigator.connection && navigator.connection.addEventListener) navigator.connection.addEventListener("change", paint); }catch(_e){}
     if(document.readyState === "loading") document.addEventListener("DOMContentLoaded", paint); else paint();

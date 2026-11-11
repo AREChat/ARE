@@ -30,6 +30,9 @@
       var lg = base === "login.html";
       badge.textContent = lg ? (off ? "📶 ログインは Wi-Fi必須（ゲームは このまま OK）" : "📶 ログイン・チャットは Wi-Fi必須") : (off ? "📶 Wi-Fi必須（いま つながっていません）" : "📶 Wi-Fi必須");
       badge.style.background = off ? "#c62828" : "#ffb300"; badge.style.color = off ? "#fff" : "#2b1b00";
+      // チャット画面では、つながっているときは数秒で消す（上のボタンと重なるため）。つながらないときは出したままにする
+      clearTimeout(badge._t); badge.style.display = "";
+      if(base === "chat.html" && !off) badge._t = setTimeout(function(){ if(badge) badge.style.display = "none"; }, 5000);
     }else{
       badge.textContent = "✈ オフライン中（このまま あそべます）";
       badge.style.background = "#455a64"; badge.style.color = "#fff";
