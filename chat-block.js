@@ -33,7 +33,7 @@ function openBlockSheet(){
     const label = {none:"設定なし",mute:"ミュート中",block:"ブロック中"}[kind];
     openSheet('<h3 style="margin:0">' + escapeHtml(profileDisplayName(partner)) + ' さん</h3><div class="meta">現在：' + label + '</div>' +
         '<div class="admin-card"><b>ミュート</b><div class="meta">相手のメッセージを薄く表示します。送受信はできます。</div><div class="row"><button type="button" class="button-secondary" data-bl="mute">ミュートする</button></div></div>' +
-        '<div class="admin-card"><b>ブロック</b><div class="meta">このチャットで、お互いにメッセージを送れなくなります。相手には「送れません」とだけ表示されます。解除すればまた送れます。なお、運営管理者は安全管理のため会話を閲覧できます。</div><div class="row"><button type="button" class="button-danger" data-bl="block">ブロックする</button></div></div>' +
+        '<div class="admin-card"><b>ブロック</b><div class="meta">このチャットで、お互いにメッセージを送れなくなります。相手には「送れません」とだけ表示されます。解除すればまた送れます。</div><div class="row"><button type="button" class="button-danger" data-bl="block">ブロックする</button></div></div>' +
         (kind !== "none" ? '<div class="row"><button type="button" class="button" data-bl="none">解除する</button></div>' : '') +
         '<div class="row"><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
 }
