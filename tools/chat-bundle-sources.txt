@@ -83,6 +83,7 @@ chat-timer.js
 chat-calc.js
 chat-zip.js
 chat-filetools.js
+chat-moreorg.js
 chat-shop.js
 chat-lock.js
 chat-admin2.js

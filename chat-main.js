@@ -219,7 +219,8 @@ const FEATURES = [
     ["geo","場所つきメッセージ",initGeo],
     ["sched","予定提案",function(){}],
     ["archive","ストーリーのアーカイブ",() => {}],
-    ["quick","ショートカット・その他の検索・フォロー一覧",initQuick]
+    ["quick","ショートカット・その他の検索・フォロー一覧",initQuick],
+    ["moreorg","その他の分類・お気に入り・最近",initMoreOrg]
 ];
 
 function startFeatures(){
