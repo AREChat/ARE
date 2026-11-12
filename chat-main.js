@@ -60,10 +60,10 @@ function initPosts(){
     });
     el.postVideo.addEventListener("change",() => {
         const file = el.postVideo.files[0] || null;
-        if(file && !String(file.type).startsWith("video/")){ showToast("動画ファイルを選択してください。"); el.postVideo.value = ""; return; }
+        if(file && !String(file.type).startsWith("video/") && !isPostPdfFile(file)){ showToast("動画またはPDFのファイルを選択してください。"); el.postVideo.value = ""; return; }
         feat.postVideoFile = file;
         if(file){ feat.postImageFile = null; el.postImage.value = ""; }
-        el.postImageName.textContent = file ? "🎬 " + file.name + "（" + formatAttachmentSize(file.size) + "）" : "";
+        el.postImageName.textContent = file ? (isPostPdfFile(file) ? "📄 " : "🎬 ") + file.name + "（" + formatAttachmentSize(file.size) + "）" : "";
     });
     registerTool("pvlink",onPostVideoLinkAction);
 }

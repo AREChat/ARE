@@ -59,7 +59,7 @@
                 <div class="section-heading"><h2>📷 投稿</h2><select id="postFilter" data-feature="posts" class="status-select" aria-label="表示する投稿"><option value="all">すべて</option><option value="following">フォロー中</option></select><button class="button-secondary" id="postsRefresh" data-feature="posts" type="button">更新</button></div>
                 <div class="post-composer">
                     <textarea id="postBody" maxlength="500" rows="2" placeholder="いまどうしてる？（500文字まで）"></textarea>
-                    <div class="post-tools"><label class="tool-button">🖼️ 写真<input class="file-input" id="postImage" type="file" accept="image/*"></label><label class="tool-button">🎬 動画<input class="file-input" id="postVideo" type="file" accept="video/*"></label><span id="postImageName" class="meta"></span><label class="post-visibility-label">公開範囲<select id="postVisibility" aria-label="投稿の公開範囲"><option value="public">全体公開</option><option value="followers">フォロワーのみ</option><option value="private">自分のみ</option></select></label><button class="button" id="postSubmit" data-feature="posts" type="button">投稿する</button></div>
+                    <div class="post-tools"><label class="tool-button">🖼️ 写真<input class="file-input" id="postImage" type="file" accept="image/*"></label><label class="tool-button">🎬 動画・PDF<input class="file-input" id="postVideo" type="file" accept="video/*,application/pdf,.pdf"></label><span id="postImageName" class="meta"></span><label class="post-visibility-label">公開範囲<select id="postVisibility" aria-label="投稿の公開範囲"><option value="public">全体公開</option><option value="followers">フォロワーのみ</option><option value="private">自分のみ</option></select></label><button class="button" id="postSubmit" data-feature="posts" type="button">投稿する</button></div>
                 </div>
                 <div id="postFeed" class="post-feed"><div class="empty-list">読み込み中...</div></div>
                 <button class="button-secondary post-more" id="postMore" type="button" hidden>さらに読み込む</button>
@@ -156,7 +156,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=06de16d218"></script>
+<script defer src="./chat.bundle.js?v=3b71b0ded3"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

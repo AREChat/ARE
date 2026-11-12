@@ -69,13 +69,23 @@ function renderPosts(){
         return '<article class="post"><div class="post-head">' + miniAvatar(author) +
             '<div><button class="post-name" type="button" data-author="' + escapeHtml(post.author_id) + '">' + escapeHtml(profileDisplayName(author)) + '</button><div class="post-time">' + escapeHtml(formatDateTime(post.created_at)) + (own ? ' ・' + visibility : '') + '</div></div></div>' +
             (post.body ? '<div class="post-body">' + linkifyPostBody(post.body) + '</div>' : '') +
-            (img ? (isPostVideoPath(post.image_path) ? '<video class="post-video" controls playsinline preload="metadata" src="' + escapeHtml(img) + '"></video>' : '<a href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer"><img class="post-img" src="' + escapeHtml(img) + '" alt="投稿画像" loading="lazy"></a>') : '') +
+            (img ? (isPostPdfPath(post.image_path) ? '<a class="post-pdf" href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer">📄 <b>' + escapeHtml(postPdfName(post.image_path)) + '</b><span>PDFを開く</span></a>' : isPostVideoPath(post.image_path) ? '<video class="post-video" controls playsinline preload="metadata" src="' + escapeHtml(img) + '"></video>' : '<a href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer"><img class="post-img" src="' + escapeHtml(img) + '" alt="投稿画像" loading="lazy"></a>') : '') +
             '<div class="post-reactions">' + ["👍","❤️","😂","😮","😢","🎉"].map((emoji) => '<button type="button" class="post-reaction' + (social.mine === emoji ? ' on' : '') + '" data-reaction="' + emoji + '" data-post="' + escapeHtml(post.id) + '" aria-pressed="' + (social.mine === emoji) + '">' + emoji + '<span>' + (social.counts[emoji] || 0) + '</span></button>').join("") + '<button type="button" class="post-comment-toggle" data-comment-toggle="' + escapeHtml(post.id) + '">💬 ' + comments.length + '</button></div>' +
             (feat.commentOpen.has(post.id) ? '<div class="post-comments">' + visibleComments.map((comment) => '<div class="post-comment">' + miniAvatar(feat.commentProfiles.get(comment.author_id)) + '<div><button class="post-name" type="button" data-comment-author="' + escapeHtml(comment.author_id) + '">' + escapeHtml(profileDisplayName(feat.commentProfiles.get(comment.author_id))) + '</button> <span class="post-time">' + escapeHtml(formatDateTime(comment.created_at)) + '</span><div>' + escapeHtml(comment.body) + '</div></div>' + (comment.author_id === state.user.id ? '<button type="button" class="post-comment-delete" data-comment-delete="' + escapeHtml(comment.id) + '" aria-label="コメントを削除">×</button>' : '') + '</div>').join("") + (comments.length > 3 ? '<div class="meta">新しいコメント3件を表示しています</div>' : '') + '<div class="post-comment-compose"><textarea rows="2" maxlength="500" data-comment-input="' + escapeHtml(post.id) + '" placeholder="コメントを入力（500文字まで）"></textarea><button type="button" class="button-secondary" data-comment-post="' + escapeHtml(post.id) + '">送信</button></div></div>' : '') +
             '<div class="post-actions">' + (post.visibility !== "private" ? '<button type="button" data-postshare="' + escapeHtml(post.id) + '">🔗 共有</button>' : '') + (own ? '<button type="button" data-postdel="' + escapeHtml(post.id) + '">削除</button>' : (feat.isAdmin ? '<button type="button" data-postadmin="' + escapeHtml(post.id) + '">管理者として削除</button>' : '')) + '</div></article>';
     }).join("");
 }
 
+function isPostPdfPath(path){ return /\.pdf$/i.test(String(path || "")); }
+function isPostPdfFile(file){ return !!file && (file.type === "application/pdf" || /\.pdf$/i.test(String(file.name || ""))); }
+function postPdfName(path){
+    const base = String(path || "").split("/").pop().replace(/\.pdf$/i,"");
+    const m = base.match(/^[0-9a-f-]{36}-(.+)$/i);
+    return (m ? m[1] : "PDF") + ".pdf";
+}
+function postPdfSafeName(file){
+    return String(file.name || "").replace(/\.pdf$/i,"").normalize("NFKD").replace(/[^A-Za-z0-9_-]+/g,"-").replace(/^-+|-+$/g,"").slice(0,30) || "file";
+}
 function isPostVideoPath(path){ return /\.(mp4|m4v|mov|webm)$/i.test(String(path || "")); }
 
 /** 投稿の文章の中の https:// を、押せるリンクにする（先に全体をエスケープしてから変換するので、HTMLは入りこめない） */
@@ -100,12 +110,12 @@ function rememberPostVideoRejected(bytes){
 }
 
 function refreshPostAttachName(){
-    el.postImageName.textContent = feat.postVideoFile ? "🎬 " + feat.postVideoFile.name + "（" + formatAttachmentSize(feat.postVideoFile.size) + "）" : (feat.postImageFile ? feat.postImageFile.name : "");
+    el.postImageName.textContent = feat.postVideoFile ? (isPostPdfFile(feat.postVideoFile) ? "📄 " : "🎬 ") + feat.postVideoFile.name + "（" + formatAttachmentSize(feat.postVideoFile.size) + "）" : (feat.postImageFile ? feat.postImageFile.name : "");
 }
 
 // 保存場所（post-images）が動画の種類を受けつけない設定のとき：1時間のあいだは、アップロードを試さずに すぐリンク投稿にする
 const POST_VIDEO_MIME_KEY = "are_post_video_mime_block";
-function postVideoMimeBlocked(){ try{ return Date.now() - (Number(localStorage.getItem(POST_VIDEO_MIME_KEY)) || 0) < 3600000; }catch(_e){ return false; } }
+function postVideoMimeBlocked(kind){ try{ return Date.now() - (Number(localStorage.getItem(POST_VIDEO_MIME_KEY + (kind === "pdf" ? "_pdf" : ""))) || 0) < 3600000; }catch(_e){ return false; } }
 function postVideoErrorIsMime(error){ return /mime type|not supported|invalid_mime|unsupported/i.test(String((error && (error.message || error.error)) || error || "")); }
 
 function clearPostAttachments(){
@@ -125,16 +135,19 @@ async function submitPost(extra){
     try{
         if(video){
             if(video.size > postVideoLimitBytes()){ openPostVideoLinkSheet(video,"size"); return; }
-            if(postVideoMimeBlocked()){ openPostVideoLinkSheet(video,"upload"); return; }
-            let duration = 0;
-            try{ duration = await getVideoDuration(video); }catch(_e){ showToast("この動画は読み込めませんでした。別の動画を選んでください。"); return; }
-            if(duration > MAX_VIDEO_SECONDS){ openPostVideoLinkSheet(video,"long"); return; }
-            const ext = (fileExt(video) || "mp4").replace(/[^a-z0-9]/gi,"").toLowerCase() || "mp4";
-            const path = state.user.id + "/" + crypto.randomUUID() + "." + ext;
-            const up = await uploadVideoWithProgress(client,path,video,resolveMime(video),(text) => { el.postImageName.textContent = "🎬 " + text; },"post-images");
+            const isPdf = isPostPdfFile(video);
+            if(postVideoMimeBlocked(isPdf ? "pdf" : "video")){ openPostVideoLinkSheet(video,"upload"); return; }
+            if(!isPdf){
+                let duration = 0;
+                try{ duration = await getVideoDuration(video); }catch(_e){ showToast("この動画は読み込めませんでした。別の動画を選んでください。"); return; }
+                if(duration > MAX_VIDEO_SECONDS){ openPostVideoLinkSheet(video,"long"); return; }
+            }
+            const ext = isPdf ? "pdf" : ((fileExt(video) || "mp4").replace(/[^a-z0-9]/gi,"").toLowerCase() || "mp4");
+            const path = state.user.id + "/" + crypto.randomUUID() + (isPdf ? "-" + postPdfSafeName(video) : "") + "." + ext;
+            const up = await uploadVideoWithProgress(client,path,video,isPdf ? "application/pdf" : resolveMime(video),(text) => { el.postImageName.textContent = "🎬 " + text; },"post-images");
             if(up.error){
                 if(videoLinkErrorIsSize(up.error)){ rememberPostVideoRejected(video.size); openPostVideoLinkSheet(video,"upload"); return; }
-                if(postVideoErrorIsMime(up.error)){ try{ localStorage.setItem(POST_VIDEO_MIME_KEY,String(Date.now())); }catch(_e){} openPostVideoLinkSheet(video,"upload"); return; }
+                if(postVideoErrorIsMime(up.error)){ try{ localStorage.setItem(POST_VIDEO_MIME_KEY + (isPdf ? "_pdf" : ""),String(Date.now())); }catch(_e){} openPostVideoLinkSheet(video,"upload"); return; }
                 throw up.error;
             }
             uploaded = path;
@@ -162,9 +175,10 @@ async function submitPost(extra){
 
 /** 動画が大きすぎるとき：YouTube・ドライブなどに置いた動画の https:// リンクを、投稿の文章に入れて投稿する */
 function openPostVideoLinkSheet(file,reason){
-    const why = reason === "long" ? "5分をこえているため" : reason === "upload" ? "保存場所がいっぱい（または動画を受けつけない）ため" : "大きすぎて（" + formatAttachmentSize(postVideoLimitBytes()) + "をこえるため）";
-    openSheet(toolHead("🎬 動画をリンクで投稿","「" + escapeHtml(String(file.name || "動画").slice(0,60)) + "」は、" + why + "そのまま投稿できません。") +
-        '<div class="meta">YouTube（限定公開）・Googleドライブ・OneDrive などに動画を置いて、その <b>https:// のリンク</b> を貼ってください。投稿の文章のあとに、押して開けるリンクとして入ります。</div>' +
+    const why = reason === "long" ? "5分をこえているため" : reason === "upload" ? "保存場所がいっぱい（またはこの種類を受けつけない）ため" : "大きすぎて（" + formatAttachmentSize(postVideoLimitBytes()) + "をこえるため）";
+    const pdf = isPostPdfFile(file);
+    openSheet(toolHead(pdf ? "📄 PDFをリンクで投稿" : "🎬 動画をリンクで投稿","「" + escapeHtml(String(file.name || (pdf ? "PDF" : "動画")).slice(0,60)) + "」は、" + why + "そのまま投稿できません。") +
+        '<div class="meta">' + (pdf ? "Googleドライブ・OneDrive などにPDFを置いて" : "YouTube（限定公開）・Googleドライブ・OneDrive などに動画を置いて") + ', その <b>https:// のリンク</b> を貼ってください。投稿の文章のあとに、押して開けるリンクとして入ります。</div>' +
         '<label for="pvUrl">動画のリンク（https://）</label><input id="pvUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://…">' +
         '<div class="row"><button type="button" class="button-secondary" data-pm="close">やめる</button><button type="button" class="button" data-t="pvlink:send">リンクで投稿する</button></div>');
     setTimeout(() => { const i = document.getElementById("pvUrl"); if(i) i.focus(); },50);
@@ -178,7 +192,7 @@ async function onPostVideoLinkAction(action){
     if(!url || !/^https:\/\//i.test(raw)){ showToast("https:// で始まるリンクを入れてください。"); return; }
     const name = feat.postVideoFile ? String(feat.postVideoFile.name || "").slice(0,40) : "";
     closeSheet();
-    await submitPost("🎬 動画" + (name ? "（" + name + "）" : "") + "\n" + url);
+    await submitPost((isPostPdfFile(feat.postVideoFile) ? "📄 PDF" : "🎬 動画") + (name ? "（" + name + "）" : "") + "\n" + url);
 }
 
 async function onFeedClick(event){

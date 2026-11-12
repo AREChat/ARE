@@ -12,6 +12,7 @@ async function checkAdmin(){
     try{ const result = await requireClient().rpc("is_current_user_admin"); feat.isAdmin = result.data === true; }
     catch(_e){ feat.isAdmin = false; }
     el.adminTabButton.hidden = !feat.isAdmin;
+    { const rr = el.readReceiptToggle && el.readReceiptToggle.closest("label"); if(rr) rr.style.display = feat.isAdmin ? "none" : ""; }   // 管理者は「既読を相手に表示する」設定なし：管理者の既読は 相手に出ず（送信済みのまま）、管理者には 常に既読が見える
     try{ if(state.allRooms){ state.rooms = state.allRooms.filter((room) => !room.orphan || feat.isAdmin); renderRooms(); } }catch(_e){}   // 管理者かどうかが分かったら、一覧を作り直す（削除ずみユーザーのチャットの 表示・非表示）
     // 管理者アカウントなのに TOTP（追加認証）がまだ → 管理者機能は ふさがれている。案内を出して 認証の画面へ つなぐ
     if(!feat.isAdmin){
