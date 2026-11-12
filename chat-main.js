@@ -55,8 +55,17 @@ function initPosts(){
     el.postFeed.addEventListener("click",onFeedClick);
     el.postImage.addEventListener("change",() => {
         feat.postImageFile = el.postImage.files[0] || null;
+        if(feat.postImageFile){ feat.postVideoFile = null; el.postVideo.value = ""; }
         el.postImageName.textContent = feat.postImageFile ? feat.postImageFile.name : "";
     });
+    el.postVideo.addEventListener("change",() => {
+        const file = el.postVideo.files[0] || null;
+        if(file && !String(file.type).startsWith("video/")){ showToast("動画ファイルを選択してください。"); el.postVideo.value = ""; return; }
+        feat.postVideoFile = file;
+        if(file){ feat.postImageFile = null; el.postImage.value = ""; }
+        el.postImageName.textContent = file ? "🎬 " + file.name + "（" + formatAttachmentSize(file.size) + "）" : "";
+    });
+    registerTool("pvlink",onPostVideoLinkAction);
 }
 
 function initFollow(){

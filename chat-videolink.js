@@ -78,7 +78,7 @@ function videoWaitLabel(sec){
 
 /** 動画をアップロードする。進み具合（％）と、のこり時間の目安を onText(文字) で知らせる。
  *  成功は {error:null}、失敗は {error:{message,statusCode}}（supabase-js の upload と同じ形）で返す。 */
-function uploadVideoWithProgress(client, path, file, mime, onText){
+function uploadVideoWithProgress(client, path, file, mime, onText, bucket){
     return new Promise((resolve) => {
         (async () => {
             try{
@@ -86,7 +86,7 @@ function uploadVideoWithProgress(client, path, file, mime, onText){
                 const token = sess && sess.data && sess.data.session && sess.data.session.access_token;
                 const cfg = window.ARE_CONFIG || {};
                 if(!token || !cfg.supabaseUrl) throw new Error("ログインの確認ができませんでした。");
-                const url = cfg.supabaseUrl + "/storage/v1/object/" + STORAGE_BUCKET + "/" + path.split("/").map(encodeURIComponent).join("/");
+                const url = cfg.supabaseUrl + "/storage/v1/object/" + (bucket || STORAGE_BUCKET) + "/" + path.split("/").map(encodeURIComponent).join("/");
                 const xhr = new XMLHttpRequest();
                 const t0 = Date.now();
                 xhr.open("POST", url);

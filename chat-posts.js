@@ -1,6 +1,6 @@
 "use strict";
 
-feat.posts = []; feat.postProfiles = new Map(); feat.postImageFile = null; feat.postsLoadedAt = 0; feat.postReactions = new Map(); feat.postComments = new Map(); feat.commentProfiles = new Map(); feat.commentOpen = new Set();
+feat.posts = []; feat.postProfiles = new Map(); feat.postImageFile = null; feat.postVideoFile = null; feat.postsLoadedAt = 0; feat.postReactions = new Map(); feat.postComments = new Map(); feat.commentProfiles = new Map(); feat.commentOpen = new Set();
 
 async function loadPosts(reset){
     const client = requireClient();
@@ -68,23 +68,77 @@ function renderPosts(){
         const visibility = {public:"🌐 全体公開",followers:"👥 フォロワーのみ",private:"🔒 自分のみ"}[post.visibility] || "🌐 全体公開";
         return '<article class="post"><div class="post-head">' + miniAvatar(author) +
             '<div><button class="post-name" type="button" data-author="' + escapeHtml(post.author_id) + '">' + escapeHtml(profileDisplayName(author)) + '</button><div class="post-time">' + escapeHtml(formatDateTime(post.created_at)) + (own ? ' ・' + visibility : '') + '</div></div></div>' +
-            (post.body ? '<div class="post-body">' + escapeHtml(post.body) + '</div>' : '') +
-            (img ? '<a href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer"><img class="post-img" src="' + escapeHtml(img) + '" alt="投稿画像" loading="lazy"></a>' : '') +
+            (post.body ? '<div class="post-body">' + linkifyPostBody(post.body) + '</div>' : '') +
+            (img ? (isPostVideoPath(post.image_path) ? '<video class="post-video" controls playsinline preload="metadata" src="' + escapeHtml(img) + '"></video>' : '<a href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer"><img class="post-img" src="' + escapeHtml(img) + '" alt="投稿画像" loading="lazy"></a>') : '') +
             '<div class="post-reactions">' + ["👍","❤️","😂","😮","😢","🎉"].map((emoji) => '<button type="button" class="post-reaction' + (social.mine === emoji ? ' on' : '') + '" data-reaction="' + emoji + '" data-post="' + escapeHtml(post.id) + '" aria-pressed="' + (social.mine === emoji) + '">' + emoji + '<span>' + (social.counts[emoji] || 0) + '</span></button>').join("") + '<button type="button" class="post-comment-toggle" data-comment-toggle="' + escapeHtml(post.id) + '">💬 ' + comments.length + '</button></div>' +
             (feat.commentOpen.has(post.id) ? '<div class="post-comments">' + visibleComments.map((comment) => '<div class="post-comment">' + miniAvatar(feat.commentProfiles.get(comment.author_id)) + '<div><button class="post-name" type="button" data-comment-author="' + escapeHtml(comment.author_id) + '">' + escapeHtml(profileDisplayName(feat.commentProfiles.get(comment.author_id))) + '</button> <span class="post-time">' + escapeHtml(formatDateTime(comment.created_at)) + '</span><div>' + escapeHtml(comment.body) + '</div></div>' + (comment.author_id === state.user.id ? '<button type="button" class="post-comment-delete" data-comment-delete="' + escapeHtml(comment.id) + '" aria-label="コメントを削除">×</button>' : '') + '</div>').join("") + (comments.length > 3 ? '<div class="meta">新しいコメント3件を表示しています</div>' : '') + '<div class="post-comment-compose"><textarea rows="2" maxlength="500" data-comment-input="' + escapeHtml(post.id) + '" placeholder="コメントを入力（500文字まで）"></textarea><button type="button" class="button-secondary" data-comment-post="' + escapeHtml(post.id) + '">送信</button></div></div>' : '') +
             '<div class="post-actions">' + (post.visibility !== "private" ? '<button type="button" data-postshare="' + escapeHtml(post.id) + '">🔗 共有</button>' : '') + (own ? '<button type="button" data-postdel="' + escapeHtml(post.id) + '">削除</button>' : (feat.isAdmin ? '<button type="button" data-postadmin="' + escapeHtml(post.id) + '">管理者として削除</button>' : '')) + '</div></article>';
     }).join("");
 }
 
-async function submitPost(){
-    const body = el.postBody.value;
-    if(!body.trim() && !feat.postImageFile){ showToast("投稿の内容か写真を入力してください。"); return; }
-    if(Array.from(body).length > 500){ showToast("投稿は500文字以内で入力してください。"); return; }
+function isPostVideoPath(path){ return /\.(mp4|m4v|mov|webm)$/i.test(String(path || "")); }
+
+/** 投稿の文章の中の https:// を、押せるリンクにする（先に全体をエスケープしてから変換するので、HTMLは入りこめない） */
+function linkifyPostBody(text){
+    return escapeHtml(text).replace(/https:\/\/[^\s<>"']+/g,(raw) => {
+        const trail = (raw.match(/[.,;:!?)\]、。）」]+$/) || [""])[0];
+        const url = raw.slice(0,raw.length - trail.length);
+        const safe = safeHttpUrl(url.replace(/&amp;/g,"&"));
+        return safe ? '<a href="' + escapeHtml(safe) + '" target="_blank" rel="noopener noreferrer">' + url + '</a>' + trail : raw;
+    });
+}
+
+// 投稿の動画：50MB・5分までは そのまま投稿。大きすぎる／長すぎる／保存場所が容量でことわった動画は、リンクにして投稿する。
+const POST_VIDEO_LIMIT_KEY = "are_post_video_limit";
+function postVideoLimitBytes(){
+    let learned = 0;
+    try{ learned = Number(localStorage.getItem(POST_VIDEO_LIMIT_KEY)) || 0; }catch(_e){}
+    return learned > 0 ? Math.min(MAX_VIDEO_BYTES,learned) : MAX_VIDEO_BYTES;
+}
+function rememberPostVideoRejected(bytes){
+    try{ const cur = Number(localStorage.getItem(POST_VIDEO_LIMIT_KEY)) || Infinity; localStorage.setItem(POST_VIDEO_LIMIT_KEY,String(Math.min(cur,Math.max(1,bytes - 1)))); }catch(_e){}
+}
+
+function refreshPostAttachName(){
+    el.postImageName.textContent = feat.postVideoFile ? "🎬 " + feat.postVideoFile.name + "（" + formatAttachmentSize(feat.postVideoFile.size) + "）" : (feat.postImageFile ? feat.postImageFile.name : "");
+}
+
+// 保存場所（post-images）が動画の種類を受けつけない設定のとき：1時間のあいだは、アップロードを試さずに すぐリンク投稿にする
+const POST_VIDEO_MIME_KEY = "are_post_video_mime_block";
+function postVideoMimeBlocked(){ try{ return Date.now() - (Number(localStorage.getItem(POST_VIDEO_MIME_KEY)) || 0) < 3600000; }catch(_e){ return false; } }
+function postVideoErrorIsMime(error){ return /mime type|not supported|invalid_mime|unsupported/i.test(String((error && (error.message || error.error)) || error || "")); }
+
+function clearPostAttachments(){
+    el.postBody.value = ""; el.postImage.value = ""; el.postVideo.value = ""; feat.postImageFile = null; feat.postVideoFile = null; el.postImageName.textContent = "";
+}
+
+async function submitPost(extra){
+    const linkText = typeof extra === "string" ? extra : "";
+    let body = el.postBody.value;
+    if(linkText) body = (body.trim() ? body.replace(/\s+$/,"") + "\n" : "") + linkText;
+    const video = linkText ? null : feat.postVideoFile;
+    if(!body.trim() && !feat.postImageFile && !video){ showToast("投稿の内容か写真・動画を入力してください。"); return; }
+    if(Array.from(body).length > 500){ showToast(linkText ? "文章とリンクをあわせて500文字以内にしてください。" : "投稿は500文字以内で入力してください。"); return; }
     el.postSubmit.disabled = true;
     const client = requireClient();
     let uploaded = null;
     try{
-        if(feat.postImageFile){
+        if(video){
+            if(video.size > postVideoLimitBytes()){ openPostVideoLinkSheet(video,"size"); return; }
+            if(postVideoMimeBlocked()){ openPostVideoLinkSheet(video,"upload"); return; }
+            let duration = 0;
+            try{ duration = await getVideoDuration(video); }catch(_e){ showToast("この動画は読み込めませんでした。別の動画を選んでください。"); return; }
+            if(duration > MAX_VIDEO_SECONDS){ openPostVideoLinkSheet(video,"long"); return; }
+            const ext = (fileExt(video) || "mp4").replace(/[^a-z0-9]/gi,"").toLowerCase() || "mp4";
+            const path = state.user.id + "/" + crypto.randomUUID() + "." + ext;
+            const up = await uploadVideoWithProgress(client,path,video,resolveMime(video),(text) => { el.postImageName.textContent = "🎬 " + text; },"post-images");
+            if(up.error){
+                if(videoLinkErrorIsSize(up.error)){ rememberPostVideoRejected(video.size); openPostVideoLinkSheet(video,"upload"); return; }
+                if(postVideoErrorIsMime(up.error)){ try{ localStorage.setItem(POST_VIDEO_MIME_KEY,String(Date.now())); }catch(_e){} openPostVideoLinkSheet(video,"upload"); return; }
+                throw up.error;
+            }
+            uploaded = path;
+        }else if(feat.postImageFile){
             const blob = await resizeImage(feat.postImageFile,1280,0.85);
             uploaded = state.user.id + "/" + crypto.randomUUID() + ".jpg";
             const up = await client.storage.from("post-images").upload(uploaded,blob,{contentType:"image/jpeg",upsert:false});
@@ -92,14 +146,39 @@ async function submitPost(){
         }
         const visibility = document.getElementById("postVisibility")?.value || "public";
         const result = await client.rpc("create_post_with_visibility",{p_body:body,p_image_path:uploaded,p_visibility:visibility});
-        if(result.error) throw result.error;
-        el.postBody.value = ""; el.postImage.value = ""; feat.postImageFile = null; el.postImageName.textContent = "";
+        if(result.error){
+            // 保存場所は受けとったのに、投稿の登録でことわられた動画は、リンクで投稿するよう案内する
+            if(video && uploaded){ client.storage.from("post-images").remove([uploaded]); uploaded = null; openPostVideoLinkSheet(video,"upload"); return; }
+            throw result.error;
+        }
+        clearPostAttachments();
         showToast("投稿しました。");
         await loadPosts(true);
     }catch(error){
         if(uploaded) client.storage.from("post-images").remove([uploaded]);
         showToast(featError(error));
-    }finally{ el.postSubmit.disabled = false; }
+    }finally{ el.postSubmit.disabled = false; refreshPostAttachName(); }
+}
+
+/** 動画が大きすぎるとき：YouTube・ドライブなどに置いた動画の https:// リンクを、投稿の文章に入れて投稿する */
+function openPostVideoLinkSheet(file,reason){
+    const why = reason === "long" ? "5分をこえているため" : reason === "upload" ? "保存場所がいっぱい（または動画を受けつけない）ため" : "大きすぎて（" + formatAttachmentSize(postVideoLimitBytes()) + "をこえるため）";
+    openSheet(toolHead("🎬 動画をリンクで投稿","「" + escapeHtml(String(file.name || "動画").slice(0,60)) + "」は、" + why + "そのまま投稿できません。") +
+        '<div class="meta">YouTube（限定公開）・Googleドライブ・OneDrive などに動画を置いて、その <b>https:// のリンク</b> を貼ってください。投稿の文章のあとに、押して開けるリンクとして入ります。</div>' +
+        '<label for="pvUrl">動画のリンク（https://）</label><input id="pvUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://…">' +
+        '<div class="row"><button type="button" class="button-secondary" data-pm="close">やめる</button><button type="button" class="button" data-t="pvlink:send">リンクで投稿する</button></div>');
+    setTimeout(() => { const i = document.getElementById("pvUrl"); if(i) i.focus(); },50);
+}
+
+async function onPostVideoLinkAction(action){
+    if(action !== "send") return;
+    const raw = String((document.getElementById("pvUrl") || {}).value || "").trim();
+    if(!raw){ showToast("動画のリンクを貼ってください。"); return; }
+    const url = safeHttpUrl(raw);
+    if(!url || !/^https:\/\//i.test(raw)){ showToast("https:// で始まるリンクを入れてください。"); return; }
+    const name = feat.postVideoFile ? String(feat.postVideoFile.name || "").slice(0,40) : "";
+    closeSheet();
+    await submitPost("🎬 動画" + (name ? "（" + name + "）" : "") + "\n" + url);
 }
 
 async function onFeedClick(event){

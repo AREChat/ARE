@@ -100,7 +100,7 @@ function cacheElements(){
         "refreshUsersButton","userSearch","recommendedUsers","refreshRoomsButton",
         "roomList","backButton","chatAvatar","chatTitle","chatSubtitle",
         "refreshMessagesButton","pageStatus","messages","imageInput","fileInput",
-        "videoInput","attachmentStatus","messageInput","sendButton","charCount","toast","delCard","delStatus","delRequestButton","delCancelButton","newGroupButton","exportOldButton","exportAllButton","postFilter","toggleHiddenUsers","postBody","postImage","postImageName","postSubmit","postFeed","postMore","postsRefresh","profileText","profileEditButton","profileModal","profileSheet","sidebar","rail","readReceiptToggle","securityBanner","myStatus","scheduleButton","schedulePanel","scheduleAt","scheduleSubmit","scheduleList","scheduleClose","adminTabButton","adminBadge","adminPanel","adminBody","adminClose"
+        "videoInput","attachmentStatus","messageInput","sendButton","charCount","toast","delCard","delStatus","delRequestButton","delCancelButton","newGroupButton","exportOldButton","exportAllButton","postFilter","postVideo","toggleHiddenUsers","postBody","postImage","postImageName","postSubmit","postFeed","postMore","postsRefresh","profileText","profileEditButton","profileModal","profileSheet","sidebar","rail","readReceiptToggle","securityBanner","myStatus","scheduleButton","schedulePanel","scheduleAt","scheduleSubmit","scheduleList","scheduleClose","adminTabButton","adminBadge","adminPanel","adminBody","adminClose"
     ].forEach((id) => el[id] = $(id));
 }
 

@@ -102,7 +102,7 @@ chatbot.txt           チャットボットの回答データ（自由に編集�
 
 1. **接続先**：`apikey.js` に、プロジェクトの URL と公開キー（`sb_publishable_…`）を書く。`service_role` キーは**絶対に書かない**。
 2. **データベース**：テーブル・関数・保護ルール（RLS）は、Supabase の「Database → Migrations」に順番に記録されています。別のプロジェクトへ移すときは、その順に実行してください。
-3. **Storage**（保存場所）：`chat-attachments`（非公開・50MB）、`post-images`（非公開・5MB）、`avatars`（公開・2MB）。
+3. **Storage**（保存場所）：`chat-attachments`（非公開・50MB）、`post-images`（非公開・5MB。動画を受けるときは sql/post_video_v1.sql で50MBに）、`avatars`（公開・2MB）。
 4. **Edge Functions**：`register-user`、`login-user`、`recover-account`、`admin-api`、`admin-delete-user`、`admin-manage-user`。
 5. **自動送信（予約送信）**：拡張機能 `pg_cron` を有効にし、毎分 `deliver_due_scheduled_messages()` を実行するジョブを登録。
 6. **Authentication**：メールの確認や新規登録の設定は、プロジェクトの方針に合わせて確認。パスワードの強さの設定にも、同じ条件（8文字以上・大文字・小文字・数字か記号）を入れておくと二重に守れます。
