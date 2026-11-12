@@ -3,7 +3,8 @@
 // ・検索バーの下に、カテゴリのボタンを並べます（すべて・★お気に入り・🕘最近・ファイル・くらし…）。
 // ・各カードの右上の ☆ を押すと お気に入り（★）。お気に入りは、「すべて」でも 上にならびます。
 // ・「🕘最近」は、最近ひらいた機能を 新しい順に出します。
-// ・お気に入りと最近は、この端末の中にだけ 保存します（ユーザーごと）。
+// ・お気に入りと最近は、この端末に保存し、さらにクラウド（user_prefs）にも保存します。スマホとパソコンで 同じになります。
+// ・クラウドの表が まだ無い／オフラインのときは、端末だけで ふつうに動きます。
 
 const MO_CATS = [
     ["file", "📁 ファイル", ["zip", "imgc", "img2pdf", "pdftool", "exifclean", "hashtool", "renametool", "textfix", "csvtool", "vframe", "splittool", "ocr"]],
@@ -22,7 +23,40 @@ function moLoad(){
     try{ mo.recent = JSON.parse(localStorage.getItem(moKey("recent")) || "[]"); }catch(_e){ mo.recent = []; }
     if(!Array.isArray(mo.favs)) mo.favs = []; if(!Array.isArray(mo.recent)) mo.recent = [];
 }
-function moSave(){ try{ localStorage.setItem(moKey("fav"), JSON.stringify(mo.favs)); localStorage.setItem(moKey("recent"), JSON.stringify(mo.recent)); }catch(_e){ /* 保存できなくても使える */ } }
+function moSave(){
+    mo.t = Date.now();
+    try{ localStorage.setItem(moKey("fav"), JSON.stringify(mo.favs)); localStorage.setItem(moKey("recent"), JSON.stringify(mo.recent)); localStorage.setItem(moKey("t"), String(mo.t)); }catch(_e){ /* 保存できなくても使える */ }
+    moCloudPush();
+}
+// ---- クラウド同期（新しく書いた方が勝つ） ----
+let moPushTimer = 0, moCloudOff = false;
+function moCloudPush(){
+    if(moCloudOff || !state || !state.user) return;
+    clearTimeout(moPushTimer);
+    moPushTimer = setTimeout(async () => {
+        try{
+            const r = await requireClient().from("user_prefs").upsert({user_id: state.user.id, key: "more", value: {favs: mo.favs, recent: mo.recent, t: mo.t || Date.now()}, updated_at: new Date().toISOString()}, {onConflict: "user_id,key"});
+            if(r.error) moCloudOff = true;
+        }catch(_e){ /* オフラインなど。次の保存でまた試す */ }
+    }, 800);
+}
+async function moCloudPull(){
+    if(moCloudOff || !state || !state.user) return;
+    try{
+        const r = await requireClient().from("user_prefs").select("value").eq("user_id", state.user.id).eq("key", "more").maybeSingle();
+        if(r.error){ moCloudOff = true; return; }
+        const v = r.data && r.data.value;
+        let localT = 0; try{ localT = Number(localStorage.getItem(moKey("t")) || 0); }catch(_e){}
+        if(v && Array.isArray(v.favs) && Number(v.t || 0) > localT){
+            mo.favs = v.favs.filter((x) => typeof x === "string").slice(0, 200);
+            mo.recent = (Array.isArray(v.recent) ? v.recent : []).filter((x) => typeof x === "string").slice(0, MO_RECENT_MAX);
+            mo.t = Number(v.t);
+            try{ localStorage.setItem(moKey("fav"), JSON.stringify(mo.favs)); localStorage.setItem(moKey("recent"), JSON.stringify(mo.recent)); localStorage.setItem(moKey("t"), String(mo.t)); }catch(_e){}
+            moApply();
+        }else if(!v && (mo.favs.length || mo.recent.length)){ mo.t = localT || Date.now(); moCloudPush(); }
+        else if(v && localT > Number(v.t || 0)){ mo.t = localT; moCloudPush(); }
+    }catch(_e){ /* 同期できなくても使える */ }
+}
 const moId = (item) => item.dataset.tool || (item.dataset.qk ? item.dataset.qk.replace(/^run:/, "run:") : "") || (item.getAttribute("href") ? "help" : "");
 const moCatOf = (id) => { for(const c of MO_CATS) if(c[2].includes(id)) return c[0]; return "other"; };
 
@@ -84,4 +118,6 @@ function initMoreOrg(){
     if(inp) inp.addEventListener("input", () => { if(inp.value.trim() && mo.cat !== "all"){ mo.cat = "all"; moApply(); } });
     try{ new MutationObserver(() => { if(!mo.applying) moSchedule(); }).observe(pane, {childList: true}); }catch(_e){ /* 何もしない */ }
     moApply();
+    moCloudPull();
+    document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") moCloudPull(); });
 }

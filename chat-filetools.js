@@ -30,7 +30,7 @@ const ftIsPdf = (f) => f.type === "application/pdf" || /\.pdf$/i.test(f.name);
 const ftBase = (n) => String(n).replace(/\.[^./\\]+$/, "");
 const ftExt = (n) => { const m = /\.([^./\\]+)$/.exec(n); return m ? m[1].toLowerCase() : ""; };
 const ftFileOf = (blob, name) => new File([blob], name, {lastModified: Date.now()});
-function ftSave(blob, name){ downloadBlob(blob, name.replace(/[\u0000-\u001f\\/:*?"<>|]/g, "_")); }
+function ftSave(blob, name){ const n = name.replace(/[\u0000-\u001f\\/:*?"<>|]/g, "_"); downloadBlob(blob, n); shareOffer(blob, n); }
 async function ftSaveZip(items, zipName){ const blob = await zipBuild(items.map((i) => ({path: i.name, file: ftFileOf(i.blob, i.name)}))); ftSave(blob, zipName); return blob; }
 function ftUniq(names){ const seen = new Map(); return names.map((n) => { const k = n.toLowerCase(); const c = seen.get(k) || 0; seen.set(k, c + 1); if(!c) return n; const e = ftExt(n); return ftBase(n) + "_" + (c + 1) + (e ? "." + e : ""); }); }
 

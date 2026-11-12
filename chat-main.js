@@ -220,7 +220,8 @@ const FEATURES = [
     ["sched","予定提案",function(){}],
     ["archive","ストーリーのアーカイブ",() => {}],
     ["quick","ショートカット・その他の検索・フォロー一覧",initQuick],
-    ["moreorg","その他の分類・お気に入り・最近",initMoreOrg]
+    ["moreorg","その他の分類・お気に入り・最近",initMoreOrg],
+    ["sharefile","ファイル共有",initShareFile]
 ];
 
 function startFeatures(){

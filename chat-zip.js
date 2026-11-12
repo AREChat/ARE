@@ -295,7 +295,7 @@ function zipAddFiles(list, withPath){
 
 async function zipSaveEntry(e){
     const bytes = await zipExtractEntry(zipSt.buf, e, zipSt.openPw);
-    downloadBlob(new Blob([bytes], {type:"application/octet-stream"}), zipSafeFileName(e.name));
+    { const b = new Blob([bytes], {type:"application/octet-stream"}), n = zipSafeFileName(e.name); downloadBlob(b, n); shareOffer(b, n); }
 }
 
 async function onZipAction(action, node){
@@ -316,7 +316,7 @@ async function onZipAction(action, node){
         zipSt.busy = true; zipSt.msg = "作っています…"; zipPaint();
         try{
             const blob = await zipBuild(zipSt.files, (i, n, p) => { const m = $("zpMsg"); if(m) m.textContent = "作っています… " + (i + 1) + "/" + n; }, zipSt.enc !== "none" ? {password: zipSt.pw, mode: zipSt.enc} : null);
-            downloadBlob(blob, base + ".zip");
+            downloadBlob(blob, base + ".zip"); shareOffer(blob, base + ".zip");
             zipSt.msg = (zipSt.enc !== "none" ? "🔒パスワード付きの" : "") + "ZIPを保存しました（" + formatAttachmentSize(blob.size) + "）。";
         }catch(error){ zipSt.msg = escapeHtml(zipErrText(error)); }
         zipSt.busy = false; zipPaint(); return;
