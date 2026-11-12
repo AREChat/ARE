@@ -67,7 +67,10 @@
         var veil = null;
         setInterval(function () {
             var w = window.outerWidth - window.innerWidth, h = window.outerHeight - window.innerHeight;
-            var open = (w > 260 && window.outerWidth > 0) || (h > 300 && window.outerHeight > 0);
+            // ブラウザの拡大（125%など）では、内側だけが小さくなり、幅の差と高さの差が「そろって」大きくなる。開発者ツールを横に出したときは幅の差だけ、下に出したときは高さの差だけが大きい。
+            // そろって大きいときは、拡大（プロジェクターに映すときなど）とみなして、画面を隠さない。
+            var side = w > 260 && h < 175, below = h > 300 && w < 100;
+            var open = (side || below) && window.outerWidth > 0 && window.outerHeight > 0;
             if (open && !veil && document.body) {
                 veil = document.createElement("div");
                 veil.style.cssText = "position:fixed;inset:0;z-index:2147483646;background:#0b1020;color:#fff;display:flex;align-items:center;justify-content:center;font:16px system-ui,sans-serif;text-align:center;padding:24px";
