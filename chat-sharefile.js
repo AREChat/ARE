@@ -34,6 +34,6 @@ async function shareFileAction(a){
 function onShfAction(action){
     const text = "ARE で作ったファイル：" + shf.name;
     if(action === "line"){ window.open("https://line.me/R/msg/text/?" + encodeURIComponent(text), "_blank", "noopener"); }
-    else if(action === "copy"){ try{ navigator.clipboard.writeText(text); showToast("コピーしました。"); }catch(_e){ showToast("コピーできませんでした。"); } }
+    else if(action === "copy"){ const okMsg = () => showToast("コピーしました。"), ngMsg = () => showToast("コピーできませんでした。"); try{ navigator.clipboard.writeText(text).then(okMsg, ngMsg); }catch(_e){ ngMsg(); } }
 }
 function initShareFile(){ registerTool("shf", onShfAction); }

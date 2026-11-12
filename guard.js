@@ -95,7 +95,9 @@
     }
     document.addEventListener("click", function (e) {
         var btn = e.target.closest && e.target.closest("button");
-        clickInfo = btn ? { btn: btn, wired: isWired(btn) } : null;
+        // ボタン以外のクリック（ダウンロード用の <a> を スクリプトが click() したとき など）では 書きかえない。
+        // 書きかえると、ボタンの処理の最中に起きた入れ子のクリックで 記録が消えて「つながっていない」と誤判定されるため
+        if (btn) clickInfo = { btn: btn, wired: isWired(btn) };
     }, true);
     document.addEventListener("click", function (e) {
         var btn = e.target.closest && e.target.closest("button");
