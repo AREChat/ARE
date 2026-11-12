@@ -7,7 +7,7 @@
 // ・クラウドの表が まだ無い／オフラインのときは、端末だけで ふつうに動きます。
 
 const MO_CATS = [
-    ["file", "📁 ファイル", ["zip", "imgc", "img2pdf", "pdftool", "exifclean", "hashtool", "renametool", "textfix", "csvtool", "vframe", "splittool", "ocr"]],
+    ["file", "📁 ファイル", ["filedrop", "zip", "imgc", "img2pdf", "pdftool", "exifclean", "hashtool", "renametool", "textfix", "csvtool", "vframe", "splittool", "ocr"]],
     ["life", "🏠 くらし", ["diary", "habit", "budget", "timer", "calc", "shop", "split", "health", "co2", "memo", "planner", "sched", "geo", "board", "weather", "transit", "run:shop"]],
     ["make", "🎨 つくる", ["story", "album", "imgedit", "draw", "mystamp", "avatar", "profile3d", "aistudio", "archive"]],
     ["play", "🎮 あそぶ", ["games", "cards", "bj", "fun", "rpg", "game2", "game4", "game5", "game7", "daifugo", "dream"]],

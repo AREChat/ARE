@@ -50,6 +50,7 @@ const TOOL_LIST = [
     ["img2pdf", "🧾", "画像→PDF", "写真やスキャンを1つのPDFにまとめる", "openImg2pdf"],
     ["pdftool", "📕", "PDFを操作", "結合・ページ抜き出し・分割・回転", "openPdfTool"],
     ["exifclean", "🛡️", "写真の位置情報を消す", "送る前に位置情報・撮影情報を取りのぞく", "openExifClean"],
+    ["filedrop", "📲", "ファイル転送（スマホ↔PC）", "スマホで入れて、パソコンで受け取る（本人だけ・7日で消える）", "openFileDrop"],
     ["hashtool", "🔐", "ファイル照合（ハッシュ）", "ダウンロードしたファイルが本物か確かめる", "openHashTool"],
     ["renametool", "🏷️", "ファイル名まとめて変更", "連番・置きかえ・大文字小文字（ZIPで保存）", "openRenameTool"],
     ["textfix", "🔤", "文字化けなおし・改行変換", "Shift_JIS などを UTF-8 になおす", "openTextFix"],
