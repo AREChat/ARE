@@ -6,7 +6,7 @@ const FT_MAX = 300 * 1024 * 1024;
 const ftSt = {};
 const ftBox = (id) => document.getElementById(id);
 const ftSize = (n) => formatAttachmentSize(n);
-const ftNum = (v, d) => { const n = Number(v); return Number.isFinite(n) ? n : d; };
+const ftNum = (v, d) => { if(v === "" || v == null) return d; const n = Number(v); return Number.isFinite(n) ? n : d; };
 const ftPick = (ns, act, label, accept, multi, extra) => '<label class="tool-button">' + label + '<input class="file-input" type="file" ' + (multi ? "multiple " : "") + (accept ? 'accept="' + accept + '" ' : "") + (extra || "") + 'data-t="' + ns + ':' + act + '"></label>';
 const ftBtn = (ns, act, label, opt) => '<button type="button" class="' + ((opt && opt.sub) ? "button-secondary" : "button") + '" data-t="' + ns + ':' + act + '"' + ((opt && opt.dis) ? " disabled" : "") + '>' + label + '</button>';
 const ftMsgHtml = (m) => m ? '<div class="meta" role="status">' + m + '</div>' : "";
@@ -38,6 +38,8 @@ async function ftLoadImage(file){
   try{ return await createImageBitmap(file, {imageOrientation: "from-image"}); }catch(_e){}
   return await new Promise((res, rej) => { const url = URL.createObjectURL(file); const im = new Image(); im.onload = () => { res(im); }; im.onerror = () => rej(new Error("ft_img")); im.src = url; });
 }
+// 画像の本当の種類から拡張子を決める（Safari などは WebP で書き出せず PNG になるため、名前と中身がズレないようにする）
+const ftTypeExt = (type) => /png/i.test(type) ? "png" : /webp/i.test(type) ? "webp" : "jpg";
 const ftToBlob = (canvas, type, q) => new Promise((res, rej) => canvas.toBlob((b) => b ? res(b) : rej(new Error("ft_img")), type, q));
 async function ftDraw(file, maxSide, flatten){
   const im = await ftLoadImage(file); let w = im.width || im.naturalWidth, h = im.height || im.naturalHeight;
@@ -75,16 +77,16 @@ ftActs.imgc = async (a, node, s) => {
   else if(a === "dl"){ const r = s.res[Number(arg)]; if(r && r.blob) ftSave(r.blob, r.name); return; }
   else if(a === "zip"){ await ftSaveZip(s.res.filter((r) => r.blob).map((r) => ({name: r.name, blob: r.blob})), "画像まとめ.zip"); s.msg = "ZIPを保存しました。"; }
   else if(a === "run"){
-    s.busy = true; s.res = []; ftPaint();
+    s.busy = true; s.res = []; s.swapped = ""; ftPaint();
     const ext = s.fmt === "image/png" ? "png" : s.fmt === "image/webp" ? "webp" : "jpg"; const names = ftUniq(s.files.map((f) => ftBase(f.name) + "." + ext));
     for(let i = 0; i < s.files.length; i++){
       const f = s.files[i];
-      try{ const c = await ftDraw(f, s.max, s.fmt === "image/jpeg"); const blob = await ftToBlob(c, s.fmt, s.q); s.res.push({name: names[i], from: f.size, blob}); }
+      try{ const c = await ftDraw(f, s.max, s.fmt === "image/jpeg"); const blob = await ftToBlob(c, s.fmt, s.q); const real = blob.type && blob.type !== s.fmt ? ftTypeExt(blob.type) : ""; if(real) s.swapped = ftTypeExt(s.fmt) + "→" + real; s.res.push({name: real ? ftBase(names[i]) + "." + real : names[i], from: f.size, blob}); }
       catch(_e){ s.res.push({name: f.name, from: f.size, blob: null}); }
       s.msg = "変換中… " + (i + 1) + "/" + s.files.length; const b = ftBox("ftBody"); if(b && ftSt.cur === "imgc") ftPaint();
     }
     const ok = s.res.filter((r) => r.blob), before = s.files.reduce((t, f) => t + f.size, 0), after = ok.reduce((t, r) => t + r.blob.size, 0);
-    s.busy = false; s.msg = ok.length + "個を変換しました（合計 " + ftSize(before) + " → " + ftSize(after) + "）" + (ok.length < s.files.length ? "。読めない画像が" + (s.files.length - ok.length) + "個ありました。" : "。");
+    s.busy = false; s.msg = ok.length + "個を変換しました（合計 " + ftSize(before) + " → " + ftSize(after) + "）" + (ok.length < s.files.length ? "。読めない画像が" + (s.files.length - ok.length) + "個ありました。" : "。") + (s.swapped ? " ※このブラウザは " + s.swapped.split("→")[0].toUpperCase() + " で書き出せないため、" + s.swapped.split("→")[1].toUpperCase() + " で保存しました。" : "");
   }
   ftPaint();
 };
@@ -152,10 +154,10 @@ function ftLoadPdfLib(){
   if(window.PDFLib) return Promise.resolve(window.PDFLib);
   return new Promise((res, rej) => { const sc = document.createElement("script"); sc.src = "./vendor/lazy/pdf-lib.min.js"; sc.onload = () => window.PDFLib ? res(window.PDFLib) : rej(new Error("ft_pdf")); sc.onerror = () => rej(new Error("PDF機能の読み込みに失敗しました。ネットワークを確認してください。")); document.head.appendChild(sc); });
 }
-async function ftOpenPdf(file){ const L = await ftLoadPdfLib(); try{ return await L.PDFDocument.load(new Uint8Array(await file.arrayBuffer())); }catch(e){ throw new Error(/encrypt/i.test(String(e && e.message)) ? "ft_pdf_enc" : "ft_pdf"); } }
+async function ftOpenPdf(file){ const L = await ftLoadPdfLib(); try{ const d = await L.PDFDocument.load(new Uint8Array(await file.arrayBuffer())); d.getPageCount(); return d; }catch(e){ throw new Error(/encrypt/i.test(String(e && e.message)) ? "ft_pdf_enc" : "ft_pdf"); } }
 function ftParseRange(text, n){
-  const out = []; for(const part of String(text).replace(/[、，]/g, ",").replace(/[ー−～〜]/g, "-").split(",")){
-    const t = part.trim(); if(!t) continue; const m = /^(\d+)(?:-(\d+))?$/.exec(t); if(!m) return null;
+  const out = []; for(const part of String(text).replace(/[０-９]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xFEE0)).replace(/[、，]/g, ",").replace(/[ー−－～〜–—]/g, "-").split(",")){
+    const t = part.replace(/[\s\u3000]+/g, ""); if(!t) continue; const m = /^(\d+)(?:-(\d+))?$/.exec(t); if(!m) return null;
     let a = Number(m[1]), b = m[2] ? Number(m[2]) : a; if(a < 1 || b < 1 || a > n || b > n) return null; if(a > b){ const x = a; a = b; b = x; }
     for(let i = a; i <= b; i++) out.push(i - 1);
   } return out.length ? out : null;
@@ -244,7 +246,7 @@ ftActs.exif = async (a, node, s) => {
   else if(a === "rm") s.files.splice(arg, 1);
   else if(a === "run"){
     s.busy = true; ftPaint(); const items = []; let fail = 0; const names = ftUniq(s.files.map((f) => ftBase(f.name) + "_clean." + (/png/i.test(f.type) ? "png" : /webp/i.test(f.type) ? "webp" : "jpg")));
-    for(let i = 0; i < s.files.length; i++){ const f = s.files[i]; try{ const type = /png/i.test(f.type) ? "image/png" : /webp/i.test(f.type) ? "image/webp" : "image/jpeg"; const c = await ftDraw(f, 0, type === "image/jpeg"); items.push({name: names[i], blob: await ftToBlob(c, type, 0.95)}); }catch(_e){ fail++; } }
+    for(let i = 0; i < s.files.length; i++){ const f = s.files[i]; try{ const type = /png/i.test(f.type) ? "image/png" : /webp/i.test(f.type) ? "image/webp" : "image/jpeg"; const c = await ftDraw(f, 0, type === "image/jpeg"); const blob = await ftToBlob(c, type, 0.95); items.push({name: blob.type && blob.type !== type ? ftBase(names[i]) + "." + ftTypeExt(blob.type) : names[i], blob}); }catch(_e){ fail++; } }
     try{ if(items.length === 1) ftSave(items[0].blob, items[0].name); else if(items.length) await ftSaveZip(items, "写真_情報なし.zip"); s.msg = items.length + "枚の情報を消して保存しました" + (fail ? "（" + fail + "枚は読めませんでした）" : "。"); }catch(e){ s.msg = escapeHtml(ftErr(e)); }
     s.busy = false;
   }
@@ -279,7 +281,7 @@ ftActs.hash = async (a, node, s) => {
 
 // ---------- 6. ファイル名まとめて変更 ----------
 function ftRenamePlan(s){
-  const o = s.o || {}; const files = s.files; const start = ftNum(o.start, 1), digits = Math.max(1, Math.min(8, ftNum(o.digits, 3)));
+  const o = s.o || {}; const files = s.files; const start = Math.max(0, Math.floor(ftNum(o.start, 1))), digits = Math.max(1, Math.min(8, ftNum(o.digits, 3)));
   const today = new Date(), ymd = today.getFullYear() + String(today.getMonth() + 1).padStart(2, "0") + String(today.getDate()).padStart(2, "0");
   const pat = o.pattern || "{name}";
   const names = files.map((f, i) => {
@@ -360,13 +362,13 @@ function ftParseCsv(text, delim){
   if(cell !== "" || row.length) { row.push(cell); rows.push(row); }
   return rows.filter((r) => !(r.length === 1 && r[0] === ""));
 }
-function ftGuessDelim(t){ const head = t.split(/\r?\n/).slice(0, 5).join("\n"); const cnt = (d) => head.split(d).length - 1; return [["\t", cnt("\t")], [",", cnt(",")], [";", cnt(";")]].sort((a, b) => b[1] - a[1])[0][0]; }
+function ftGuessDelim(t){ const head = t.slice(0, 20000).split(/\r?\n/).slice(0, 5).join("\n"); const cnt = (d) => head.split(d).length - 1; return [["\t", cnt("\t")], [",", cnt(",")], [";", cnt(";")]].sort((a, b) => b[1] - a[1])[0][0]; }
 ftPainters.csv = (s) => {
   s.hdr = s.hdr !== false; s.delim = s.delim || "auto";
   let table = "";
   if(s.text){
-    const d = s.delim === "auto" ? ftGuessDelim(s.text) : s.delim; s.rows = ftParseCsv(s.text, d);
-    const rows = s.rows, cols = Math.max(0, ...rows.map((r) => r.length));
+    const d = s.delim === "auto" ? ftGuessDelim(s.text) : s.delim; if(s._pt !== s.text || s._pd !== d){ s.rows = ftParseCsv(s.text, d); s._pt = s.text; s._pd = d; }
+    const rows = s.rows; let cols = 0; for(const r of rows){ if(r.length > cols) cols = r.length; }
     table = '<div class="meta">' + rows.length + '行 × ' + cols + '列（区切り：' + (d === "\t" ? "タブ" : d === "," ? "カンマ" : "セミコロン") + '）</div><div style="overflow:auto;max-height:36vh"><table style="border-collapse:collapse;font-size:12px">' + rows.slice(0, 60).map((r, i) => '<tr>' + Array.from({length: cols}, (_, j) => (i === 0 && s.hdr ? "<th" : "<td") + ' style="border:1px solid rgba(128,128,128,.35);padding:2px 6px;white-space:nowrap">' + escapeHtml(r[j] == null ? "" : r[j]) + (i === 0 && s.hdr ? "</th>" : "</td>")).join("") + '</tr>').join("") + '</table></div>' + (rows.length > 60 ? '<div class="meta">先頭の60行だけ表示しています（保存は全部）。</div>' : "");
   }
   return ftPick("csv", "add", "📊 CSVを選ぶ", ".csv,.tsv,.txt,text/csv", false) + '<textarea id="csvText" rows="3" placeholder="またはここにCSVを貼りつけ" data-live="1" data-t="csv:text" style="width:100%">' + escapeHtml(s.text || "") + '</textarea>' +
@@ -413,6 +415,14 @@ ftActs.vframe = async (a, node, s) => {
 };
 
 // ---------- 10. 大きいファイルの分割・結合 ----------
+// 「名前.part001」「名前.001」のように番号がついた部品が、途中で欠けていないか確かめる（欠けたまま つなぐと こわれたファイルになるため）
+function ftPartsGap(files){
+  const m = files.map((f) => /^(.*?)\.(?:part(\d+)|(\d{3}))$/i.exec(f.name)); if(m.some((x) => !x)) return "";
+  const base = m[0][1].toLowerCase(); if(m.some((x) => x[1].toLowerCase() !== base)) return "";
+  const nums = m.map((x) => Number(x[2] || x[3])).sort((a, b) => a - b); if(nums[0] > 1) return nums[0] > 2 ? "最初の部分が足りないようです。" : "1番が足りないようです。";
+  for(let i = 1; i < nums.length; i++){ if(nums[i] === nums[i - 1]) return nums[i] + "番が2つあります。"; if(nums[i] !== nums[i - 1] + 1) return (nums[i - 1] + 1) + "番が足りないようです。"; }
+  return "";
+}
 ftPainters.fsplit = (s) => {
   s.mode = s.mode || "cut"; s.mb = s.mb || 20;
   const tabs = '<div class="row" style="justify-content:flex-start">' + ftBtn("fsplit", "mode:cut", "分割する", {sub: s.mode !== "cut"}) + ftBtn("fsplit", "mode:join", "もとに戻す（結合）", {sub: s.mode !== "join"}) + '</div>';
@@ -433,6 +443,7 @@ ftActs.fsplit = async (a, node, s) => {
     try{ for(let i = 0, o = 0; o < f.size; i++, o += size) items.push({name: f.name + ".part" + String(i + 1).padStart(3, "0"), blob: f.slice(o, o + size)}); await ftSaveZip(items, ftBase(f.name) + "_分割.zip"); s.msg = items.length + "個に分けて、ZIPで保存しました。受け取った側は、ZIPをほどいてから「もとに戻す」を使います。"; }catch(e){ s.msg = escapeHtml(ftErr(e)); }
     s.busy = false;
   }else if(a === "join"){
+    const gap = ftPartsGap(s.files); if(gap){ s.msg = escapeHtml(gap + "ぜんぶの部分を選びなおしてください。"); ftPaint(); return; }
     s.busy = true; ftPaint();
     try{
       const first = s.files[0].name; const name = first.replace(/\.part0*1$/i, "").replace(/\.0*1$/, "") || "joined";

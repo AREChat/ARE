@@ -57,7 +57,7 @@ async function moCloudPull(){
         else if(v && localT > Number(v.t || 0)){ mo.t = localT; moCloudPush(); }
     }catch(_e){ /* 同期できなくても使える */ }
 }
-const moId = (item) => item.dataset.tool || (item.dataset.qk ? item.dataset.qk.replace(/^run:/, "run:") : "") || (item.getAttribute("href") ? "help" : "");
+const moId = (item) => item.dataset.tool || item.dataset.extra || (item.dataset.qk ? item.dataset.qk.replace(/^run:/, "run:") : "") || (item.getAttribute("href") ? "help" : "");
 const moCatOf = (id) => { for(const c of MO_CATS) if(c[2].includes(id)) return c[0]; return "other"; };
 
 function moApply(){

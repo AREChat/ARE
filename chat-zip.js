@@ -24,7 +24,8 @@ async function zipStream(bytes, Ctor, format, limit){
     const out = new Blob([bytes]).stream().pipeThrough(new Ctor(format));
     const reader = out.getReader(); const chunks = []; let total = 0;
     for(;;){
-        const r = await reader.read(); if(r.done) break;
+        let r; try{ r = await reader.read(); }catch(_e){ throw new Error("zip_broken"); }   // こわれたデータは ブラウザの英語メッセージを出さず、やさしい文にする
+        if(r.done) break;
         total += r.value.length;
         if(limit && total > limit){ try{ await reader.cancel(); }catch(_e){} throw new Error("zip_too_big"); }
         chunks.push(r.value);
@@ -241,7 +242,7 @@ function zipSafePath(path){
 
 function zipErrText(error){
     const m = String(error && error.message || error);
-    return ({zip_invalid:"ZIPファイルとして読めませんでした（こわれている可能性があります）。", zip_zip64:"4GBをこえる大きなZIP（ZIP64）には対応していません。", zip_many:"ファイルの数が多すぎます（" + ZIP_MAX_ENTRIES + "個まで）。", zip_bomb:"ほどくと大きくなりすぎるため、安全のため中止しました（" + formatAttachmentSize(ZIP_MAX_UNPACKED) + "まで）。", zip_need_password:"パスワードを入れてください。", zip_password:"パスワードがちがうようです（または、こわれています）。", zip_nostream:"このブラウザは ZIP の解凍に対応していません。新しいブラウザ（Chrome・Edge・Safari 16.4以上など）をお使いください。", zip_method:"この圧縮方式には対応していません。", zip_crc:"中身がこわれているようです（チェックが合いません）。", zip_too_big:"大きすぎるため中止しました。"})[m] || featError(error);
+    return ({zip_invalid:"ZIPファイルとして読めませんでした（こわれている可能性があります）。", zip_zip64:"4GBをこえる大きなZIP（ZIP64）には対応していません。", zip_many:"ファイルの数が多すぎます（" + ZIP_MAX_ENTRIES + "個まで）。", zip_bomb:"ほどくと大きくなりすぎるため、安全のため中止しました（" + formatAttachmentSize(ZIP_MAX_UNPACKED) + "まで）。", zip_need_password:"パスワードを入れてください。", zip_password:"パスワードがちがうようです（または、こわれています）。", zip_nostream:"このブラウザは ZIP の解凍に対応していません。新しいブラウザ（Chrome・Edge・Safari 16.4以上など）をお使いください。", zip_method:"この圧縮方式には対応していません。", zip_crc:"中身がこわれているようです（チェックが合いません）。", zip_broken:"中身がこわれていて、ほどけませんでした。", zip_too_big:"大きすぎるため中止しました。"})[m] || featError(error);
 }
 
 function openZip(){
