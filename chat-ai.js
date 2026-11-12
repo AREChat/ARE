@@ -65,7 +65,7 @@ function aiKeywords(msgs, limit){
 function aiSummary(msgs, keywords){
     const score = new Map(keywords.map(([w, n]) => [w, n]));
     const sentences = [];
-    msgs.forEach((x) => x.text.split(/(?<=[。！？!?\n])/).map((s) => s.trim()).filter((s) => s.length >= 6).forEach((s, i) => sentences.push({s, at:x.at, i, base:aiTokens(s).reduce((a, w) => a + (score.get(w) || 0), 0)})));
+    msgs.forEach((x) => (x.text.match(/[^。！？!?\n]*[。！？!?\n]|[^。！？!?\n]+/g) || []).map((s) => s.trim()).filter((s) => s.length >= 6).forEach((s, i) => sentences.push({s, at:x.at, i, base:aiTokens(s).reduce((a, w) => a + (score.get(w) || 0), 0)})));
     const ranked = sentences.map((x, k) => ({...x, k, v:x.base / Math.sqrt(x.s.length)})).sort((a, b) => b.v - a.v).slice(0, 3).sort((a, b) => a.k - b.k);
     return ranked.filter((x) => x.base > 0).map((x) => x.s.slice(0, 80));
 }
