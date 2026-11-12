@@ -174,6 +174,8 @@ const FEATURES = [
     ["budget","家計簿",initBudget],
     ["timer","タイマー",initTimer],
     ["calc","電卓・換算",initCalc],
+    ["zip","ZIP圧縮・解凍",initZip],
+    ["filetools","ファイルの便利ツール",initFileTools],
     ["shop","買い物リスト",initShop],
     ["lock","ロック・自動ログアウト",initLock],
     ["announce","お知らせ",initAnnounce],

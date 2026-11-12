@@ -1,6 +1,6 @@
 // オフライン用の一覧（precache-manifest.js / precache.json）を作る。ファイルを足したり消したりしたら実行する:  node tools/gen-precache.js
 const fs = require("fs"), path = require("path"), crypto = require("crypto");
-const SKIP_DIR = new Set([".git", "node_modules", "docs", "tools", ".github", "sql", "edge-functions"]);
+const SKIP_DIR = new Set(["lazy", ".git", "node_modules", "docs", "tools", ".github", "sql", "edge-functions"]);
 const SHELL = /\.(html|js|css|json|webmanifest|txt)$/i;
 const MEDIA = /\.(webp|png|jpg|jpeg|gif|svg|ico)$/i, AUDIO = /\.(mp3|ogg|wav|m4a)$/i;
 const SKIP_FILE = /^(sw\.js|precache-manifest\.js|precache\.json|googlea.*\.html|robots\.txt|sitemap\.xml)$/;
