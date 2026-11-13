@@ -115,11 +115,11 @@ try { if (window.top !== window.self) { window.top.location = window.self.locati
             return await parseResponse(response);
         } catch (error) {
             if (error.name === "AbortError") {
-                throw new Error("サーバーからの応答がタイムアウトしました。時間をおいて再試行してください。");
+                throw new Error("サーバーからの返事がありません。ネットの調子が悪いかもしれません。少し待って、もう一度お試しください。");
             }
 
             if (error instanceof TypeError) {
-                throw new Error("サーバーに接続できませんでした。通信状態とEdge Functionの設定を確認してください。");
+                throw new Error("サーバーに つながりませんでした。Wi-Fi などの通信をたしかめて、もう一度お試しください（会社・学校のネットは、制限で つながらないことがあります。別の回線もためしてください）。");
             }
 
             throw error;
@@ -334,11 +334,11 @@ try { if (window.top !== window.self) { window.top.location = window.self.locati
             return await parseResponse(response);
         } catch (error) {
             if (error.name === "AbortError") {
-                throw new Error("サーバーからの応答がタイムアウトしました。");
+                throw new Error("サーバーからの返事がありません。ネットの調子が悪いかもしれません。少し待って、もう一度お試しください。");
             }
 
             if (error instanceof TypeError) {
-                throw new Error("サーバーに接続できませんでした。通信状態とEdge Functionの設定を確認してください。");
+                throw new Error("サーバーに つながりませんでした。Wi-Fi などの通信をたしかめて、もう一度お試しください（会社・学校のネットは、制限で つながらないことがあります。別の回線もためしてください）。");
             }
 
             throw error;

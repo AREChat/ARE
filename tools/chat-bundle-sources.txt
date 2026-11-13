@@ -1,3 +1,4 @@
+chat-netwatch.js
 apikey.js
 password-toggle.js
 system.js

@@ -210,6 +210,9 @@ function getErrorMessage(error){
     if(/JWT|auth session missing|not authenticated/i.test(message)){
         return "ログイン状態を確認できません。再度ログインしてください。";
     }
+    if(/failed to fetch|networkerror|network request failed|load failed|aborterror|signal is aborted|timed? ?out|タイムアウト|サーバーに接続できません/i.test(message)){
+        return "通信が不安定です。入力した文章は消えていません。少し待ってから、もう一度お試しください。";
+    }
     return message;
 }
 
