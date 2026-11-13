@@ -42,7 +42,7 @@ function openSchedPicker(kind, onDone){
         '<div class="row"><button type="button" class="button-secondary" data-pm="close">やめる</button><button type="button" class="button" data-t="sched:go">この日時に予約する</button></div>');
 }
 
-const schedState = {onDone: null, kind: ""};
+const schedState = {onDone: null, kind: "", rows: new Map()};
 
 function startSchedulePost(){
     const hasBody = !!el.postBody.value.trim();
@@ -58,7 +58,7 @@ function schedSummary(row){
 }
 
 async function openSchedList(){
-    openSheet(toolHead("📋 予約中の投稿・ストーリー", "時間になると自動で公開されます。取り消すと、アップロード済みの写真・動画も削除されます。") +
+    openSheet(toolHead("📋 予約中の投稿・ストーリー", "時間になると自動で公開されます。「編集」で日時や文章を直せます。「削除」すると、アップロード済みの写真・動画も消えます。") +
         '<div id="schedBox"><div class="empty-list">読み込み中...</div></div>' + toolClose());
     return loadSchedList();
 }
@@ -69,30 +69,64 @@ async function loadSchedList(){
         const client = requireClient();
         const [posts, stories] = await Promise.all([
             client.from("scheduled_posts").select("id,body,image_path,visibility,send_at,status,error").in("status", ["pending", "failed"]).order("send_at", {ascending: true}).limit(60),
-            client.from("scheduled_stories").select("id,body,image_path,send_at,status,error").in("status", ["pending", "failed"]).order("send_at", {ascending: true}).limit(60)
+            client.from("scheduled_stories").select("id,body,image_path,bg,send_at,status,error").in("status", ["pending", "failed"]).order("send_at", {ascending: true}).limit(60)
         ]);
         if(posts.error) throw posts.error;
         if(stories.error) throw stories.error;
         const rows = [].concat((posts.data || []).map((r) => Object.assign({kind: "post"}, r)), (stories.data || []).map((r) => Object.assign({kind: "story"}, r)))
             .sort((a, b) => new Date(a.send_at) - new Date(b.send_at));
         if(!document.getElementById("schedBox")) return;
+        schedState.rows = new Map(rows.map((r) => [r.kind + ":" + r.id, r]));
         box.innerHTML = rows.length ? rows.map((r) =>
             '<div class="sched-item"><span>' + (r.kind === "story" ? "📖 ストーリー" : "📷 投稿") + '　' + escapeHtml(formatDateTime(r.send_at)) + '<br>' + schedSummary(r) +
             (r.status === "failed" ? '<br><b style="color:#ffb4a8">⚠ 投稿できませんでした：' + escapeHtml(String(r.error || "").slice(0, 80)) + '</b>' : "") + '</span>' +
-            '<button type="button" class="button-secondary" data-t="sched:cancel" data-kind="' + r.kind + '" data-id="' + escapeHtml(r.id) + '">' + (r.status === "failed" ? "消す" : "取消") + '</button></div>').join("")
+            '<span style="display:flex;gap:6px;flex-shrink:0"><button type="button" class="button-secondary" data-t="sched:edit" data-kind="' + r.kind + '" data-id="' + escapeHtml(r.id) + '">' + (r.status === "failed" ? "直す" : "編集") + '</button>' +
+            '<button type="button" class="button-secondary" data-t="sched:cancel" data-kind="' + r.kind + '" data-id="' + escapeHtml(r.id) + '">削除</button></span></div>').join("")
             : '<div class="empty-list">予約中のものはありません。</div>';
     }catch(error){ box.innerHTML = '<div class="empty-list">' + escapeHtml(featError(error)) + '</div>'; }
 }
 
+function openSchedEdit(kind, id){
+    const r = schedState.rows.get(kind + ":" + id);
+    if(!r){ showToast("予約が見つかりません。一覧を開き直してください。"); return; }
+    const max = kind === "story" ? 200 : 500;
+    const vis = kind === "post"
+        ? '<label for="seVis">公開範囲</label><select id="seVis">' + [["public", "全員"], ["followers", "フォロワーのみ"], ["private", "自分のみ"]].map(([v, t]) => '<option value="' + v + '"' + (r.visibility === v ? " selected" : "") + '>' + t + '</option>').join("") + '</select>'
+        : '<label for="seBg">背景の色</label><select id="seBg">' + [["blue", "青"], ["pink", "ピンク"], ["green", "緑"], ["orange", "オレンジ"], ["purple", "紫"]].map(([v, t]) => '<option value="' + v + '"' + (r.bg === v ? " selected" : "") + '>' + t + '</option>').join("") + '</select>';
+    openSheet(toolHead("✏ 予約を編集", (kind === "story" ? "ストーリー" : "投稿") + "の文章と日時を直せます。" + (r.image_path ? "（写真・動画は変えられません。変えたいときは削除して予約し直してください）" : "")) +
+        '<label for="seBody">文章（' + max + '文字まで）</label><textarea id="seBody" rows="4" maxlength="' + max + '">' + escapeHtml(r.body || "") + '</textarea>' + vis +
+        '<label for="seAt">投稿する日時</label><input id="seAt" type="datetime-local" min="' + schedLocalInput(new Date(Date.now() + 60000)) + '" value="' + schedLocalInput(new Date(Math.max(new Date(r.send_at).getTime(), Date.now() + 120000))) + '">' +
+        (r.status === "failed" ? '<div class="meta">前回は投稿できませんでした。直して保存すると、もう一度予約されます。</div>' : "") +
+        '<div class="row"><button type="button" class="button-secondary" data-t="sched:list">もどる</button><button type="button" class="button" data-t="sched:save" data-kind="' + kind + '" data-id="' + escapeHtml(id) + '">保存する</button></div>');
+}
+
+async function saveSchedEdit(node){
+    const kind = node.dataset.kind, id = node.dataset.id;
+    const body = (document.getElementById("seBody") || {}).value || "";
+    const when = new Date((document.getElementById("seAt") || {}).value || "");
+    if(isNaN(when.getTime()) || when.getTime() < Date.now() + 60000){ showToast("日時は1分以上先を指定してください。"); return; }
+    if(when.getTime() > Date.now() + 30 * 86400000){ showToast("予約は30日先までです。"); return; }
+    node.disabled = true;
+    try{
+        const client = requireClient();
+        const result = kind === "story"
+            ? await client.rpc("update_scheduled_story", {p_id: id, p_body: body, p_bg: (document.getElementById("seBg") || {}).value || "blue", p_send_at: when.toISOString()})
+            : await client.rpc("update_scheduled_post", {p_id: id, p_body: body, p_visibility: (document.getElementById("seVis") || {}).value || "public", p_send_at: when.toISOString()});
+        if(result.error) throw result.error;
+        showToast("予約を直しました。");
+        await openSchedList();
+    }catch(error){ showToast(featError(error)); node.disabled = false; }
+}
+
 async function cancelSched(node){
-    if(!window.confirm("この予約を取り消しますか？")) return;
+    if(!window.confirm("この予約を削除しますか？（写真・動画も消えます）")) return;
     node.disabled = true;
     try{
         const client = requireClient();
         const result = await client.rpc(node.dataset.kind === "story" ? "cancel_scheduled_story" : "cancel_scheduled_post", {p_id: node.dataset.id});
         if(result.error) throw result.error;
         if(result.data) client.storage.from("post-images").remove([result.data]);
-        showToast("予約を取り消しました。");
+        showToast("予約を削除しました。");
         await loadSchedList();
     }catch(error){ showToast(featError(error)); node.disabled = false; }
 }
@@ -101,6 +135,8 @@ function onSchedAction(action, node){
     if(action === "quick"){ const i = document.getElementById("schedAt"); if(i) i.value = node.dataset.at; return; }
     if(action === "list") return openSchedList();
     if(action === "cancel") return cancelSched(node);
+    if(action === "edit") return openSchedEdit(node.dataset.kind, node.dataset.id);
+    if(action === "save") return saveSchedEdit(node);
     if(action === "go"){
         const i = document.getElementById("schedAt");
         const when = new Date(i ? i.value : "");
