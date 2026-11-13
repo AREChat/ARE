@@ -32,7 +32,7 @@ begin
     url := 'https://formsubmit.co/ajax/skytomohiko17@gmail.com',
     headers := jsonb_build_object(
       'Content-Type', 'application/json', 'Accept', 'application/json',
-      'Origin', 'https://arechat.github.io', 'Referer', 'https://arechat.github.io/AREDA/'),
+      'Origin', 'https://arechat.github.io', 'Referer', 'https://arechat.github.io/ARE/'),
     body := jsonb_build_object('_subject', p_subject, '_template', 'box', '_captcha', 'false', 'message', p_body),
     timeout_milliseconds := 8000
   ) into v_id;
