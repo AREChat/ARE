@@ -4,7 +4,7 @@
 //     1対1のチャットは、2人とも自分と相手の名前を変えられます。グループは、自分の名前だけ変えられます（作成者はメンバーの名前も変えられます）。
 // ・プロフィールで友だちにつける名前：この端末（自分の画面）にだけ保存。相手にも他のだれにも見えません。
 // ・表示の優先順位：自分だけの名前 ＞ チャット内の名前 ＞ 本来の表示名
-// ・入力中：チャットの上部と、一覧の相手の横にも「入力中…」を出します。
+// ・入力中：相手が入力中のときだけ、チャットの上部と、左の一覧の相手の名前の下にも「入力中…」を出します（自分が入力中のときは、開いているチャットの画面だけ）。
 
 feat.nick = {priv:{}, room:new Map(), timer:null, loaded:false};
 
@@ -87,10 +87,11 @@ function nickPaintRoomList(){
 }
 
 function nickPaintTyping(){
-    const who = [];
-    const t = feat.typing;
-    if(t && t.who){ const now = Date.now(); t.who.forEach((e, uid) => { if(e.until > now) who.push({uid, name:e.name}); }); }
-    const names = who.map((w) => profileDisplayName({id:w.uid, display_name:w.name}));
+    // 入力中は「相手だけ」。いま開いているチャット（画面の上）と、左の一覧の その相手の行に出す。
+    // 自分が入力中のときは、開いているチャットの画面だけ（typingOwnPart）。一覧には出さない。
+    const byRoom = (typeof typingNamesByRoom === "function") ? typingNamesByRoom() : new Map();
+    const cur = state.currentRoom ? (byRoom.get(state.currentRoom.id) || []) : [];
+    const names = cur.map((w) => profileDisplayName({id:w.uid, display_name:w.name}));
     const line = document.getElementById("typingLine");
     if(line){
         const parts = [], own = (typeof typingOwnPart === "function") ? typingOwnPart() : "";
@@ -101,12 +102,22 @@ function nickPaintTyping(){
     const h = document.getElementById("nkTyping"), sub = document.getElementById("chatSubtitle");
     if(h){ h.hidden = !names.length; h.textContent = names.length ? "✏️ 入力中…" : ""; }
     if(sub) sub.hidden = !!names.length;
-    // 一覧の、いま開いているチャットの横にも出す
-    document.querySelectorAll("#roomList .nk-ty").forEach((n) => n.remove());
-    if(names.length && state.currentRoom){
-        const btn = document.querySelector('#roomList [data-room-id="' + state.currentRoom.id + '"]');
-        if(btn){ const s = document.createElement("span"); s.className = "nk-ty"; s.textContent = "✏️ 入力中…"; btn.appendChild(s); }
-    }
+    // 左の一覧：入力中の相手の行は、名前の下を「✏️ 入力中…」にする（ほかの行は そのまま）
+    document.querySelectorAll("#roomList .nk-ty").forEach((n) => n.remove());   // 古い版の表示が残っていたら消す
+    document.querySelectorAll("#roomList [data-room-id]").forEach((btn) => {
+        const rid = btn.dataset.roomId, who = byRoom.get(rid) || [];
+        let tl = btn.querySelector(".rt-typing");
+        if(!who.length){ if(tl) tl.remove(); btn.classList.remove("is-typing"); return; }
+        const room = (state.rooms || []).find((r) => r.id === rid);
+        let text = "✏️ 入力中…";
+        if(room && room.is_group){
+            const nm = who.map((w) => nickRoomName(rid, w.uid) || w.name);
+            text = "✏️ " + nm[0] + (nm.length > 1 ? " ほか" + (nm.length - 1) + "人" : " さん") + "が入力中…";
+        }
+        if(!tl){ tl = document.createElement("small"); tl.className = "rt-typing"; tl.setAttribute("aria-live", "polite"); (btn.querySelector(".person-text") || btn).appendChild(tl); }
+        if(tl.textContent !== text) tl.textContent = text;
+        btn.classList.add("is-typing");
+    });
 }
 
 // ---------- チャット内の名前（みんなに見える） ----------
