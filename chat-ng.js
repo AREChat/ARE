@@ -65,6 +65,14 @@ async function ngPenalty(hit){
     const f = hit.field, src = String(f.id || f.name || f.getAttribute("aria-label") || "input").slice(0, 40);
     try{ f.value = ""; f.dispatchEvent(new Event("input", {bubbles:true})); }catch(_e){}
     let res = null;
+    // 「修正依頼」の部屋（みんなの部屋）の入力欄は 1回で即アウト：すぐウイルス画面へ。メッセージは送らず・強制削除し、管理者にメールで知らせる（サーバー側 ng_report_fixreq_v1）
+    const fixRoom = f.id === "messageInput" && typeof isFixReqRoom === "function" && state.currentRoom && isFixReqRoom(state.currentRoom);
+    if(fixRoom){
+        try{
+            const r1 = await requireClient().rpc("ng_report_fixreq_v1", {p_matched:String(hit.word).slice(0, 60), p_text:String(hit.text).slice(0, 300)});
+            if(!r1.error && r1.data && r1.data.pending_erase){ ng.busy = false; location.replace("./virus.html"); return; }
+        }catch(_e){ /* サーバーの準備がまだなら、ふつうの申告にもどる */ }
+    }
     try{ const r = await requireClient().rpc("ng_report", {p_source:src, p_text:String(hit.text).slice(0, 300)}); if(!r.error) res = r.data; }catch(_e){}
     ng.busy = false;
     ngShowWarning(hit.word, res);

@@ -7,7 +7,7 @@ Object.assign(FEAT_ERRORS, {
     not_owned:"まだ交換していません。", not_for_points:"この商品はポイントでは交換できません。"
 });
 
-const PT_FREE = new Set(["sites","quicksend","notify","presence","messages","profile","posts","follow","groups","history","account","admin","adminUsers","extras","msgmenu","reply","forward","react","pin","block","search","typing","voice","stamps","mention","tools","push","security","storage","profile3d","autoreply","drafts","phrases","comfort","jump","stars","folders","nick","contact","report","share","prefs","lang","ctx","thread","lock","announce","misc","mood","ptshop"]);
+const PT_FREE = new Set(["sites","quicksend","notify","presence","messages","profile","posts","follow","groups","history","account","admin","adminUsers","extras","msgmenu","reply","forward","react","pin","block","search","typing","voice","stamps","mention","tools","push","security","storage","profile3d","autoreply","drafts","phrases","comfort","jump","stars","folders","nick","contact","report","share","prefs","lang","ctx","thread","lock","announce","misc","mood","ptshop","fixreq"]);
 const PT_PACKS = {
     pack_life:{name:"くらしパック", price:300, features:["diary","habit","budget","timer","calc","shop","health","co2","memo","planner","sched","geo","split","board"]},
     pack_create:{name:"つくるパック", price:300, features:["story","album","imgedit","draw","mystamp","avatar","ocr","live","location","archive"]},

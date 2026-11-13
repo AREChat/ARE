@@ -222,7 +222,8 @@ const FEATURES = [
     ["archive","ストーリーのアーカイブ",() => {}],
     ["quick","ショートカット・その他の検索・フォロー一覧",initQuick],
     ["moreorg","その他の分類・お気に入り・最近",initMoreOrg],
-    ["sharefile","ファイル共有",initShareFile]
+    ["sharefile","ファイル共有",initShareFile],
+    ["fixreq","修正依頼の共通の部屋（一覧の いちばん上）",initFixReq]   // 一覧の並べ替えのあとに働かせるため、いちばん最後に置く
 ];
 
 function startFeatures(){

@@ -29,6 +29,7 @@ chat-stamps.js
 chat-mention.js
 qr.js
 chat-tools.js
+chat-fixreq.js
 chat-story.js
 chat-profile-3d.js
 chat-security.js

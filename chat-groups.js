@@ -194,7 +194,7 @@ async function renderGroupInfo(roomId,focusPollId){
         '<div class="grp-sec"><h4>👤 メンバー</h4><div style="overflow-wrap:anywhere">' + escapeHtml(members) + '</div>' +
             (owner ? '<label>メンバーを追加</label>' + pickList(room.memberIds || []) + '<button type="button" class="button-secondary" data-g="addmembers">選んだ人を追加</button>' : '') + '</div>' +
         (owner ? '<div class="grp-sec"><h4>🔐 期限付き招待リンク</h4><div class="row"><label for="gInviteHours">有効期限</label><select id="gInviteHours"><option value="1">1時間</option><option value="24" selected>24時間</option><option value="72">3日</option><option value="168">7日</option></select><button type="button" class="button-secondary" data-g="createinvite">一回限りリンクを作る</button></div>' + inviteLink + inviteList + '</div>' : '') +
-        '<div class="row"><button type="button" class="button-danger" data-g="leave">グループを退出</button><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
+        '<div class="row">' + (typeof isFixReqRoom === "function" && isFixReqRoom(room) ? '<span class="meta">この部屋は、みんなの「修正依頼」の部屋なので、退出できません。</span>' : '<button type="button" class="button-danger" data-g="leave">グループを退出</button>') + '<button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
     if(owner) pickInit();
     if(focusPollId){ const target = document.getElementById("poll-" + focusPollId); if(target) target.scrollIntoView({block:"center"}); }
 }
@@ -318,6 +318,7 @@ async function onGroupAction(event){
             if(fresh) state.currentRoom = fresh;
             updateHeaderPresence();
         }else if(act === "leave"){
+            if(typeof isFixReqRoom === "function" && isFixReqRoom(room)){ showToast("「修正依頼」の部屋は、退出できません。"); b.disabled = false; return; }
             if(!window.confirm("このグループを退出しますか？")){ b.disabled = false; return; }
             const r = await client.rpc("leave_group",{p_room_id:room.id});
             if(r.error) throw r.error;
