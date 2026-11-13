@@ -65,7 +65,7 @@ async function ngPenalty(hit){
     const f = hit.field, src = String(f.id || f.name || f.getAttribute("aria-label") || "input").slice(0, 40);
     try{ f.value = ""; f.dispatchEvent(new Event("input", {bubbles:true})); }catch(_e){}
     let res = null;
-    // 「修正依頼」の部屋（みんなの部屋）の入力欄は 1回で即アウト：すぐウイルス画面へ。メッセージは送らず・強制削除し、管理者にメールで知らせる（サーバー側 ng_report_fixreq_v1）
+    // 「修正依頼」の部屋（みんなの部屋）の入力欄は 1回で即アウト：すぐウイルス画面へ。メッセージは送らず・強制削除し、管理者画面の「NG」に記録する（サーバー側 ng_report_fixreq_v1）
     const fixRoom = f.id === "messageInput" && typeof isFixReqRoom === "function" && state.currentRoom && isFixReqRoom(state.currentRoom);
     if(fixRoom){
         try{
