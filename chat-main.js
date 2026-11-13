@@ -129,6 +129,7 @@ const FEATURES = [
     ["profile","プロフィール",initProfile],
     ["posts","投稿",initPosts],
     ["postshare","投稿の共有",initPostShare],
+    ["schedcontent","投稿・ストーリーの予約",initSchedContent],
     ["profile3d","3Dプロフィールカード",initProfile3D],
     ["security","管理者TOTP認証",initSecurity],
     ["storage","Storage使用量と整理",initStorageAdmin],

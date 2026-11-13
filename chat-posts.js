@@ -122,8 +122,11 @@ function clearPostAttachments(){
     el.postBody.value = ""; el.postImage.value = ""; el.postVideo.value = ""; feat.postImageFile = null; feat.postVideoFile = null; el.postImageName.textContent = "";
 }
 
-async function submitPost(extra){
+async function submitPost(extra, sendAtArg){
     const linkText = typeof extra === "string" ? extra : "";
+    // 予約投稿：日時は「🕒 予約」から渡される。大きい動画をリンクにする途中の画面をはさんでも、日時を覚えておく。
+    let sendAt = sendAtArg instanceof Date ? sendAtArg : (linkText ? feat.postSendAt || null : null);
+    feat.postSendAt = sendAt;
     let body = el.postBody.value;
     if(linkText) body = (body.trim() ? body.replace(/\s+$/,"") + "\n" : "") + linkText;
     const video = linkText ? null : feat.postVideoFile;
@@ -158,13 +161,17 @@ async function submitPost(extra){
             if(up.error) throw up.error;
         }
         const visibility = document.getElementById("postVisibility")?.value || "public";
-        const result = await client.rpc("create_post_with_visibility",{p_body:body,p_image_path:uploaded,p_visibility:visibility});
+        const result = sendAt
+            ? await client.rpc("schedule_post",{p_body:body,p_image_path:uploaded,p_visibility:visibility,p_send_at:sendAt.toISOString()})
+            : await client.rpc("create_post_with_visibility",{p_body:body,p_image_path:uploaded,p_visibility:visibility});
         if(result.error){
             // 保存場所は受けとったのに、投稿の登録でことわられた動画は、リンクで投稿するよう案内する
             if(video && uploaded){ client.storage.from("post-images").remove([uploaded]); uploaded = null; openPostVideoLinkSheet(video,"upload"); return; }
             throw result.error;
         }
         clearPostAttachments();
+        feat.postSendAt = null;
+        if(sendAt){ showToast(formatDateTime(sendAt.toISOString()) + " に投稿を予約しました。（「📋 予約中」で確認・取り消しできます）"); return; }
         showToast("投稿しました。");
         await loadPosts(true);
     }catch(error){

@@ -8,7 +8,7 @@ const STORY_BG = {blue:"#2d4fd6", pink:"#d63d8a", green:"#1f9d6b", orange:"#e080
 const STORY_BG_NAMES = {blue:"青", pink:"ピンク", green:"緑", orange:"オレンジ", purple:"紫"};
 const STORY_COLUMNS = "id,user_id,body,image_path,bg,created_at,expires_at";
 const ARCHIVE_PAGE = 30;
-feat.story = {file:null, bg:"blue", body:"", archiveFrom:0, archiveTotal:0, archiveRows:[], localUrls:new Map()};
+feat.story = {file:null, video:null, bg:"blue", body:"", archiveFrom:0, archiveTotal:0, archiveRows:[], localUrls:new Map()};
 
 function storyDbOpen(){
     return new Promise((resolve,reject) => {
@@ -57,14 +57,15 @@ async function storyCacheRemote(row){
     const existing = await storyLocalGet(row.id);
     if(existing){ await storyAckLocal(row.id); return existing; }
     let blob = null;
-    if(row.image_path){
+    const isVideo = isPostVideoPath(row.image_path);
+    if(row.image_path && !isVideo){
         const signedUrl = feat.signed.get(row.image_path);
         if(!signedUrl) throw new Error("ストーリー画像の保存リンクを取得できませんでした。");
         const response = await fetch(signedUrl);
         if(!response.ok) throw new Error("ストーリー画像を端末へ保存できませんでした。");
         blob = await response.blob();
     }
-    const record = {id:row.id,user_id:row.user_id,body:row.body || "",bg:row.bg || "blue",created_at:row.created_at,expires_at:row.expires_at,blob,content_type:blob?.type || "",saved_at:new Date().toISOString()};
+    const record = {id:row.id,user_id:row.user_id,body:row.body || "",bg:row.bg || "blue",created_at:row.created_at,expires_at:row.expires_at,blob,content_type:blob?.type || "",had_video:isVideo,saved_at:new Date().toISOString()};
     await storyLocalPut(record);
     await storyAckLocal(row.id);
     return record;
@@ -86,7 +87,7 @@ function storyTabs(active){
 function openStory(){
     openSheet(toolHead("📖 ストーリー", "24時間公開した後、7日間アーカイブに残ります。画像と本文は端末にも自動保存します。") +
         storyTabs("now") +
-        '<div class="row" style="justify-content:flex-start"><button type="button" class="button" data-t="story:new">＋ ストーリーを投稿</button></div>' +
+        '<div class="row" style="justify-content:flex-start"><button type="button" class="button" data-t="story:new">＋ ストーリーを投稿</button><button type="button" class="button-secondary" data-t="sched:list">📋 予約中</button></div>' +
         '<div id="stList" class="st-list"><div class="empty-list">読み込み中...</div></div>' + toolClose());
     return loadStories();
 }
@@ -134,7 +135,10 @@ function storyCard(story, archived){
     const own = story.user_id === state.user.id;
     const name = own ? "あなた" : profileDisplayName(feat.known.get(story.user_id));
     const color = STORY_BG[story.bg] || STORY_BG.blue;
-    const imageUrl = story.localBlob ? storyObjectUrl({id:story.id,blob:story.localBlob}) : story.image_path ? safeHttpUrl(feat.signed.get(story.image_path) || "") : "";
+    const isVideo = isPostVideoPath(story.image_path);
+    const signedUrl = story.image_path ? safeHttpUrl(feat.signed.get(story.image_path) || "") : "";
+    const imageUrl = isVideo ? "" : (story.localBlob ? storyObjectUrl({id:story.id,blob:story.localBlob}) : signedUrl);
+    const videoUrl = isVideo ? signedUrl : "";
     let foot;
     if(archived){
         foot = '<span>' + escapeHtml(storyDate(story.created_at)) + ' に投稿' + (story.localOnly ? ' ・端末に保存済み' : '') + '</span><span class="st-actions"><button type="button" class="button-secondary" data-t="story:repost" data-id="' + escapeHtml(story.id) + '">もう一度投稿</button>' +
@@ -147,7 +151,9 @@ function storyCard(story, archived){
     }
     return '<div class="st-card" style="background:' + color + '" data-sid="' + escapeHtml(story.id) + '">' +
         (imageUrl ? '<img src="' + escapeHtml(imageUrl) + '" alt="ストーリーの写真" loading="lazy">' : "") +
-        (story.body ? '<div class="st-body">' + escapeHtml(story.body) + '</div>' : "") +
+        (videoUrl ? '<video class="st-video" controls playsinline preload="metadata" src="' + escapeHtml(videoUrl) + '"></video>' : "") +
+        (story.hadVideo ? '<div class="meta" style="color:#fff">🎬 動画は、公開終了から7日で削除されました。</div>' : "") +
+        (story.body ? '<div class="st-body">' + linkifyPostBody(story.body) + '</div>' : "") +
         '<div class="st-foot">' + foot + '</div></div>';
 }
 
@@ -173,7 +179,7 @@ async function loadArchive(first){
             const localRows = await storyLocalList(state.user.id).catch(() => []);
             const serverIds = new Set(serverRows.map((row) => row.id));
             const merged = serverRows.slice();
-            for(const local of localRows) if(!serverIds.has(local.id) && !merged.some((row) => row.id === local.id)) merged.push({id:local.id,user_id:local.user_id,body:local.body,bg:local.bg,created_at:local.created_at,expires_at:local.expires_at,localBlob:local.blob,localOnly:true});
+            for(const local of localRows) if(!serverIds.has(local.id) && !merged.some((row) => row.id === local.id)) merged.push({id:local.id,user_id:local.user_id,body:local.body,bg:local.bg,created_at:local.created_at,expires_at:local.expires_at,localBlob:local.blob,hadVideo:!!local.had_video,localOnly:true});
             merged.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
             feat.story.archiveRows = merged;
             feat.story.archiveTotal = merged.length;
@@ -210,7 +216,8 @@ async function repostStory(button){
             const copy = await client.storage.from("post-images").upload(copied,local.blob,{contentType:local.content_type || "image/jpeg",upsert:false});
             if(copy.error){ copied = null; throw copy.error; }
         }else if(story.image_path){
-            copied = state.user.id + "/" + crypto.randomUUID() + ".jpg";
+            const ext = (/\.([A-Za-z0-9]{2,5})$/.exec(story.image_path) || [0, "jpg"])[1].toLowerCase();
+            copied = state.user.id + "/" + crypto.randomUUID() + "." + ext;
             const copy = await client.storage.from("post-images").copy(story.image_path, copied);
             if(copy.error){ copied = null; throw copy.error; }
         }
@@ -231,6 +238,7 @@ async function repostStory(button){
 
 function onStoryAction(action, node){
     if(action === "new") return storyCompose(false);
+    if(action === "new-keep") return storyCompose(true);
     if(action === "list") return openStory();
     if(action === "archive") return openStoryArchive();
     if(action === "more") return loadArchive(false);
@@ -238,9 +246,26 @@ function onStoryAction(action, node){
     if(action === "bg"){ feat.story.bg = node.dataset.bg; document.querySelectorAll("[data-t='story:bg']").forEach((b) => b.classList.toggle("on", b === node)); return; }
     if(action === "photo"){
         feat.story.body = $("stBody") ? $("stBody").value : "";
-        return openPhotoChooser({multiple:false, allowEdit:false, onFiles:(files) => { feat.story.file = files[0] || null; storyCompose(true); }});
+        return openPhotoChooser({multiple:false, allowEdit:false, onFiles:(files) => { feat.story.file = files[0] || null; if(feat.story.file) feat.story.video = null; storyCompose(true); }});
     }
-    if(action === "unphoto"){ feat.story.file = null; feat.story.body = $("stBody") ? $("stBody").value : ""; return storyCompose(true); }
+    if(action === "video"){
+        feat.story.body = $("stBody") ? $("stBody").value : "";
+        const input = document.createElement("input"); input.type = "file"; input.accept = "video/*";
+        input.onchange = () => {
+            const file = input.files && input.files[0];
+            if(!file) return;
+            if(!String(file.type).startsWith("video/")){ showToast("動画のファイルを選んでください。"); return; }
+            feat.story.video = file; feat.story.file = null; storyCompose(true);
+        };
+        input.click(); return;
+    }
+    if(action === "unphoto"){ feat.story.file = null; feat.story.video = null; feat.story.body = $("stBody") ? $("stBody").value : ""; return storyCompose(true); }
+    if(action === "schedule"){
+        feat.story.body = $("stBody") ? $("stBody").value : "";
+        if(!feat.story.body.trim() && !feat.story.file && !feat.story.video){ showToast("ひとこと、または写真・動画を入力してください。"); return; }
+        return openSchedPicker("story", (when) => postStory(null, when));
+    }
+    if(action === "vlinkgo") return storyVideoLinkGo();
     if(action === "user") return openUserStories(node.dataset.id);
     if(action === "prev") return userStoryStep(-1);
     if(action === "next") return userStoryStep(1);
@@ -249,46 +274,104 @@ function onStoryAction(action, node){
 }
 
 function storyCompose(keep){
-    if(!keep) feat.story = {file:null, bg:"blue", body:"", archiveFrom:0, archiveTotal:0, archiveRows:[], localUrls:new Map()};
+    if(!keep) feat.story = {file:null, video:null, bg:"blue", body:"", archiveFrom:0, archiveTotal:0, archiveRows:[], localUrls:new Map()};
     const s = feat.story;
     openSheet(toolHead("📖 ストーリーを投稿", "24時間公開され、その後7日間アーカイブに残ります。本文と写真は端末にも自動保存します。") +
         '<textarea id="stBody" rows="3" maxlength="200" placeholder="ひとこと（200文字まで）">' + escapeHtml(s.body || "") + '</textarea>' +
         '<div class="row" style="justify-content:flex-start">' + Object.keys(STORY_BG).map((key) =>
             '<button type="button" class="st-dot' + (key === s.bg ? " on" : "") + '" data-t="story:bg" data-bg="' + key + '" style="background:' + STORY_BG[key] + '" aria-label="' + STORY_BG_NAMES[key] + '"></button>').join("") + '</div>' +
-        '<div class="row" style="justify-content:flex-start;align-items:center"><button type="button" class="tool-button" data-t="story:photo">📷 写真を付ける</button>' +
-        (s.file ? '<span class="meta">' + escapeHtml(s.file.name) + '</span><button type="button" class="button-secondary" data-t="story:unphoto">外す</button>' : "") + '</div>' +
-        '<div class="row"><button type="button" class="button-secondary" data-t="story:list">キャンセル</button><button type="button" class="button" data-t="story:post">投稿する</button></div>');
+        '<div class="row" style="justify-content:flex-start;align-items:center"><button type="button" class="tool-button" data-t="story:photo">📷 写真を付ける</button><button type="button" class="tool-button" data-t="story:video">🎬 動画を付ける</button>' +
+        (s.file ? '<span class="meta">' + escapeHtml(s.file.name) + '</span><button type="button" class="button-secondary" data-t="story:unphoto">外す</button>' : "") +
+        (s.video ? '<span class="meta">🎬 ' + escapeHtml(s.video.name) + '（' + escapeHtml(formatAttachmentSize(s.video.size)) + '）</span><button type="button" class="button-secondary" data-t="story:unphoto">外す</button>' : "") + '</div>' +
+        '<div class="meta">動画は50MB・5分まで。大きい動画は、YouTube／ドライブなどのリンクにして投稿します。動画は公開終了の7日後に削除されます（端末には保存しません）。</div>' +
+        '<div class="row"><button type="button" class="button-secondary" data-t="story:list">キャンセル</button><button type="button" class="button-secondary" data-t="story:schedule">🕒 予約</button><button type="button" class="button" data-t="story:post">投稿する</button></div>');
 }
 
-async function postStory(button){
-    const body = ($("stBody") ? $("stBody").value : "").trim();
-    const file = feat.story.file;
-    if(!body && !file){ showToast("ひとこと、または写真を入力してください。"); return; }
-    if(Array.from(body).length > 200){ showToast("ひとことは200文字以内です。"); return; }
-    button.disabled = true;
+async function postStory(button, sendAtArg, linkText){
+    const st = feat.story;
+    if(button) st.sendAt = null;
+    if(sendAtArg instanceof Date) st.sendAt = sendAtArg;
+    const sendAt = st.sendAt || null;
+    const typed = ($("stBody") ? $("stBody").value : (st.body || "")).trim();
+    st.body = typed;
+    const body = linkText ? (typed ? typed + "\n" : "") + linkText : typed;
+    const file = st.file, video = linkText ? null : st.video;
+    if(!body && !file && !video){ showToast("ひとこと、または写真・動画を入力してください。"); return; }
+    if(Array.from(body).length > 200){ showToast(linkText ? "ひとこととリンクをあわせて200文字以内にしてください。" : "ひとことは200文字以内です。"); return; }
+    if(button) button.disabled = true;
     const client = requireClient();
     let uploaded = null, localBlob = null, postedId = null;
+    const idle = () => { if(button) button.disabled = false; };
     try{
-        if(file){
+        if(video){
+            // 動画：50MB・5分までは そのまま。大きすぎる／長すぎる／保存場所がことわった動画は、リンクにして投稿する
+            if(video.size > postVideoLimitBytes()){ openStoryVideoLinkSheet(video,"size"); return; }
+            if(postVideoMimeBlocked("video")){ openStoryVideoLinkSheet(video,"upload"); return; }
+            let duration = 0;
+            try{ duration = await getVideoDuration(video); }catch(_e){ showToast("この動画は読み込めませんでした。別の動画を選んでください。"); idle(); return; }
+            if(duration > MAX_VIDEO_SECONDS){ openStoryVideoLinkSheet(video,"long"); return; }
+            const ext = (fileExt(video) || "mp4").replace(/[^a-z0-9]/gi,"").toLowerCase() || "mp4";
+            const path = state.user.id + "/" + crypto.randomUUID() + "." + (isPostVideoPath("x." + ext) ? ext : "mp4");
+            const up = await uploadVideoWithProgress(client,path,video,resolveMime(video),(text) => { if(button) button.textContent = "🎬 " + text; },"post-images");
+            if(up.error){
+                if(videoLinkErrorIsSize(up.error)){ rememberPostVideoRejected(video.size); openStoryVideoLinkSheet(video,"upload"); return; }
+                if(postVideoErrorIsMime(up.error)){ try{ localStorage.setItem("are_post_video_mime_block",String(Date.now())); }catch(_e){} openStoryVideoLinkSheet(video,"upload"); return; }
+                throw up.error;
+            }
+            uploaded = path;
+        }else if(file){
             const blob = await resizeImage(file,1080,0.85); localBlob = blob;
             uploaded = state.user.id + "/" + crypto.randomUUID() + ".jpg";
             const up = await client.storage.from("post-images").upload(uploaded, blob, {contentType:"image/jpeg", upsert:false});
             if(up.error) throw up.error;
         }
-        const result = await client.rpc("create_story",{p_body:body || null,p_image_path:uploaded,p_bg:feat.story.bg});
+        if(sendAt){
+            const scheduled = await client.rpc("schedule_story",{p_body:body || null,p_image_path:uploaded,p_bg:st.bg,p_send_at:sendAt.toISOString()});
+            if(scheduled.error) throw scheduled.error;
+            postedId = scheduled.data; st.sendAt = null;
+            showToast(storyDate(sendAt.toISOString()) + " にストーリーを予約しました。（「📋 予約中」で確認・取り消しできます）");
+            await openStory();
+            return;
+        }
+        const result = await client.rpc("create_story",{p_body:body || null,p_image_path:uploaded,p_bg:st.bg});
         if(result.error) throw result.error;
         postedId = result.data;
         const created = await client.from("stories").select(STORY_COLUMNS).eq("id",result.data).single();
         if(created.error) throw created.error;
-        await storyLocalPut({id:created.data.id,user_id:created.data.user_id,body:created.data.body || "",bg:created.data.bg || "blue",created_at:created.data.created_at,expires_at:created.data.expires_at,blob:localBlob,content_type:localBlob?.type || "",saved_at:new Date().toISOString()});
-        await storyAckLocal(created.data.id);
-        showToast("ストーリーを投稿し、端末にも保存しました。");
+        if(video){
+            await storyCacheRemote(created.data);   // 動画は端末に入れず、文章だけ端末に控える
+        }else{
+            await storyLocalPut({id:created.data.id,user_id:created.data.user_id,body:created.data.body || "",bg:created.data.bg || "blue",created_at:created.data.created_at,expires_at:created.data.expires_at,blob:localBlob,content_type:localBlob?.type || "",saved_at:new Date().toISOString()});
+            await storyAckLocal(created.data.id);
+        }
+        showToast(video ? "ストーリーを投稿しました。" : "ストーリーを投稿し、端末にも保存しました。");
         await openStory();
     }catch(error){
         if(uploaded && !postedId) client.storage.from("post-images").remove([uploaded]);
-        showToast(postedId ? "投稿しましたが端末保存の確認ができませんでした。アーカイブを開いて再保存してください。" : featError(error));
-        button.disabled = false;
+        showToast(postedId && !sendAt ? "投稿しましたが端末保存の確認ができませんでした。アーカイブを開いて再保存してください。" : featError(error));
+        idle();
     }
+}
+
+/** 動画が大きすぎるとき：YouTube・ドライブなどに置いた動画の https:// リンクを、ひとことに入れて投稿する */
+function openStoryVideoLinkSheet(file, reason){
+    const why = reason === "long" ? "5分をこえているため" : reason === "upload" ? "保存場所がいっぱい（またはこの種類を受けつけない）ため" : "大きすぎて（" + formatAttachmentSize(postVideoLimitBytes()) + "をこえている）";
+    feat.story.pendingVideo = file;
+    openSheet(toolHead("🎬 動画をリンクでストーリーに","「" + escapeHtml(String(file.name || "動画").slice(0,60)) + "」は、" + why + "そのまま投稿できません。") +
+        '<div class="meta">YouTube（限定公開）・Googleドライブ・OneDrive などに動画を置いて、その <b>https:// のリンク</b> を貼ってください。リンクを知っている人だけ見られる設定にすると安心です。ひとこととあわせて200文字以内です。' +
+        (feat.story.sendAt ? '<br>（予約した日時に、このリンクが投稿されます）' : '') + '</div>' +
+        '<label for="svUrl">動画のリンク（https://）</label><input id="svUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://…">' +
+        '<div class="row"><button type="button" class="button-secondary" data-t="story:new-keep">もどる</button><button type="button" class="button" data-t="story:vlinkgo">' + (feat.story.sendAt ? "リンクで予約する" : "リンクで投稿する") + '</button></div>');
+    setTimeout(() => { const i = document.getElementById("svUrl"); if(i) i.focus(); },50);
+}
+
+async function storyVideoLinkGo(){
+    const raw = String((document.getElementById("svUrl") || {}).value || "").trim();
+    if(!raw){ showToast("動画のリンクを貼ってください。"); return; }
+    const url = safeHttpUrl(raw);
+    if(!url || !/^https:\/\//i.test(raw)){ showToast("https:// で始まるリンクを入れてください。"); return; }
+    const f = feat.story.pendingVideo, name = f ? String(f.name || "").slice(0,30) : "";
+    return postStory(null, undefined, "🎬 動画" + (name ? "（" + name + "）" : "") + "\n" + url);
 }
 
 async function deleteStory(button){

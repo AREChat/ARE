@@ -9,7 +9,7 @@ const IDLE_MS = 5 * 60 * 1000;
 const FEAT_ERRORS = {
     already_requested:"すでに削除を申請済みです。", not_allowed:"この操作はできません。", only_text_editable:"テキストのメッセージのみ編集できます。",
     room_suspended:"このチャットは停止中です。", send_at_out_of_range:"送信日時は30秒後〜30日以内で指定してください。",
-    too_many_scheduled:"予約は最大50件までです。", forbidden:"管理者権限がありません。", message_length_invalid:"メッセージの長さが正しくありません。",
+    too_many_scheduled:"予約がいっぱいです（メッセージは50件、投稿とストーリーはそれぞれ30件まで）。先に取り消してください。", forbidden:"管理者権限がありません。", message_length_invalid:"メッセージの長さが正しくありません。",
     guest_limit:"お試しアカウントは、管理者以外の人には5件までしかメッセージを送れません。登録すると制限なく使えます。",
     request_not_pending:"この申請はすでに処理されています。",
     reason_required:"理由を2文字以上で入力してください。", confirm_mismatch:"確認用の表示名が一致しません。", already_requested:"すでに削除を申請済みです。",
