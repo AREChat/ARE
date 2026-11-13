@@ -116,11 +116,14 @@ begin
                  and position((v_who || 'さん、') in x.content) > 0) then
       return new;
     end if;
+    perform set_config('are.auto_reply', 'on', true);   -- messages の安全装置（自動返信のフラグは are.auto_reply=on のときだけ）を、入れる間だけ開ける
     insert into public.messages (room_id, sender_id, content, is_auto_reply)
     values (v_room, v_bot,
             jsonb_build_object('type', 'text', 'text', v_who || 'さん、貴重なご意見ありがとうございました。すぐに対応いたします！')::text,
             true);
+    perform set_config('are.auto_reply', 'off', true);
   exception when others then
+    perform set_config('are.auto_reply', 'off', true);
     raise warning 'fix_request_ack_v1: %', sqlerrm;   -- 失敗しても、送った人のメッセージは そのまま届ける
   end;
   return new;
