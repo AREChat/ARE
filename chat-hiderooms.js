@@ -2,12 +2,13 @@
 // ===== チャットの非表示（メッセージは消さずに、一覧から隠す）。個人チャットもグループも同じ =====
 // ・チャット一覧の「⋯」→「🙈 このチャットを非表示にする」。メッセージも履歴も そのまま残ります
 // ・戻すとき／開くとき：ユーザータブの「🙈 非表示のチャット」ボタン。ユーザータブが無い人は、トークタブ（チャット一覧）に出ます
-// ・この端末だけに保存します（フォルダ分け・固定と同じ）。依頼確認チャットは隠せません
+// ・この端末だけに保存します（フォルダ分け・固定と同じ）。依頼確認チャットは管理者だけ隠せます
 
 const hr = { ids:new Set() };
 function hrKey(){ return "are_hidden_rooms_" + (state.user ? state.user.id : "x"); }
 function hrLoad(){ try{ hr.ids = new Set(JSON.parse(localStorage.getItem(hrKey())) || []); }catch(_e){ hr.ids = new Set(); } }
 function hrSave(){ try{ localStorage.setItem(hrKey(), JSON.stringify([...hr.ids])); }catch(_e){ showToast("この端末に保存できませんでした。"); } }
+function hrIsAdmin(){ return !!(typeof feat !== "undefined" && feat.isAdmin) || !!(typeof segSt !== "undefined" && segSt.flags && segSt.flags.is_admin); }
 function hrExists(id){ return (state.rooms || []).some((r) => r.id === id); }
 function hrName(id){ return typeof roomNameById === "function" ? roomNameById(id) : "チャット"; }
 
@@ -19,7 +20,7 @@ function hrPaint(){
 }
 
 function hrHide(id){
-    if(typeof isFixReqRoom === "function" && isFixReqRoom(id)){ showToast("この部屋は非表示にできません。"); return; }
+    if(typeof isFixReqRoom === "function" && isFixReqRoom(id) && !hrIsAdmin()){ showToast("この部屋は非表示にできません。"); return; }
     hr.ids.add(id); hrSave(); hrPaint(); closeSheet();
     showToast("非表示にしました（メッセージは消えていません）。戻すときは「🙈 非表示のチャット」から。");
 }
