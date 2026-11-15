@@ -65,6 +65,14 @@ function segAddHelpButton(){
     a.textContent = "📖 操作方法はこちら";
     const head = pane.querySelector(".section-heading");
     if(head) head.insertAdjacentElement("afterend", a); else pane.prepend(a);
+    // 「はじめて開く画面の案内」を もう一度 出す（オフにした人・見逃した人向け）
+    if(!document.getElementById("segTipsAgain")){
+        const t = document.createElement("button");
+        t.type = "button"; t.id = "segTipsAgain"; t.className = "button-secondary seg-help";
+        t.textContent = "💡 はじめての案内をもう一度出す";
+        t.addEventListener("click", () => { if(window.AREFirstTips) window.AREFirstTips.reset(); });
+        a.insertAdjacentElement("afterend", t);
+    }
 }
 
 // ---------- 3) 友達追加 ----------
