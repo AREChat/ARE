@@ -27,11 +27,23 @@ function segCss(){
     document.head.appendChild(s);
 }
 
+function segCacheKey(){ return "are_ui_flags_" + (state.user ? state.user.id : "x"); }
 async function segLoadFlags(){
     try{
         const r = await requireClient().rpc("my_ui_flags");
-        if(!r.error && r.data && typeof r.data === "object") segSt.flags = r.data;
-    }catch(_e){ /* SQL 未実行・通信失敗：今までどおり */ }
+        if(!r.error && r.data && typeof r.data === "object"){
+            segSt.flags = r.data;
+            try{ localStorage.setItem(segCacheKey(), JSON.stringify({ show_users:r.data.show_users, show_posts:r.data.show_posts, request_room:r.data.request_room, is_admin:r.data.is_admin })); }catch(_e){}
+            return;
+        }
+    }catch(_e){ /* SQL 未実行・通信失敗 */ }
+    if(segSt.flags && segSt.flags.provisional) segSt.flags = null;      // 仮の状態のままだったら、今までどおりの表示に戻す
+}
+/** 起動直後（サーバーの答えを待つ間）の仮の出しわけ：前回の答え → なければ「ユーザー・投稿は隠す」（新しいアカウントは、その他だから） */
+function segProvisional(){
+    let c = null;
+    try{ c = JSON.parse(localStorage.getItem(segCacheKey())); }catch(_e){}
+    segSt.flags = c && typeof c === "object" ? Object.assign({ provisional:true }, c) : { provisional:true, show_users:false, show_posts:false };
 }
 
 function segApplyTabs(){
@@ -270,6 +282,7 @@ function initSegments(){
             try{ await segDecorateAdminUsers(client); }catch(e){ console.error("[ARE seg]", e); }
         };
     }
+    segProvisional(); segApplyTabs();
     segLoadFlags().then(() => {
         segApplyTabs();
         if(typeof loadRecommendations === "function") loadRecommendations();     // おすすめ（同じグループの人）を出す
