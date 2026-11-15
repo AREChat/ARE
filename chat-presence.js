@@ -8,7 +8,28 @@ function relativeAgo(ms){
     return hours < 24 ? hours + "時間前" : Math.floor(hours / 24) + "日前";
 }
 
+// 管理者だけ：平日（月〜金）の 9:00〜19:00 は仕事中なので、いつもオフライン表示にする。
+// その日の 9:00 までに一度も開いていなければ「今日 3:00（深夜）に使っていた」と表示する。日本時間で判定
+const ADMIN_PRES_ID = "9d660098-27f5-4933-bdce-d0ea7a6f08b4";
+function adminPresence(seen){
+    const p = {};
+    new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Tokyo",weekday:"short",hour:"2-digit",hour12:false,year:"numeric",month:"2-digit",day:"2-digit"})
+        .formatToParts(new Date()).forEach((x) => { p[x.type] = x.value; });
+    const hour = parseInt(p.hour,10) % 24, weekday = ["Sat","Sun"].indexOf(p.weekday) < 0;
+    if(!weekday) return null;
+    const nine = new Date(p.year + "-" + p.month + "-" + p.day + "T09:00:00+09:00").getTime();
+    const working = hour >= 9 && hour < 19;
+    if(hour < 9) return null;                               // 朝9時前はふつうの表示
+    if(!seen || seen < nine) return {cls:"offline",text:"オフライン（最終オンライン 今日 3:00）"};
+    if(working) return {cls:"offline",text:"オフライン"};
+    return null;                                            // 19時以降は ふつうの表示
+}
+
 function presenceOf(profile){
+    if(profile && profile.id === ADMIN_PRES_ID){
+        const o = adminPresence(profile.last_seen_at ? new Date(profile.last_seen_at).getTime() : 0);
+        if(o) return o;
+    }
     const seen = profile?.last_seen_at ? new Date(profile.last_seen_at).getTime() : 0;
     const age = Date.now() - seen;
     const status = profile?.presence_status;

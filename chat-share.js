@@ -51,7 +51,10 @@ async function openSharedProfileFromUrl(){
     try{ history.replaceState(null, "", location.pathname); }catch(_e){}
     if(id === state.user.id){ showToast("これはあなた自身のプロフィールです。"); return; }
     const result = await requireClient().from(TABLES.profiles).select("*").eq("id", id).maybeSingle();
-    if(result.error || !result.data){ showToast("共有されたユーザーが見つかりませんでした。"); return; }
+    if(result.error || !result.data){
+        if(typeof segRequestContact === "function"){ await segRequestContact(id); return; }     // 見えない相手＝家庭の区切りの向こう側：管理者への申請へ
+        showToast("共有されたユーザーが見つかりませんでした。"); return;
+    }
     feat.known.set(result.data.id, result.data);
     openProfileView(result.data);
 }

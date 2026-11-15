@@ -195,6 +195,9 @@ function getErrorMessage(error){
         return "この機能は未実装です（サーバー側の準備ができていません）。";
     }
     const message = error?.message || String(error || "不明なエラー");
+    if(/segment_blocked/.test(message)){
+        return "この方とは、いまは連絡できません。管理者の承認が必要です。";
+    }
     if(/guest_limit/.test(message)){
         return "お試しアカウントは、管理者以外の人には5件までしかメッセージを送れません。登録すると制限なく使えます。";
     }
@@ -532,6 +535,7 @@ async function openOrCreateDirectChat(partnerId){
         await selectRoom(room,partner);
     }catch(error){
         console.error("Open direct chat error:",error);
+        if(/segment_blocked/.test(String(error?.message || "")) && typeof segRequestContact === "function"){ setStatus("","info"); segRequestContact(partnerId); return; }
         setStatus(getErrorMessage(error),"error");
     }
 }

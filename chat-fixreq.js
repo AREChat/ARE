@@ -6,39 +6,45 @@
 // ・「その他」→「🛠 修正依頼を送る」から、この部屋を開いて、書きかたの見本を入力欄に入れます。
 
 const FIXREQ_ID = "7f1c0de0-5a1e-4f1c-8f1c-0000000f1c01";     // 「修正依頼」アカウント
-const FIXREQ_ROOM = "7f1c0de0-5a1e-4f1c-8f1c-0000000f1c02";   // 共通の部屋
+const FIXREQ_ROOM = "7f1c0de0-5a1e-4f1c-8f1c-0000000f1c02";   // 共通の部屋（区分ごとに4つあり、名前はぜんぶ「依頼確認チャット」。sql/segments_v1.sql）
+const FIXREQ_ROOMS = [FIXREQ_ROOM,"7f1c0de0-5a1e-4f1c-8f1c-0000000f1c11","7f1c0de0-5a1e-4f1c-8f1c-0000000f1c12","7f1c0de0-5a1e-4f1c-8f1c-0000000f1c14"];
 const FIXREQ_TEMPLATE = "【修正依頼】\nどこで（画面・ゲーム名）：\nどうなった：\nどうしてほしい：\n";
-const FIXREQ_SUB = "📌 みんなの部屋 ・ 直してほしいところを送れます";
+const FIXREQ_SUB = "📌 直してほしいところを送れます";
 
 function isFixReqRoom(room){
     const id = (room && typeof room === "object") ? room.id : room;
-    return id === FIXREQ_ROOM;
+    return FIXREQ_ROOMS.indexOf(id) >= 0;
 }
 
 /** 左の一覧：この部屋を いちばん上に出す（絞り込み・並べ替えより優先）。ほかのファイルの並べ替えのあとに呼ぶ */
 function fixreqPaintRooms(){
     const list = el && el.roomList; if(!list) return;
-    const b = list.querySelector('[data-room-id="' + FIXREQ_ROOM + '"]');
-    if(!b) return;
-    b.hidden = false; b.style.display = "";
-    b.classList.add("fixreq-room");
-    if(list.firstElementChild !== b) list.insertBefore(b, list.firstElementChild);
-    const sm = b.querySelector(".person-text > small:not(.rt-typing)");
-    if(sm && sm.textContent !== FIXREQ_SUB) sm.textContent = FIXREQ_SUB;
-    const menu = b.querySelector(".cf-menu"); if(menu) menu.style.display = "none";    // 固定・フォルダ分けは できない（いつも いちばん上）
-    let m = b.querySelector(".cf-marks");
-    if(!m){ m = document.createElement("span"); m.className = "cf-marks"; b.appendChild(m); }
-    if(m.textContent.indexOf("📌") < 0) m.textContent = m.textContent + "📌";
+    // 自分の部屋が複数あれば（管理者は4つ）、上から順に固定する
+    let first = list.firstElementChild;
+    FIXREQ_ROOMS.forEach((rid) => {
+        const b = list.querySelector('[data-room-id="' + rid + '"]');
+        if(!b) return;
+        b.hidden = false; b.style.display = "";
+        b.classList.add("fixreq-room");
+        if(first !== b) list.insertBefore(b, first); else first = b.nextElementSibling;
+        const sm = b.querySelector(".person-text > small:not(.rt-typing)");
+        if(sm && sm.textContent !== FIXREQ_SUB) sm.textContent = FIXREQ_SUB;
+        const menu = b.querySelector(".cf-menu"); if(menu) menu.style.display = "none";    // 固定・フォルダ分けは できない（いつも いちばん上）
+        let m = b.querySelector(".cf-marks");
+        if(!m){ m = document.createElement("span"); m.className = "cf-marks"; b.appendChild(m); }
+        if(m.textContent.indexOf("📌") < 0) m.textContent = m.textContent + "📌";
+    });
 }
 
 async function openFixRequest(){
     if(!state.user) return;
     if(state.user.id === FIXREQ_ID){ showToast("これは「修正依頼」の受付用アカウントです。"); return; }
-    let room = (state.rooms || []).find((r) => r.id === FIXREQ_ROOM);
+    const myRoom = (typeof segRequestRoomId === "function" && segRequestRoomId()) || FIXREQ_ROOM;
+    let room = (state.rooms || []).find((r) => r.id === myRoom);
     if(!room){ try{ await loadRooms(); }catch(_e){ /* 下で準備中と出す */ } room = (state.rooms || []).find((r) => r.id === FIXREQ_ROOM); }
     if(!room){ showToast("「修正依頼」の部屋は、いま準備中です。少し待ってから、もう一度お試しください。"); return; }
     await selectRoom(room, null);
-    if(state.currentRoom && state.currentRoom.id === FIXREQ_ROOM && el.messageInput && !el.messageInput.value.trim()){
+    if(state.currentRoom && isFixReqRoom(state.currentRoom) && el.messageInput && !el.messageInput.value.trim()){
         el.messageInput.value = FIXREQ_TEMPLATE;
         try{ el.messageInput.focus(); const at = FIXREQ_TEMPLATE.indexOf("：") + 1; el.messageInput.setSelectionRange(at, at); }catch(_e){ /* 何もしない */ }
         showToast("直してほしいことを書き足して、送信してください。");
