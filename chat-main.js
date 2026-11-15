@@ -223,6 +223,7 @@ const FEATURES = [
     ["quick","ショートカット・その他の検索・フォロー一覧",initQuick],
     ["moreorg","その他の分類・お気に入り・最近",initMoreOrg],
     ["sharefile","ファイル共有",initShareFile],
+    ["hiderooms","チャットの非表示（消さずに隠す）",initHideRooms],
     ["segments","ユーザー区分・友達追加・操作方法ボタン",initSegments],
     ["fixreq","修正依頼の共通の部屋（一覧の いちばん上）",initFixReq]   // 一覧の並べ替えのあとに働かせるため、いちばん最後に置く
 ];
