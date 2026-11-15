@@ -814,7 +814,8 @@
     }
 
     async function logout(){
-        if(!confirm("ログアウトしますか？")) return;
+        const logoutMsg = (window.AREAuth && window.AREAuth.logoutConfirmText) ? await window.AREAuth.logoutConfirmText() : "ログアウトしますか？";
+    if(!confirm(logoutMsg)) return;
 
         setBusy(el.logoutButton,true,"ログアウト中...");
         try{
@@ -825,7 +826,7 @@
                 state.authSubscription.unsubscribe();
                 state.authSubscription = null;
             }
-            await window.AREAuth.logout();
+            await window.AREAuth.logout({deleteGuest:true});
             window.location.replace("./index.html");
         }catch(error){
             console.error("Logout error:",error);

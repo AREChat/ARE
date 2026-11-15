@@ -1009,7 +1009,8 @@ async function uploadAndSend(file,kind,originalBytes,nthLabel){
 }
 
 async function logout(){
-    if(!confirm("ログアウトしますか？")) return;
+    const logoutMsg = (window.AREAuth && window.AREAuth.logoutConfirmText) ? await window.AREAuth.logoutConfirmText() : "ログアウトしますか？";
+    if(!confirm(logoutMsg)) return;
 
     setBusy(el.logoutButton,true,"ログアウト中...");
     try{
@@ -1020,7 +1021,7 @@ async function logout(){
             state.authSubscription.unsubscribe();
             state.authSubscription = null;
         }
-        await window.AREAuth.logout();
+        await window.AREAuth.logout({deleteGuest:true});
         redirectToIndex();
     }catch(error){
         console.error("Logout error:",error);

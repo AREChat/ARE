@@ -2,6 +2,7 @@
 // ===== チャットの非表示（メッセージは消さずに、一覧から隠す）。個人チャットもグループも同じ =====
 // ・チャット一覧の「⋯」→「🙈 このチャットを非表示にする」。メッセージも履歴も そのまま残ります
 // ・戻すとき／開くとき：ユーザータブの「🙈 非表示のチャット」ボタン。ユーザータブが無い人は、トークタブ（チャット一覧）に出ます
+// ・隠したチャットに「新しいメッセージ（通知）」が来たときは、自動で一覧に戻して知らせます（見逃さないため）
 // ・この端末だけに保存します（フォルダ分け・固定と同じ）。依頼確認チャットも隠せます（「非表示のチャット」から戻せます）
 
 const hr = { ids:new Set() };
@@ -20,7 +21,10 @@ function hrPaint(){
 }
 
 function hrHide(id){
-        hr.ids.add(id); hrSave(); hrPaint(); closeSheet();
+        hr.ids.add(id); hrSave();
+    // 隠す前までの未読は「読んだ」ことにする（隠した直後に、古い未読で すぐ戻ってしまわないように）
+    try{ if(typeof nfMarkSeen === "function") nfMarkSeen(id); }catch(_e){ /* 続行 */ }
+    hrPaint(); closeSheet();
     showToast("非表示にしました（メッセージは消えていません）。戻すときは「🙈 非表示のチャット」から。");
 }
 function hrShow(id){ hr.ids.delete(id); hrSave(); hrPaint(); }
@@ -57,5 +61,19 @@ function initHideRooms(){
     hrLoad(); hrAddButtons();
     const orig = renderRooms;
     renderRooms = function(){ orig.apply(this, arguments); try{ hrPaint(); }catch(e){ console.error("[ARE hide]", e); } };
+    // 隠しているチャットに新着（未読）が来たら、一覧に戻す
+    if(typeof nfPaint === "function"){
+        const origPaint = nfPaint;
+        nfPaint = function(){
+            try{
+                const back = [...hr.ids].filter((id) => (feat.unread && feat.unread[id] > 0) && hrExists(id));
+                if(back.length){
+                    back.forEach((id) => hr.ids.delete(id)); hrSave(); hrPaint();
+                    showToast("非表示にしていたチャット（" + back.map(hrName).join("、") + "）に新着があったので、一覧に戻しました。");
+                }
+            }catch(e){ console.error("[ARE hide]", e); }
+            return origPaint.apply(this, arguments);
+        };
+    }
     if(state.rooms && state.rooms.length) hrPaint();
 }

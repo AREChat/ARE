@@ -242,8 +242,35 @@ try { if (window.top !== window.self) { window.top.location = window.self.locati
         });
     }
 
-    async function logout() {
+    // ログアウト前の確認文。お試しアカウントのときは「削除されます」と はっきり伝える
+    async function logoutConfirmText() {
+        try {
+            const st = await getClient().rpc("guest_status_me");
+            if (st && st.data && st.data.guest === true) {
+                return "ログアウトすると、このお試しアカウントは削除されます。\n送ったメッセージもすべて消えて、元にはもどせません。\n\nログアウトしますか？";
+            }
+        } catch (_e) { /* 取れなくても、ふつうの確認にする */ }
+        return "ログアウトしますか？";
+    }
+
+    async function logout(options) {
         const client = getClient();
+
+        // ログアウトボタンから呼ばれたとき（deleteGuest）だけ、お試しアカウントは その場で完全に消す
+        // （同じ人が何度も作り直して管理者への通知が増えるのを防ぐ。自動ログアウトなどでは消さない）
+        if (options && options.deleteGuest === true) {
+            try {
+                const st = await client.rpc("guest_status_me");
+                if (st && st.data && st.data.guest === true) {
+                    const del = await client.rpc("guest_delete_me_v1");
+                    if (!del.error) {
+                        try { await client.auth.signOut({ scope: "local" }); } catch (_e) { /* 消えたあとなので無視 */ }
+                        return true;
+                    }
+                }
+            } catch (_e) { /* 失敗しても、ふつうのログアウトにもどる */ }
+        }
+
         const result = await client.auth.signOut();
 
         if (result.error) {
@@ -581,6 +608,7 @@ try { if (window.top !== window.self) { window.top.location = window.self.locati
         register: register,
         recover: recover,
         logout: logout,
+        logoutConfirmText: logoutConfirmText,
         guestStart: guestStart,
         getSession: getSession,
         getCurrentUser: getCurrentUser,
