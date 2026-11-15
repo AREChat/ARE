@@ -68,12 +68,12 @@ begin
     return exists (select 1 from private.segment_links l where l.a = least(p_a, p_b) and l.b = greatest(p_a, p_b));
 end $$;
 
-create or replace function private.seg_bot_say(p_room uuid, p_text text) returns void
+create or replace function private.seg_bot_say(p_room uuid, p_sender uuid, p_text text) returns void
 language plpgsql security definer set search_path = '' as $$
 begin
     perform set_config('are.auto_reply', 'on', true);
     insert into public.messages (room_id, sender_id, content, is_auto_reply)
-    values (p_room, '7f1c0de0-5a1e-4f1c-8f1c-0000000f1c01',
+    values (p_room, p_sender,
             jsonb_build_object('type', 'text', 'text', p_text)::text, true);
     perform set_config('are.auto_reply', 'off', true);
 exception when others then
@@ -195,7 +195,7 @@ begin
     select room_id into v_room from private.segment_rooms where segment = private.seg_of(c.requester);
     select display_name into v_tname from public.profiles where id = c.target;
     if v_room is not null then
-        perform private.seg_bot_say(v_room, case when p_approve
+        perform private.seg_bot_say(v_room, (select auth.uid()), case when p_approve
             then '管理者が承認しました。' || coalesce(v_tname, 'その方') || 'さんとの個人チャットとゲームが使えます（グループチャット・投稿は使えません）。'
             else '今回は、' || coalesce(v_tname, 'その方') || 'さんとの連絡は見送りになりました。' end);
     end if;
@@ -242,7 +242,7 @@ begin
     select display_name into v_mn from public.profiles where id = v_me;
     select display_name into v_tn from public.profiles where id = p_target;
     if v_room is not null then
-        perform private.seg_bot_say(v_room,
+        perform private.seg_bot_say(v_room, v_me,
             '【連絡の申請】' || coalesce(v_mn, '利用者') || 'さんが ' || coalesce(v_tn, 'ほかの方') ||
             'さんとの個人チャット・ゲームを希望しています。管理者の承認をお待ちください。');
     end if;
@@ -394,9 +394,9 @@ on conflict do nothing;
 
 -- 区分ごとの「依頼確認チャット」（名前は全部おなじ）
 insert into public.chat_rooms (id, is_group, name, created_by) values
-    ('7f1c0de0-5a1e-4f1c-8f1c-0000000f1c11', true, '依頼確認チャット', '7f1c0de0-5a1e-4f1c-8f1c-0000000f1c01'),
-    ('7f1c0de0-5a1e-4f1c-8f1c-0000000f1c12', true, '依頼確認チャット', '7f1c0de0-5a1e-4f1c-8f1c-0000000f1c01'),
-    ('7f1c0de0-5a1e-4f1c-8f1c-0000000f1c14', true, '依頼確認チャット', '7f1c0de0-5a1e-4f1c-8f1c-0000000f1c01')
+    ('7f1c0de0-5a1e-4f1c-8f1c-0000000f1c11', true, '依頼確認チャット', null),
+    ('7f1c0de0-5a1e-4f1c-8f1c-0000000f1c12', true, '依頼確認チャット', null),
+    ('7f1c0de0-5a1e-4f1c-8f1c-0000000f1c14', true, '依頼確認チャット', null)
 on conflict (id) do nothing;
 update public.chat_rooms set name = '依頼確認チャット' where id = '7f1c0de0-5a1e-4f1c-8f1c-0000000f1c02';
 
