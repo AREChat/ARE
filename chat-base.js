@@ -385,6 +385,14 @@ async function loadRecommendations(){
             result = await client.from(TABLES.profiles).select("*").ilike("display_name","%" + escLike(text) + "%").neq("id",state.user.id).order("display_name",{ascending:true}).limit(30);
         }else if(state.showHidden && state.hiddenIds.size){
             result = await client.from(TABLES.profiles).select("*").in("id",[...state.hiddenIds]).limit(100);
+        }else{
+            // おすすめ：同じグループ（社員は社員、友人は友人）の人。SQL 未実行・該当なしなら今までどおり（検索のみ）
+            try{
+                const peers = await client.rpc("my_segment_peers_v1");
+                const ids = (!peers.error && peers.data ? peers.data : []).map((r) => r.user_id).filter(Boolean);
+                state.recommendedMode = ids.length > 0;
+                if(ids.length) result = await client.from(TABLES.profiles).select("*").in("id",ids).limit(20);
+            }catch(_e){ state.recommendedMode = false; }
         }
         if(result.error) throw result.error;
         state.recommendations = result.data || [];
@@ -410,7 +418,8 @@ function renderRecommendations(){
         return;
     }
 
-    el.recommendedUsers.innerHTML = list.map((profile) => {
+    const recoHead = state.recommendedMode && !el.userSearch.value.trim() && !state.showHidden ? '<div class="meta" style="margin:4px 2px">⭐ おすすめのユーザー</div>' : "";
+    el.recommendedUsers.innerHTML = recoHead + list.map((profile) => {
         const name = profileDisplayName(profile);
         const avatar = safeHttpUrl(profile?.avatar_url || profile?.avatarUrl || profile?.photo_url || "");
         const hidden = state.hiddenIds.has(profile.id);

@@ -272,6 +272,7 @@ function initSegments(){
     }
     segLoadFlags().then(() => {
         segApplyTabs();
+        if(typeof loadRecommendations === "function") loadRecommendations();     // おすすめ（同じグループの人）を出す
         if(typeof renderRooms === "function" && state.rooms && state.rooms.length) try{ renderRooms(); }catch(_e){}
     });
 }
