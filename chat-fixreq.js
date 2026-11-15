@@ -29,7 +29,7 @@ function fixreqPaintRooms(){
         if(first !== b) list.insertBefore(b, first); else first = b.nextElementSibling;
         const sm = b.querySelector(".person-text > small:not(.rt-typing)");
         if(sm && sm.textContent !== FIXREQ_SUB) sm.textContent = FIXREQ_SUB;
-        const menu = b.querySelector(".cf-menu"); if(menu) menu.style.display = (typeof hrIsAdmin === "function" && hrIsAdmin()) ? "" : "none";    // 固定・フォルダ分けは できない（いつも いちばん上）。管理者だけ「⋯」から非表示にできる
+        const menu = b.querySelector(".cf-menu"); if(menu) menu.style.display = "";    // 「⋯」から非表示にできる（固定・フォルダ分けも出るが、並びは いつも いちばん上）
         let m = b.querySelector(".cf-marks");
         if(!m){ m = document.createElement("span"); m.className = "cf-marks"; b.appendChild(m); }
         if(m.textContent.indexOf("📌") < 0) m.textContent = m.textContent + "📌";
