@@ -33,6 +33,7 @@ chat-tools.js
 chat-segments.js
 chat-hiderooms.js
 chat-firsttips.js
+chat-reco.js
 chat-fixreq.js
 chat-story.js
 chat-profile-3d.js

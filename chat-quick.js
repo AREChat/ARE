@@ -160,6 +160,7 @@ let qkCounts = null;
 
 function qkPaintFollowCounts(){
     document.querySelectorAll("[data-flcount]").forEach((box) => {
+        if(box.closest(".pane-users") && typeof rcStatsHtml === "function"){ const h = rcStatsHtml(); if(h){ box.innerHTML = h; return; } }
         const c = qkCounts;
         box.innerHTML = '<button type="button" class="fl-chip" data-keep="1" data-fl="followers"><b>' + (c ? c.followers : "–") + '</b> フォロワー</button>' +
             '<button type="button" class="fl-chip" data-keep="1" data-fl="following"><b>' + (c ? c.following : "–") + '</b> フォロー中</button>';

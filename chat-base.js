@@ -391,7 +391,8 @@ async function loadRecommendations(){
                 const peers = await client.rpc("my_segment_peers_v1");
                 const ids = (!peers.error && peers.data ? peers.data : []).map((r) => r.user_id).filter(Boolean);
                 state.recommendedMode = ids.length > 0;
-                if(ids.length) result = await client.from(TABLES.profiles).select("*").in("id",ids).limit(20);
+                if(ids.length) result = await client.from(TABLES.profiles).select("*").in("id",ids).limit(300);
+                if(typeof rcPrepare === "function") await rcPrepare();
             }catch(_e){ state.recommendedMode = false; }
         }
         if(result.error) throw result.error;
@@ -409,6 +410,7 @@ function renderRecommendations(){
     const list = state.recommendations.filter((profile) => {
         return state.showHidden || !state.hiddenIds.has(profile.id);
     });
+    if(typeof rcPaintCount === "function") rcPaintCount();
     el.toggleHiddenUsers.textContent = state.showHidden ? "非表示を隠す" : "非表示（" + state.hiddenIds.size + "）";
 
     if(!list.length){
@@ -418,8 +420,11 @@ function renderRecommendations(){
         return;
     }
 
-    const recoHead = state.recommendedMode && !el.userSearch.value.trim() && !state.showHidden ? '<div class="meta" style="margin:4px 2px">⭐ おすすめのユーザー</div>' : "";
-    el.recommendedUsers.innerHTML = recoHead + list.map((profile) => {
+    let shown = list, recoTitle = "⭐ おすすめのユーザー";
+    const recoOn = state.recommendedMode && !el.userSearch.value.trim() && !state.showHidden;
+    if(recoOn && typeof rcPick === "function"){ const r = rcPick(list); if(r){ shown = r.list; recoTitle = r.title; } }
+    const recoHead = recoOn ? '<div class="meta" style="margin:4px 2px">' + recoTitle + '</div>' : "";
+    el.recommendedUsers.innerHTML = recoHead + shown.map((profile) => {
         const name = profileDisplayName(profile);
         const avatar = safeHttpUrl(profile?.avatar_url || profile?.avatarUrl || profile?.photo_url || "");
         const hidden = state.hiddenIds.has(profile.id);
@@ -434,6 +439,7 @@ function renderRecommendations(){
             '<button class="hide-btn" type="button" data-hide="' + escapeHtml(profile.id) + '" data-action="' + (hidden ? 'show' : 'hide') + '">' + (hidden ? '再表示' : '非表示') + '</button></div>';
     }).join("");
 
+    if(typeof qkPaintFollowCounts === "function") qkPaintFollowCounts();
     el.recommendedUsers.querySelectorAll("[data-user-id]").forEach((button) => {
         button.addEventListener("click",() => openOrCreateDirectChat(button.dataset.userId));
     });
