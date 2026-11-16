@@ -1,8 +1,9 @@
 "use strict";
 // ===== チャットの非表示（メッセージは消さずに、一覧から隠す）。個人チャットもグループも同じ =====
 // ・チャット一覧の「⋯」→「🙈 このチャットを非表示にする」。メッセージも履歴も そのまま残ります
-// ・戻すとき／開くとき：ユーザータブの「🙈 非表示のチャット」ボタン。ユーザータブが無い人は、トークタブ（チャット一覧）に出ます
-// ・隠したチャットに「新しいメッセージ（通知）」が来たときは、自動で一覧に戻して知らせます（見逃さないため）
+// ・戻すとき／開くとき／まとめて隠すとき：ユーザータブの「🙈 非表示のチャット」ボタン。ユーザータブが無い人は、トークタブ（チャット一覧）に出ます
+//   （チェックを入れて、まとめて「非表示にする」「表示に戻す」。「開く」は一覧に戻してから開きます）
+// ・隠したチャットに「新しいメッセージ（通知）」が来たとき、または通知から そのチャットを開いたときは、自動で一覧に戻します（見逃さないため）
 // ・この端末だけに保存します（フォルダ分け・固定と同じ）。依頼確認チャットも隠せます（「非表示のチャット」から戻せます）
 
 const hr = { ids:new Set() };
@@ -29,23 +30,48 @@ function hrHide(id){
 }
 function hrShow(id){ hr.ids.delete(id); hrSave(); hrPaint(); }
 
-function hrOpenList(){
-    const rooms = (state.rooms || []).filter((r) => hr.ids.has(r.id));
-    openSheet('<h3 style="margin:0">🙈 非表示のチャット</h3><div class="meta">メッセージは消えていません。「開く」で読めます。「表示に戻す」で一覧に戻ります。</div>' +
-        (rooms.length ? rooms.map((r) =>
-            '<div class="admin-card"><b>' + escapeHtml(r.is_group ? (r.name || "グループ") : profileDisplayName(r.partner)) + '</b><span class="meta"> ' + (r.is_group ? "グループ" : "個人チャット") + '</span>' +
-            '<div class="row"><button type="button" class="button" data-hropen="' + escapeHtml(r.id) + '">開く</button>' +
-            '<button type="button" class="button-secondary" data-hrshow="' + escapeHtml(r.id) + '">表示に戻す</button></div></div>').join("")
-            : '<div class="empty-list">非表示のチャットはありません。</div>') +
-        '<div class="row"><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
-    const root = document.getElementById("sheet") || document;
-    document.querySelectorAll("[data-hropen]").forEach((b) => b.addEventListener("click", () => {
-        const room = state.rooms.find((r) => r.id === b.dataset.hropen); closeSheet(); if(room) selectRoom(room, room.partner);
+/** まとめて隠す／戻す（ids は配列）。隠す前までの未読は「読んだ」ことにして、すぐ戻らないようにする */
+function hrHideMany(ids){
+    ids.forEach((id) => { hr.ids.add(id); try{ if(typeof nfMarkSeen === "function") nfMarkSeen(id); }catch(_e){ /* 続行 */ } });
+    hrSave(); hrPaint();
+}
+function hrShowMany(ids){ ids.forEach((id) => hr.ids.delete(id)); hrSave(); hrPaint(); }
+
+/** 「非表示のチャット」の画面：表示中・非表示のチャットを ぜんぶ並べて、チェックしてまとめて 隠す／戻す ができる */
+function hrOpenList(keepScroll){
+    const all = (state.rooms || []);
+    const hidden = all.filter((r) => hr.ids.has(r.id));
+    const shown = all.filter((r) => !hr.ids.has(r.id));
+    const row = (r, mode) => '<label class="admin-card hr-row" style="display:flex;align-items:center;gap:10px;margin:6px 0;cursor:pointer"><input type="checkbox" class="hr-chk" data-hrid="' + escapeHtml(r.id) + '" data-hrmode="' + mode + '" style="width:22px;height:22px;flex:none">' +
+        '<span style="flex:1;min-width:0"><b>' + escapeHtml(hrName(r.id)) + '</b><span class="meta"> ' + (r.is_group ? "グループ" : "個人チャット") + '</span></span>' +
+        (mode === "hidden" ? '<button type="button" class="button" data-hropen="' + escapeHtml(r.id) + '" style="min-height:40px">開く</button>' : '') + '</label>';
+    const sec = (title, list, mode, act, actLabel, allLabel) => '<h4 style="margin:14px 0 4px">' + title + '（' + list.length + '）</h4>' +
+        (list.length ? '<div class="row" style="gap:8px;flex-wrap:wrap"><button type="button" class="button-secondary" data-hrall="' + mode + '" style="min-height:40px">' + allLabel + '</button>' +
+            '<button type="button" class="button" data-hract="' + act + '" style="min-height:40px">' + actLabel + '</button></div>' + list.map((r) => row(r, mode)).join("")
+            : '<div class="empty-list">' + (mode === "hidden" ? "非表示のチャットはありません。" : "表示中のチャットはありません。") + '</div>');
+    openSheet('<h3 style="margin:0">🙈 チャットの表示・非表示</h3><div class="meta">チェックを入れて、まとめて「非表示にする」「表示に戻す」ができます。メッセージは消えません。「開く」を押すと、一覧に戻してチャットを開きます。</div>' +
+        sec("非表示のチャット", hidden, "hidden", "show", "選んだチャットを表示に戻す", "ぜんぶ選ぶ／外す") +
+        sec("表示中のチャット", shown, "shown", "hide", "選んだチャットを非表示にする", "ぜんぶ選ぶ／外す") +
+        '<div class="row" style="margin-top:12px"><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
+    const checked = (mode) => [...document.querySelectorAll('.hr-chk[data-hrmode="' + mode + '"]:checked')].map((c) => c.dataset.hrid);
+    document.querySelectorAll("[data-hropen]").forEach((b) => b.addEventListener("click", (e) => {
+        e.preventDefault(); e.stopPropagation();
+        const id = b.dataset.hropen; const room = state.rooms.find((r) => r.id === id);
+        hrShow(id);                                     // 「開く」＝ チャット一覧に戻して、そのチャットを開く
+        closeSheet(); if(room) selectRoom(room, room.partner);
+        showToast("一覧に戻しました。");
     }));
-    document.querySelectorAll("[data-hrshow]").forEach((b) => b.addEventListener("click", () => {
-        hrShow(b.dataset.hrshow); showToast("一覧に戻しました。"); hrOpenList();
+    document.querySelectorAll("[data-hrall]").forEach((b) => b.addEventListener("click", () => {
+        const boxes = [...document.querySelectorAll('.hr-chk[data-hrmode="' + b.dataset.hrall + '"]')];
+        const on = boxes.some((c) => !c.checked); boxes.forEach((c) => { c.checked = on; });
     }));
-    void root;
+    document.querySelectorAll("[data-hract]").forEach((b) => b.addEventListener("click", () => {
+        const act = b.dataset.hract; const ids = checked(act === "show" ? "hidden" : "shown");
+        if(!ids.length){ showToast("先に、チャットにチェックを入れてください。"); return; }
+        if(act === "show"){ hrShowMany(ids); showToast(ids.length + "件を、一覧に戻しました。"); }
+        else { hrHideMany(ids); showToast(ids.length + "件を、非表示にしました。（メッセージは消えていません）"); }
+        hrOpenList();
+    }));
 }
 
 function hrAddButtons(){
@@ -73,6 +99,14 @@ function initHideRooms(){
                 }
             }catch(e){ console.error("[ARE hide]", e); }
             return origPaint.apply(this, arguments);
+        };
+    }
+    // 非表示のチャットを開いたとき（通知をタップして開いた場合など）も、一覧に戻す
+    if(typeof selectRoom === "function"){
+        const origSel = selectRoom;
+        selectRoom = function(room){
+            try{ if(room && room.id && hr.ids.has(room.id)){ hrShow(room.id); } }catch(e){ console.error("[ARE hide]", e); }
+            return origSel.apply(this, arguments);
         };
     }
     if(state.rooms && state.rooms.length) hrPaint();
