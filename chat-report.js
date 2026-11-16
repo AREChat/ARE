@@ -33,6 +33,13 @@ function initReport(){
             b.type = "button"; b.className = "button-danger"; b.dataset.t = "rp:user"; b.dataset.id = profile.id; b.dataset.name = profile.display_name || "";
             b.textContent = "🚩 このユーザーを通報";
             if(row) row.insertAdjacentElement("afterbegin", b); else el.profileSheet.appendChild(b);
+            // 管理者だけ：通報の隣に「このアカウントを削除」（押すと確認シートが出ます）
+            if(feat.isAdmin && typeof deleteAccount === "function"){
+                const d = document.createElement("button");
+                d.type = "button"; d.className = "button-danger"; d.dataset.t = "rp:del"; d.dataset.id = profile.id; d.dataset.name = profile.display_name || "ユーザー";
+                d.textContent = "🗑️ このアカウントを削除";
+                b.insertAdjacentElement("afterend", d);
+            }
         }catch(e){ console.error("[ARE report]", e); }
     };
 }
@@ -51,6 +58,7 @@ function openReport(o){
 
 async function onReportAction(action, node){
     if(action === "user"){ openReport({target:node.dataset.id}); return; }
+    if(action === "del"){ closeSheet(); deleteAccount(node.dataset.id, node.dataset.name || "ユーザー"); return; }
     if(action !== "send") return;
     const reason = (document.querySelector('input[name="rpReason"]:checked') || {}).value || "other";
     const detail = String((document.getElementById("rpDetail") || {}).value || "").trim();
