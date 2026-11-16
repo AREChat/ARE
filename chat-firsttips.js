@@ -3,7 +3,8 @@
 // ・タブ（チャット／ユーザー／投稿／その他／マイページ）、チャットの部屋、グループ作成・検索・非表示の画面、
 //   「その他」の各機能（カードを はじめて押したとき）で、その人が はじめて開いたときに1回だけ出します。
 // ・「わかった」を押すとその画面の案内は二度と出ません。「案内を今後ぜんぶ出さない」でオフにできます。
-// ・オフにしたあとは「その他」→「操作方法」の「案内をもう一度出す」で戻せます（localStorage：この端末だけ）。
+// ・もう一度出すのは、操作ガイド（help.html）の「案内をもう一度出す」ボタン（localStorage：この端末だけ）。
+// ・チャットの一覧・部屋には案内を出しません。
 // ・ほかのポップアップと重ならないよう、順番に1つずつ出します。
 
 const ftip = { seen:{}, queue:[], showing:false, off:false, key:"", offKey:"" };
@@ -42,7 +43,7 @@ function ftipEnsureUi(){
     m.innerHTML = '<div class="ftip-card"><h3 id="ftipTitle"></h3><p class="ftip-sub">はじめて開く画面の案内です</p><div id="ftipBody"></div><button type="button" class="button ftip-ok" id="ftipOk">わかった</button><button type="button" class="ftip-off" id="ftipOff">案内を今後ぜんぶ出さない</button></div>';
     document.body.appendChild(m);
     document.getElementById("ftipOk").addEventListener("click", ftipNext);
-    document.getElementById("ftipOff").addEventListener("click", () => { ftip.off = true; ftip.queue = []; try{ localStorage.setItem(ftip.offKey, "1"); }catch(_e){} ftipNext(); showToast("案内をオフにしました。「その他」→「操作方法」から、もう一度出せます。"); });
+    document.getElementById("ftipOff").addEventListener("click", () => { ftip.off = true; ftip.queue = []; try{ localStorage.setItem(ftip.offKey, "1"); }catch(_e){} ftipNext(); showToast("案内をオフにしました。操作ガイド（📖 操作方法）のページから、もう一度出せます。"); });
     m.addEventListener("keydown", (e) => { if(e.key === "Escape") ftipNext(); });
 }
 function ftipNext(){
@@ -90,17 +91,7 @@ function initFirstTips(){
             return r;
         };
     }
-    // はじめにチャット画面
-    setTimeout(() => { try{ const t = FTIP_TABS.chats; ftipOnce("tab:chats", t[0], t[1], "ようこそ！はじめて開く画面では、こんな案内が出ます。", 0); }catch(e){} }, 2500);
-    // チャットの部屋
-    if(typeof selectRoom === "function"){
-        const origSel = selectRoom;
-        selectRoom = function(){
-            const r = origSel.apply(this, arguments);
-            try{ ftipOnce("room", FTIP_ROOM[0], FTIP_ROOM[1], "", 700); }catch(e){ console.error("[ARE tips]", e); }
-            return r;
-        };
-    }
+    // チャット（一覧・部屋）には、案内を出さない（そのため tab:chats と room の案内は使いません）
     // シート（グループ作成・検索・非表示）
     if(typeof openSheet === "function"){
         const origSheet = openSheet;

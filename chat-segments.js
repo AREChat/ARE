@@ -33,7 +33,7 @@ async function segLoadFlags(){
         const r = await requireClient().rpc("my_ui_flags");
         if(!r.error && r.data && typeof r.data === "object"){
             segSt.flags = r.data;
-            try{ localStorage.setItem(segCacheKey(), JSON.stringify({ show_users:r.data.show_users, show_posts:r.data.show_posts, request_room:r.data.request_room, is_admin:r.data.is_admin })); }catch(_e){}
+            try{ localStorage.setItem(segCacheKey(), JSON.stringify({ show_users:r.data.show_users, show_posts:r.data.show_posts, request_room:r.data.request_room, is_admin:r.data.is_admin, restricted:r.data.restricted, quick:r.data.quick })); }catch(_e){}
             return;
         }
     }catch(_e){ /* SQL 未実行・通信失敗 */ }
@@ -65,14 +65,6 @@ function segAddHelpButton(){
     a.textContent = "📖 操作方法はこちら";
     const head = pane.querySelector(".section-heading");
     if(head) head.insertAdjacentElement("afterend", a); else pane.prepend(a);
-    // 「はじめて開く画面の案内」を もう一度 出す（オフにした人・見逃した人向け）
-    if(!document.getElementById("segTipsAgain")){
-        const t = document.createElement("button");
-        t.type = "button"; t.id = "segTipsAgain"; t.className = "button-secondary seg-help";
-        t.textContent = "💡 はじめての案内をもう一度出す";
-        t.addEventListener("click", () => { if(window.AREFirstTips) window.AREFirstTips.reset(); });
-        a.insertAdjacentElement("afterend", t);
-    }
 }
 
 // ---------- 3) 友達追加 ----------
@@ -293,6 +285,7 @@ function initSegments(){
     segProvisional(); segApplyTabs();
     segLoadFlags().then(() => {
         segApplyTabs();
+        try{ if(typeof qkPaintBar === "function") qkPaintBar(); }catch(_e){ /* ショートカットの描き直し */ }
         if(typeof loadRecommendations === "function") loadRecommendations();     // おすすめ（同じグループの人）を出す
         if(typeof renderRooms === "function" && state.rooms && state.rooms.length) try{ renderRooms(); }catch(_e){}
     });

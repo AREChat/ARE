@@ -6,6 +6,25 @@
 
 const QK_MAX = 7;
 const QK_DEFAULT = ["tool:study124", "tool:games", "tool:rpg", "shop", "search:more"];
+// 自分で ショートカットを変えていない人の「はじめのショートカット」を、グループ（q1〜q4）ごとに変える
+//  q1=家庭（ゲームなし）／ q2=社員（ゲームは1つだけ＋仕事に役立つもの）／ q3=友人・q4=その他（ゲームも便利機能も）／ 管理者は今までどおり
+const QK_BY_GROUP = {
+    q1: ["tool:memo", "tool:planner", "tool:album", "tool:diary", "tool:comfort", "search:more"],
+    q2: ["tool:work", "tool:planner", "tool:sched", "tool:memo", "tool:filedrop", "tool:games", "search:more"],
+    q3: ["tool:games", "tool:rpg", "tool:album", "tool:split", "tool:board", "shop", "search:more"],
+    q4: ["tool:games", "tool:rpg", "tool:album", "tool:split", "tool:board", "shop", "search:more"]
+};
+function qkDefaultList(){
+    try{
+        const f = typeof segSt !== "undefined" ? segSt.flags : null;
+        if(f && !f.is_admin){
+            let g = f.quick;
+            if(!QK_BY_GROUP[g]) g = f.restricted ? "q1" : (f.show_users === false ? "q4" : "");   // SQL（segments_quick_v1.sql）がまだのときの代わり
+            if(QK_BY_GROUP[g]) return QK_BY_GROUP[g].slice();
+        }
+    }catch(_e){ /* 既定にもどる */ }
+    return QK_DEFAULT.slice();
+}
 const QK_LABEL = {rpg:"RPGゲーム", games:"ゲーム", study124:"学習アプリ", prefs:"表示設定・言語"};
 const QK_ALIAS = {
     zip:"あっしゅく 圧縮 かいとう 解凍 ぜっぷ zip ふぁいる ファイル まとめる 展開 てんかい", imgc:"がぞう 画像 しゃしん 写真 ちいさく 小さく りさいず リサイズ へんかん 変換 jpg png webp あっしゅく 圧縮 ふぁいる ファイル 軽く",
@@ -60,7 +79,7 @@ function qkKey(){ return "are_quick_v1_" + (state && state.user ? state.user.id 
 function qkLoad(){
     let list = null;
     try{ list = JSON.parse(localStorage.getItem(qkKey()) || "null"); }catch(_e){ list = null; }
-    if(!Array.isArray(list)) list = QK_DEFAULT.slice();
+    if(!Array.isArray(list)) list = qkDefaultList();
     const seen = new Set();
     return list.filter((id) => typeof id === "string" && qkFind(id) && !seen.has(id) && seen.add(id)).slice(0, QK_MAX);
 }

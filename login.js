@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
             box.innerHTML =
                 '<h2 id="guestNoticeTitle" style="font-size:17px;margin:0 0 10px">お試しをはじめる前に</h2>' +
                 '<p style="margin:0 0 10px"><strong>① 管理者に、自分の名前を伝えてください。</strong><br>お試しでは、名前が自動で「ゲスト＋数字」になります。はじめたら、チャット画面で自分の名前を確かめて、管理者に伝えてください。</p>' +
-                '<p style="margin:0 0 14px"><strong>② ログアウトに注意してください。</strong><br>ログアウトすると、このお試しには戻れません。もう一度「お試し」を押すと、新しいアカウント（別の名前）が作られます。</p>' +
+                '<p style="margin:0 0 14px"><strong>② ログアウトに注意してください。</strong><br>ログアウトすると、このお試しアカウントは削除されます（送ったメッセージも消えます）。もう一度「お試し」を押すと、新しいアカウント（別の名前）が作られます。</p>' +
                 '<div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">' +
                 '<button type="button" id="guestNoticeNo" style="min-width:104px;min-height:44px;padding:8px 14px;border-radius:10px;border:1px solid #9aa3bd;background:#eef0f7;color:#1b2540;font-size:15px;font-weight:700;cursor:pointer">やめる</button>' +
                 '<button type="button" id="guestNoticeYes" style="min-width:104px;min-height:44px;padding:8px 14px;border-radius:10px;border:1px solid #2b3fb5;background:#2f45c8;color:#fff;font-size:15px;font-weight:700;cursor:pointer">はじめる</button></div>';
