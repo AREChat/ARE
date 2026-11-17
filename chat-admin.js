@@ -11,6 +11,8 @@ function attachmentText(content){
 async function checkAdmin(){
     try{ const result = await requireClient().rpc("is_current_user_admin"); feat.isAdmin = result.data === true; }
     catch(_e){ feat.isAdmin = false; }
+    try{ localStorage.setItem("are_is_admin_ui", feat.isAdmin ? "1" : "0"); }catch(_e){ /* 操作ガイドの表示用。保存できなくても問題なし */ }
+    if(typeof emgPaint === "function") emgPaint();
     el.adminTabButton.hidden = !feat.isAdmin;
     { const rr = el.readReceiptToggle && el.readReceiptToggle.closest("label"); if(rr) rr.style.display = feat.isAdmin ? "none" : ""; }   // 管理者は「既読を相手に表示する」設定なし：管理者の既読は 相手に出ず（送信済みのまま）、管理者には 常に既読が見える
     try{ if(state.allRooms){ state.rooms = state.allRooms.filter((room) => !room.orphan || feat.isAdmin); renderRooms(); } }catch(_e){}   // 管理者かどうかが分かったら、一覧を作り直す（削除ずみユーザーのチャットの 表示・非表示）
@@ -109,14 +111,53 @@ async function openAdminRoom(roomId,title){
     }catch(error){ el.adminBody.innerHTML = '<div class="empty-list">' + escapeHtml(featError(error)) + '</div>'; }
 }
 
+const AU_SEG_LABEL = {home:"🏠 家庭", work:"💼 社員", friend:"🧑‍🤝‍🧑 友達", other:"🙂 その他"};
+const auSt = {rows:null, seg:"all", sort:"new"};
+const AU_SORTS = [["new","新しい順"], ["old","古い順"], ["used","使用頻度：高い順"], ["unused","使用頻度：低い順"], ["name","名前順"]];
+
+function auSortRows(rows, sort){
+    const r = rows.slice();
+    if(sort === "old") r.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    else if(sort === "used") r.sort((a, b) => (b.msg_count || 0) - (a.msg_count || 0));
+    else if(sort === "unused") r.sort((a, b) => (a.msg_count || 0) - (b.msg_count || 0));
+    else if(sort === "name") r.sort((a, b) => (a.display_name || "").localeCompare(b.display_name || "", "ja"));
+    else r.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    return r;
+}
+function auFilterBar(){
+    const segs = [["all", "全体"], ["home", "🏠 家庭のみ"], ["friend", "🧑‍🤝‍🧑 友達のみ"], ["work", "💼 社員のみ"], ["other", "🙂 その他のみ"]];
+    return '<div class="row" style="flex-wrap:wrap">' + segs.map((s) => '<button type="button" class="' + (auSt.seg === s[0] ? "button" : "button-secondary") + '" data-auseg="' + s[0] + '">' + s[1] + '</button>').join("") + '</div>' +
+        '<div class="row" style="flex-wrap:wrap;align-items:center"><span class="meta">並び順</span>' + AU_SORTS.map((s) => '<button type="button" class="' + (auSt.sort === s[0] ? "button" : "button-secondary") + '" data-ausort="' + s[0] + '">' + s[1] + '</button>').join("") + '</div>';
+}
+function auUserCard(u){
+    const seg = u.segment ? ('<span class="meta">' + (AU_SEG_LABEL[u.segment] || u.segment) + '</span> ') : "";
+    const used = u.msg_count !== undefined ? ' ・送信 ' + u.msg_count + '件' : "";
+    return '<div class="admin-card">' + (u.is_admin ? '' : '<label class="row" style="gap:6px;align-items:center"><input type="checkbox" data-selu="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '"> <span class="meta">選ぶ（まとめて削除）</span></label>') +
+        '<b>' + escapeHtml(u.display_name || "ユーザー") + '</b> ' + seg + '<span class="meta">ID：' + escapeHtml(u.login_id || "-") + (u.last_seen_at ? ' ・最終オンライン：' + escapeHtml(formatDate(u.last_seen_at)) : '') + escapeHtml(used) + '</span>' +
+        '<div class="row"><button class="button-secondary" data-contact="' + escapeHtml(u.user_id) + '" type="button">連絡先を表示（閲覧は記録されます）</button></div>' + (u.is_admin ? '<div class="meta">管理者アカウント（再発行不可）</div>' : '<div class="row"><button class="button-secondary" data-edituser="' + escapeHtml(u.user_id) + '" type="button">編集</button><button class="button-secondary" data-reissue="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '" type="button">復旧コードを再発行</button><button class="button-danger" data-deluser="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '" type="button">アカウントを削除</button></div>') + '</div>';
+}
+function auPaintList(){
+    const list = el.adminBody.querySelector("#auList"); if(!list || !auSt.rows) return;
+    const filtered = auSt.seg === "all" ? auSt.rows : auSt.rows.filter((u) => u.segment === auSt.seg);
+    const rows = auSortRows(filtered, auSt.sort);
+    list.innerHTML = rows.length ? rows.map(auUserCard).join("") : '<div class="empty-list">このグループのユーザーはいません。</div>';
+    const bar = el.adminBody.querySelector("#auBar"); if(bar) bar.innerHTML = auFilterBar();
+}
 async function renderAdminUsers(client){
-    const result = await client.rpc("admin_list_profiles");
-    if(result.error) throw result.error;
+    let rows, hasSeg = true;
+    const v2 = await client.rpc("admin_list_profiles_v2");
+    if(v2.error){
+        hasSeg = false;
+        const v1 = await client.rpc("admin_list_profiles");
+        if(v1.error) throw v1.error;
+        rows = v1.data;
+    }else{ rows = v2.data; }
+    auSt.rows = rows;
     el.adminBody.innerHTML = '<div class="row"><button class="button" id="adminCreateUser" type="button">＋ 新規アカウントを作成</button></div><div class="row"><button class="button-secondary" data-bulk="all" type="button">全員を選ぶ／解除</button><button class="button-secondary" data-bulk="noname" type="button">名前なし（「ユーザー」）だけ選ぶ</button><button class="button-secondary" data-bulk="orphan" type="button">削除ずみユーザーの残りチャットを消す</button><button class="button-danger" data-bulk="del" id="adminBulkDel" type="button" disabled>選んだユーザーを削除（0人）</button></div><div class="admin-card meta">復旧コードを失くした利用者に対する再発行です。必ず本人確認を行ってから実行してください。新しいコードは画面に1回だけ表示され、保存されません。旧コードは無効になり、利用者本人にも再発行の通知が表示されます。</div>' +
-        (result.data.length ? result.data.map((u) =>
-            '<div class="admin-card">' + (u.is_admin ? '' : '<label class="row" style="gap:6px;align-items:center"><input type="checkbox" data-selu="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '"> <span class="meta">選ぶ（まとめて削除）</span></label>') + '<b>' + escapeHtml(u.display_name || "ユーザー") + '</b> <span class="meta">ID：' + escapeHtml(u.login_id || "-") + (u.last_seen_at ? ' ・最終オンライン：' + escapeHtml(formatDate(u.last_seen_at)) : '') + '</span>' +
-            '<div class="row"><button class="button-secondary" data-contact="' + escapeHtml(u.user_id) + '" type="button">連絡先を表示（閲覧は記録されます）</button></div>' + (u.is_admin ? '<div class="meta">管理者アカウント（再発行不可）</div>' : '<div class="row"><button class="button-secondary" data-edituser="' + escapeHtml(u.user_id) + '" type="button">編集</button><button class="button-secondary" data-reissue="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '" type="button">復旧コードを再発行</button><button class="button-danger" data-deluser="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '" type="button">アカウントを削除</button></div>') + '</div>').join("")
-            : '<div class="empty-list">ユーザーがいません。</div>');
+        (hasSeg ? '<div id="auBar">' + auFilterBar() + '</div>' : '<div class="meta">（グループ・使用頻度の表示には admin_list_profiles_v2.sql の実行が必要です）</div>') +
+        '<div id="auList"></div>';
+    if(hasSeg) auPaintList();
+    else el.adminBody.querySelector("#auList").innerHTML = rows.length ? rows.map(auUserCard).join("") : '<div class="empty-list">ユーザーがいません。</div>';
     el.adminBody.onchange = updateBulkCount;
 }
 
@@ -147,6 +188,8 @@ async function onAdminClick(event){
     const target = event.target.closest("button");
     if(!target) return;
     if(target.dataset.back) return renderAdmin();
+    if(target.dataset.auseg){ auSt.seg = target.dataset.auseg; auPaintList(); return; }
+    if(target.dataset.ausort){ auSt.sort = target.dataset.ausort; auPaintList(); return; }
     if(target.dataset.adminRoom) return openAdminRoom(target.dataset.adminRoom,target.dataset.title);
     if(target.dataset.contact){
         try{

@@ -8,33 +8,45 @@ function relativeAgo(ms){
     return hours < 24 ? hours + "時間前" : Math.floor(hours / 24) + "日前";
 }
 
-// 管理者だけ：平日（月〜金）の 9:00〜19:00 は仕事中なので、いつもオフライン表示にする。
-// その日の 9:00 までに一度も開いていなければ「今日 3:00（深夜）に使っていた」と表示する。日本時間で判定
+// オフライン時の表記：「最終オンライン2時間前（26年11/17 14:16）」（日本時間）
+function presenceDateText(ms){
+    const q = {};
+    new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Tokyo",year:"2-digit",month:"numeric",day:"numeric",hour:"numeric",minute:"2-digit",hour12:false}).formatToParts(new Date(ms)).forEach((x) => { q[x.type] = x.value; });
+    return q.year + "年" + q.month + "/" + q.day + " " + (parseInt(q.hour,10) % 24) + ":" + q.minute;
+}
+function offlineText(seen){
+    return seen ? "最終オンライン" + relativeAgo(Date.now() - seen) + "（" + presenceDateText(seen) + "）" : "オフライン";
+}
+
+// 管理者だけ（日本時間・平日＝月〜金）：
+//   1:00〜3:00  → いつもオンライン表示
+//   8:00〜20:00 → いつもオフライン表示（最後にオンラインだったのは、その日の3:00ということにする）
+//   それ以外・土日 → ふつうの表示。ほかのユーザーは時間に関係なく ふつうの表示
 const ADMIN_PRES_ID = "9d660098-27f5-4933-bdce-d0ea7a6f08b4";
-function adminPresence(seen){
+function adminPresence(){
     const p = {};
     new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Tokyo",weekday:"short",hour:"2-digit",hour12:false,year:"numeric",month:"2-digit",day:"2-digit"})
         .formatToParts(new Date()).forEach((x) => { p[x.type] = x.value; });
-    const hour = parseInt(p.hour,10) % 24, weekday = ["Sat","Sun"].indexOf(p.weekday) < 0;
-    if(!weekday) return null;
-    const nine = new Date(p.year + "-" + p.month + "-" + p.day + "T09:00:00+09:00").getTime();
-    const working = hour >= 9 && hour < 19;
-    if(hour < 9) return null;                               // 朝9時前はふつうの表示
-    if(!seen || seen < nine) return {cls:"offline",text:"オフライン（最終オンライン 今日 3:00）"};
-    if(working) return {cls:"offline",text:"オフライン"};
-    return null;                                            // 19時以降は ふつうの表示
+    const hour = parseInt(p.hour,10) % 24;
+    if(["Sat","Sun"].indexOf(p.weekday) >= 0) return null;
+    if(hour >= 1 && hour < 3) return {cls:"online",text:STATUS_LABELS.online || "オンライン"};
+    if(hour >= 8 && hour < 20){
+        const three = new Date(p.year + "-" + p.month + "-" + p.day + "T03:00:00+09:00").getTime();
+        return {cls:"offline",text:offlineText(three)};
+    }
+    return null;
 }
 
 function presenceOf(profile){
     if(profile && profile.id === ADMIN_PRES_ID){
-        const o = adminPresence(profile.last_seen_at ? new Date(profile.last_seen_at).getTime() : 0);
+        const o = adminPresence();
         if(o) return o;
     }
     const seen = profile?.last_seen_at ? new Date(profile.last_seen_at).getTime() : 0;
     const age = Date.now() - seen;
     const status = profile?.presence_status;
     if(!seen || age > ONLINE_WINDOW_MS || !STATUS_LABELS[status]){
-        return {cls:"offline",text:seen ? "オフライン（最終オンライン " + relativeAgo(age) + "）" : "オフライン"};
+        return {cls:"offline",text:offlineText(seen)};
     }
     return {cls:status,text:STATUS_LABELS[status]};
 }

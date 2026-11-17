@@ -1,3 +1,16 @@
+// 朝・昼・晩 × 四季 で、あいさつと背景（軽量webp・1枚だけ読み込み）を変える
+(function seasonalGreeting() {
+    try {
+        const now = new Date();
+        const month = now.getMonth() + 1, hour = now.getHours();
+        const season = month >= 3 && month <= 5 ? "haru" : month >= 6 && month <= 8 ? "natsu" : month >= 9 && month <= 11 ? "aki" : "fuyu";
+        const tod = hour >= 5 && hour < 10 ? "asa" : hour >= 10 && hour < 17 ? "hiru" : "yoru";
+        document.documentElement.style.setProperty("--bg-photo", 'url("./img/bg/' + season + "-" + tod + '.webp")');
+        const greet = document.getElementById("loginGreeting");
+        if (greet) greet.textContent = tod === "asa" ? "おはようございます" : tod === "yoru" ? "こんばんは" : "おかえりなさい";
+    } catch (_e) { /* 背景・あいさつが変わらなくても、ログインは普通にできます */ }
+})();
+
 document.addEventListener("DOMContentLoaded", () => {
     const elements = {
         form: document.getElementById("loginForm"),

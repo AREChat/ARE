@@ -22,6 +22,7 @@
 <div class="wrap">
 <div style="position:sticky;top:0;z-index:50;background:#fff;border-bottom:1px solid #ccc;padding:8px 12px;display:flex;gap:8px"><a href="./chat.html" style="display:inline-block;padding:10px 16px;border-radius:10px;background:#2563eb;color:#fff;font-weight:700;text-decoration:none">← チャットに戻る</a><a href="./index.html" style="display:inline-block;padding:10px 16px;border-radius:10px;border:1px solid #2563eb;color:#2563eb;text-decoration:none">ホーム</a></div>
 <header class="top"><h1>📖 ARE 操作ガイド</h1><p>スマホ（縦向きがおすすめ）でもパソコンでも、このページ1つで読めます。気になる項目だけ開いて読んでください。</p><p class="two"><a class="big" href="#s1">💬 チャットアプリ 手順書</a><a class="big" href="#rpg">🎮 RPG 手順書</a></p></header>
+<div style="margin:12px auto;max-width:760px;padding:10px 14px;border:1px solid #e0476b;border-radius:12px;text-align:center;background:#e0476b14"><b>🆘 緊急ボタン</b><br><span style="font-size:.9em">困ったときは、チャットの「その他」タブの一番上にある「🆘 緊急ボタン」を押すと、管理者とチャットで直接やりとりできます（電話はできません）。<br><a href="./chat.html?emergency=1" style="display:inline-block;margin-top:8px;min-height:44px;line-height:44px;padding:0 18px;border-radius:10px;background:#e0476b;color:#fff;font-weight:700;text-decoration:none">🆘 管理者にチャットで連絡する</a></span></div>
 <div class="tipsreset" style="margin:12px auto;max-width:760px;padding:10px 14px;border:1px solid #8884;border-radius:12px;text-align:center"><b>💡 はじめての案内</b><br><span style="font-size:.9em;opacity:.8">画面やゲームを はじめて開いたときに出る案内を、もう一度 見られるようにします。<br>（チャット・ゲーム・LearnLab124 ぜんぶ）</span><br><button type="button" id="tipsAgain" style="margin-top:8px;min-height:44px;padding:0 18px;border-radius:10px;border:0;background:#4b6bfb;color:#fff;font-weight:700;cursor:pointer">案内をもう一度出す</button><div id="tipsAgainMsg" role="status" style="margin-top:6px;font-size:.9em"></div></div>
 <script src="help-tips.js" defer></script>
 
@@ -30,7 +31,7 @@
 <li><a href="#s1">はじめに（登録とログイン）</a></li><li><a href="#s2">画面の見かた</a></li><li><a href="#s3">1対1のチャット</a></li>
 <li><a href="#s4">グループチャット</a></li><li><a href="#s5">投稿とフォロー</a></li><li><a href="#s6">プロフィールとステータス</a></li>
 <li><a href="#s7">その他（ボット・天気・交通）</a></li><li><a href="#s7b">ツール（ストーリー・ゲームなど）</a></li><li><a href="#s8">履歴の保存（ZIP）</a></li><li><a href="#s9">アカウントの削除</a></li>
-<li><a href="#s10">安全のために</a></li><li><a href="#s11">困ったとき</a></li><li><a href="#s12">管理者向けガイド</a></li></ol><p class="grp">🎮 RPG（ARE QUEST）</p><ol class="rl"><li><a href="#rpg">RPG 手順書のはじめに</a></li><li><a href="#r1">はじめかた</a></li><li><a href="#r2">ものがたりの すすめかた</a></li><li><a href="#r3">たたかいかた</a></li><li><a href="#r4">職業（てんしょく）</a></li><li><a href="#r5">しょうごう（称号）</a></li><li><a href="#r6">おみせ・そうび・どうぐ</a></li><li><a href="#r7">クリアのあと</a></li><li><a href="#r8">リプレイコード</a></li><li><a href="#r9">名前・難しさ・チート</a></li><li><a href="#r10">こまったとき（RPG）</a></li></ol></details></nav>
+<li><a href="#s10">安全のために</a></li><li><a href="#s11">困ったとき</a></li><li class="admin-only" hidden><a href="#s12">管理者向けガイド</a></li></ol><p class="grp">🎮 RPG（ARE QUEST）</p><ol class="rl"><li><a href="#rpg">RPG 手順書のはじめに</a></li><li><a href="#r1">はじめかた</a></li><li><a href="#r2">ものがたりの すすめかた</a></li><li><a href="#r3">たたかいかた</a></li><li><a href="#r4">職業（てんしょく）</a></li><li><a href="#r5">しょうごう（称号）</a></li><li><a href="#r6">おみせ・そうび・どうぐ</a></li><li><a href="#r7">クリアのあと</a></li><li><a href="#r8">リプレイコード</a></li><li><a href="#r9">名前・難しさ・チート</a></li><li><a href="#r10">こまったとき（RPG）</a></li></ol></details></nav>
 
 <main>
 <section id="s1"><h2>1. はじめに（登録とログイン）</h2>
@@ -69,7 +70,7 @@
 <tr><td>編集</td><td>自分のテキストメッセージの下の「編集」から直せます。「編集済み」と表示されます。</td></tr>
 <tr><td>削除の申請</td><td>メッセージの下の「削除申請」を押すと、管理者に届きます。承認されると消えます（すぐには消えません）。</td></tr>
 <tr><td>既読</td><td>相手が開くと「既読」と出ます。マイページの「既読を相手に表示する」で、自分の既読を見せるかどうか選べます。</td></tr>
-<tr><td>在席</td><td>🟢オンライン／🔴取り込み中／📞通話中／🟡待機中（5分操作がないと自動）／オフライン（最終オンライン◯時間前）。マイページの上のメニューで選べます。</td></tr>
+<tr><td>在席</td><td>🟢オンライン／🔴取り込み中／📞通話中／🟡待機中（5分操作がないと自動）／オフラインのときは「最終オンライン2時間前（26年11/17 14:16）」のように、最後にオンラインだった時間が出ます。マイページの上のメニューで選べます。</td></tr>
 <tr><td>↩ 返信</td><td>メッセージの下の「↩」を押すと、入力欄の上に返信先が出ます。送ると、引用つきで表示されます。引用を押すと元のメッセージへ移動します。</td></tr>
 <tr><td>↪ 転送</td><td>メッセージの下の「↪」→転送先のチャットを選びます。「転送」と表示されて送られます。アンケートは転送できません。</td></tr>
 <tr><td>😀 リアクション</td><td>メッセージの下の「😀」から、👍❤️😂😮😢🙏🎉👀 を付けられます。もう一度押すと取り消せます。</td></tr>
@@ -144,7 +145,7 @@
 <details><summary>「未実装です」「現在ご利用いただけません」と表示された</summary><p>その機能が、まだ用意されていないか、サーバー側でエラーが起きています。ほかの機能は使えます。ページを再読み込みしても直らない場合は、運営に連絡してください。</p></details>
 <details><summary>表示がおかしい・古い</summary><p>ページを再読み込みしてください。それでも直らなければ、運営に連絡してください。</p></details></section>
 
-<section id="s12"><h2>12. 管理者向けガイド</h2>
+<section id="s12" class="admin-only" hidden><h2>12. 管理者向けガイド</h2>
 <p>管理者でログインすると、「👤 マイページ」に「🛡️ 管理者パネル」が出ます（管理者以外には表示されません）。操作は、監査ログに記録されます。</p>
 <table><tr><th>タブ</th><th>内容</th></tr>
 <tr><td>削除申請</td><td>メッセージの削除申請を承認・却下します。</td></tr>

@@ -45,9 +45,14 @@
             position: fixed;
             inset: 0;
             z-index: -1;
-            background:
+            background-image:
                 radial-gradient(circle at 15% 15%, #4338ca33, transparent 35%),
-                radial-gradient(circle at 85% 85%, #7c3aed22, transparent 35%);
+                radial-gradient(circle at 85% 85%, #7c3aed22, transparent 35%),
+                linear-gradient(rgba(11,16,32,.72), rgba(11,16,32,.72)),
+                var(--bg-photo, none);
+            background-size: auto, auto, cover, cover;
+            background-position: center, center, center, center;
+            background-repeat: no-repeat;
         }
 
         .app {

@@ -226,6 +226,8 @@ const FEATURES = [
     ["hiderooms","チャットの非表示（消さずに隠す）",initHideRooms],
     ["segments","ユーザー区分・友達追加・操作方法ボタン",initSegments],
     ["firsttips","はじめて開く画面の案内ポップアップ",initFirstTips],
+    ["guestpin","お試し：管理者チャットを一覧の先頭に固定",initGuestPin],
+    ["emergency","緊急ボタン（管理者とチャット）",initEmergency],
     ["reco","友達・社員グループのおすすめ（ランダム・人数選択）",initReco],
     ["fixreq","修正依頼の共通の部屋（一覧の いちばん上）",initFixReq]   // 一覧の並べ替えのあとに働かせるため、いちばん最後に置く
 ];
