@@ -7,5 +7,7 @@
   "assets": {
     "directory": "./",
     "not_found_handling": "404-page"
-  }
+  },
+  // 非本番ブランチのプレビュー（npx wrangler preview）に必要。空のままでよい。
+  "previews": {}
 }
