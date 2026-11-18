@@ -10,7 +10,7 @@ const MO_CATS = [
     ["file", "📁 ファイル", ["filedrop", "zip", "imgc", "img2pdf", "pdftool", "exifclean", "hashtool", "renametool", "textfix", "csvtool", "vframe", "splittool", "ocr"]],
     ["life", "🏠 くらし", ["diary", "habit", "budget", "timer", "calc", "shop", "split", "health", "co2", "memo", "planner", "sched", "geo", "board", "weather", "transit", "run:shop"]],
     ["make", "🎨 つくる", ["story", "album", "imgedit", "draw", "mystamp", "avatar", "profile3d", "aistudio", "archive"]],
-    ["play", "🎮 あそぶ", ["games", "cards", "bj", "fun", "rpg", "game2", "game4", "game5", "game7", "daifugo", "dream"]],
+    ["play", "🎮 あそぶ", ["games", "cards", "bj", "fun", "rpg", "game2", "game4", "game5", "game7", "daifugo", "dream", "bingo"]],
     ["smart", "🧠 かしこい・学習", ["chatbot", "myai", "ai", "work", "autoreply", "study124"]],
     ["chat", "💬 チャット・設定", ["phrases", "folders", "stars", "location", "live", "share", "contact", "push", "comfort", "mood", "prefs", "lock", "announce", "security", "storage", "run:follow"]]
 ];
@@ -57,7 +57,7 @@ async function moCloudPull(){
         else if(v && localT > Number(v.t || 0)){ mo.t = localT; moCloudPush(); }
     }catch(_e){ /* 同期できなくても使える */ }
 }
-const moId = (item) => item.dataset.tool || item.dataset.extra || (item.dataset.qk ? item.dataset.qk.replace(/^run:/, "run:") : "") || (item.getAttribute("href") ? "help" : "");
+const moId = (item) => item.dataset.tool || item.dataset.extra || (item.dataset.qk ? item.dataset.qk.replace(/^run:/, "run:") : "") || (item.getAttribute("href") ? "help" : "") || item.dataset.moKey || "";
 const moCatOf = (id) => { for(const c of MO_CATS) if(c[2].includes(id)) return c[0]; return "other"; };
 
 function moApply(){
