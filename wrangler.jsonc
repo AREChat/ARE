@@ -1,7 +1,8 @@
 {
   // Cloudflare Workers Static Assets: GitHub Pages と並行して、同じリポジトリをそのまま配信する。
   // main への push で Workers Builds が自動デプロイ（ビルド工程なし）。
-  "name": "are-chat",
+  // name は Cloudflare ダッシュボード上の Worker 名と一致させる（不一致だとビルドが失敗する）。
+  "name": "are-dev",
   "compatibility_date": "2026-11-18",
   "assets": {
     "directory": "./",
