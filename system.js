@@ -271,6 +271,7 @@ try { if (window.top !== window.self) { window.top.location = window.self.locati
             } catch (_e) { /* 失敗しても、ふつうのログアウトにもどる */ }
         }
 
+        try { localStorage.removeItem("are_is_admin_ui"); } catch (_e) { /* 何もしない */ }
         const result = await client.auth.signOut();
 
         if (result.error) {

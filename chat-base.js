@@ -385,6 +385,10 @@ async function loadRecommendations(){
             result = await client.from(TABLES.profiles).select("*").ilike("display_name","%" + escLike(text) + "%").neq("id",state.user.id).order("display_name",{ascending:true}).limit(30);
         }else if(state.showHidden && state.hiddenIds.size){
             result = await client.from(TABLES.profiles).select("*").in("id",[...state.hiddenIds]).limit(100);
+        }else if(typeof absActive === "function" && absActive()){
+            // 管理者：グループ（家庭/友達/社員/その他/全員）を選んで一覧
+            try{ result = {data: await absFetch(client)}; state.recommendedMode = false; }
+            catch(error){ showToast(getErrorMessage(error)); result = {data: []}; }
         }else{
             // おすすめ：同じグループ（社員は社員、友人は友人）の人。SQL 未実行・該当なしなら今までどおり（検索のみ）
             try{
@@ -411,6 +415,7 @@ function renderRecommendations(){
         return state.showHidden || !state.hiddenIds.has(profile.id);
     });
     if(typeof rcPaintCount === "function") rcPaintCount();
+    if(typeof absPaintBar === "function") absPaintBar();
     el.toggleHiddenUsers.textContent = state.showHidden ? "非表示を隠す" : "非表示（" + state.hiddenIds.size + "）";
 
     if(!list.length){
@@ -420,10 +425,11 @@ function renderRecommendations(){
         return;
     }
 
+    const absOn = typeof absActive === "function" && absActive() && !el.userSearch.value.trim() && !state.showHidden;
     let shown = list, recoTitle = "⭐ おすすめのユーザー";
-    const recoOn = state.recommendedMode && !el.userSearch.value.trim() && !state.showHidden;
+    const recoOn = !absOn && state.recommendedMode && !el.userSearch.value.trim() && !state.showHidden;
     if(recoOn && typeof rcPick === "function"){ const r = rcPick(list); if(r){ shown = r.list; recoTitle = r.title; } }
-    const recoHead = recoOn ? '<div class="meta" style="margin:4px 2px">' + recoTitle + '</div>' : "";
+    const recoHead = absOn ? (typeof absHeadHtml === "function" ? absHeadHtml(shown.length) : "") : (recoOn ? '<div class="meta" style="margin:4px 2px">' + recoTitle + '</div>' : "");
     el.recommendedUsers.innerHTML = recoHead + shown.map((profile) => {
         const name = profileDisplayName(profile);
         const avatar = safeHttpUrl(profile?.avatar_url || profile?.avatarUrl || profile?.photo_url || "");

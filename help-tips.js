@@ -1,2 +1,4 @@
 // 操作ガイド：「案内をもう一度出す」ボタン（チャット・ゲーム・LearnLab124 の「はじめての案内」の記録を消す。この端末だけ）
 (function(){var b=document.getElementById("tipsAgain");if(!b)return;b.addEventListener("click",function(){var n=0;try{var ks=[];for(var i=0;i<localStorage.length;i++)ks.push(localStorage.key(i));ks.forEach(function(k){if(/^(are_tips_seen_|are_tips_off_|are_gtips_seen|are_gtips_off|ll_tips_seen|ll_tips_off)/.test(k)){localStorage.removeItem(k);n++}});document.getElementById("tipsAgainMsg").textContent="もう一度出すようにしました。各画面を開き直すと、案内が出ます。"}catch(e){document.getElementById("tipsAgainMsg").textContent="この端末では設定を変えられませんでした。"}})})();
+
+(function(){try{if(localStorage.getItem("are_is_admin_ui")==="1"){var a=document.querySelectorAll(".admin-only");for(var i=0;i<a.length;i++)a[i].hidden=false}}catch(e){}})();
