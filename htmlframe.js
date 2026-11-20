@@ -17,7 +17,10 @@
                 (ctrl && event.shiftKey && (key === "i" || key === "j" || key === "c" || key === "k" || key === "e" || key === "m")) ||
                 (ctrl && event.altKey && (key === "i" || key === "j" || key === "c" || key === "u")) ||
                 (event.metaKey && event.altKey && (key === "i" || key === "j" || key === "c" || key === "u")) ||
-                (ctrl && !event.shiftKey && (key === "u" || key === "s"));
+                (ctrl && !event.shiftKey && (key === "u" || key === "s")) ||
+                event.key === "F7" ||                                                       // キャレット閲覧
+                (ctrl && event.shiftKey && key === "s") ||                                  // 名前をつけて保存の別の形
+                (ctrl && !event.shiftKey && !event.altKey && key === "p");                  // 印刷（protect.js と同じ：チャット・読みもの以外では止める）
             if (!blocked) return;
             event.preventDefault();
             event.stopPropagation();
@@ -26,6 +29,13 @@
         window.addEventListener("contextmenu", stopMenu, true);
         document.addEventListener("mousedown", function (e) { if (e.button === 2) e.preventDefault(); }, true);
         document.addEventListener("auxclick", function (e) { if (e.button === 2) stopMenu(e); }, true);
+        // ファイルのドロップ：入力欄の上以外では、ブラウザが勝手にファイルを開かないように止める（protect.js と同じ）
+        function isField(t) { return !!(t && t.closest && t.closest("input,textarea,select,[contenteditable=''],[contenteditable='true']")); }
+        window.addEventListener("dragover", function (e) { if (e.defaultPrevented || isField(e.target)) return; e.preventDefault(); try { e.dataTransfer.dropEffect = "none"; } catch (_e) { /* 何もしない */ } });
+        window.addEventListener("drop", function (e) { if (e.defaultPrevented || isField(e.target)) return; e.preventDefault(); });
+        // 印刷しても、画面の中身が出ない（protect.js と同じ）
+        var pst = document.createElement("style"); pst.textContent = "@media print{html,body{display:none!important}}";
+        (document.head || document.documentElement).appendChild(pst);
     }
     guard();
     var done = false;
