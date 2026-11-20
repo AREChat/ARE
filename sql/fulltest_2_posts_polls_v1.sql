@@ -108,7 +108,7 @@ perform set_config('request.jwt.claims', json_build_object('sub', u1, 'role', 'a
   set local role authenticated;
   begin perform public.cancel_scheduled_post(v::uuid); r := r||E'\n・ A21 予約のとりけし → 通った'; exception when others then r := r||E'\n・ A21 予約のとりけし → 止められた: '||left(sqlerrm,70); end;
   r := r||E'\n\n【B ストーリー】';
-  begin perform public.create_story('おはよう', null, 'sky'); r := r||E'\n・ B1 ストーリーを作る → 通った'; exception when others then r := r||E'\n・ B1 ストーリーを作る → 止められた: '||left(sqlerrm,70); end;
+  begin perform public.create_story('おはよう', null, 'blue'); r := r||E'\n・ B1 ストーリーを作る → 通った'; exception when others then r := r||E'\n・ B1 ストーリーを作る → 止められた: '||left(sqlerrm,70); end;
 reset role;
   select id into sid from public.stories where user_id = u1 order by created_at desc limit 1;
   begin v := ((select expires_at - created_at from public.stories where id = sid))::text; r := r||E'\n・ B2 ストーリーの長さ（期限－作成。24時間のはず） = '||coalesce(v,'(空)'); exception when others then r := r||E'\n・ B2 ストーリーの長さ（期限－作成。24時間のはず） → エラー: '||left(sqlerrm,70); end;
@@ -128,7 +128,7 @@ perform set_config('request.jwt.claims', json_build_object('sub', u1, 'role', 'a
   if sid is not null then
   begin perform public.delete_story(sid); r := r||E'\n○ B5 自分のストーリーは消せる'; exception when others then r := r||E'\n× B5 自分のストーリーは消せる ← '||left(sqlerrm,90); end;
   else r := r||E'\n・ B5（前の手順でIDが取れなかったので、とばした）'; end if;
-  begin v := public.schedule_story('予約ストーリー', null, 'sky', now() + interval '1 hour')::text; r := r||E'\n・ B6 ストーリーの予約 → 通った'; exception when others then r := r||E'\n・ B6 ストーリーの予約 → 止められた: '||left(sqlerrm,70); end;
+  begin v := public.schedule_story('予約ストーリー', null, 'blue', now() + interval '1 hour')::text; r := r||E'\n・ B6 ストーリーの予約 → 通った'; exception when others then r := r||E'\n・ B6 ストーリーの予約 → 止められた: '||left(sqlerrm,70); end;
   begin perform public.cancel_scheduled_story(v::uuid); r := r||E'\n・ B7 ストーリー予約のとりけし → 通った'; exception when others then r := r||E'\n・ B7 ストーリー予約のとりけし → 止められた: '||left(sqlerrm,70); end;
   r := r||E'\n\n【C アンケート（相互フォローの部屋）】';
 perform set_config('request.jwt.claims', json_build_object('sub', u1, 'role', 'authenticated')::text, true);
@@ -185,7 +185,12 @@ perform set_config('request.jwt.claims', json_build_object('sub', u1, 'role', 'a
   perform set_config('request.jwt.claim.sub', u1::text, true);
   set local role authenticated;
   begin perform public.update_my_profile('新しい名前', '自己紹介です', '元気', null, false); r := r||E'\n○ D1 プロフィールを変える'; exception when others then r := r||E'\n× D1 プロフィールを変える ← '||left(sqlerrm,90); end;
-  begin perform public.update_my_profile('', null, null, null, false); r := r||E'\n× D2 名前が空は、ことわる（通ってしまった）'; exception when others then r := r||E'\n○ D2 名前が空は、ことわる → '||left(sqlerrm,70); end;
+  begin perform public.update_my_profile('', null, null, null, false); r := r||E'\n・ D2 名前が空 → 通った'; exception when others then r := r||E'\n・ D2 名前が空 → 止められた: '||left(sqlerrm,70); end;
+reset role;
+  begin v := ((select display_name from public.profiles where id = u1))::text; r := r||E'\n・ D2b そのあとの名前（『新しい名前』のまま＝空は無視／空になっていたら問題） = '||coalesce(v,'(空)'); exception when others then r := r||E'\n・ D2b そのあとの名前（『新しい名前』のまま＝空は無視／空になっていたら問題） → エラー: '||left(sqlerrm,70); end;
+perform set_config('request.jwt.claims', json_build_object('sub', u1, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claim.sub', u1::text, true);
+  set local role authenticated;
   begin perform public.update_my_profile(repeat('あ',31), null, null, null, false); r := r||E'\n・ D3 名前が31文字 → 通った'; exception when others then r := r||E'\n・ D3 名前が31文字 → 止められた: '||left(sqlerrm,70); end;
   begin perform public.update_my_profile('新しい名前', repeat('あ',1000), null, null, false); r := r||E'\n・ D4 自己紹介が1000文字 → 通った'; exception when others then r := r||E'\n・ D4 自己紹介が1000文字 → 止められた: '||left(sqlerrm,70); end;
   begin perform public.update_my_profile('新しい名前', null, null, 'javascript:alert(1)', false); r := r||E'\n・ D5 画像の場所に javascript: → 通った'; exception when others then r := r||E'\n・ D5 画像の場所に javascript: → 止められた: '||left(sqlerrm,70); end;
@@ -204,7 +209,14 @@ perform set_config('request.jwt.claims', json_build_object('sub', u2, 'role', 'a
   perform set_config('request.jwt.claim.sub', u2::text, true);
   set local role authenticated;
   begin select (select count(*) from public.user_prefs where user_id = u1) into n; r := r||case when n = 0 then E'\n○ ' else E'\n× ' end||'E5 他人の保存データは読めない （'||n||'件／期待 0）'; exception when others then r := r||E'\n× E5 他人の保存データは読めない ← '||left(sqlerrm,70); end;
-  begin update public.user_prefs set value = '{}'::jsonb where user_id = u1; r := r||E'\n× E6 他人の保存データを書きかえられない（通ってしまった）'; exception when others then r := r||E'\n○ E6 他人の保存データを書きかえられない → '||left(sqlerrm,70); end;
+  begin update public.user_prefs set value = '{}'::jsonb where user_id = u1; get diagnostics n = row_count;
+    r := r||case when n = 0 then E'\n○ E6 他人の保存データを書きかえようとしても、0行（何も変わらない）' else E'\n× E6 他人の保存データが書きかわった（'||n||'行）' end;
+  exception when others then r := r||E'\n○ E6 他人の保存データの書きかえは止められた → '||left(sqlerrm,50); end;
+reset role;
+  begin v := ((select value from public.user_prefs where user_id = u1 and key = 'itin:t'))::text; r := r||E'\n・ E6b u1 の保存データ（{"a":1} のままのはず） = '||coalesce(v,'(空)'); exception when others then r := r||E'\n・ E6b u1 の保存データ（{"a":1} のままのはず） → エラー: '||left(sqlerrm,70); end;
+perform set_config('request.jwt.claims', json_build_object('sub', u2, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claim.sub', u2::text, true);
+  set local role authenticated;
   r := r||E'\n\n【F みんなの待ち時間（予定表）  ※送る関数は、受けつけないとき false を返します（エラーにはなりません）】';
 perform set_config('request.jwt.claims', json_build_object('sub', u1, 'role', 'authenticated')::text, true);
   perform set_config('request.jwt.claim.sub', u1::text, true);
