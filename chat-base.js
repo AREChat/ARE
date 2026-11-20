@@ -978,6 +978,23 @@ async function handleFiles(fileList,kind){
         return;
     }
 
+    // 📎で、写真や動画も いっしょに選んだとき：種類ごとに、いつもの送り方で 順番に送る（写真 → 動画 → ファイル）
+    if(kind === "file" && typeof qsKind === "function"){
+        const kinds = files.map((file) => qsKind(file) || "file");
+        if(kinds.some((k) => k !== "file")){
+            const of = (k) => files.filter((file, i) => kinds[i] === k);
+            const imgs = of("image"), vids = of("video"), docs = of("file");
+            if(imgs.length > MAX_IMAGES){ showToast("写真は一度に最大" + MAX_IMAGES + "枚までです。分けて選んでください。"); clearFileInputs(); return; }
+            if(vids.length > MAX_VIDEOS_AT_ONCE){ showToast("動画は一度に最大" + MAX_VIDEOS_AT_ONCE + "本までです。分けて選んでください。"); clearFileInputs(); return; }
+            clearFileInputs();   // 先に空にしても、選んだファイルは files に残っている
+            showToast(files.length + "個を 順番に送ります（写真 → 動画 → ファイルの順）。");
+            if(imgs.length) await handleFiles(imgs,"image");
+            for(const v of vids) await handleFiles([v],"video");
+            if(docs.length) await handleFiles(docs,"file");
+            return;
+        }
+    }
+
     const tooBigVideos = [];   // 大きすぎて送れない動画（あとで「リンクで送る」画面を出す）
     const fixedNotes = [];     // 文字化けを直して送ったファイル（あとで画面にお知らせする）
     for(const file of files){
