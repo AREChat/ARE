@@ -199,6 +199,7 @@ const FEATURES = [
     ["share","プロフィール共有・QR",initShare],
     ["games","ゲーム",() => { initGames(); }],
     ["planner","タスク・カレンダー",initPlanner],
+    ["itin","行動予定表",initItin],
     ["prefs","表示設定",initPrefs],
     ["lang","多言語UI",initLang],
     ["camera","写真・カメラ",initCamera],

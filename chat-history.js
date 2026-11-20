@@ -63,6 +63,7 @@ function contentLine(content){
     if(item.type === "board") return "[日程調整] " + (item.title || "");
     if(item.type === "contact") return "[連絡先] " + (item.name || "");
     if(item.type === "live") return "[ライブ位置共有]";
+    if(item.type === "itin") return "[行動予定表] " + (item.title || "");
     return "[" + item.type + "] " + (item.name || "添付ファイル");
 }
 

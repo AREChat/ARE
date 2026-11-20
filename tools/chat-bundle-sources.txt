@@ -52,6 +52,10 @@ chat-share.js
 chat-games.js
 chat-game-play.js
 chat-planner.js
+chat-itin.js
+chat-itin-ui.js
+chat-itin-export.js
+chat-itin-more.js
 chat-prefs.js
 chat-lang.js
 chat-camera.js

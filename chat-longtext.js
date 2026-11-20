@@ -34,7 +34,7 @@
 
     function plain(b){ return cps(b.textContent).length; }
     function isPlainText(b){
-        if(b.classList.contains("edit") || b.querySelector("textarea,input,audio,video,img,.attachment,iframe,canvas")) return false;
+        if(b.classList.contains("edit") || b.classList.contains("itn-cd") || b.querySelector("textarea,input,audio,video,img,.attachment,iframe,canvas")) return false;
         return true;
     }
     function bar(label, kind){

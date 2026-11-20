@@ -218,6 +218,94 @@
         });
     }
 
+    // ---- HTML：ページの画面として表示する（安全な枠＝sandbox の中。コードの表示にも切りかえられる）----
+    var MAX_HTML_BYTES = 5 * 1024 * 1024;
+
+    // 送られてきた HTML の先頭に、外への通信を止める決まり（CSP）を付ける。DOCTYPE があれば、その直後（前に置くと表示のしかたが変わるため）
+    function guardHtml(text, run, net) {
+        var ext = net ? " https:" : "";
+        var csp = "default-src 'none'; script-src " + (run ? "'unsafe-inline' 'unsafe-eval'" : "'none'") + "; style-src 'unsafe-inline'" + ext +
+            "; img-src data: blob:" + ext + "; font-src data:" + ext + "; media-src data: blob:" + ext +
+            "; connect-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'";
+        var meta = '<meta http-equiv="Content-Security-Policy" content="' + csp + '"><meta name="referrer" content="no-referrer">';
+        var m = /^(?:\uFEFF)?\s*<!doctype[^>]*>/i.exec(text);
+        return m ? text.slice(0, m[0].length) + meta + text.slice(m[0].length) : meta + text;
+    }
+
+    function makeFrame(text, run, net) {
+        var guarded = guardHtml(text, run, net);
+        var f = document.createElement("iframe");
+        f.className = "hf"; f.title = "ページの表示"; f.referrerPolicy = "no-referrer";
+        f.setAttribute("allow", "");                       // カメラ・マイク・位置情報などは 許可しない
+        if (run) {
+            f.setAttribute("sandbox", "allow-scripts");    // 同じ場所のもの（ログイン情報など）には さわれない。ポップアップ・フォーム・ページの乗っ取りも できない
+            f.src = "./htmlframe.html";
+            var sent = false;
+            var onMsg = function (e) {
+                if (e.source !== f.contentWindow) return;
+                if (!f.isConnected) { window.removeEventListener("message", onMsg); return; }
+                if (e.data && e.data.ready && !sent) { sent = true; f.contentWindow.postMessage({ html: guarded }, "*"); }
+            };
+            window.addEventListener("message", onMsg);
+        } else {
+            f.setAttribute("sandbox", "");                 // プログラムは いっさい動かさない
+            f.srcdoc = guarded;
+        }
+        return f;
+    }
+
+    function showHtml(url, ext) {
+        var viewBtn = $("fvView"), runBtn = $("fvRun"), netBtn = $("fvNet");
+        return fetch(url.href, { credentials: "omit", cache: "no-store" }).then(function (r) {
+            if (!r.ok) throw new Error("http " + r.status);
+            return r.arrayBuffer();
+        }).then(function (buf) {
+            var bytes = new Uint8Array(buf);
+            if (bytes.length > MAX_HTML_BYTES) {
+                note("このファイルは大きい（" + Math.round(bytes.length / 1048576) + "MB）ため、ここでは表示しません。<br><b>ダウンロード</b>して開いてください。");
+                showSave([bytes], "text/html;charset=utf-8");
+                return;
+            }
+            var found = detectTextEncoding(bytes), text = null, label = "";
+            if (found.enc === "utf-8" || found.enc === "utf-8-bom") {
+                text = new TextDecoder("utf-8").decode(bytes); label = "UTF-8";
+                showSave([bytes], "text/html;charset=utf-8");
+            } else if (typeof found.text === "string") {
+                text = found.text; label = (TEXT_ENCODING_LABEL[found.enc] || found.enc) + " → UTF-8 に直して表示";
+                showSave([encodeUtf8Text(text, false)], "text/html;charset=utf-8");
+            }
+            if (text === null) {
+                note("このファイルは、文字として読めませんでした（文字コードを判定できません）。<br><b>ダウンロード</b>して開いてください。");
+                showSave([bytes], "application/octet-stream");
+                return;
+            }
+            copyText = text; copyBtn.hidden = false;
+            var st = { code: false, run: true, net: false };
+            function draw() {
+                main.textContent = "";
+                viewBtn.hidden = false; runBtn.hidden = st.code; netBtn.hidden = st.code || !st.run;   // 外の画像は、プログラムを動かすときだけ 選べる（止めるときは、いちばん固い設定で 何も読まない）
+                viewBtn.textContent = st.code ? "🖥 ページの画面で見る" : "</> コードを見る";
+                runBtn.textContent = st.run ? "🛡 プログラムを止める" : "▶ プログラムを動かす";
+                netBtn.textContent = st.net ? "🔒 外の画像を読まない" : "🌐 外の画像も読む";
+                if (st.code) {
+                    var pre = document.createElement("pre"); pre.textContent = text; main.appendChild(pre);
+                    metaEl.textContent = "HTML のコード ・ 文字コード：" + label + " ・ " + text.length.toLocaleString() + " 文字";
+                    return;
+                }
+                var tip = document.createElement("div");
+                tip.className = "hnote";
+                tip.textContent = "🛡 安全な枠の中で表示しています（ログイン情報には さわれません・外へのデータ送信は止めています）。" + (st.run ? "" : "プログラム（スクリプト）は 止めています。") + (st.run && st.net ? "" : "ほかのファイル・外の画像やデザインは 読みません。");
+                main.appendChild(tip);
+                main.appendChild(makeFrame(text, st.run, st.net));
+                metaEl.textContent = "HTML のページ ・ 文字コード：" + label;
+            }
+            viewBtn.onclick = function () { st.code = !st.code; draw(); };
+            runBtn.onclick = function () { st.run = !st.run; draw(); };
+            netBtn.onclick = function () { st.net = !st.net; draw(); };
+            draw();
+        });
+    }
+
     function init() {
         var p = readHash();
         var url = checkUrl(p.u || "");
@@ -248,6 +336,12 @@
             main.textContent = ""; main.appendChild(m);
             saveBtn.hidden = false;
             saveBtn.addEventListener("click", function () { fetchAndSave(url.href); });
+            return;
+        }
+        if (kind === "html") {
+            showHtml(url, ext).catch(function () {
+                fail("ファイルを読み込めませんでした（リンクの期限が切れた可能性があります）。チャットを開き直して、もう一度お試しください。");
+            });
             return;
         }
         if (kind === "text") {

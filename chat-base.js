@@ -76,7 +76,8 @@ const FILE_MIME_BY_EXT = {
     txt:"text/plain",log:"text/plain",ini:"text/plain",cfg:"text/plain",conf:"text/plain",toml:"text/plain",yaml:"text/plain",yml:"text/plain",
     srt:"text/plain",vtt:"text/plain",lrc:"text/plain",tex:"text/plain",rst:"text/plain",sql:"text/plain",diff:"text/plain",patch:"text/plain",jsonl:"text/plain",
     md:"text/markdown",markdown:"text/markdown",json:"application/json",csv:"text/csv",tsv:"text/tab-separated-values",ics:"text/calendar",vcf:"text/vcard",
-    // ソースコード（文字として送るだけ。動かす種類の js・html・svg・xml は 危険なので入れていません）
+    // ソースコード（文字として送るだけ。js・svg・xml は 危険なので入れていません。html・htm は、保存先には「文字」として預け、見るときは 安全な枠（sandbox）の中でページとして表示します）
+    html:"text/plain",htm:"text/plain",
     py:"text/plain",mjs:"text/plain",ts:"text/plain",jsx:"text/plain",tsx:"text/plain",css:"text/plain",scss:"text/plain",
     java:"text/plain",kt:"text/plain",c:"text/plain",h:"text/plain",cpp:"text/plain",hpp:"text/plain",cs:"text/plain",go:"text/plain",rs:"text/plain",
     rb:"text/plain",php:"text/plain",swift:"text/plain",lua:"text/plain",dart:"text/plain",gd:"text/plain",pl:"text/plain",r:"text/plain",scala:"text/plain",
@@ -92,7 +93,7 @@ const FILE_MIME_BY_EXT = {
 // ブラウザが教える種類を信じてよい拡張子（それ以外は、拡張子から決めた種類を使う。例：.md や .json は ブラウザによって種類が空になる）
 const FILE_TRUST_BROWSER_TYPE = new Set(["jpg","jpeg","png","gif","webp","heic","heif","mp4","mov","webm"]);
 // 危険なので、送れない拡張子（ホワイトリストに無いものは すべて送れませんが、理由を はっきり伝えるための一覧）
-const FILE_BLOCKED_EXT = new Set(["exe","msi","bat","cmd","com","scr","pif","ps1","psm1","vbs","vbe","js","jse","wsf","wsh","hta","cpl","reg","lnk","dll","sys","jar","apk","ipa","app","dmg","iso","sh","bash","command","html","htm","xhtml","svg","xml","docm","xlsm","pptm","dotm","xlam"]);
+const FILE_BLOCKED_EXT = new Set(["exe","msi","bat","cmd","com","scr","pif","ps1","psm1","vbs","vbe","js","jse","wsf","wsh","hta","cpl","reg","lnk","dll","sys","jar","apk","ipa","app","dmg","iso","sh","bash","command","xhtml","svg","xml","docm","xlsm","pptm","dotm","xlam"]);
 
 function fileExt(file){ const m = /\.([A-Za-z0-9]+)$/.exec(file.name || ""); return m ? m[1].toLowerCase() : ""; }
 
@@ -742,7 +743,7 @@ function parseMessageContent(content){
     if(typeof content !== "string") return {type:"text",text:String(content ?? "")};
     try{
         const parsed = JSON.parse(content);
-        if(parsed && typeof parsed === "object" && ["text","image","file","video","audio","poll","location","game","board","contact","live"].includes(parsed.type)){
+        if(parsed && typeof parsed === "object" && ["text","image","file","video","audio","poll","location","game","board","contact","live","itin"].includes(parsed.type)){
             return parsed;
         }
     }catch(_error){}
@@ -764,7 +765,7 @@ function renderMessageContent(content){
     if(item.type === "game"){
         return typeof renderGameBubble === "function" ? renderGameBubble(item) : '<div class="bubble">🎮 対戦</div>';
     }
-    if(item.type === "board" || item.type === "contact" || item.type === "live"){
+    if(item.type === "board" || item.type === "contact" || item.type === "live" || item.type === "itin"){
         return typeof renderExtraBubble === "function" ? renderExtraBubble(item) : '<div class="bubble">（この版では表示できません）</div>';
     }
     if(item.type === "location"){

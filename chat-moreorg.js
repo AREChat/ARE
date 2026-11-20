@@ -8,7 +8,7 @@
 
 const MO_CATS = [
     ["file", "📁 ファイル", ["filedrop", "zip", "imgc", "img2pdf", "pdftool", "exifclean", "hashtool", "renametool", "textfix", "csvtool", "vframe", "splittool", "ocr"]],
-    ["life", "🏠 くらし", ["diary", "habit", "budget", "timer", "calc", "shop", "split", "health", "co2", "memo", "planner", "sched", "geo", "board", "weather", "transit", "run:shop"]],
+    ["life", "🏠 くらし", ["itin", "diary", "habit", "budget", "timer", "calc", "shop", "split", "health", "co2", "memo", "planner", "sched", "geo", "board", "weather", "transit", "run:shop"]],
     ["make", "🎨 つくる", ["story", "album", "imgedit", "draw", "mystamp", "avatar", "profile3d", "aistudio", "archive"]],
     ["play", "🎮 あそぶ", ["games", "cards", "bj", "fun", "rpg", "game2", "game4", "game5", "game7", "daifugo", "dream", "bingo"]],
     ["smart", "🧠 かしこい・学習", ["chatbot", "myai", "ai", "work", "autoreply", "study124"]],
@@ -96,6 +96,15 @@ function moApply(){
 }
 function moSchedule(){ if(mo.timer) return; mo.timer = setTimeout(() => { mo.timer = 0; moApply(); }, 30); }
 
+/** 新しい「行動予定表」を、はじめて 一度だけ ★お気に入りに入れる（あとで外してもOK。もう一度は入れません）*/
+function moSeedItin(){
+    try{
+        const k = "are_itin_seed_" + (state && state.user ? state.user.id : "guest");
+        if(localStorage.getItem(k)) return;
+        localStorage.setItem(k, "1");
+        if(!mo.favs.includes("itin")){ mo.favs.unshift("itin"); moSave(); moApply(); }
+    }catch(_e){ /* 入れられなくても使える */ }
+}
 function initMoreOrg(){
     const pane = document.querySelector(".pane-more"); if(!pane || pane.querySelector("#moChips")) return;
     moLoad(); pane.classList.add("mo-on");
@@ -118,6 +127,6 @@ function initMoreOrg(){
     if(inp) inp.addEventListener("input", () => { if(inp.value.trim() && mo.cat !== "all"){ mo.cat = "all"; moApply(); } });
     try{ new MutationObserver(() => { if(!mo.applying) moSchedule(); }).observe(pane, {childList: true}); }catch(_e){ /* 何もしない */ }
     moApply();
-    moCloudPull();
+    moCloudPull().then(moSeedItin, moSeedItin);
     document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") moCloudPull(); });
 }

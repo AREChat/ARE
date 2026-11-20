@@ -5,14 +5,14 @@
 // ・フォロワー／フォロー中を押すと、一覧が開きます（チャットを始める・フォロー解除もできます）
 
 const QK_MAX = 7;
-const QK_DEFAULT = ["tool:study124", "tool:games", "tool:rpg", "shop", "search:more"];
+const QK_DEFAULT = ["tool:study124", "tool:itin", "tool:rpg", "shop", "search:more"];
 // 自分で ショートカットを変えていない人の「はじめのショートカット」を、グループ（q1〜q4）ごとに変える
 //  q1=家庭（ゲームなし）／ q2=社員（ゲームは1つだけ＋仕事に役立つもの）／ q3=友人・q4=その他（ゲームも便利機能も）／ 管理者は今までどおり
 const QK_BY_GROUP = {
     q1: ["tool:memo", "tool:planner", "tool:album", "tool:diary", "tool:comfort", "search:more"],
-    q2: ["tool:work", "tool:planner", "tool:sched", "tool:memo", "tool:filedrop", "tool:games", "search:more"],
-    q3: ["tool:games", "tool:rpg", "tool:album", "tool:split", "tool:board", "shop", "search:more"],
-    q4: ["tool:games", "tool:rpg", "tool:album", "tool:split", "tool:board", "shop", "search:more"]
+    q2: ["tool:work", "tool:planner", "tool:sched", "tool:memo", "tool:filedrop", "tool:itin", "search:more"],
+    q3: ["tool:itin", "tool:rpg", "tool:album", "tool:split", "tool:board", "shop", "search:more"],
+    q4: ["tool:itin", "tool:rpg", "tool:album", "tool:split", "tool:board", "shop", "search:more"]
 };
 function qkDefaultList(){
     try{
@@ -25,7 +25,7 @@ function qkDefaultList(){
     }catch(_e){ /* 既定にもどる */ }
     return QK_DEFAULT.slice();
 }
-const QK_LABEL = {rpg:"RPGゲーム", games:"ゲーム", study124:"学習アプリ", prefs:"表示設定・言語"};
+const QK_LABEL = {rpg:"RPGゲーム", games:"ゲーム", itin:"行動予定表", study124:"学習アプリ", prefs:"表示設定・言語"};
 const QK_ALIAS = {
     zip:"あっしゅく 圧縮 かいとう 解凍 ぜっぷ zip ふぁいる ファイル まとめる 展開 てんかい", imgc:"がぞう 画像 しゃしん 写真 ちいさく 小さく りさいず リサイズ へんかん 変換 jpg png webp あっしゅく 圧縮 ふぁいる ファイル 軽く",
     img2pdf:"pdf ぴーでぃーえふ がぞう 画像 しゃしん 写真 すきゃん スキャン まとめる ふぁいる ファイル", pdftool:"pdf ぴーでぃーえふ けつごう 結合 ぶんかつ 分割 かいてん 回転 ぬきだし 抜き出し ふぁいる ファイル ぺーじ",
@@ -34,7 +34,7 @@ const QK_ALIAS = {
     renametool:"なまえ 名前 りねーむ いっかつ 一括 れんばん 連番 ふぁいる ファイル めい", textfix:"もじばけ 文字化け もじこーど 文字コード しふとじす shift_jis utf8 かいぎょう 改行 てきすと テキスト ふぁいる ファイル なおす 直す",
     csvtool:"csv しーえすぶい えくせる excel ひょう 表 json へんかん 変換 ふぁいる ファイル", vframe:"どうが 動画 ふれーむ 静止画 せいしが きりだし 切り出し きゃぷちゃ 画面 ふぁいる ファイル さいしゅう",
     splittool:"ぶんかつ 分割 けつごう 結合 おおきい 大きい ふぁいる ファイル おくれない 送れない おもい 重い",
-    rpg:"げーむ ゲーム rpg ぼうけん 冒険 あれ are", games:"げーむ ゲーム あそび 遊び", cards:"ゲーム トランプ ばばぬき", bj:"ゲーム トランプ かじの",
+    itin:"こうどう よてい 予定 よていひょう 予定表 まちじかん 待ち時間 すけじゅーる 旅行 りょこう あらーむ めも 行列 ぎょうれつ", rpg:"げーむ ゲーム rpg ぼうけん 冒険 あれ are", games:"げーむ ゲーム あそび 遊び", cards:"ゲーム トランプ ばばぬき", bj:"ゲーム トランプ かじの",
     budget:"お金 かけいぼ 家計 しゅうし 収支 支出 収入", diary:"にっき 日記 きおく", weather:"てんき 天気 あめ 雨 気温 予報", transit:"でんしゃ 電車 のりかえ 乗換 鉄道 交通",
     calc:"けいさん 計算 かわせ 為替 たんい 単位 換算", timer:"すとっぷ ぽもどーろ 時計", memo:"めも ノート keep きーぷ", planner:"よてい 予定 すけじゅーる かれんだー カレンダー たすく タスク",
     health:"たいじゅう 体重 すいみん 睡眠 ほすう 歩数 きぶん", split:"わりかん 割り勘 お金", shop:"かいもの 買い物 りすと", story:"すとーりー 24時間 投稿",
@@ -80,6 +80,16 @@ function qkLoad(){
     let list = null;
     try{ list = JSON.parse(localStorage.getItem(qkKey()) || "null"); }catch(_e){ list = null; }
     if(!Array.isArray(list)) list = qkDefaultList();
+    else{   // 自分で保存していたショートカットの「🎮 ゲーム」を、一度だけ「📋 行動予定表」に置きかえる（ゲームは「その他」にあります）
+        try{
+            const mk = "are_quick_itin_mig_" + (state && state.user ? state.user.id : "guest");
+            if(!localStorage.getItem(mk)){
+                localStorage.setItem(mk, "1");
+                const at = list.indexOf("tool:games");
+                if(at >= 0){ if(list.includes("tool:itin")) list.splice(at, 1); else list[at] = "tool:itin"; qkSave(list); }
+            }
+        }catch(_e){ /* 置きかえられなくても使える */ }
+    }
     const seen = new Set();
     return list.filter((id) => typeof id === "string" && qkFind(id) && !seen.has(id) && seen.add(id)).slice(0, QK_MAX);
 }
