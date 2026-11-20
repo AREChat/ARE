@@ -401,6 +401,7 @@ function itnRender(){
     const b = root.querySelector(".itn-body"); if(b) b.scrollTop = sc;
     if(itn.botScroll){ itn.botScroll = false; if(b && itn.sub === "bot"){ b.scrollTop = b.scrollHeight; const inp = document.getElementById("itnBotIn"); if(inp && !itn.voiceOn) try{ inp.focus({preventScroll: true}); }catch(_e){} } }
     itnLive();
+    if(!itn.crowdOff && Date.now() - itn.crowdAt > 600000){ try{ itnCrowdFetch(false); }catch(_e){} }
 }
 function itnRenderStatus(){ const r = document.getElementById("itnRoot"); if(r && itn.sub === "plans") itnRender(); }
 
