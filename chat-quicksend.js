@@ -11,9 +11,12 @@ function qsAuto(){ try{ return localStorage.getItem("are_qs_auto") === "1"; }cat
 
 function qsKind(file){
     const t = String(file.type || "");
+    const ext = fileExt(file);
+    // 危険な拡張子（.svg など）は、ブラウザが画像や動画と言っても 送らない。.ts は ブラウザが「動画」と答えることがあるので、先に拡張子を見る
+    if(FILE_BLOCKED_EXT.has(ext)) return null;
+    if(FILE_MIME_BY_EXT[ext] && !FILE_TRUST_BROWSER_TYPE.has(ext)) return "file";
     if(t.startsWith("image/") && t !== "image/svg+xml") return "image";
     if(t.startsWith("video/")) return "video";
-    const ext = fileExt(file);
     if(FILE_MIME_BY_EXT[ext]) return "file";
     return null;
 }
@@ -121,7 +124,7 @@ async function qsCapture(){
 function qsAdd(files){
     const ok = [], bad = [];
     files.forEach((f, i) => { const k = qsKind(f); if(k) ok.push(qsName(f, i)); else bad.push(f.name || "ファイル"); });
-    if(bad.length) showToast("送れない形式です：" + bad.join("、") + "（画像・動画・PDF・Word・Excel・PowerPointが送れます）");
+    if(bad.length) showToast("送れない形式です：" + bad.join("、") + "（画像・動画・PDF・Office・テキスト・ZIP など約110種類が送れます。ヘルプの「送れるファイルの種類」を見てください）");
     if(!ok.length) return;
     feat.qs.files = feat.qs.files.concat(ok).slice(0, 10);
     if(qsAuto()){ qsSend(); return; }

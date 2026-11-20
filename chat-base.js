@@ -55,21 +55,61 @@ async function compressChatImage(file){
     }
 }
 
+// ===== 送れるファイルの種類（ホワイトリスト）：ここに書いた拡張子だけ送れます（約110種類） =====
+// 追加するときは、保存先（Supabase の chat-attachments）の許可リストにも 同じ種類を足してください（sql/chat_attachments_mime_v2.sql）。
 const FILE_MIME_BY_EXT = {
-    pdf:"application/pdf",
-    docx:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    xlsx:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    pptx:"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    // 画像・動画（ブラウザが教えてくれる種類をそのまま使う）
     jpg:"image/jpeg",jpeg:"image/jpeg",png:"image/png",gif:"image/gif",webp:"image/webp",heic:"image/heic",heif:"image/heif",
-    mp4:"video/mp4",mov:"video/quicktime",webm:"video/webm"
+    mp4:"video/mp4",mov:"video/quicktime",webm:"video/webm",
+    // 画像・動画（追加）
+    bmp:"image/bmp",tif:"image/tiff",tiff:"image/tiff",avif:"image/avif",ico:"image/vnd.microsoft.icon",
+    mkv:"video/x-matroska",avi:"video/x-msvideo",m4v:"video/mp4","3gp":"video/3gpp",wmv:"video/x-ms-wmv",
+    // 文書
+    pdf:"application/pdf",
+    doc:"application/msword",docx:"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls:"application/vnd.ms-excel",xlsx:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ppt:"application/vnd.ms-powerpoint",pptx:"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    odt:"application/vnd.oasis.opendocument.text",ods:"application/vnd.oasis.opendocument.spreadsheet",odp:"application/vnd.oasis.opendocument.presentation",
+    rtf:"application/rtf",epub:"application/epub+zip",
+    pages:"application/vnd.apple.pages",numbers:"application/vnd.apple.numbers",key:"application/vnd.apple.keynote",
+    // テキスト・データ
+    txt:"text/plain",log:"text/plain",ini:"text/plain",cfg:"text/plain",conf:"text/plain",toml:"text/plain",yaml:"text/plain",yml:"text/plain",
+    srt:"text/plain",vtt:"text/plain",lrc:"text/plain",tex:"text/plain",rst:"text/plain",sql:"text/plain",diff:"text/plain",patch:"text/plain",jsonl:"text/plain",
+    md:"text/markdown",markdown:"text/markdown",json:"application/json",csv:"text/csv",tsv:"text/tab-separated-values",ics:"text/calendar",vcf:"text/vcard",
+    // ソースコード（文字として送るだけ。動かす種類の js・html・svg・xml は 危険なので入れていません）
+    py:"text/plain",mjs:"text/plain",ts:"text/plain",jsx:"text/plain",tsx:"text/plain",css:"text/plain",scss:"text/plain",
+    java:"text/plain",kt:"text/plain",c:"text/plain",h:"text/plain",cpp:"text/plain",hpp:"text/plain",cs:"text/plain",go:"text/plain",rs:"text/plain",
+    rb:"text/plain",php:"text/plain",swift:"text/plain",lua:"text/plain",dart:"text/plain",gd:"text/plain",pl:"text/plain",r:"text/plain",scala:"text/plain",
+    // ゲーム・3D
+    glb:"model/gltf-binary",gltf:"model/gltf+json",stl:"model/stl",obj:"text/plain",tmx:"text/plain",ldtk:"text/plain",
+    // フォント
+    ttf:"font/ttf",otf:"font/otf",woff:"font/woff",woff2:"font/woff2",
+    // 圧縮
+    zip:"application/zip","7z":"application/x-7z-compressed",rar:"application/vnd.rar",tar:"application/x-tar",gz:"application/gzip",tgz:"application/gzip",bz2:"application/x-bzip2",xz:"application/x-xz",
+    // 音声
+    mp3:"audio/mpeg",m4a:"audio/mp4",aac:"audio/aac",wav:"audio/wav",flac:"audio/flac",ogg:"audio/ogg",opus:"audio/ogg",mid:"audio/midi",midi:"audio/midi",weba:"audio/webm"
 };
+// ブラウザが教える種類を信じてよい拡張子（それ以外は、拡張子から決めた種類を使う。例：.md や .json は ブラウザによって種類が空になる）
+const FILE_TRUST_BROWSER_TYPE = new Set(["jpg","jpeg","png","gif","webp","heic","heif","mp4","mov","webm"]);
+// 危険なので、送れない拡張子（ホワイトリストに無いものは すべて送れませんが、理由を はっきり伝えるための一覧）
+const FILE_BLOCKED_EXT = new Set(["exe","msi","bat","cmd","com","scr","pif","ps1","psm1","vbs","vbe","js","jse","wsf","wsh","hta","cpl","reg","lnk","dll","sys","jar","apk","ipa","app","dmg","iso","sh","bash","command","html","htm","xhtml","svg","xml","docm","xlsm","pptm","dotm","xlam"]);
 
 function fileExt(file){ const m = /\.([A-Za-z0-9]+)$/.exec(file.name || ""); return m ? m[1].toLowerCase() : ""; }
 
 function resolveMime(file){
-    const byExt = FILE_MIME_BY_EXT[fileExt(file)];
+    const ext = fileExt(file), byExt = FILE_MIME_BY_EXT[ext];
+    if(byExt && !FILE_TRUST_BROWSER_TYPE.has(ext)) return byExt;
     if(file.type && file.type !== "application/octet-stream") return file.type;
     return byExt || "application/octet-stream";
+}
+
+// ファイルを送れるか調べる。送れないときは、理由の文を返す（送れるときは ""）
+function fileRejectReason(file){
+    const ext = fileExt(file);
+    if(!ext) return "拡張子（.txt など）がないため送れません";
+    if(FILE_BLOCKED_EXT.has(ext)) return "危険なため送れません（." + ext + "）";
+    if(!FILE_MIME_BY_EXT[ext]) return "送れない形式です（." + ext + "）";
+    return "";
 }
 
 const state = {
@@ -887,9 +927,9 @@ async function handleFiles(fileList,kind){
     }
 
     if(kind === "file"){
-        const rejected = files.filter((file) => !FILE_MIME_BY_EXT[fileExt(file)]);
+        const rejected = files.filter((file) => fileRejectReason(file));
         if(rejected.length){
-            showToast("対応形式は PDF・Word(.docx)・Excel(.xlsx)・PowerPoint(.pptx) です：" + rejected.map((f) => f.name).join("、"));
+            showToast("送れないファイルがあります：" + rejected.map((f) => f.name + "（" + fileRejectReason(f) + "）").join("、") + "　送れる種類は、ヘルプの「送れるファイルの種類」で見られます。");
             clearFileInputs();
             return;
         }
@@ -976,9 +1016,13 @@ async function uploadAndSend(file,kind,originalBytes,nthLabel){
         const objectPath = state.currentRoom.id + "/" + state.user.id + "/" + crypto.randomUUID() + (ext ? "." + ext : "");
 
         // 動画は、進み具合と「あと何秒」を表示しながらアップロードする（chat-videolink.js）。ほかは今までどおり。
-        const plainUpload = () => client.storage.from(STORAGE_BUCKET).upload(objectPath,file,{
+        // supabase-js は、ファイルをそのまま渡すと「ファイルの種類」をブラウザ任せにするため、.md や .json などが空の種類で断られることがある。
+        // そこで、拡張子から決めた種類つきの Blob にして渡す（中身は同じ。コピーはしない）。
+        const sendMime = resolveMime(file);
+        const sendBody = file.type === sendMime ? file : file.slice(0,file.size,sendMime);
+        const plainUpload = () => client.storage.from(STORAGE_BUCKET).upload(objectPath,sendBody,{
             cacheControl:"3600",
-            contentType:resolveMime(file),
+            contentType:sendMime,
             upsert:false
         });
         let uploadResult;
