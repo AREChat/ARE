@@ -771,6 +771,11 @@ function renderMessageContent(content){
         return typeof renderLocationBubble === "function" ? renderLocationBubble(item) : '<div class="bubble">📍 位置情報</div>';
     }
 
+    // 30日たって、運営の保管場所（Google ドライブ）に移したファイル：URL も保存先のパスも無いので、案内のカードだけ出す
+    if(item.archived && (item.type === "file" || item.type === "image" || item.type === "video" || item.type === "audio")){
+        return '<div class="bubble"><div class="attachment"><div class="file-card archived"><span class="file-icon">🗂</span><span><span class="file-name">' + escapeHtml(item.name || "添付ファイル") + '</span><div class="file-meta">30日たったので、チャットからは消えました。運営の保管場所（Google ドライブ）に移しています。</div></span></div></div></div>';
+    }
+
     const url = item.url || "";
     const name = item.name || "添付ファイル";
     const dataPath = item.path ? ' data-path="' + escapeHtml(String(item.path)) + '"' : "";

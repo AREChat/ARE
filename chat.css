@@ -61,6 +61,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .attachment video{max-width:100%;max-height:300px;border-radius:10px;background:#000}
 .attachment a{color:#c6d6ff;overflow-wrap:anywhere}
 .file-card{display:flex;gap:10px;align-items:center;padding:10px;background:#111a2d;border:1px solid var(--line);border-radius:10px}
+.file-card.archived{opacity:.85;border-style:dashed}
 .file-icon{font-size:25px}
 .file-name{overflow-wrap:anywhere}
 .file-meta{font-size:11px;color:var(--muted);margin-top:3px}

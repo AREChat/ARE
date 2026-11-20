@@ -3,7 +3,7 @@
 
 function initForward(){
     if(!window.AREFeatures.ok("msgmenu")) throw new Error("メッセージ操作メニューが起動していません。");
-    addMsgTool({id:"forward",icon:"↪",label:"転送",when:(message,item) => item.type !== "poll",run:(message,item) => openForward(message,item)});
+    addMsgTool({id:"forward",icon:"↪",label:"転送",when:(message,item) => item.type !== "poll" && !item.archived,run:(message,item) => openForward(message,item)});
     el.profileModal.addEventListener("click",onForwardClick);
 }
 

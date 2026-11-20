@@ -11,7 +11,7 @@ function initThread(){
     });
     addMsgTool({id:"thread", icon:"🧵", label:"スレッドで見る", when:(message, item) => Boolean(item.replyTo) || threadMembers(message.id).length > 1,
         run:(message) => openThread(message.id)});
-    addMsgTool({id:"save", icon:"💾", label:"端末に保存", when:(message, item) => ["image", "video", "audio", "file"].includes(item.type), run:(message, item) => saveMedia(message, item)});
+    addMsgTool({id:"save", icon:"💾", label:"端末に保存", when:(message, item) => !item.archived && ["image", "video", "audio", "file"].includes(item.type), run:(message, item) => saveMedia(message, item)});
 }
 
 function threadParent(message){
