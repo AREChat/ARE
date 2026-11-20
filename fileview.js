@@ -3,9 +3,11 @@
 // ・保存先（Supabase Storage）の中身を、ブラウザ標準の表示ではなく、このページの中で表示する。
 //   （標準の表示だと、右クリックや F12 を止める protect.js が効かず、文字コードの推測で文字化けもするため）
 // ・文字のファイルは、文字コードを自分で判定して、正しく表示する（Shift_JIS・EUC-JP・JIS・UTF-16 も読める）。
+// ・PDF は、ブラウザ標準の表示（右クリックや F12 を止められない）は使わず、pdf.js（vendor/lazy）で、このページの canvas に描く。
 // ・開けるのは「このアプリの保存先（ARE_CONFIG.supabaseUrl）」のファイルだけ。ほかの URL は開かない。
 (function () {
     var MAX_TEXT_BYTES = 5 * 1024 * 1024;   // 文字のファイルは、5MB まで表示（それより大きいときはダウンロードだけ）
+    var MAX_PDF_BYTES = 80 * 1024 * 1024;   // PDF は、80MB まで表示（チャットで送れるのは 50MB まで）
     var $ = function (id) { return document.getElementById(id); };
     var main = $("fvMain"), nameEl = $("fvName"), metaEl = $("fvMeta"), copyBtn = $("fvCopy"), saveBtn = $("fvSave");
     var downloadParts = null, downloadMime = "application/octet-stream", downloadName = "file", copyText = "";
@@ -44,6 +46,11 @@
         if (b) b.addEventListener("click", function () { location.href = "./chat.html"; });
     }
 
+    // 画像・動画・音声が出せなかったとき：リンクの期限切れのほか、ブラウザが対応していない形式のこともある。ダウンロードのボタンは残す
+    function mediaFail() {
+        note("このファイルは、ここでは開けませんでした。<br>リンクの期限が切れたか、ブラウザで表示・再生できない形式かもしれません。<br><b>ダウンロード</b>して開くか、チャットを開き直してもう一度お試しください。");
+    }
+
     function extOf(pathname, name) {
         var s = "";
         try { s = decodeURIComponent(pathname); } catch (_e) { s = pathname; }
@@ -77,6 +84,102 @@
         a.href = href; a.download = downloadName; a.style.display = "none";
         document.body.appendChild(a); a.click(); a.remove();
         setTimeout(function () { URL.revokeObjectURL(href); }, 30000);
+    }
+
+    function loadScript(src) {
+        return new Promise(function (resolve, reject) {
+            var el = document.createElement("script");
+            el.src = src; el.onload = resolve; el.onerror = function () { reject(new Error("script")); };
+            document.head.appendChild(el);
+        });
+    }
+
+    // PDF：1ページずつ canvas に描く（見える付近のページだけ描き、遠くなったページは捨てて、メモリを使いすぎない）
+    function drawPdf(pdf) {
+        var total = pdf.numPages, wrap = document.createElement("div"), pages = [], queue = Promise.resolve();
+        wrap.className = "pdf";
+        metaEl.textContent = "PDF ・ " + total + " ページ";
+        main.textContent = "";
+        main.appendChild(wrap);
+        function release(st) {
+            st.want = false;
+            if (st.task) { try { st.task.cancel(); } catch (_e) { /* 何もしない */ } st.task = null; }
+            if (st.done) { st.holder.textContent = ""; st.done = false; }
+        }
+        function draw(st) {
+            if (st.done || st.busy) return;
+            st.busy = true;
+            queue = queue.then(function () {
+                if (!st.want) { st.busy = false; return null; }      // 見えなくなったので、描かない
+                return pdf.getPage(st.n).then(function (page) {
+                    var base = page.getViewport({ scale: 1 });
+                    var cssW = Math.min(980, Math.max(240, main.clientWidth - 28));
+                    var scale = (cssW / base.width) * Math.min(window.devicePixelRatio || 1, 2);
+                    var px = base.width * scale * base.height * scale;
+                    if (px > 16000000) scale *= Math.sqrt(16000000 / px);      // 大きすぎる紙は、少し粗くして描く
+                    var vp = page.getViewport({ scale: scale });
+                    var canvas = document.createElement("canvas");
+                    canvas.width = Math.max(1, Math.floor(vp.width)); canvas.height = Math.max(1, Math.floor(vp.height));
+                    canvas.draggable = false;
+                    st.holder.style.aspectRatio = base.width + " / " + base.height;
+                    st.task = page.render({ canvasContext: canvas.getContext("2d"), viewport: vp });
+                    return st.task.promise.then(function () {
+                        st.task = null; st.busy = false;
+                        if (st.want) { st.holder.textContent = ""; st.holder.appendChild(canvas); st.done = true; }
+                        try { page.cleanup(); } catch (_e) { /* 何もしない */ }
+                    });
+                }).catch(function (err) {
+                    st.task = null; st.busy = false;
+                    if (err && err.name === "RenderingCancelledException") return;
+                    st.holder.textContent = "このページは表示できませんでした";
+                });
+            });
+        }
+        return pdf.getPage(1).then(function (first) {
+            var v = first.getViewport({ scale: 1 });
+            for (var i = 1; i <= total; i++) {
+                var holder = document.createElement("div");
+                holder.className = "pg"; holder.dataset.n = String(i);
+                holder.style.aspectRatio = v.width + " / " + v.height;
+                wrap.appendChild(holder);
+                pages.push({ n: i, holder: holder, want: false, busy: false, done: false, task: null });
+            }
+            var byHolder = new Map(pages.map(function (st) { return [st.holder, st]; }));
+            var near = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) { var st = byHolder.get(e.target); if (st && e.isIntersecting) { st.want = true; draw(st); } });
+            }, { root: main, rootMargin: "900px 0px", threshold: 0 });
+            var far = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) { var st = byHolder.get(e.target); if (st && !e.isIntersecting) release(st); });
+            }, { root: main, rootMargin: "3500px 0px", threshold: 0 });
+            pages.forEach(function (st) { near.observe(st.holder); far.observe(st.holder); });
+        });
+    }
+
+    function showPdf(url) {
+        return fetch(url.href, { credentials: "omit", cache: "no-store" }).then(function (r) {
+            if (!r.ok) throw new Error("http " + r.status);
+            return r.arrayBuffer();
+        }).then(function (buf) {
+            var bytes = new Uint8Array(buf);
+            showSave([bytes], "application/pdf");
+            if (bytes.length > MAX_PDF_BYTES) {
+                note("このPDFは大きい（" + Math.round(bytes.length / 1048576) + "MB）ため、ここでは表示しません。<br><b>ダウンロード</b>して開いてください。");
+                return null;
+            }
+            return loadScript("./vendor/lazy/pdf.min.js").then(function () {
+                var lib = window.pdfjsLib;
+                if (!lib) throw new Error("pdfjs");
+                lib.GlobalWorkerOptions.workerSrc = "./vendor/lazy/pdf.worker.min.js";
+                return lib.getDocument({
+                    data: bytes.slice(0),               // 渡すと中身が空になるので、ダウンロード用に残す分は別に持つ
+                    isEvalSupported: false, enableXfa: false, disableAutoFetch: true, disableStream: true,
+                    cMapUrl: "./vendor/lazy/cmaps/", cMapPacked: true, useSystemFonts: true
+                }).promise;
+            }).then(drawPdf).catch(function (err) {
+                if (err && err.name === "PasswordException") note("パスワードつきのPDFは、この画面では開けません。<br><b>ダウンロード</b>して、お使いのアプリで開いてください。");
+                else note("このPDFは、この画面では表示できませんでした（壊れているか、特殊な形式です）。<br><b>ダウンロード</b>して、お使いのアプリで開いてください。");
+            });
+        });
     }
 
     function showText(url, ext) {
@@ -130,7 +233,7 @@
             var img = document.createElement("img");
             img.className = "view"; img.alt = downloadName; img.draggable = false; img.src = url.href;
             img.addEventListener("click", function () { img.classList.toggle("zoom"); });
-            img.addEventListener("error", function () { fail("画像を読み込めませんでした（リンクの期限が切れた可能性があります）。チャットを開き直して、もう一度お試しください。"); });
+            img.addEventListener("error", mediaFail);
             main.textContent = ""; main.appendChild(img);
             saveBtn.hidden = false;
             saveBtn.addEventListener("click", function () { fetchAndSave(url.href); });
@@ -141,7 +244,7 @@
             m.controls = true; m.preload = "metadata"; m.src = url.href;
             m.setAttribute("controlsList", "nodownload noremoteplayback");
             if (kind === "video") { m.setAttribute("playsinline", ""); m.setAttribute("disablePictureInPicture", ""); }
-            m.addEventListener("error", function () { fail("ファイルを読み込めませんでした（リンクの期限が切れた可能性があります）。チャットを開き直して、もう一度お試しください。"); });
+            m.addEventListener("error", mediaFail);
             main.textContent = ""; main.appendChild(m);
             saveBtn.hidden = false;
             saveBtn.addEventListener("click", function () { fetchAndSave(url.href); });
@@ -153,8 +256,14 @@
             });
             return;
         }
-        // PDF・そのほか：ブラウザ標準の表示（右クリックや F12 を止められない）は使わず、ダウンロードだけにする
-        note((kind === "pdf" ? "PDF" : "このファイル") + "は、この画面では表示しません。<br><b>ダウンロード</b>して、お使いのアプリで開いてください。");
+        if (kind === "pdf") {
+            showPdf(url).catch(function () {
+                fail("ファイルを読み込めませんでした（リンクの期限が切れた可能性があります）。チャットを開き直して、もう一度お試しください。");
+            });
+            return;
+        }
+        // そのほか（docx・zip など）：ブラウザ標準の表示（右クリックや F12 を止められない）は使わず、ダウンロードだけにする
+        note("このファイルは、この画面では表示しません。<br><b>ダウンロード</b>して、お使いのアプリで開いてください。");
         saveBtn.hidden = false;
         saveBtn.addEventListener("click", function () { fetchAndSave(url.href); });
     }
