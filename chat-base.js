@@ -689,7 +689,7 @@ async function loadMessages(showFeedback,quiet){
         state.messages = loaded.concat(arrived);
         await loadPending(requestedRoomId);
         if(!state.currentRoom || state.currentRoom.id !== requestedRoomId) return;
-        renderMessages(!quiet);
+        renderMessages(!quiet, !!quiet);   // 自動の更新（quiet）で、変化がなければ作り直さない
         if(showFeedback) showToast("メッセージを更新しました。");
     }catch(error){
         console.error("Message loading error:",error);
@@ -819,7 +819,7 @@ function flushDeferredRender(){
     }, 400);
 }
 
-function renderMessages(scrollToBottom){
+function renderMessages(scrollToBottom, onlyIfChanged){
     const nowMs = Date.now();
     state.messages = state.messages.filter((m) => !m.expires_at || new Date(m.expires_at).getTime() > nowMs);
     if(!state.messages.length){
@@ -839,7 +839,7 @@ function renderMessages(scrollToBottom){
     const stick = scrollToBottom || (el.messages.scrollHeight - prevTop - el.messages.clientHeight < 80);
     const readAt = feat.partnerReadAt ? new Date(feat.partnerReadAt).getTime() : 0;
 
-    el.messages.innerHTML = state.messages.map((message, msgIdx) => {
+    const html = state.messages.map((message, msgIdx) => {
         const own = message.sender_id === state.user.id;
         const profile = own ? state.profile : (feat.known.get(message.sender_id) || state.currentPartner);
         const name = own ? "あなた" : profileDisplayName(profile);
@@ -879,7 +879,13 @@ function renderMessages(scrollToBottom){
             body + '<div class="message-time">' + meta + '</div>' + actions + '</div></article>';
     }).join("");
 
+    // 8秒ごとの自動更新などで、中身が前とまったく同じなら、作り直さない。
+    // （作り直すと、メッセージ全体が一瞬消えて また出るので、画面がチカチカ点滅して 目が疲れるため）
+    if(onlyIfChanged && el.messages.__lastHtml === html && el.messages.__lastFirst && el.messages.__lastFirst === el.messages.firstElementChild) return;
+
+    el.messages.innerHTML = html;
     if(typeof afterRenderMessages === "function") afterRenderMessages();
+    el.messages.__lastHtml = html; el.messages.__lastFirst = el.messages.firstElementChild;
     el.messages.scrollTop = stick ? el.messages.scrollHeight : prevTop;
 }
 
@@ -1091,6 +1097,7 @@ async function uploadAndSend(file,kind,originalBytes,nthLabel){
             contentType:sendMime,
             upsert:false
         });
+        if(file.size >= 5 * 1024 * 1024 && typeof freshAccessToken === "function") await freshAccessToken(client);   // 大きいファイルは、送っている間にログインの期限が切れないよう、先に更新しておく
         let uploadResult;
         if(kind === "video" && typeof uploadVideoWithProgress === "function"){
             uploadResult = await uploadVideoWithProgress(client,objectPath,file,resolveMime(file),(text) => { el.attachmentStatus.textContent = nthPrefix + file.name + " ・ " + sizeLabel + " ・ " + text; });
