@@ -82,8 +82,7 @@ function uploadVideoWithProgress(client, path, file, mime, onText, bucket){
     return new Promise((resolve) => {
         (async () => {
             try{
-                const sess = await client.auth.getSession();
-                const token = sess && sess.data && sess.data.session && sess.data.session.access_token;
+                const token = await freshAccessToken(client);
                 const cfg = window.ARE_CONFIG || {};
                 if(!token || !cfg.supabaseUrl) throw new Error("ログインの確認ができませんでした。");
                 const url = cfg.supabaseUrl + "/storage/v1/object/" + (bucket || STORAGE_BUCKET) + "/" + path.split("/").map(encodeURIComponent).join("/");
@@ -131,15 +130,30 @@ function driveUploadUrl(){
     return /^https:\/\//i.test(u) ? u : "";
 }
 
-async function gasCall(body){
-    const sess = await requireClient().auth.getSession();
-    const token = sess && sess.data && sess.data.session && sess.data.session.access_token;
-    if(!token) throw new Error("ログインが確認できませんでした。");
+/** ログインの「合いかぎ（トークン）」を返す。期限（1時間）が5分以内に近いとき、または force のときは、先に更新する。
+ *  大きい動画は、アップロード中に期限が切れて、最後の「リンクを作る」が「ログインが確認できません」と断られることがあったため。 */
+async function freshAccessToken(client, force){
+    let s = null;
+    try{ const r = await client.auth.getSession(); s = r && r.data && r.data.session; }catch(_e){}
+    const left = s && s.expires_at ? s.expires_at * 1000 - Date.now() : Infinity;
+    if(force || !s || left < 5 * 60 * 1000){
+        try{ const r = await client.auth.refreshSession(); if(r && r.data && r.data.session) s = r.data.session; }catch(_e){ /* 更新できなくても、いまのものを使ってみる */ }
+    }
+    return (s && s.access_token) || "";
+}
+
+async function gasCall(body, retried){
+    const token = await freshAccessToken(requireClient(), !!retried);
+    if(!token) throw new Error("ログインが確認できませんでした。いちどログアウトして、ログインし直してください。");
     // text/plain にすると、事前確認（プリフライト）なしで送れる（GASの決まり）
     const res = await fetch(driveUploadUrl(), {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(Object.assign({token}, body)), redirect:"follow"});
     let j = null;
     try{ j = await res.json(); }catch(_e){}
-    if(!j || !j.ok) throw new Error((j && j.message) || "動画の置き場所と通信できませんでした。");
+    if(!j || !j.ok){
+        // 「ログインが確認できません」と返ってきたときは、ログインを更新して、1回だけやり直す（端末の時計がずれていても、これで直る）
+        if(!retried && j && /ログイン/.test(String(j.message || ""))) return gasCall(body, true);
+        throw new Error((j && j.message) || "動画の置き場所と通信できませんでした。");
+    }
     return j;
 }
 
