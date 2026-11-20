@@ -4,6 +4,7 @@ password-toggle.js
 system.js
 chat-qa.js
 extras.js
+textenc.js
 chat-base.js
 chat-inputlimit.js
 chat-feat.js
@@ -110,6 +111,7 @@ chat-postshare.js
 chat-schedcontent.js
 chat-main.js
 link-copy.js
+chat-fileopen.js
 chat-layout.js
 sw-update.js
 chat-guest.js

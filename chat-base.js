@@ -112,6 +112,37 @@ function fileRejectReason(file){
     return "";
 }
 
+// ---- 文字化けの自動なおし -------------------------------------------------------------
+// （文字コードを調べる部分は textenc.js。ファイルを開く専用ページ fileview.html と共通）
+// txt・md・csv・json などの「文字のファイル」は、送る前に中身の文字コードを調べる。
+//  ・すでに UTF-8 のファイルは、中身にいっさい手を入れない（保存先に「UTF-8 です」と伝えるだけ）。
+//  ・Shift_JIS・EUC-JP・JIS（ISO-2022-JP）・UTF-16（目印つき）のファイルは、UTF-8 に直して送る。
+//  ・どれか決められない（読めない・バイナリ・ほかの言語など）ときは、何も変えずにそのまま送る。
+const TEXT_FIX_MAX_BYTES = 10 * 1024 * 1024;                  // これより大きいファイルは、中身を調べずにそのまま送る
+const textUtf8Files = new WeakSet();                           // 「中身は UTF-8」と確かめたファイル
+
+function isTextFixTarget(file){
+    return TEXT_FILE_EXT.has(fileExt(file));                   // 文字のファイルの一覧は textenc.js
+}
+
+// 戻り値: {file, changed, from}  changed が true のときだけ、file は UTF-8 に直した新しいファイル
+async function fixTextEncoding(file){
+    const same = {file, changed:false, from:""};
+    if(!isTextFixTarget(file) || file.size === 0 || file.size > TEXT_FIX_MAX_BYTES) return same;
+    let found;
+    try{
+        found = detectTextEncoding(new Uint8Array(await file.arrayBuffer()));
+    }catch(error){
+        return same;
+    }
+    if(found.enc === "utf-8" || found.enc === "utf-8-bom"){ textUtf8Files.add(file); return same; }
+    if(typeof found.text !== "string") return same;
+    const out = encodeUtf8Text(found.text,TEXT_FIX_BOM_EXT.has(fileExt(file)));
+    const fixed = new File([out],file.name,{type:resolveMime(file), lastModified:file.lastModified});
+    textUtf8Files.add(fixed);
+    return {file:fixed, changed:true, from:TEXT_ENCODING_LABEL[found.enc] || found.enc};
+}
+
 const state = {
     client: null,
     user: null,
@@ -942,8 +973,13 @@ async function handleFiles(fileList,kind){
     }
 
     const tooBigVideos = [];   // 大きすぎて送れない動画（あとで「リンクで送る」画面を出す）
+    const fixedNotes = [];     // 文字化けを直して送ったファイル（あとで画面にお知らせする）
     for(const file of files){
         let uploadFile = file;
+        if(kind === "file"){
+            const fixed = await fixTextEncoding(file);   // txt などの文字コードを調べ、Shift_JIS などなら UTF-8 に直す（textenc.js）
+            if(fixed.changed){ uploadFile = fixed.file; fixedNotes.push({name:file.name, from:fixed.from}); }
+        }
         if(kind === "image"){
             uploadFile = await compressChatImage(file);
             el.attachmentStatus.textContent = uploadFile === file
@@ -975,6 +1011,11 @@ async function handleFiles(fileList,kind){
     }
 
     clearFileInputs();
+    if(fixedNotes.length){
+        showToast(fixedNotes.length === 1
+            ? "「" + fixedNotes[0].name + "」の文字コードは " + fixedNotes[0].from.replace(" → UTF-8 に直して表示","") + " でした。文字化けしないよう UTF-8 に直して送りました。"
+            : "文字化けしないよう UTF-8 に直して送りました：" + fixedNotes.map((n) => n.name + "（" + n.from.replace(" → UTF-8 に直して表示","") + "）").join("、"));
+    }
     if(tooBigVideos.length && typeof openVideoLinkSheet === "function") openVideoLinkSheet(null, "", tooBigVideos);
 }
 
@@ -1018,7 +1059,9 @@ async function uploadAndSend(file,kind,originalBytes,nthLabel){
         // 動画は、進み具合と「あと何秒」を表示しながらアップロードする（chat-videolink.js）。ほかは今までどおり。
         // supabase-js は、ファイルをそのまま渡すと「ファイルの種類」をブラウザ任せにするため、.md や .json などが空の種類で断られることがある。
         // そこで、拡張子から決めた種類つきの Blob にして渡す（中身は同じ。コピーはしない）。
-        const sendMime = resolveMime(file);
+        // 中身が UTF-8 と確かめた文字のファイルは、「文字コードは UTF-8」と保存先に伝える（ブラウザが Shift_JIS と読み違えて文字化けするのを防ぐ）
+        const baseMime = resolveMime(file);
+        const sendMime = baseMime.indexOf("text/") === 0 && textUtf8Files.has(file) ? baseMime + ";charset=utf-8" : baseMime;
         const sendBody = file.type === sendMime ? file : file.slice(0,file.size,sendMime);
         const plainUpload = () => client.storage.from(STORAGE_BUCKET).upload(objectPath,sendBody,{
             cacheControl:"3600",
