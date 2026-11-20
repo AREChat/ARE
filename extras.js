@@ -171,7 +171,9 @@
         $("tPref").value = pc;
         $("tPref").onchange = () => { try { localStorage.setItem("are_transit_pref", $("tPref").value); } catch (_e) { /* 続行 */ } showTransit($("tPref").value); };
         showTransit(pc);
+        let tSeq = 0;   // 都道府県をすばやく切りかえたとき、古い取得結果があとから上書きしないための番号
         async function showTransit(code) {
+            const mySeq = ++tSeq;
             const out = $("tResult"), name = PREF_NAMES[Number(code) - 1];
             const n = Number(code);
             const JR = {
@@ -195,6 +197,7 @@
             out.textContent = "読み込み中...";
             try {
                 const row = await cacheRow("transit", "toei");
+                if (mySeq !== tSeq) return;
                 if (!row.ok || !row.payload || !row.payload.lines) throw new Error("bad");
                 if (Date.now() - new Date(row.updated_at).getTime() > 6 * 3600 * 1000) throw new Error("stale");
                 out.innerHTML = '<div class="eb-day" style="text-align:left;margin:8px 0"><b>都営交通の運行状況</b><ul style="margin:6px 0 0 18px;padding:0">' +
@@ -202,6 +205,7 @@
                     '<div class="eb-note">更新 ' + hhmm(row.updated_at) + '（1時間ごとに自動更新）<br>出典：' + esc(row.payload.credit || "東京都交通局（公共交通オープンデータセンター）") + '</div></div>' +
                     '<div class="eb-note">JR・私鉄・東京メトロはこのアプリ内では表示できません。下のボタンで公式サイトを確認してください。</div>' + yahoo;
             } catch (_e) {
+                if (mySeq !== tSeq) return;
                 out.innerHTML = failBox("都営交通の運行状況を取得できませんでした。", "https://www.kotsu.metro.tokyo.jp/subway/schedule/", "東京都交通局の運行情報を開く") + yahoo;
             }
         }
