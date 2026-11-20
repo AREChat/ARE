@@ -26,7 +26,7 @@ const ITN_TPL = [
 ];
 const itnTplItems = (key) => (ITN_TPL.find((t) => t[0] === key) || ITN_TPL[ITN_TPL.length - 1])[4].map((r) => ({n: r[2], s: r[0], e: r[1], w: r[3] || null, k: r[4]}));
 
-// ---------- 取り込み（Excel・メモ・PDFの表を貼りつけ）----------
+// ---------- 取り込み（貼りつけ。ファイルからの取り込み10種類は chat-itin-import.js）----------
 const ITN_TIME = "(\\d{1,2})(?::(\\d{2})|時(?!間)\\s*(\\d{2})?\\s*分?)";
 const itnTimeG = () => new RegExp(ITN_TIME, "g");
 function itnTimesIn(s){ const out = []; let m; const re = itnTimeG(); while((m = re.exec(s))){ const h = Number(m[1]), mi = Number(m[2] || m[3] || 0); if(h < 24 && mi < 60) out.push(itnHM(h * 60 + mi)); } return out; }
@@ -163,8 +163,8 @@ function itnTabsHtml(){
     return '<div class="itn-tabs" role="tablist">' + [["now", "🎯 いま"], ["list", "📋 予定表"], ["time", "🕐 時間割"], ["sum", "📊 まとめ"]].map((t) => '<button type="button" role="tab" class="' + (itn.tab === t[0] ? "on" : "") + '" data-t="itin:tab" data-v="' + t[0] + '">' + t[1] + '</button>').join("") + '</div>';
 }
 function itnEmptyHtml(){
-    return '<div class="itn-empty"><div class="itn-bigemoji">📋</div><b>まず、予定を入れましょう</b><p>Excelやメモの表を はりつけると、時刻・待ち時間・金額を 自動で読み取ります。ひな形から 作ることも できます。</p>' +
-        '<button type="button" class="itn-big" data-t="itin:import">📥 表をはりつけて取り込む</button><button type="button" class="itn-big sec" data-t="itin:plans">✨ ひな形から作る（テーマパーク・旅行・仕事…）</button><button type="button" class="itn-big sec" data-t="itin:add">＋ 1件ずつ入れる</button></div>';
+    return '<div class="itn-empty"><div class="itn-bigemoji">📋</div><b>まず、予定を入れましょう</b><p>Excel・Word・PDF・テキストなどの ファイルを 選ぶか、表を はりつけると、時刻・待ち時間・金額を 自動で読み取ります。ひな形から 作ることも できます。</p>' +
+        '<button type="button" class="itn-big" data-t="itin:import">📥 ファイル・表から取り込む</button><button type="button" class="itn-big sec" data-t="itin:plans">✨ ひな形から作る（テーマパーク・旅行・仕事…）</button><button type="button" class="itn-big sec" data-t="itin:add">＋ 1件ずつ入れる</button></div>';
 }
 function itnStarsHtml(it){
     let h = '<div class="itn-stars" role="group" aria-label="満足度">';
@@ -330,21 +330,49 @@ function itnPlansHtml(plan){
         h += '<div class="itn-card"><div class="itn-card-t">この予定表の名前と日付</div><div class="itn-f2"><label>名前<input type="text" maxlength="40" value="' + itnE(plan.title) + '" data-t="itin:pset" data-f="title"></label><label>日付<input type="date" value="' + itnE(plan.date) + '" data-t="itin:pset" data-f="date"></label></div>' +
             '<div class="itn-tools"><button type="button" class="button-secondary" data-t="itin:pdup">⧉ この表をコピー</button><button type="button" class="button-secondary" data-t="itin:pclear">🔄 記録だけ消して やりなおし</button><button type="button" class="button-danger" data-t="itin:pdel">' + (itn.confirm === "plan:" + plan.id ? "もういちど押すと この表を消します" : "🗑 この表を消す") + '</button></div></div>';
     }
-    h += '<div class="itn-card"><div class="itn-card-t">新しい予定表を作る</div>' + ITN_TPL.map((t) => '<button type="button" class="itn-next" data-t="itin:tpl" data-k="' + t[0] + '"><span>' + t[1] + '</span><b>' + t[2] + '</b><small>' + t[3] + '</small></button>').join("") + '<button type="button" class="itn-next" data-t="itin:import"><span>📥</span><b>表をはりつけて作る</b><small>Excel・メモ・PDFの表から</small></button></div>';
+    h += '<div class="itn-card"><div class="itn-card-t">新しい予定表を作る</div>' + ITN_TPL.map((t) => '<button type="button" class="itn-next" data-t="itin:tpl" data-k="' + t[0] + '"><span>' + t[1] + '</span><b>' + t[2] + '</b><small>' + t[3] + '</small></button>').join("") + '<button type="button" class="itn-next" data-t="itin:import"><span>📥</span><b>ファイル・表から作る</b><small>Excel・Word・PDF・CSV・カレンダーなど10種類</small></button></div>';
     return h + '<div class="itn-meta">' + (itn.cloudMsg ? '⚠ ' + itnE(itn.cloudMsg) : itn.cloudOff ? '☁ クラウドには まだ つながっていません（この端末には 保存されています）' : '☁ この端末とクラウド（あなただけ）に 自動で保存されます。スマホとパソコンで 同じ予定表が 見えます。') + '</div>';
 }
+function itnImpItemLine(x){
+    return '<div class="itn-pv"><b>' + itnCatOf(x.k)[1] + ' ' + itnE(x.n) + '</b><small>' + itnE((x.s || "（時刻なし）") + (x.e ? "–" + x.e : "") + (x.w > 0 ? " ・待ち予想" + x.w + "分" : "") + (x.aw != null ? " ・実際" + x.aw + "分" : "") + (x.st === "x" ? " ・✔完了" : x.st === "s" ? " ・スキップ" : "") + (x.c != null ? " ・" + itnYen(x.c) : "") + (x.m ? " ・" + x.m : "") + (x.nt ? " ・📝" + x.nt : "")) + '</small></div>';
+}
+function itnImpModeHtml(plan, many){
+    const sel = (v) => ((v === "new" && (itn.importMode === "new" || !plan)) || (v !== "new" && itn.importMode === v)) ? " selected" : "";
+    return '<label>取り込みかた<select id="itnImpMode"><option value="new"' + sel("new") + '>' + (many ? "まとまりごとに 新しい予定表にする" : "新しい予定表にする") + '</option>' + (plan ? '<option value="add"' + sel("add") + '>' + (many ? "いまの予定表に ぜんぶ足す" : "いまの予定表に 足す") + '</option><option value="replace"' + sel("replace") + '>いまの予定表を 入れかえる</option>' : '') + '</select></label>';
+}
+function itnImpGroupsHtml(pv, plan){
+    const on = pv.groups.filter((g) => g.on), total = on.reduce((s, g) => s + g.items.length, 0), files = {};
+    pv.groups.forEach((g) => { files[g.file] = 1; });
+    let h = '<div class="itn-card"><div class="itn-card-t">読み取った結果：' + pv.groups.length + '個のまとまり（' + on.length + '個・' + total + '件を 選んでいます）</div>' +
+        (pv.note ? '<p class="itn-meta">' + itnE(pv.note) + '</p>' : '') +
+        '<div class="itn-tools"><button type="button" class="button-secondary" data-t="itin:grpall" data-v="1">ぜんぶ選ぶ</button><button type="button" class="button-secondary" data-t="itin:grpall" data-v="0">ぜんぶ外す</button></div>';
+    pv.groups.forEach((g, i) => {
+        const names = g.items.slice(0, 3).map((x) => x.n).join("・") + (g.items.length > 3 ? " ほか" : "");
+        h += '<div class="itn-grp' + (g.on ? "" : " off") + '"><label class="itn-sw"><input type="checkbox" data-t="itin:grp" data-f="on" data-g="' + i + '"' + (g.on ? " checked" : "") + '> <b>' + itnE(g.title) + '</b> <small>' + g.items.length + '件' + (g.skipped ? '（読めない行 ' + g.skipped + '）' : '') + (Object.keys(files).length > 1 ? ' ・' + itnE(g.file) : '') + '</small></label>' +
+            '<small class="itn-meta">' + itnE(names) + '</small>' +
+            '<div class="itn-f2"><label>名前<input type="text" maxlength="40" value="' + itnE(g.title) + '" data-t="itin:grp" data-f="title" data-g="' + i + '"></label><label>日付<input type="date" value="' + itnE(g.date || (plan && plan.date) || itnToday()) + '" data-t="itin:grp" data-f="date" data-g="' + i + '"></label></div></div>';
+    });
+    return h + '<div class="itn-f2">' + itnImpModeHtml(plan, true) + '</div><button type="button" class="itn-big" data-t="itin:doimport">✅ 選んだまとまりを 取り込む</button></div>';
+}
 function itnImportHtml(plan){
-    let h = '<button type="button" class="itn-back" data-t="itin:back">← もどる</button><div class="itn-card"><div class="itn-card-t">📥 表をはりつけて取り込む</div><p class="itn-meta">Excel・メモ・PDFの表を コピーして、下に はりつけてください。<b>時刻・待ち時間（35分）・金額（¥1,200）・内容・備考</b>を 自動で読み取ります。列の順番は 自由です。</p>' +
+    const chips = ITN_IMP_TYPES.map((t) => '<span class="itn-chip"><b>' + t[1] + ' ' + t[2] + '</b><small>' + t[3] + '</small></span>').join("");
+    let h = '<button type="button" class="itn-back" data-t="itin:back">← もどる</button>' +
+        '<div class="itn-card"><div class="itn-card-t">📂 ファイルから取り込む（10種類）</div><p class="itn-meta">Excelは シートが いくつあっても、Wordは 表が いくつあっても、カレンダーは 何日分でも 読めます。<b>ファイルは いくつでも 同時に選べます</b>（txt が2つ以上でもOK）。このアプリで書き出したファイルは、記録（実際の待ち時間など）も そのまま 読みこめます。</p><div class="itn-chips">' + chips + '</div>' +
+        '<div class="itn-tools"><label class="button itn-file">📂 ファイルを選ぶ（いくつでも）<input type="file" multiple accept="' + ITN_IMP_ACCEPT + '" data-t="itin:file" hidden></label></div>' +
+        (itn.importErrors && itn.importErrors.length ? '<div class="itn-errs">' + itn.importErrors.map((e) => '<p class="itn-meta">⚠ ' + itnE(e) + '</p>').join("") + '</div>' : '') +
+        '<p class="itn-meta">※ PDF・画像で書き出したものは「画像」なので 読めません。古い形式（.xls／.doc）やパスワードつきは、.xlsx／.docx に保存し直してください。</p></div>' +
+        '<div class="itn-card"><div class="itn-card-t">📥 表をはりつけて取り込む</div><p class="itn-meta">Excel・メモ・PDFの表を コピーして、下に はりつけてください。<b>時刻・待ち時間（35分）・金額（¥1,200）・内容・備考</b>を 自動で読み取ります。列の順番は 自由です。</p>' +
         '<textarea id="itnImpTxt" rows="9" placeholder="例）&#10;9:00&#9;9:45&#9;アトラクションA 待ち35分&#9;備考" spellcheck="false">' + itnE(itn.importTxt) + '</textarea>' +
-        '<div class="itn-tools"><button type="button" class="button" data-t="itin:parse">🔍 読み取る</button><button type="button" class="button-secondary" data-t="itin:sample">例を入れる</button><label class="button-secondary itn-file">ファイルから<input type="file" accept=".txt,.csv,.tsv,.md,.json,text/*,application/json" data-t="itin:file" hidden></label></div></div>';
+        '<div class="itn-tools"><button type="button" class="button" data-t="itin:parse">🔍 読み取る</button><button type="button" class="button-secondary" data-t="itin:sample">例を入れる</button></div></div>';
     const pv = itn.preview;
+    if(pv && pv.groups) return h + itnImpGroupsHtml(pv, plan);
     if(pv){
-        h += '<div class="itn-card"><div class="itn-card-t">読み取った結果：' + pv.items.length + '件' + (pv.skipped ? '（読み取れない行 ' + pv.skipped + '）' : '') + '</div>';
+        h += '<div class="itn-card"><div class="itn-card-t">読み取った結果：' + pv.items.length + '件' + (pv.skipped ? '（読み取れない行 ' + pv.skipped + '）' : '') + (pv.kind ? ' ・' + itnE(pv.kind) : '') + '</div>' + (pv.note ? '<p class="itn-meta">' + itnE(pv.note) + '</p>' : '');
         if(!pv.items.length) h += '<p class="itn-meta">予定が見つかりませんでした。1行に1つずつ、「時刻」と「内容」が入っているか 確かめてください。</p>';
-        pv.items.slice(0, 12).forEach((x) => { h += '<div class="itn-pv"><b>' + itnCatOf(x.k)[1] + ' ' + itnE(x.n) + '</b><small>' + itnE((x.s || "（時刻なし）") + (x.e ? "–" + x.e : "") + (x.w > 0 ? " ・待ち予想" + x.w + "分" : "") + (x.c != null ? " ・" + itnYen(x.c) : "") + (x.m ? " ・" + x.m : "")) + '</small></div>'; });
+        pv.items.slice(0, 12).forEach((x) => { h += itnImpItemLine(x); });
         if(pv.items.length > 12) h += '<div class="itn-meta">ほか ' + (pv.items.length - 12) + '件</div>';
         if(pv.items.length){
-            h += '<div class="itn-f2"><label>取り込みかた<select id="itnImpMode"><option value="new"' + (itn.importMode === "new" || !plan ? " selected" : "") + '>新しい予定表にする</option>' + (plan ? '<option value="add"' + (itn.importMode === "add" ? " selected" : "") + '>いまの予定表に 足す</option><option value="replace">いまの予定表を 入れかえる</option>' : '') + '</select></label><label>名前（新しい表のとき）<input type="text" id="itnImpTitle" maxlength="40" value="' + itnE(itn.importTitle || pv.title || "") + '" placeholder="例：11/21 おでかけ"></label></div>' +
+            h += '<div class="itn-f2">' + itnImpModeHtml(plan, false) + '<label>名前（新しい表のとき）<input type="text" id="itnImpTitle" maxlength="40" value="' + itnE(itn.importTitle || pv.title || "") + '" placeholder="例：11/21 おでかけ"></label></div>' +
                 '<label>日付<input type="date" id="itnImpDate" value="' + itnE(pv.date || (plan && plan.date) || itnToday()) + '"></label><button type="button" class="itn-big" data-t="itin:doimport">✅ ' + pv.items.length + '件を 取り込む</button>';
         }
         h += '</div>';
@@ -353,7 +381,7 @@ function itnImportHtml(plan){
 }
 function itnExportHtml(plan){
     const F = [["pdf", "📄", "PDF", "印刷・メールに"], ["xlsx", "📗", "Excel", "表計算（.xlsx）"], ["docx", "📘", "Word", "文書（.docx）"], ["txt", "📃", "テキスト", "メモ帳・LINEに"], ["jpg", "📷", "JPEG画像", "スマホに保存・送る"], ["png", "🖼️", "PNG画像", "くっきり画像"], ["csv", "📊", "CSV", "Excelで開ける"], ["html", "🌐", "Webページ", "ブラウザで見る・印刷"], ["ics", "📅", "カレンダー", "iPhone・Googleに（.ics）"], ["json", "💾", "バックアップ", "あとで読みこめる"]];
-    return '<button type="button" class="itn-back" data-t="itin:back">← もどる</button><div class="itn-card"><div class="itn-card-t">📤 書き出す（10種類）</div><p class="itn-meta">「' + itnE(plan ? plan.title : "") + '」を 好きな形で 保存・共有できます。記録（実際の待ち時間など）も 入ります。</p><div class="itn-xgrid">' +
+    return '<button type="button" class="itn-back" data-t="itin:back">← もどる</button><div class="itn-card"><div class="itn-card-t">📤 書き出す（10種類）</div><p class="itn-meta">「' + itnE(plan ? plan.title : "") + '」を 好きな形で 保存・共有できます。記録（実際の待ち時間など）も 入ります。<b>Excel・CSV・JSON・テキスト・Webページ・Word・カレンダー</b>で書き出したものは、「📥 ファイル・表から取り込む」で そのまま読みもどせます（PDF・JPEG・PNGは 絵なので 読みもどせません）。</p><div class="itn-xgrid">' +
         F.map((f) => '<button type="button" data-t="itin:x" data-k="' + f[0] + '"><span>' + f[1] + '</span><b>' + f[2] + '</b><small>' + f[3] + '</small></button>').join("") + '</div></div>' +
         itnRoomSendHtml() + '<div class="itn-card"><div class="itn-card-t">そのほか</div><div class="itn-tools"><button type="button" class="button-secondary" data-t="itin:x" data-k="memory">🎴 思い出カード（画像）</button><button type="button" class="button-secondary" data-t="itin:x" data-k="share">📤 共有（LINEなど）</button><button type="button" class="button-secondary" data-t="itin:x" data-k="copy">📋 テキストをコピー</button><button type="button" class="button-secondary" data-t="itin:x" data-k="print">🖨 印刷</button></div></div>' +
         '<div class="itn-meta">PDF・画像は「見た目そのまま」の画像ベースです（文字の選択はできません）。文字を使いたいときは Excel・Word・テキストをお使いください。</div>';
@@ -455,7 +483,7 @@ function itnLeaveEdit(plan){
     if(it && !it.n && !it.s && !it.e && !it.m && it.w == null && it.c == null && it.st === "t"){ plan.items.splice(plan.items.indexOf(it), 1); itnTouch(plan); }
     itn.editId = ""; itn.confirm = "";
 }
-function itnGo(sub){ const bb = document.querySelector("#itnRoot .itn-body"); if(!itn.sub && bb) itn.ret = bb.scrollTop; itn.sub = sub; itn.confirm = ""; itn.scroll0 = true; if(sub !== "import") itn.preview = null; itnRender(); }
+function itnGo(sub){ const bb = document.querySelector("#itnRoot .itn-body"); if(!itn.sub && bb) itn.ret = bb.scrollTop; itn.sub = sub; itn.confirm = ""; itn.scroll0 = true; if(sub !== "import"){ itn.preview = null; itn.importErrors = []; } itnRender(); }
 function itnMic(plan, it, node){
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if(!SR){ showToast("このブラウザでは 声のメモを使えません。"); return; }
@@ -557,30 +585,58 @@ async function onItinAction(action, node){
         case "sample": itn.importTxt = ITN_SAMPLE; itn.preview = null; return redo();
         case "parse": {
             const ta = document.getElementById("itnImpTxt"); itn.importTxt = ta ? ta.value : itn.importTxt;
-            itn.preview = itnParse(itn.importTxt);
-            if(!itn.preview.items.length) showToast("予定が見つかりませんでした。");
+            itn.importErrors = [];
+            itn.preview = itnImpPreviewOf({groups: itnImpFromText(itn.importTxt, ""), notes: [], kind: ""});
+            if(!itn.preview.groups && !itn.preview.items.length) showToast("予定が見つかりませんでした。");
+            if(itn.preview.groups) itn.importMode = "new";
             return redo();
         }
         case "file": {
-            const f = node.files && node.files[0]; if(!f) return;
-            if(f.size > 500000){ showToast("ファイルが大きすぎます（500KBまで）。"); return; }
-            const text = await f.text(); node.value = "";
-            if(/\.json$/i.test(f.name) || /^\s*\{/.test(text)){
-                try{ const j = JSON.parse(text), p = j && (j.plan || j); if(p && Array.isArray(p.items)){ const np = itnNewPlan(String(p.title || "取り込んだ予定表").slice(0, 40), /^\d{4}-\d{2}-\d{2}$/.test(p.date || "") ? p.date : itnToday(), p.items.slice(0, ITN_MAX_ITEMS)); itn.sub = ""; itn.tab = "list"; showToast("バックアップから「" + np.title + "」を作りました。"); return redo(); } }catch(_e){}
-            }
-            itn.importTxt = text.slice(0, 60000); itn.preview = itnParse(itn.importTxt); return redo();
+            const files = node.files ? Array.from(node.files) : []; if(!files.length) return;
+            showToast("ファイルを 読み取っています…");
+            const res = await itnImportFiles(files); node.value = "";
+            itn.importErrors = res.errors.slice(0, 10); itn.importTitle = "";
+            if(!res.groups.length){ itn.preview = null; showToast(res.errors.length ? res.errors[0] : "予定が見つかりませんでした。"); return redo(); }
+            itn.importTxt = res.text || ""; itn.preview = itnImpPreviewOf(res);
+            if(itn.preview.groups) itn.importMode = "new";
+            return redo();
         }
+        case "grp": {
+            const pv = itn.preview, g = pv && pv.groups && pv.groups[Number(d.g)]; if(!g) return;
+            if(d.f === "on"){ g.on = !!node.checked; return redo(); }
+            if(d.f === "title") g.title = node.value.trim().slice(0, 40); else if(d.f === "date") g.date = /^\d{4}-\d{2}-\d{2}$/.test(node.value) ? node.value : "";
+            return;
+        }
+        case "grpall": { const pv = itn.preview; if(!pv || !pv.groups) return; pv.groups.forEach((g) => { g.on = d.v === "1"; }); return redo(); }
         case "doimport": {
-            const pv = itn.preview; if(!pv || !pv.items.length) return;
+            const pv = itn.preview; if(!pv) return;
             const mode = (document.getElementById("itnImpMode") || {}).value || "new", title = ((document.getElementById("itnImpTitle") || {}).value || "").trim(), date = (document.getElementById("itnImpDate") || {}).value || "";
             itn.importMode = mode; itn.importTitle = title;
+            const finish = (msg) => { itn.preview = null; itn.importTxt = ""; itn.importErrors = []; itn.sub = ""; itn.tab = "list"; itn.scroll0 = true; showToast(msg); return redo(); };
+            if(pv.groups){
+                const on = pv.groups.filter((g) => g.on && g.items.length), total = on.reduce((s, g) => s + g.items.length, 0);
+                if(!on.length){ showToast("取り込むまとまりを 選んでください。"); return; }
+                if(mode === "new" || !plan){
+                    const have = Object.keys(itn.plans).length, room = ITN_MAX_PLANS - have;
+                    if(on.length > room){ showToast("予定表は " + ITN_MAX_PLANS + "個までです（いま " + have + "個）。選ぶまとまりを " + Math.max(room, 0) + "個までにしてください。"); return; }
+                    on.forEach((g) => { itnNewPlan(g.title || "取り込んだ予定表", g.date || itnToday(), g.items); });
+                    return finish(on.length + "個の予定表（合計 " + total + "件）を 作りました。時刻は あとから 直せます。");
+                }
+                const baseN = mode === "replace" ? 0 : plan.items.length;
+                if(baseN + total > ITN_MAX_ITEMS){ showToast("予定は " + ITN_MAX_ITEMS + "件までです。選ぶまとまりを 減らしてください。"); return; }
+                if(mode === "replace") plan.items = [];
+                on.forEach((g) => g.items.forEach((x) => plan.items.push(itnCleanItem(x)))); itnTouch(plan);
+                return finish(total + "件を いまの予定表に 取り込みました。");
+            }
+            if(!pv.items.length) return;
             if(mode === "new" || !plan){ itnNewPlan(title || pv.title || "取り込んだ予定表", date || itnToday(), pv.items); }
             else{
+                const baseN = mode === "replace" ? 0 : plan.items.length;
+                if(baseN + pv.items.length > ITN_MAX_ITEMS){ showToast("予定は " + ITN_MAX_ITEMS + "件までです。"); return; }
                 if(mode === "replace") plan.items = [];
-                if(plan.items.length + pv.items.length > ITN_MAX_ITEMS){ showToast("予定は " + ITN_MAX_ITEMS + "件までです。"); return; }
                 pv.items.forEach((x) => plan.items.push(itnCleanItem(x))); if(date) plan.date = date; itnTouch(plan);
             }
-            const n = pv.items.length; itn.preview = null; itn.importTxt = ""; itn.sub = ""; itn.tab = "list"; itn.scroll0 = true; showToast(n + "件を 取り込みました。時刻は あとから 直せます。"); return redo();
+            return finish(pv.items.length + "件を 取り込みました。時刻は あとから 直せます。");
         }
         // ----- 設定・書き出し -----
         case "pref": {

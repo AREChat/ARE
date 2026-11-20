@@ -16,7 +16,7 @@ const itn = {
     prefs: {alarm: true, sound: true, vibrate: true, notify: true, speak: true, speakAct: true, speakEvery: 0, rate: 1, crowd: false, lead: 5, wake: false}, cards: new Map(),
     fired: {}, snooze: {}, del: {}, dirty: new Set(), undo: null, cloudMsg: "", cloudOff: false,
     crowd: {}, crowdOff: false, crowdAt: 0, voiceOn: false, undoAll: null,
-    live: null, alarm: null, wl: null, scroll0: false, importTxt: "", importTitle: "", importMode: "add", pulledAt: 0
+    live: null, alarm: null, wl: null, scroll0: false, importTxt: "", importTitle: "", importMode: "add", importErrors: [], pulledAt: 0
 };
 
 // ---------- ちいさな道具 ----------

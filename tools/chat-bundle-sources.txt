@@ -55,6 +55,7 @@ chat-planner.js
 chat-itin.js
 chat-itin-ui.js
 chat-itin-export.js
+chat-itin-import.js
 chat-itin-more.js
 chat-prefs.js
 chat-lang.js

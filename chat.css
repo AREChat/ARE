@@ -798,3 +798,5 @@ button:disabled#delRequestButton,button:disabled#delCancelButton{opacity:.55;cur
 .itn-botin input{flex:1;min-width:0;border:1px solid var(--line,#2a3354);border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;background:transparent;color:inherit}
 
 .itn-place a.itn-link{display:inline-block;padding:6px 4px}
+.itn-chips{display:flex;flex-wrap:wrap;gap:6px}.itn-chip{display:inline-flex;flex-direction:column;align-items:center;border:1px solid var(--line);border-radius:12px;padding:4px 8px;font-size:12px;background:var(--panel)}.itn-chip small{color:var(--muted);font-size:11px}
+.itn-grp{display:flex;flex-direction:column;gap:6px;border:1px solid var(--line);border-radius:14px;padding:8px 10px;background:var(--panel)}.itn-grp.off{opacity:.55}.itn-errs .itn-meta{color:#c0392b}

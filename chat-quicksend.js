@@ -126,7 +126,9 @@ function qsAdd(files){
     files.forEach((f, i) => { const k = qsKind(f); if(k) ok.push(qsName(f, i)); else bad.push(f.name || "ファイル"); });
     if(bad.length) showToast("送れない形式です：" + bad.join("、") + "（画像・動画・PDF・Office・テキスト・ZIP など約110種類が送れます。ヘルプの「送れるファイルの種類」を見てください）");
     if(!ok.length) return;
-    feat.qs.files = feat.qs.files.concat(ok).slice(0, 10);
+    const merged = feat.qs.files.concat(ok);
+    if(merged.length > 10) showToast("一度に送れるのは 10個までです。のこりの " + (merged.length - 10) + "個は、送ったあとで もういちど選んでください。");
+    feat.qs.files = merged.slice(0, 10);
     if(qsAuto()){ qsSend(); return; }
     qsPaint();
 }
