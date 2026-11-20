@@ -12,8 +12,13 @@ function initVideoLink(){
 /** reason: "size"（50MB超）｜"long"（5分超）｜"upload"（アップロードで容量エラー）。
  *  items を渡すと、複数本を順番に出す（[{file, reason}, …]）。1本だけのときは (file, reason) でも呼べる。 */
 function openVideoLinkSheet(file, reason, items){
-    if(Array.isArray(items) && items.length){ vl.queue = items.slice(); vl.index = 0; }
-    else if(file){ vl.queue = [{file, reason}]; vl.index = 0; }
+    const add = (Array.isArray(items) && items.length) ? items.slice() : (file ? [{file, reason}] : null);
+    if(add){
+        // いま ドライブに1本ずつ置いている最中に、次の大きい動画が来たとき（📎でまぜて選んだとき）は、あとにつけたす。
+        // （入れかえると、2本目以降が消えてしまうため。1本ずつ順番に、それぞれリンクにする）
+        if(dq.running && !dq.cancel && vl.index < vl.queue.length){ vl.queue = vl.queue.concat(add); return; }
+        vl.queue = add; vl.index = 0;
+    }
     // Googleドライブへの自動アップロード（GAS）が設定されていれば、まずそれで順番に送る。だめなときだけ、リンクを貼る画面にする。
     if(driveUploadUrl()) runDriveQueue(); else showVideoLinkStep();
 }
