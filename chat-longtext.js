@@ -34,7 +34,13 @@
 
     function plain(b){ return cps(b.textContent).length; }
     function isPlainText(b){
-        if(b.classList.contains("edit") || b.classList.contains("itn-cd") || b.querySelector("textarea,input,audio,video,img,.attachment,iframe,canvas")) return false;
+        // リンク（URL）が入っているメッセージは、文字数に関係なく常に全文を表示する。
+        // 折りたたんだあとに別の処理でURLをリンク化する画面があり、折りたたみが先に起きると
+        // 「クリックできる文字」だけが途中で切れて、途中までのURLでリンクが作られてしまう
+        // （開こうとすると「ファイルが存在しません」になる）。それを防ぐため、まだ<a>になっていない
+        // 生の文字の時点でURLらしきものを見つけたら、その場で折りたたみをやめる。
+        if(b.classList.contains("edit") || b.classList.contains("itn-cd") || b.querySelector("textarea,input,audio,video,img,.attachment,iframe,canvas,a[href]")) return false;
+        if(/https?:\/\//.test(b.textContent)) return false;
         return true;
     }
     function bar(label, kind){
