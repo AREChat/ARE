@@ -54,7 +54,7 @@ function openSheet(html){
     el.profileModal.hidden = false;
 }
 
-function closeSheet(){ if(typeof stopCamera === "function") stopCamera(); try{ if(typeof ctStop === "function") ctStop(); if(typeof aiStudioClearPreview === "function") aiStudioClearPreview(); }catch(_e){} if(window.stopProfile3D) window.stopProfile3D(); el.profileModal.hidden = true; el.profileSheet.innerHTML = ""; feat.avatarBlob = null; }
+function closeSheet(){ if(typeof stopCamera === "function") stopCamera(); try{ if(typeof ctStop === "function") ctStop(); if(typeof pbStop === "function") pbStop(); if(typeof aiStudioClearPreview === "function") aiStudioClearPreview(); }catch(_e){} if(window.stopProfile3D) window.stopProfile3D(); el.profileModal.hidden = true; el.profileSheet.innerHTML = ""; feat.avatarBlob = null; }
 
 function bigAvatar(profile, ctxUser){
     const url = safeHttpUrl(profile?.avatar_url || "");

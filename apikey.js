@@ -12,8 +12,8 @@
             recovery: "recover-account",
             guest: "guest-start"
         }),
-        // 大きい動画を Googleドライブに置いてリンクにする GAS ウェブアプリのURL（https://script.google.com/macros/s/…/exec）。
-        // 空のままなら、動画のリンクを自分で貼る画面になります。
+        // 大きい動画・ファイルを Googleドライブに置いてリンクにする GAS ウェブアプリのURL（https://script.google.com/macros/s/…/exec）。
+        // 空のままなら、動画のリンクを自分で貼る画面になります（ファイルは50MBまでに制限されます）。
         videoUploadUrl: "https://script.google.com/macros/s/AKfycbwFTUvhKYlxWMpd4G3gaAT2qdk-Pxcc-gYQXiskWGIUI-w4R531CG1oi3thVSvmlPQ2nw/exec",
         requestTimeoutMs: 20000
     });
