@@ -3,7 +3,11 @@
 // ・動画が 50MB をこえる／5分をこえる／アップロードが容量でことわられたとき、動画そのものは送らずに、
 //   「ほかの場所（YouTube の限定公開・Google ドライブ・OneDrive など）に置いた動画のリンク」を貼って送れる画面を出します。
 // ・リンクは https:// だけ受けつけます。メッセージには、動画の名前・大きさ・リンクが文字で入り、リンクは押して開けます（link-copy.js が自動でリンクにします）。
-const vl = {name:"", size:0, reason:"", queue:[], index:0};   // queue: まだリンクにしていない大きい動画（順番に1本ずつ出す）
+const vl = {name:"", size:0, reason:"", kind:"video", queue:[], index:0};   // queue: まだリンクにしていない大きい動画（順番に1本ずつ出す）
+
+// 大きいファイル（動画いがい）も、動画と同じように ドライブに置いて リンクで送る。言葉と絵文字だけ入れかえる
+const vlWord = (cur) => cur && cur.kind === "file" ? "ファイル" : "動画";
+const vlIcon = (cur) => cur && cur.kind === "file" ? "📎" : "🎬";
 
 function initVideoLink(){
     registerTool("vlink", onVideoLinkAction);
@@ -27,19 +31,21 @@ function showVideoLinkStep(failNote){
     const cur = vl.queue[vl.index];
     if(!cur){ vl.queue = []; vl.index = 0; return; }
     const file = cur.file, total = vl.queue.length, nth = vl.index + 1;
-    vl.name = String((file && file.name) || "動画").slice(0, 100);
+    const W = vlWord(cur);
+    vl.name = String((file && file.name) || W).slice(0, 100);
+    vl.kind = cur.kind === "file" ? "file" : "video";
     vl.size = Number(file && file.size) || 0;
     vl.reason = cur.reason || "size";
     const why = vl.reason === "long" ? "5分をこえているため"
         : vl.reason === "upload" ? "容量がいっぱいで、アップロードできなかったため"
         : "50MBをこえているため";
-    openSheet(toolHead("🎬 動画をリンクで送る" + (total > 1 ? "（" + nth + " / " + total + " 本目）" : ""), escapeHtml(vl.name) + (vl.size ? "（" + formatAttachmentSize(vl.size) + "）" : "") + " は、" + why + "そのままでは送れません。") +
+    openSheet(toolHead(vlIcon(cur) + " " + W + "をリンクで送る" + (total > 1 ? "（" + nth + " / " + total + " 本目）" : ""), escapeHtml(vl.name) + (vl.size ? "（" + formatAttachmentSize(vl.size) + "）" : "") + " は、" + why + "そのままでは送れません。") +
         (failNote ? '<div class="meta" style="color:#ffb4a8">' + escapeHtml(failNote) + '</div>' : "") +
-        '<div class="meta">YouTube（限定公開）・Googleドライブ・OneDrive などに動画を置いて、その <b>https:// のリンク</b> を貼ってください。リンクを知っている人だけ見られる設定にすると安心です。</div>' +
-        (total > 1 ? '<div class="meta">大きい動画が全部で ' + total + ' 本あります。1本ずつ順番にリンクを入れてください（残り ' + (total - nth) + ' 本）。</div>' : "") +
-        '<label for="vlUrl">動画のリンク（https://）</label><input id="vlUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://…">' +
-        '<label for="vlNote">ひとこと（なくてもOK・100文字まで）</label><input id="vlNote" type="text" maxlength="100" placeholder="例：旅行の動画です">' +
-        '<div class="row"><button type="button" class="button-secondary" data-pm="close">やめる</button>' + (total > 1 && nth < total ? '<button type="button" class="button-secondary" data-t="vlink:skip">この動画はとばす</button>' : "") + '<button type="button" class="button" data-t="vlink:send">' + (total > 1 && nth < total ? "送って次へ" : "リンクで送る") + '</button></div>');
+        '<div class="meta">YouTube（限定公開）・Googleドライブ・OneDrive などに' + W + 'を置いて、その <b>https:// のリンク</b> を貼ってください。リンクを知っている人だけ見られる設定にすると安心です。</div>' +
+        (total > 1 ? '<div class="meta">大きい' + W + 'が全部で ' + total + ' 本あります。1本ずつ順番にリンクを入れてください（残り ' + (total - nth) + ' 本）。</div>' : "") +
+        '<label for="vlUrl">' + W + 'のリンク（https://）</label><input id="vlUrl" type="url" inputmode="url" autocomplete="off" placeholder="https://…">' +
+        '<label for="vlNote">ひとこと（なくてもOK・100文字まで）</label><input id="vlNote" type="text" maxlength="100" placeholder="' + (cur.kind === "file" ? "例：資料です" : "例：旅行の動画です") + '">' +
+        '<div class="row"><button type="button" class="button-secondary" data-pm="close">やめる</button>' + (total > 1 && nth < total ? '<button type="button" class="button-secondary" data-t="vlink:skip">この' + W + 'はとばす</button>' : "") + '<button type="button" class="button" data-t="vlink:send">' + (total > 1 && nth < total ? "送って次へ" : "リンクで送る") + '</button></div>');
     setTimeout(() => { const i = document.getElementById("vlUrl"); if(i) i.focus(); }, 50);
 }
 
@@ -56,10 +62,10 @@ async function onVideoLinkAction(action){
     const raw = String((document.getElementById("vlUrl") || {}).value || "").trim();
     const note = Array.from(String((document.getElementById("vlNote") || {}).value || "").trim()).slice(0, 100).join("");
     const url = safeHttpUrl(raw);
-    if(!raw){ showToast("動画のリンクを貼ってください。"); return; }
+    if(!raw){ showToast((vl.kind === "file" ? "ファイル" : "動画") + "のリンクを貼ってください。"); return; }
     if(!url || !/^https:\/\//i.test(raw)){ showToast("https:// で始まるリンクを入れてください。"); return; }
     if(!state.currentRoom){ showToast("先にチャット相手を選択してください。"); return; }
-    const lines = ["🎬 動画のリンク", vl.name + (vl.size ? "（" + formatAttachmentSize(vl.size) + "）" : ""), url];
+    const lines = [(vl.kind === "file" ? "📎 ファイルのリンク" : "🎬 動画のリンク"), vl.name + (vl.size ? "（" + formatAttachmentSize(vl.size) + "）" : ""), url];
     if(note) lines.push(note);
     const text = lines.join("\n");
     if(Array.from(text).length > MAX_TEXT_LENGTH){ showToast("リンクが長すぎます。"); return; }
@@ -202,8 +208,8 @@ function driveUploadChunks(sessionUrl, file, onProgress){
     })();
 }
 
-function driveProgressSheet(nth, total, name, size){
-    openSheet(toolHead("🎬 動画をドライブに置いています" + (total > 1 ? "（" + nth + " / " + total + " 本目）" : ""), escapeHtml(name) + "（" + formatAttachmentSize(size) + "）") +
+function driveProgressSheet(nth, total, name, size, cur){
+    openSheet(toolHead(vlIcon(cur) + " " + vlWord(cur) + "をドライブに置いています" + (total > 1 ? "（" + nth + " / " + total + " 本目）" : ""), escapeHtml(name) + "（" + formatAttachmentSize(size) + "）") +
         '<div class="meta" id="dqText">準備しています…</div>' +
         '<progress id="dqBar" max="100" value="0" style="width:100%"></progress>' +
         '<div class="meta">このまま少しお待ちください。やめるときは「やめる」を押してください。' + (total > 1 ? "（残り " + (total - nth) + " 本）" : "") + '</div>' +
@@ -217,13 +223,13 @@ async function runDriveQueue(){
     try{
         while(vl.index < vl.queue.length && !dq.cancel){
             const cur = vl.queue[vl.index], file = cur.file, total = vl.queue.length, nth = vl.index + 1;
-            driveProgressSheet(nth, total, file.name || "動画", file.size);
+            driveProgressSheet(nth, total, file.name || vlWord(cur), file.size, cur);
             const setText = (t) => { const e = document.getElementById("dqText"); if(e) e.textContent = t; };
             const setBar = (pct) => { const e = document.getElementById("dqBar"); if(e) e.value = pct; };
             let link = null, retention = 14;
             try{
                 setText("ドライブに置く準備をしています…");
-                const s = await gasCall({action:"start", name:file.name || "video", size:file.size, mime:file.type || "video/mp4"});
+                const s = await gasCall({action:"start", name:file.name || (cur.kind === "file" ? "file" : "video"), size:file.size, mime:file.type || (cur.kind === "file" ? "application/octet-stream" : "video/mp4"), kind:cur.kind === "file" ? "file" : "video"});
                 retention = s.retentionDays || retention;
                 const t0 = Date.now();
                 const id = await driveUploadChunks(s.sessionUrl, file, (sent) => {
@@ -246,7 +252,7 @@ async function runDriveQueue(){
                 return;
             }
             const sizeText = "（" + formatAttachmentSize(file.size) + "）";
-            const text = ["🎬 動画のリンク", String(file.name || "動画").slice(0, 100) + sizeText, link, "※" + retention + "日たつと自動で消えます。"].join("\n");
+            const text = [vlIcon(cur) + " " + vlWord(cur) + "のリンク", String(file.name || vlWord(cur)).slice(0, 100) + sizeText, link, "※" + retention + "日たつと自動で消えます。"].join("\n");
             closeSheet();
             await sendMessagePayload(buildTextPayload(text), {keepInput:true});
             vl.index++;

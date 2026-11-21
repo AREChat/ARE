@@ -1032,7 +1032,9 @@ async function handleFiles(fileList,kind){
                 continue;
             }
         }else if(uploadFile.size > MAX_FILE_BYTES){
-            showToast(file.name + " は50MBを超えているため送信できません。");
+            // 50MBをこえるファイルも、動画と同じように ドライブに置いて リンクで送る
+            if(typeof openVideoLinkSheet === "function") tooBigVideos.push({file:uploadFile, reason:"size", kind:"file"});
+            else showToast(file.name + " は50MBを超えているため送信できません。");
             continue;
         }
 

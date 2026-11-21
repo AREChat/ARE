@@ -82,6 +82,7 @@ function fileViewKind(ext){
     if(VIEW_VIDEO_EXT.has(ext)) return "video";
     if(VIEW_AUDIO_EXT.has(ext)) return "audio";
     if(ext === "pdf") return "pdf";
+    if(ext === "pptx") return "pptx";       // スライドの表示とスライドショー（fileview-pptx.js）
     return "";
 }
 

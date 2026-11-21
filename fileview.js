@@ -3,11 +3,13 @@
 // ・保存先（Supabase Storage）の中身を、ブラウザ標準の表示ではなく、このページの中で表示する。
 //   （標準の表示だと、右クリックや F12 を止める protect.js が効かず、文字コードの推測で文字化けもするため）
 // ・文字のファイルは、文字コードを自分で判定して、正しく表示する（Shift_JIS・EUC-JP・JIS・UTF-16 も読める）。
+// ・pptx（PowerPoint）は、fileview-pptx.js で、スライドを描いて、スライドショーにする。
 // ・PDF は、ブラウザ標準の表示（右クリックや F12 を止められない）は使わず、pdf.js（vendor/lazy）で、このページの canvas に描く。
 // ・開けるのは「このアプリの保存先（ARE_CONFIG.supabaseUrl）」のファイルだけ。ほかの URL は開かない。
 (function () {
     var MAX_TEXT_BYTES = 5 * 1024 * 1024;   // 文字のファイルは、5MB まで表示（それより大きいときはダウンロードだけ）
     var MAX_PDF_BYTES = 80 * 1024 * 1024;   // PDF は、80MB まで表示（チャットで送れるのは 50MB まで）
+    var MAX_PPTX_BYTES = 80 * 1024 * 1024;  // pptx も、80MB まで表示
     var $ = function (id) { return document.getElementById(id); };
     var main = $("fvMain"), nameEl = $("fvName"), metaEl = $("fvMeta"), copyBtn = $("fvCopy"), saveBtn = $("fvSave");
     var downloadParts = null, downloadMime = "application/octet-stream", downloadName = "file", copyText = "";
@@ -182,6 +184,29 @@
         });
     }
 
+    // pptx：スライドを描いて、スライドショーにする（fileview-pptx.js）。読めなかったときは、ダウンロードだけにする
+    function showPptx(url) {
+        return fetch(url.href, { credentials: "omit", cache: "no-store" }).then(function (r) {
+            if (!r.ok) throw new Error("http " + r.status);
+            return r.arrayBuffer();
+        }).then(function (buf) {
+            var bytes = new Uint8Array(buf);
+            showSave([bytes], "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+            if (bytes.length > MAX_PPTX_BYTES) {
+                note("このファイルは大きい（" + Math.round(bytes.length / 1048576) + "MB）ため、ここでは表示しません。<br><b>ダウンロード</b>して、お使いのアプリで開いてください。");
+                return null;
+            }
+            return loadScript("./fileview-pptx.js").then(function () {
+                return window.AREPptx.open({ bytes: bytes, main: main, meta: metaEl, note: note, showBtn: $("fvShow"), hereBtn: $("fvShowHere") });
+            }).catch(function (err) {
+                var m = String(err && err.message || "");
+                $("fvShow").hidden = true; $("fvShowHere").hidden = true;
+                if (m === "nostream") note("お使いのブラウザでは、スライドを表示できません（新しい Chrome・Safari・Edge・Firefox でお試しください）。<br><b>ダウンロード</b>して、お使いのアプリで開いてください。");
+                else note("このファイルは、この画面では表示できませんでした（壊れているか、特殊な形式です）。<br><b>ダウンロード</b>して、お使いのアプリで開いてください。");
+            });
+        });
+    }
+
     function showText(url, ext) {
         return fetch(url.href, { credentials: "omit", cache: "no-store" }).then(function (r) {
             if (!r.ok) throw new Error("http " + r.status);
@@ -346,6 +371,12 @@
         }
         if (kind === "text") {
             showText(url, ext).catch(function () {
+                fail("ファイルを読み込めませんでした（リンクの期限が切れた可能性があります）。チャットを開き直して、もう一度お試しください。");
+            });
+            return;
+        }
+        if (kind === "pptx") {
+            showPptx(url).catch(function () {
                 fail("ファイルを読み込めませんでした（リンクの期限が切れた可能性があります）。チャットを開き直して、もう一度お試しください。");
             });
             return;

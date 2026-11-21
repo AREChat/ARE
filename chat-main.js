@@ -222,6 +222,7 @@ const FEATURES = [
     ["sched","予定提案",function(){}],
     ["archive","ストーリーのアーカイブ",() => {}],
     ["quick","ショートカット・その他の検索・フォロー一覧",initQuick],
+    ["passby","すれ違いタウン",initPassby],
     ["moreorg","その他の分類・お気に入り・最近",initMoreOrg],
     ["sharefile","ファイル共有",initShareFile],
     ["hiderooms","チャットの非表示（消さずに隠す）",initHideRooms],
