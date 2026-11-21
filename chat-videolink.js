@@ -141,6 +141,61 @@ function driveUploadUrl(){
     return /^https:\/\//i.test(u) ? u : "";
 }
 
+// ===== 中断しても最初からやり直さない（再開できるアップロード） =====
+// ・ブラウザを閉じた／PCの電源を落とした／通信が切れた、などでアップロードが途中で止まっても、
+//   もう一度「同じファイル」を選べば、途中から続きを送れるようにする（ゼロからやり直さない）。
+// ・Googleドライブの「アップロード口（セッションURL）」は、作ってから何日か使えるので、
+//   そのURLと「どこまで送ったか」をこの端末に覚えておき、続きから PUT するだけでよい。
+// ・「同じファイル」かどうかは、名前・大きさ・最終更新日時で見分ける（ブラウザは、閉じたあとの
+//   ファイルそのものを覚えていられないため、もう一度同じファイルを選び直してもらう必要がある）。
+const RESUME_PREFIX = "are_resume_";
+const RESUME_MAX_AGE = 6 * 24 * 3600 * 1000;   // 6日（ドライブのアップロード口は だいたい1週間もつので、それより少し短く）
+
+function resumeKey(file, kind){
+    return RESUME_PREFIX + [file.name || "", file.size || 0, file.lastModified || 0, kind].join("|");
+}
+function loadResume(file, kind){
+    try{
+        const raw = localStorage.getItem(resumeKey(file, kind));
+        if(!raw) return null;
+        const s = JSON.parse(raw);
+        if(!s || !s.sessionUrl || !s.total || s.total !== file.size) return null;
+        if(Date.now() - (s.createdAt || 0) > RESUME_MAX_AGE) return null;
+        return s;
+    }catch(_e){ return null; }
+}
+function saveResume(file, kind, sessionUrl){
+    try{ localStorage.setItem(resumeKey(file, kind), JSON.stringify({sessionUrl, total:file.size, createdAt:Date.now()})); }catch(_e){ /* 保存できなくても、最初から送るだけなので続行 */ }
+}
+function clearResume(file, kind){
+    try{ localStorage.removeItem(resumeKey(file, kind)); }catch(_e){}
+}
+
+/** ドライブの「アップロード口」に、いま どこまで届いているかを聞く（本体は送らない）。
+ *  すでに完成していたら {done:true, id}、続きがあれば {offset}、口が無効・期限切れなら null。 */
+function driveQueryOffset(sessionUrl, total){
+    return new Promise((resolve) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", sessionUrl);
+        xhr.setRequestHeader("Content-Range", "bytes */" + total);
+        xhr.onload = () => {
+            if(xhr.status === 308){
+                const range = xhr.getResponseHeader("Range") || "";
+                const m = /bytes=0-(\d+)/.exec(range);
+                resolve({offset: m ? Number(m[1]) + 1 : 0});
+            }else if(xhr.status === 200 || xhr.status === 201){
+                let id = ""; try{ id = JSON.parse(xhr.responseText).id || ""; }catch(_e){}
+                resolve(id ? {done:true, id} : null);
+            }else{
+                resolve(null);   // 404・410 など → 期限切れ・無効。最初からやり直す
+            }
+        };
+        xhr.onerror = () => resolve(null);
+        xhr.ontimeout = () => resolve(null);
+        xhr.send();
+    });
+}
+
 /** ログインの「合いかぎ（トークン）」を返す。期限（1時間）が5分以内に近いとき、または force のときは、先に更新する。
  *  大きい動画は、アップロード中に期限が切れて、最後の「リンクを作る」が「ログインが確認できません」と断られることがあったため。 */
 async function freshAccessToken(client, force){
@@ -168,8 +223,9 @@ async function gasCall(body, retried){
     return j;
 }
 
-/** ドライブの「アップロード口」へ、16MBずつ送る。onProgress(送った量) を呼ぶ。返り値：できあがった動画の番号（fileId）。 */
-function driveUploadChunks(sessionUrl, file, onProgress){
+/** ドライブの「アップロード口」へ、16MBずつ送る。onProgress(送った量) を呼ぶ。返り値：できあがった動画の番号（fileId）。
+ *  startAt を渡すと、そこから続きを送る（再開）。 */
+function driveUploadChunks(sessionUrl, file, onProgress, startAt){
     const total = file.size;
     function putChunk(start, end){
         return new Promise((resolve, reject) => {
@@ -184,7 +240,8 @@ function driveUploadChunks(sessionUrl, file, onProgress){
         });
     }
     return (async () => {
-        let start = 0;
+        let start = Number(startAt) > 0 ? Number(startAt) : 0;
+        if(start > 0) onProgress(start);
         while(start < total){
             if(dq.cancel) throw new Error("やめました。");
             const end = Math.min(total, start + DRIVE_CHUNK);
@@ -227,28 +284,49 @@ async function runDriveQueue(){
             const setText = (t) => { const e = document.getElementById("dqText"); if(e) e.textContent = t; };
             const setBar = (pct) => { const e = document.getElementById("dqBar"); if(e) e.value = pct; };
             let link = null, retention = 14;
+            const kind = cur.kind === "file" ? "file" : "video";
             try{
-                setText("ドライブに置く準備をしています…");
-                const s = await gasCall({action:"start", name:file.name || (cur.kind === "file" ? "file" : "video"), size:file.size, mime:file.type || (cur.kind === "file" ? "application/octet-stream" : "video/mp4"), kind:cur.kind === "file" ? "file" : "video"});
-                retention = s.retentionDays || retention;
-                const t0 = Date.now();
-                const id = await driveUploadChunks(s.sessionUrl, file, (sent) => {
-                    const pct = Math.min(99, Math.floor(sent / file.size * 100));
-                    const secs = (Date.now() - t0) / 1000;
-                    const left = secs >= 1 && sent > 0 ? (file.size - sent) / (sent / secs) : 0;
-                    setBar(pct);
-                    setText("アップロード中 " + pct + "%（" + formatAttachmentSize(sent) + " / " + formatAttachmentSize(file.size) + "）" + (left ? " ・ のこり" + videoWaitLabel(left) + "（目安）" : " ・ 時間を計測中…"));
-                });
+                let sessionUrl = null, id = null, resumedFrom = 0;
+                const saved = loadResume(file, kind);
+                if(saved){
+                    setText("前回の続きから再開できるか確認しています…");
+                    const q = await driveQueryOffset(saved.sessionUrl, file.size);
+                    if(q && q.done){ id = q.id; }
+                    else if(q){ sessionUrl = saved.sessionUrl; resumedFrom = q.offset || 0; }
+                    else { clearResume(file, kind); }   // 期限切れ・無効 → 最初からやり直す
+                }
+                if(!id && !sessionUrl){
+                    setText("ドライブに置く準備をしています…");
+                    const s = await gasCall({action:"start", name:file.name || (kind === "file" ? "file" : "video"), size:file.size, mime:file.type || (kind === "file" ? "application/octet-stream" : "video/mp4"), kind});
+                    retention = s.retentionDays || retention;
+                    sessionUrl = s.sessionUrl;
+                    saveResume(file, kind, sessionUrl);   // ここで覚えておけば、この先 途中で止まっても再開できる
+                }
+                if(!id){
+                    if(resumedFrom > 0) setText("前回の続き（" + formatAttachmentSize(resumedFrom) + " 分）から再開します…");
+                    const t0 = Date.now();
+                    const sentBase = resumedFrom;
+                    id = await driveUploadChunks(sessionUrl, file, (sent) => {
+                        const pct = Math.min(99, Math.floor(sent / file.size * 100));
+                        const secs = (Date.now() - t0) / 1000;
+                        const newlySent = Math.max(0, sent - sentBase);
+                        const left = secs >= 1 && newlySent > 0 ? (file.size - sent) / (newlySent / secs) : 0;
+                        setBar(pct);
+                        setText("アップロード中 " + pct + "%（" + formatAttachmentSize(sent) + " / " + formatAttachmentSize(file.size) + "）" + (left ? " ・ のこり" + videoWaitLabel(left) + "（目安）" : " ・ 時間を計測中…"));
+                    }, resumedFrom);
+                }
                 if(dq.cancel) throw new Error("やめました。");
                 setBar(100); setText("リンクを作っています…");
                 const f = await gasCall({action:"finish", fileId:id});
                 link = f.link; retention = f.retentionDays || retention;
+                clearResume(file, kind);   // 最後までできたので、再開用の記録は消す
             }catch(error){
                 if(dq.cancel) break;
                 console.error("[ARE drive upload]", error);
                 // この1本は自動で置けなかった → リンクを貼る画面に切りかえる（送ったら、つづきの動画へ）
+                // ※再開用の記録は消さない。もう一度同じファイルを選べば、途中から続きを送れる。
                 dq.running = false;
-                showVideoLinkStep("自動でドライブに置けませんでした：" + (error && error.message ? error.message : "原因不明") + " 　お手数ですが、リンクを貼って送ってください。");
+                showVideoLinkStep("自動でドライブに置けませんでした：" + (error && error.message ? error.message : "原因不明") + " 　お手数ですが、リンクを貼って送ってください（もう一度同じファイルを選べば、途中からの続きになります）。");
                 return;
             }
             const sizeText = "（" + formatAttachmentSize(file.size) + "）";
