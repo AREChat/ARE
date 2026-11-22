@@ -51,7 +51,7 @@ function pushState(){
 async function pushRegister(){
     if(!("serviceWorker" in navigator)) return null;
     try{
-        feat.push.reg = await navigator.serviceWorker.register("sw.js");
+        feat.push.reg = await navigator.serviceWorker.register("sw.js", {updateViaCache: "none"});
         if(pushSupported()){
             const ready = await navigator.serviceWorker.ready;
             feat.push.reg = ready || feat.push.reg;
