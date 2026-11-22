@@ -167,6 +167,9 @@ html,body{height:100%}
  .composer textarea{min-height:44px;resize:none;border-radius:22px;padding:11px 14px}
  .composer .button{min-height:44px;border-radius:22px;padding:0 18px}
  .char-count{display:none}
+ /* 文字入力中（キーボード表示中）は、ツール行をたたんで会話をより見やすくする */
+ .composer.kb-focus .composer-tools{display:none}
+ .composer.kb-focus{padding-bottom:calc(6px + env(safe-area-inset-bottom))}
  .schedule-panel{flex-direction:column;align-items:stretch}
  .admin-panel>header{padding:calc(10px + env(safe-area-inset-top)) 12px 10px}
  .admin-body{padding:12px 12px calc(12px + env(safe-area-inset-bottom))}

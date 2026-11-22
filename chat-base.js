@@ -454,6 +454,13 @@ function bindEvents(){
         el.messageInput.placeholder = "メッセージを入力...（Enterか ↵ ボタンで改行、送信は送信ボタンから）";
         el.messageInput.setAttribute("enterkeyhint","enter");
     }
+    // スマホで文字を入力中（キーボードが出ている間）は、ツール行をたたんで、会話がより見えるようにする
+    (function(){
+        const composerEl = el.messageInput.closest(".composer");
+        if(!composerEl) return;
+        el.messageInput.addEventListener("focus",() => { if(isCoarsePointer()) composerEl.classList.add("kb-focus"); });
+        el.messageInput.addEventListener("blur",() => { composerEl.classList.remove("kb-focus"); });
+    })();
     el.sendButton.addEventListener("click",sendTextMessage);
     el.newlineButton.addEventListener("click",() => {
         // スマホでは Shift+Enter が使いづらいので、改行専用ボタンで確実に改行だけできるようにする（送信しない）
