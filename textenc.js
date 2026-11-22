@@ -69,6 +69,8 @@ function detectTextEncoding(bytes){
 // 文字のファイルとして扱う拡張子（chat-base.js の送れるファイル一覧のうち、text/* と json。ics・vcf は中に文字コードが書いてあるので除く）
 const TEXT_FILE_EXT = new Set(["txt","log","ini","cfg","conf","toml","yaml","yml","srt","vtt","lrc","tex","rst","sql","diff","patch","jsonl","md","markdown","json","html","htm","csv","tsv","py","mjs","ts","jsx","tsx","css","scss","java","kt","c","h","cpp","hpp","cs","go","rs","rb","php","swift","lua","dart","gd","pl","r","scala","obj","tmx","ldtk"]);
 const TEXT_FIX_BOM_EXT = new Set(["txt","csv","tsv","log"]);   // 直したあと、先頭に UTF-8 の目印（BOM）を付ける（メモ帳や Excel で正しく開けるように）
+// このアプリの中で「文字として表示してよい」ファイル。プログラムのコード・設定・データ（py・css・json・sql など）は、中身を画面に出さない（ダウンロードだけ）
+const VIEW_TEXT_EXT = new Set(["txt","log","srt","vtt","lrc","md","markdown","csv","tsv"]);
 const VIEW_IMAGE_EXT = new Set(["jpg","jpeg","png","gif","webp","avif","bmp"]);
 const VIEW_VIDEO_EXT = new Set(["mp4","mov","webm","m4v"]);
 const VIEW_AUDIO_EXT = new Set(["mp3","m4a","aac","wav","ogg","opus","weba","flac"]);
@@ -77,7 +79,7 @@ const VIEW_AUDIO_EXT = new Set(["mp3","m4a","aac","wav","ogg","opus","weba","fla
 function fileViewKind(ext){
     ext = String(ext || "").toLowerCase();
     if(ext === "html" || ext === "htm") return "html";      // ページの画面として、安全な枠（sandbox）の中で表示する
-    if(TEXT_FILE_EXT.has(ext)) return "text";
+    if(VIEW_TEXT_EXT.has(ext)) return "text";            // コードは、画面に出さない（VIEW_TEXT_EXT に無いものは ダウンロードだけ）
     if(VIEW_IMAGE_EXT.has(ext)) return "image";
     if(VIEW_VIDEO_EXT.has(ext)) return "video";
     if(VIEW_AUDIO_EXT.has(ext)) return "audio";

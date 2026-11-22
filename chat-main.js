@@ -194,6 +194,7 @@ const FEATURES = [
     ["points","ポイント・AREShop",initPoints],
     ["story","ストーリー",initStory],
     ["album","アルバム",initAlbum],
+    ["filefresh","ファイルのリンク更新",initFileFresh],
     ["imgedit","画像編集",initImgEdit],
     ["location","位置情報",initLocation],
     ["share","プロフィール共有・QR",initShare],

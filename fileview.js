@@ -185,11 +185,33 @@
     }
 
     // pptx：スライドを描いて、スライドショーにする（fileview-pptx.js）。読めなかったときは、ダウンロードだけにする
-    function showPptx(url) {
-        return fetch(url.href, { credentials: "omit", cache: "no-store" }).then(function (r) {
+    // 大きいファイルは、どれだけ読めたかを画面に出す（止まっているように見えないように）
+    function fetchWithProgress(href, label) {
+        return fetch(href, { credentials: "omit", cache: "no-store" }).then(function (r) {
             if (!r.ok) throw new Error("http " + r.status);
-            return r.arrayBuffer();
-        }).then(function (buf) {
+            var total = Number(r.headers.get("content-length")) || 0;
+            if (!r.body || !r.body.getReader || total < 2 * 1048576) return r.arrayBuffer();
+            var reader = r.body.getReader(), chunks = [], got = 0, shown = 0;
+            function mb(n) { return (n / 1048576).toFixed(1); }
+            function pump() {
+                return reader.read().then(function (x) {
+                    if (x.done) {
+                        var out = new Uint8Array(got), o = 0;
+                        chunks.forEach(function (c) { out.set(c, o); o += c.length; });
+                        return out.buffer;
+                    }
+                    chunks.push(x.value); got += x.value.length;
+                    var now = Date.now();
+                    if (now - shown > 250) { shown = now; metaEl.textContent = label + " " + mb(got) + " / " + mb(total) + " MB"; }
+                    return pump();
+                });
+            }
+            return pump();
+        });
+    }
+
+    function showPptx(url) {
+        return fetchWithProgress(url.href, "読み込み中…").then(function (buf) {
             var bytes = new Uint8Array(buf);
             showSave([bytes], "application/vnd.openxmlformats-officedocument.presentationml.presentation");
             if (bytes.length > MAX_PPTX_BYTES) {
@@ -243,7 +265,7 @@
         });
     }
 
-    // ---- HTML：ページの画面として表示する（安全な枠＝sandbox の中。コードの表示にも切りかえられる）----
+    // ---- HTML：ページの画面として表示する（安全な枠＝sandbox の中。コードは画面に出さない・コピーもさせない）----
     var MAX_HTML_BYTES = 5 * 1024 * 1024;
 
     // 送られてきた HTML の先頭に、外への通信を止める決まり（CSP）を付ける。DOCTYPE があれば、その直後（前に置くと表示のしかたが変わるため）
@@ -304,11 +326,10 @@
                 showSave([bytes], "application/octet-stream");
                 return;
             }
-            copyText = text; copyBtn.hidden = false;
             var st = { run: true, net: false };
             function draw() {
                 main.textContent = "";
-                runBtn.hidden = false; netBtn.hidden = !st.run;   // 外の画像は、プログラムを動かすときだけ 選べる（止めるときは、いちばん固い設定で 何も読まない）
+                runBtn.hidden = false; netBtn.hidden = !st.run;   // 外の画像は、プログラムを動かすときだけ 選べる（止めるときは、いつも読まない）
                 runBtn.textContent = st.run ? "🛡 プログラムを止める" : "▶ プログラムを動かす";
                 netBtn.textContent = st.net ? "🔒 外の画像を読まない" : "🌐 外の画像も読む";
                 var tip = document.createElement("div");

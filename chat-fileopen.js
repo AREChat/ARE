@@ -53,7 +53,7 @@
     function freshUrl(u, path) {
         if (!path || typeof requireClient !== "function" || typeof STORAGE_BUCKET === "undefined") return Promise.resolve(u);
         return requireClient().storage.from(STORAGE_BUCKET).createSignedUrl(path, 3600).then(function (r) {
-            if (r && r.data && r.data.signedUrl) { try { return new URL(r.data.signedUrl, location.href); } catch (_e) { /* そのまま */ } }
+            if (r && r.data && r.data.signedUrl) { try { var nu = new URL(r.data.signedUrl, location.href); if (nu.protocol === "https:" || nu.protocol === "http:") return nu; } catch (_e) { /* そのまま */ } }   // http(s) 以外（data: など）は、取り直しの答えとして使わない
             return u;
         }).catch(function () { return u; });
     }

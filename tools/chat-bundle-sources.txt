@@ -47,6 +47,7 @@ chat-storage-admin.js
 chat-timepick.js
 chat-auto-reply.js
 chat-album.js
+chat-filefresh.js
 chat-imgedit.js
 chat-location.js
 chat-share.js

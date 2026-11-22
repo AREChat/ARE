@@ -334,14 +334,14 @@ function ftDecode(bytes, enc){
 ftPainters.textfix = (s) => {
   s.enc = s.enc || "auto"; s.eol = s.eol || "keep"; s.text = s.text == null ? "" : s.text;
   const shown = s.bytes ? ftDecode(s.bytes, s.enc) : null; if(shown) s.text = shown.text;
-  return ftPick("textfix", "add", "📝 テキストファイルを選ぶ", ".txt,.csv,.tsv,.log,.md,.json,.xml,.html,.htm,.srt,.ini,text/*", false) +
+  return ftPick("textfix", "add", "📝 テキストファイルを選ぶ", ".txt,.csv,.tsv,.log,.md,.markdown,.srt,.vtt,.lrc", false) +
     '<div class="row" style="justify-content:flex-start;gap:8px;flex-wrap:wrap"><label>もとの文字コード ' + ftSel("textfix", "enc", s.enc, FT_ENC) + '</label><label>改行 ' + ftSel("textfix", "eol", s.eol, [["keep", "そのまま"], ["lf", "LF（Mac・Linux）"], ["crlf", "CRLF（Windows）"]]) + '</label><label><input type="checkbox" data-t="textfix:bom"' + (s.bom ? " checked" : "") + '> BOM付きで保存（Excelで開く用）</label></div>' +
     (s.bytes ? '<div class="meta">' + escapeHtml(s.name) + '（' + ftSize(s.bytes.length) + '）・判定：' + escapeHtml(shown.enc) + '</div><textarea readonly rows="8" style="width:100%;font-family:monospace;font-size:12px">' + escapeHtml(s.text.slice(0, 3000)) + (s.text.length > 3000 ? "\n…（先頭の3000文字だけ表示）" : "") + '</textarea>' : '<div class="empty-list">ファイルを選ぶと、文字化けをなおして UTF-8 にします。ためしに別の文字コードを選ぶと、読めるようになることがあります。</div>') +
     ftMsgHtml(s.msg) + '<div class="row">' + ftBtn("textfix", "run", "UTF-8で保存", {dis: !s.bytes}) + ftBtn("textfix", "copy", "コピー", {sub:1, dis: !s.bytes}) + '</div>';
 };
 function ftFixText(s){ let t = s.text; if(s.eol !== "keep"){ t = t.replace(/\r\n?|\n/g, "\n"); if(s.eol === "crlf") t = t.replace(/\n/g, "\r\n"); } return t; }
 ftActs.textfix = async (a, node, s) => {
-  if(a === "add"){ const f = node.files[0]; node.value = ""; if(!f) return; if(f.size > 50 * 1024 * 1024){ s.msg = "大きすぎます（50MBまで）。"; } else{ s.bytes = new Uint8Array(await f.arrayBuffer()); s.name = f.name; s.msg = ""; } }
+  if(a === "add"){ const f = node.files[0]; node.value = ""; if(!f) return; if(!/\.(txt|csv|tsv|log|md|markdown|srt|vtt|lrc)$/i.test(f.name)){ s.msg = "プログラムのコード・設定・データのファイルは、ここでは開けません（txt・csv・tsv・log・md・srt・vtt・lrc だけ）。"; } else if(f.size > 50 * 1024 * 1024){ s.msg = "大きすぎます（50MBまで）。"; } else{ s.bytes = new Uint8Array(await f.arrayBuffer()); s.name = f.name; s.msg = ""; } }
   else if(a === "enc") s.enc = node.value; else if(a === "eol") s.eol = node.value; else if(a === "bom") s.bom = node.checked;
   else if(a === "run"){ const t = ftFixText(s); ftSave(new Blob([s.bom ? "﻿" : "", t], {type: "text/plain;charset=utf-8"}), ftBase(s.name) + "_utf8." + (ftExt(s.name) || "txt")); s.msg = "UTF-8で保存しました。"; }
   else if(a === "copy"){ try{ await navigator.clipboard.writeText(ftFixText(s)); s.msg = "コピーしました。"; }catch(_e){ s.msg = "コピーできませんでした。"; } }
