@@ -172,7 +172,7 @@ function cacheElements(){
         "refreshUsersButton","userSearch","recommendedUsers","refreshRoomsButton",
         "roomList","backButton","chatAvatar","chatTitle","chatSubtitle",
         "refreshMessagesButton","pageStatus","messages","imageInput","fileInput",
-        "videoInput","attachmentStatus","messageInput","sendButton","charCount","toast","delCard","delStatus","delRequestButton","delCancelButton","newGroupButton","exportOldButton","exportAllButton","postFilter","postVideo","toggleHiddenUsers","postBody","postImage","postImageName","postSubmit","postFeed","postMore","postsRefresh","profileText","profileEditButton","profileModal","profileSheet","sidebar","rail","readReceiptToggle","securityBanner","myStatus","scheduleButton","schedulePanel","scheduleAt","scheduleSubmit","scheduleList","scheduleClose","adminTabButton","adminBadge","adminPanel","adminBody","adminClose"
+        "videoInput","attachmentStatus","messageInput","sendButton","newlineButton","charCount","toast","delCard","delStatus","delRequestButton","delCancelButton","newGroupButton","exportOldButton","exportAllButton","postFilter","postVideo","toggleHiddenUsers","postBody","postImage","postImageName","postSubmit","postFeed","postMore","postsRefresh","profileText","profileEditButton","profileModal","profileSheet","sidebar","rail","readReceiptToggle","securityBanner","myStatus","scheduleButton","schedulePanel","scheduleAt","scheduleSubmit","scheduleList","scheduleClose","adminTabButton","adminBadge","adminPanel","adminBody","adminClose"
     ].forEach((id) => el[id] = $(id));
 }
 
@@ -239,6 +239,14 @@ function formatBytes(bytes){
 function setStatus(message, type){
     el.pageStatus.textContent = message || "";
     el.pageStatus.className = "status" + (message ? " show " + (type || "info") : "");
+    window.clearTimeout(setStatus.timeout);
+    // エラー以外（「チャットに接続しました」などの一時的なお知らせ）は、5秒で自動的に消す
+    if(message && type !== "error"){
+        setStatus.timeout = window.setTimeout(() => {
+            el.pageStatus.textContent = "";
+            el.pageStatus.className = "status";
+        },5000);
+    }
 }
 
 function showToast(message){
@@ -326,6 +334,7 @@ function setTab(tab){
 function setChatEnabled(enabled){
     el.messageInput.disabled = !enabled;
     el.sendButton.disabled = !enabled;
+    el.newlineButton.disabled = !enabled;
     el.refreshMessagesButton.disabled = !enabled;
     el.scheduleButton.disabled = !enabled;
     document.querySelectorAll("[data-needs-room]").forEach((node) => { node.disabled = !enabled; });
@@ -418,6 +427,15 @@ function bindEvents(){
         searchTimer = setTimeout(loadRecommendations,250);
     });
     el.sendButton.addEventListener("click",sendTextMessage);
+    el.newlineButton.addEventListener("click",() => {
+        // スマホでは Shift+Enter が使いづらいので、改行専用ボタンで確実に改行だけできるようにする（送信しない）
+        const i = el.messageInput.selectionStart || el.messageInput.value.length;
+        const j = el.messageInput.selectionEnd || i;
+        el.messageInput.value = el.messageInput.value.slice(0,i) + "\n" + el.messageInput.value.slice(j);
+        el.messageInput.selectionStart = el.messageInput.selectionEnd = i + 1;
+        el.messageInput.focus();
+        updateCharCount();
+    });
     el.messageInput.addEventListener("input",updateCharCount);
     el.messageInput.addEventListener("keydown",(event) => {
         if(event.key === "Enter" && !event.shiftKey && !event.isComposing){
