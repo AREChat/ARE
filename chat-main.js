@@ -21,7 +21,9 @@ function initPresence(){
         }
     });
     ["mousemove","keydown","touchstart","click"].forEach((name) => window.addEventListener(name,onActivity,{passive:true}));
-    document.addEventListener("visibilitychange",() => { if(!document.hidden){ onActivity(); markRead(); } });
+    // 画面にもどってきたとき：次の自動更新（8秒ごと）を待たず、すぐに最新のメッセージを読みこみなおす
+    // （スマホがバックグラウンドで リアルタイム通信を止めていたときも、もどってきたら すぐ反映されるように）
+    document.addEventListener("visibilitychange",() => { if(!document.hidden){ onActivity(); markRead(); pollRoom(); } });
     sendPresence();
     refreshPresence();
     feat.timers.push(setInterval(sendPresence,30000),setInterval(refreshPresence,30000),setInterval(pollRoom,8000));

@@ -8,8 +8,8 @@
 // ・開けるのは「このアプリの保存先（ARE_CONFIG.supabaseUrl）」のファイルだけ。ほかの URL は開かない。
 (function () {
     var MAX_TEXT_BYTES = 5 * 1024 * 1024;   // 文字のファイルは、5MB まで表示（それより大きいときはダウンロードだけ）
-    var MAX_PDF_BYTES = 80 * 1024 * 1024;   // PDF は、80MB まで表示（チャットで送れるのは 50MB まで）
-    var MAX_PPTX_BYTES = 80 * 1024 * 1024;  // pptx も、80MB まで表示
+    var MAX_PDF_BYTES = 80 * 1024 * 1024;   // PDF は、80MB まで表示
+    var MAX_PPTX_BYTES = 400 * 1024 * 1024;  // pptx は、400MB まで表示（それより大きいものは、ブラウザが固まらないよう ダウンロードだけにする）
     var $ = function (id) { return document.getElementById(id); };
     var main = $("fvMain"), nameEl = $("fvName"), metaEl = $("fvMeta"), copyBtn = $("fvCopy"), saveBtn = $("fvSave");
     var downloadParts = null, downloadMime = "application/octet-stream", downloadName = "file", copyText = "";
@@ -224,6 +224,7 @@
                 var m = String(err && err.message || "");
                 $("fvShow").hidden = true; $("fvShowHere").hidden = true;
                 if (m === "nostream") note("お使いのブラウザでは、スライドを表示できません（新しい Chrome・Safari・Edge・Firefox でお試しください）。<br><b>ダウンロード</b>して、お使いのアプリで開いてください。");
+                else if (m === "big") note("このファイルには、大きすぎる画像・動画などが含まれているため、ここでは表示できませんでした。<br><b>ダウンロード</b>して、お使いのアプリで開いてください。");
                 else note("このファイルは、この画面では表示できませんでした（壊れているか、特殊な形式です）。<br><b>ダウンロード</b>して、お使いのアプリで開いてください。");
             });
         });

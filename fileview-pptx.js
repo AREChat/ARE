@@ -6,7 +6,7 @@
 // ・スライドショー：全画面・矢印キー・スワイプ・タップ・自動で進める。点滅や動きは付けない（目にやさしく）。
 (function () {
     var PX = 9525;                                  // 1px = 9525 EMU（96dpi）
-    var MAX_ENTRY = 40 * 1024 * 1024, MAX_TOTAL = 220 * 1024 * 1024, MAX_SLIDES = 300;
+    var MAX_ENTRY = 150 * 1024 * 1024, MAX_TOTAL = 500 * 1024 * 1024, MAX_SLIDES = 300;
     var TXT = "http://www.w3.org/2000/svg";
 
     // ---------- zip を開く ----------

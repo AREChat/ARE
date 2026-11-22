@@ -44,10 +44,12 @@ if (!sources.length) { console.error("chat-bundle-sources.txt が空です。");
     }
     const joined = parts.join("\n");
 
-    // 空白とコメントを消すだけ（compress / mangle は使わない）
+    // 空白・コメントを消し、関数の中のローカルな変数名も短くする（読みこみを少しでも速くするため）。
+    // ・mangle は toplevel:false のまま → ファイルをまたいで呼び合う関数名・var（グローバル）は、いままでどおり変わらない
+    // ・compress は、まとめた全体を1つのプログラムとして見て行うので、ファイルをまたぐ参照も安全に扱える
     const result = await terser.minify(joined, {
-        compress: false,
-        mangle: false,
+        compress: { toplevel: false, passes: 1 },
+        mangle: { toplevel: false },
         format: { comments: false, ascii_only: false, beautify: false }
     });
     if (result.error) { console.error("terser エラー: " + result.error.message); process.exit(1); }
