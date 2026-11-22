@@ -172,6 +172,7 @@ const FEATURES = [
     ["ocr","画像の文字読み取り",initOcr],
     ["contact","連絡先・QR友だち追加",initContact],
     ["report","通報",initReport],
+    ["copytool","コピーボタン",initCopyTool],
     ["diary","日記",initDiary],
     ["habit","習慣トラッカー",initHabit],
     ["budget","家計簿",initBudget],

@@ -92,6 +92,7 @@ chat-split.js
 chat-board.js
 chat-livenote.js
 chat-report.js
+chat-copytool.js
 chat-live.js
 chat-ocr.js
 chat-contact.js
@@ -125,4 +126,5 @@ chat-layout.js
 sw-update.js
 chat-guest.js
 chat-longtext.js
+chat-copyblock.js
 chat-offlinegame.js
