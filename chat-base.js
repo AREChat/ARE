@@ -176,6 +176,11 @@ function cacheElements(){
     ].forEach((id) => el[id] = $(id));
 }
 
+// スマホなど「指で操作する」端末かどうか（Shift+Enter が押しづらい端末では、キーボードの Enter を送信ではなく改行にする）
+function isCoarsePointer(){
+    try{ return !!(window.matchMedia && matchMedia("(pointer: coarse)").matches); }catch(_e){ return false; }
+}
+
 function safeHttpUrl(value){
     if(!String(value || "").trim()) return "";   // 空のときに「いま開いているページ（chat.html）」を返すと、アイコンが壊れた画像になるため
     try{
@@ -426,6 +431,11 @@ function bindEvents(){
         clearTimeout(searchTimer);
         searchTimer = setTimeout(loadRecommendations,250);
     });
+    // スマホ（指で操作する端末）では「Enterで送信」ではなく「Enterで改行、送信は送信ボタン」に切りかえる案内にする
+    if(isCoarsePointer()){
+        el.messageInput.placeholder = "メッセージを入力...（Enterか ↵ ボタンで改行、送信は送信ボタンから）";
+        el.messageInput.setAttribute("enterkeyhint","enter");
+    }
     el.sendButton.addEventListener("click",sendTextMessage);
     el.newlineButton.addEventListener("click",() => {
         // スマホでは Shift+Enter が使いづらいので、改行専用ボタンで確実に改行だけできるようにする（送信しない）
@@ -450,6 +460,10 @@ function bindEvents(){
                 updateCharCount();
                 return;
             }
+            // スマホ（指で操作する端末）では、キーボードの Enter／改行キーを押しても送信せず、ふつうに改行だけ入れる。
+            // （Shift+Enter が押しづらいスマホで「改行したいだけなのに送信してしまう」事故を防ぐため。
+            //  送信は、送信ボタンを押したときだけ行う。パソコン（物理キーボード）では、これまでどおり Enter で送信する）
+            if(isCoarsePointer()) return;
             event.preventDefault();
             sendTextMessage();
         }
