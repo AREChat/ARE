@@ -102,7 +102,7 @@ chatbot.txt           チャットボットの回答データ（自由に編集�
 
 1. **接続先**：`apikey.js` に、プロジェクトの URL と公開キー（`sb_publishable_…`）を書く。`service_role` キーは**絶対に書かない**。
 2. **データベース**：テーブル・関数・保護ルール（RLS）は、Supabase の「Database → Migrations」に順番に記録されています。別のプロジェクトへ移すときは、その順に実行してください。
-3. **Storage**（保存場所）：`chat-attachments`（非公開・50MB。これをこえる動画・ファイルは Googleドライブ側に置く）、`post-images`（非公開・5MB。動画を受けるときは sql/post_video_v1.sql で50MBに）、`avatars`（公開・2MB）。
+3. **Storage**（保存場所・本番の設定、2026-11-22 時点）：`chat-attachments`（非公開。バケットの設定値は大きいが、Supabase 無料プランの「1ファイル50MBまで」という全体の上限が効くので、実際に直接送れるのは50MBまで。これをこえる動画・ファイルは Googleドライブ側に置いてリンクで送る）、`post-images`（非公開・50MB。動画つき投稿のため sql/post_video_v1.sql で広げた）、`avatars`（公開・2MB）、`file-drop`（本人専用のファイル転送・50MB・7日で自動削除）、`ws-docs`（5MB）、`shop-content`（50MB）。
 4. **Edge Functions**（本番に入っているもの・2026-11-22 時点で13個）：`register-user`、`login-user`、`recover-account`、`guest-start`（お試し）、`change-display-name`、`admin-api`、`admin-delete-user`、`admin-manage-user`、`admin-storage`、`send-push`、`cleanup-stories`（ストーリー整理）、`refresh-info`（天気・電車の更新）、`archive-old-files`（30日たったファイルのドライブ移送）。コードの控えは `edge-functions/`（一部）。**本番に入っているものが正**です。
 5. **定期実行（pg_cron）**：拡張機能 `pg_cron` を有効にして登録します。本番は11件（2026-11-22 時点・すべて有効）：`deliver-scheduled-messages`・`deliver-scheduled-content`・`expire-timed-messages`（毎分）、`cleanup-stories-6h`（6時間ごと）、`refresh-info-hourly`・`file-archive-hourly`（毎時）、`live-loc-purge`（15分ごと）、`guest-purge-v1`・`purge-memo-trash`・`purge-old-story-archive`（毎日）、`weekly-admin-message`（毎週）。**GitHub Actions や GitHub の Secret は使いません。**
 6. **Authentication**：メールの確認や新規登録の設定は、プロジェクトの方針に合わせて確認。パスワードの強さの設定にも、同じ条件（8文字以上・大文字・小文字・数字か記号）を入れておくと二重に守れます。
