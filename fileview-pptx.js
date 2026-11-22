@@ -16,19 +16,125 @@
         var n = bytes.length, i = n - 22, min = Math.max(0, n - 22 - 65535);
         for (; i >= min; i--) if (u32(bytes, i) === 0x06054b50) break;
         if (i < min) throw new Error("zip");
-        var count = u16(bytes, i + 10), p = u32(bytes, i + 16), map = Object.create(null);
+        var count = u16(bytes, i + 10), p = u32(bytes, i + 16), map = Object.create(null), lc = Object.create(null);
         for (var k = 0; k < count; k++) {
             if (p + 46 > n || u32(bytes, p) !== 0x02014b50) throw new Error("zip");
             var flags = u16(bytes, p + 8), method = u16(bytes, p + 10), csize = u32(bytes, p + 20), usize = u32(bytes, p + 24);
             var nl = u16(bytes, p + 28), el = u16(bytes, p + 30), cl = u16(bytes, p + 32), lho = u32(bytes, p + 42);
-            var name = new TextDecoder("utf-8").decode(bytes.subarray(p + 46, p + 46 + nl));
+            // 名前のゆれをならす（古い Windows のツールは「\」区切り、先頭に「/」を付けるものもある）
+            var name = new TextDecoder("utf-8").decode(bytes.subarray(p + 46, p + 46 + nl)).replace(/\\/g, "/").replace(/^\/+/, "");
             map[name] = { method: method, csize: csize, usize: usize, lho: lho, enc: !!(flags & 1) };
+            lc[name.toLowerCase()] = name;
             p += 46 + nl + el + cl;
         }
-        return { bytes: bytes, map: map, total: 0 };
+        return { bytes: bytes, map: map, lc: lc, total: 0 };
+    }
+    // 名前をさがす（大文字小文字がちがっても見つける）。無ければ null
+    function findName(z, name) {
+        name = String(name || "");
+        if (z.map[name]) return name;
+        return z.lc[name.toLowerCase()] || null;
+    }
+    // ---------- 自前の展開（deflate）。ブラウザの DecompressionStream が使えないときだけ使う ----------
+    var LBASE = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258];
+    var LEXT = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0];
+    var DBASE = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577];
+    var DEXT = [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13];
+    var CLORD = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
+    var fixedL = null, fixedD = null;
+    function huff(lengths, n) {
+        var count = new Uint16Array(16), offs = new Uint16Array(16), symbol = new Uint16Array(n), i;
+        for (i = 0; i < n; i++) count[lengths[i]]++;
+        for (i = 1; i < 15; i++) offs[i + 1] = offs[i] + count[i];
+        for (i = 0; i < n; i++) if (lengths[i]) symbol[offs[lengths[i]]++] = i;
+        return { count: count, symbol: symbol };
+    }
+    function inflateRaw(src, maxOut) {
+        var pos = 0, bitbuf = 0, bitcnt = 0, op = 0, out = new Uint8Array(Math.min(maxOut, Math.max(65536, src.length * 3)));
+        function bits(need) {
+            var v = bitbuf;
+            while (bitcnt < need) { if (pos >= src.length) throw new Error("zip"); v |= src[pos++] << bitcnt; bitcnt += 8; }
+            bitbuf = v >>> need; bitcnt -= need;
+            return v & ((1 << need) - 1);
+        }
+        function decode(h) {
+            var code = 0, first = 0, index = 0, len, count;
+            for (len = 1; len <= 15; len++) {
+                code |= bits(1);
+                count = h.count[len];
+                if (code - count < first) return h.symbol[index + (code - first)];
+                index += count; first += count; first <<= 1; code <<= 1;
+            }
+            throw new Error("zip");
+        }
+        function room(n) {
+            if (op + n <= out.length) return;
+            if (op + n > maxOut) throw new Error("big");
+            var b = new Uint8Array(Math.min(maxOut, Math.max(out.length * 2, op + n)));
+            b.set(out.subarray(0, op)); out = b;
+        }
+        function codes(lc, dc) {
+            for (;;) {
+                var sym = decode(lc);
+                if (sym < 256) { room(1); out[op++] = sym; }
+                else if (sym === 256) return;
+                else {
+                    sym -= 257;
+                    if (sym >= 29) throw new Error("zip");
+                    var len = LBASE[sym] + bits(LEXT[sym]), ds = decode(dc);
+                    if (ds >= 30) throw new Error("zip");
+                    var dist = DBASE[ds] + bits(DEXT[ds]);
+                    if (dist > op) throw new Error("zip");
+                    room(len);
+                    for (var k = 0; k < len; k++) { out[op] = out[op - dist]; op++; }
+                }
+            }
+        }
+        var last, type, i;
+        do {
+            last = bits(1); type = bits(2);
+            if (type === 0) {
+                bitbuf = 0; bitcnt = 0;
+                if (pos + 4 > src.length) throw new Error("zip");
+                var sl = src[pos] | (src[pos + 1] << 8), nl = src[pos + 2] | (src[pos + 3] << 8);
+                if (sl !== (~nl & 0xFFFF)) throw new Error("zip");
+                pos += 4;
+                if (pos + sl > src.length) throw new Error("zip");
+                room(sl); out.set(src.subarray(pos, pos + sl), op); op += sl; pos += sl;
+            } else if (type === 1) {
+                if (!fixedL) {
+                    var fl = new Uint8Array(288);
+                    for (i = 0; i < 288; i++) fl[i] = i < 144 ? 8 : i < 256 ? 9 : i < 280 ? 7 : 8;
+                    var fd = new Uint8Array(30); for (i = 0; i < 30; i++) fd[i] = 5;
+                    fixedL = huff(fl, 288); fixedD = huff(fd, 30);
+                }
+                codes(fixedL, fixedD);
+            } else if (type === 2) {
+                var nlen = bits(5) + 257, ndist = bits(5) + 1, ncode = bits(4) + 4;
+                if (nlen > 286 || ndist > 30) throw new Error("zip");
+                var cl = new Uint8Array(19);
+                for (i = 0; i < ncode; i++) cl[CLORD[i]] = bits(3);
+                var clc = huff(cl, 19), lens = new Uint8Array(nlen + ndist), idx = 0;
+                while (idx < nlen + ndist) {
+                    var sy = decode(clc);
+                    if (sy < 16) lens[idx++] = sy;
+                    else {
+                        var ln = 0, rep;
+                        if (sy === 16) { if (idx === 0) throw new Error("zip"); ln = lens[idx - 1]; rep = 3 + bits(2); }
+                        else if (sy === 17) rep = 3 + bits(3);
+                        else rep = 11 + bits(7);
+                        if (idx + rep > nlen + ndist) throw new Error("zip");
+                        while (rep--) lens[idx++] = ln;
+                    }
+                }
+                if (lens[256] === 0) throw new Error("zip");
+                codes(huff(lens.subarray(0, nlen), nlen), huff(lens.subarray(nlen), ndist));
+            } else throw new Error("zip");
+        } while (!last);
+        return out.subarray(0, op);
     }
     function extract(z, name) {
-        var e = z.map[name];
+        var key = findName(z, name), e = key && z.map[key];
         if (!e || e.enc) return Promise.resolve(null);
         if (e.usize > MAX_ENTRY) return Promise.reject(new Error("big"));
         var b = z.bytes;
@@ -37,8 +143,17 @@
         var data = b.subarray(start, start + e.csize);
         if (e.method === 0) return Promise.resolve(data);
         if (e.method !== 8) return Promise.reject(new Error("method"));
-        if (typeof DecompressionStream !== "function") return Promise.reject(new Error("nostream"));
-        var reader = new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw")).getReader();
+        var stream = null;
+        if (typeof DecompressionStream === "function") { try { stream = new DecompressionStream("deflate-raw"); } catch (_e) { stream = null; } }
+        if (!stream) {                      // 昔のブラウザ（deflate-raw が使えない）：自前の展開
+            try {
+                var plain = inflateRaw(data, MAX_ENTRY);
+                z.total += plain.length;
+                if (z.total > MAX_TOTAL) return Promise.reject(new Error("big"));
+                return Promise.resolve(plain);
+            } catch (err) { return Promise.reject(err); }
+        }
+        var reader = new Blob([data]).stream().pipeThrough(stream).getReader();
         var chunks = [], total = 0;
         function pump() {
             return reader.read().then(function (r) {
@@ -90,6 +205,8 @@
     function dirOf(p) { var i = p.lastIndexOf("/"); return i < 0 ? "" : p.slice(0, i + 1); }
     function resolvePath(base, target) {
         if (!target) return "";
+        if (target.indexOf("%") >= 0) { try { target = decodeURIComponent(target); } catch (_e) { /* そのまま */ } }
+        target = target.replace(/\\/g, "/");
         if (target.charAt(0) === "/") return target.slice(1);
         var parts = (dirOf(base) + target).split("/"), out = [];
         parts.forEach(function (s) { if (s === "..") out.pop(); else if (s && s !== ".") out.push(s); });
@@ -157,7 +274,7 @@
 
     // ---------- 先に読むもの（テーマ・サイズ・スライドの順番） ----------
     function loadTheme(z) {
-        var name = Object.keys(z.map).filter(function (n) { return /^ppt\/theme\/theme\d+\.xml$/.test(n); }).sort()[0];
+        var name = Object.keys(z.map).filter(function (n) { return /^ppt\/theme\/theme\d+\.xml$/i.test(n); }).sort()[0];
         var theme = { colors: {}, major: "", minor: "", majorEa: "", minorEa: "" };
         if (!name) return Promise.resolve(theme);
         return readXml(z, name).then(function (root) {
@@ -636,9 +753,19 @@
     }
 
     // ---------- 全体を読む ----------
+    // 本体（プレゼンの部品）の場所：ふつうは ppt/presentation.xml。ちがう場所に置くツールもあるので、_rels/.rels から探す
+    function findMain(z) {
+        return readXml(z, "_rels/.rels").then(function (root) {
+            var t = "";
+            kids(root, "Relationship").forEach(function (r) { if (/officeDocument$/.test(String(r.getAttribute("Type") || ""))) t = resolvePath("", r.getAttribute("Target")); });
+            return (t && findName(z, t)) || findName(z, "ppt/presentation.xml") || "ppt/presentation.xml";
+        }).catch(function () { return "ppt/presentation.xml"; });
+    }
     function loadDeck(bytes) {
         var z = openZip(bytes), theme, pres, ctx;
-        return Promise.all([loadTheme(z), readXml(z, "ppt/presentation.xml"), loadRels(z, "ppt/presentation.xml")]).then(function (r) {
+        return findMain(z).then(function (mainPart) {
+            return Promise.all([loadTheme(z), readXml(z, mainPart), loadRels(z, mainPart)]);
+        }).then(function (r) {
             theme = r[0];
             var root = r[1], rels = r[2];
             if (!root) throw new Error("pptx");
@@ -650,9 +777,14 @@
             var list = [];
             ids.forEach(function (s, i) {
                 var rid = s.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id") || s.getAttribute("r:id");
-                var rel = rels[rid];
-                if (rel && z.map[rel.target]) list.push({ part: rel.target, number: i + 1 });
+                var rel = rels[rid], real = rel && findName(z, rel.target);
+                if (real) list.push({ part: real, number: i + 1 });
             });
+            if (!list.length) {             // 一覧が読めないときは、スライドの部品を番号順にならべて見せる
+                Object.keys(z.map).filter(function (n) { return /^ppt\/slides\/slide\d+\.xml$/i.test(n); })
+                    .sort(function (a, b2) { return parseInt(a.replace(/\D+/g, ""), 10) - parseInt(b2.replace(/\D+/g, ""), 10); })
+                    .slice(0, MAX_SLIDES).forEach(function (n, i) { list.push({ part: n, number: i + 1 }); });
+            }
             return { ctx: ctx, list: list };
         });
     }
@@ -890,5 +1022,5 @@
         });
     }
 
-    window.AREPptx = { open: open };
+    window.AREPptx = { open: open, _inflate: inflateRaw };     // _inflate は、動作の確認用
 })();
