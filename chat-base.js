@@ -181,6 +181,24 @@ function isCoarsePointer(){
     try{ return !!(window.matchMedia && matchMedia("(pointer: coarse)").matches); }catch(_e){ return false; }
 }
 
+// サイドバーの「更新」ボタン：パソコンの Shift+Ctrl+R（強制再読み込み）と同じ役わり。
+// たまった控え（サービスワーカー・キャッシュ）をぜんぶ消してから、ページを読み直す＝いちばん確実に最新版になる。
+async function hardRefreshPage(){
+    try{
+        if("caches" in window){
+            const keys = await caches.keys();
+            await Promise.all(keys.map((key) => caches.delete(key)));
+        }
+    }catch(_e){ /* 消せなくても、読み直しは続ける */ }
+    try{
+        if("serviceWorker" in navigator){
+            const regs = await navigator.serviceWorker.getRegistrations();
+            await Promise.all(regs.map((reg) => reg.unregister()));
+        }
+    }catch(_e){ /* 消せなくても、読み直しは続ける */ }
+    location.reload();
+}
+
 function safeHttpUrl(value){
     if(!String(value || "").trim()) return "";   // 空のときに「いま開いているページ（chat.html）」を返すと、アイコンが壊れた画像になるため
     try{
@@ -418,7 +436,7 @@ function redirectToIndex(){
 function bindEvents(){
     el.logoutButton.addEventListener("click",logout);
     el.refreshUsersButton.addEventListener("click",loadRecommendations);
-    el.refreshRoomsButton.addEventListener("click",loadRooms);
+    el.refreshRoomsButton.addEventListener("click",hardRefreshPage);
     el.refreshMessagesButton.addEventListener("click",() => loadMessages(true));
     // 再生や全画面が終わったら、ためておいた描き直しを行う（renderMessages を参照）
     ["pause","ended"].forEach((type) => el.messages.addEventListener(type,flushDeferredRender,true));
