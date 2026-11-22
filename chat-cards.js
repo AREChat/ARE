@@ -11,7 +11,91 @@ const CG_GAMES = {
 };
 const CG_SUIT = {S:"♠", H:"♥", D:"♦", C:"♣"};
 const CG_RANK_LABEL = ["", "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-feat.cg = {ended:{}, gid:null, view:null, sel:[], timer:null, busy:false, autoTimer:null, done:{}, active:{}, skip:{}, watchTimer:null};
+feat.cg = {ended:{}, gid:null, view:null, sel:[], timer:null, busy:false, autoTimer:null, done:{}, active:{}, skip:{}, watchTimer:null, jumpBtn:null};
+
+// ===== 対戦専用チャット（個人チャットとは別の部屋で、ゲームの会話をする）=====
+// ・部屋の名前（絵文字＋ゲーム名＋「対戦」）で、対戦専用チャットかどうかを見分ける（新しい列は増やさない）。
+// ・ゲームを始めるときは、この名前の部屋がすでにあれば使い、なければ create_group で新しく作る（相手と自分の2人だけ）。
+// ・個人チャット側には、対戦チャットへ飛べる小さなボタンを出す。対戦チャット側には、個人チャットへ飛べるボタンを出す。
+function cgRoomName(game){ const info = CG_GAMES[game]; return info ? info.icon + " " + info.name + "対戦" : ""; }
+function cgRoomGameKey(room){
+    if(!room || !room.is_group || !room.name) return null;
+    return Object.keys(CG_GAMES).find((k) => cgRoomName(k) === room.name) || null;
+}
+function cgFindGameRoom(partnerId, game){
+    const name = cgRoomName(game);
+    return (state.rooms || []).find((r) => r.is_group && r.name === name && (r.memberIds || []).length === 2 && (r.memberIds || []).includes(partnerId)) || null;
+}
+function cgFindAnyGameRoom(partnerId){
+    return (state.rooms || []).find((r) => r.is_group && cgRoomGameKey(r) && (r.memberIds || []).length === 2 && (r.memberIds || []).includes(partnerId)) || null;
+}
+// いま開いている部屋から「対戦相手のID」を取る（個人チャットでも、対戦専用チャットでもOK。ふつうのグループは対象外）
+function cgCurrentPartnerId(){
+    const room = state.currentRoom;
+    if(!room) return null;
+    if(!room.is_group) return room.partnerId || (room.partner && room.partner.id) || null;
+    if(!cgRoomGameKey(room)) return null;
+    return (room.memberIds || []).find((id) => id !== state.user.id) || null;
+}
+async function cgEnsureGameRoom(game, partnerId){
+    const existing = cgFindGameRoom(partnerId, game);
+    if(existing) return existing;
+    try{
+        const result = await requireClient().rpc("create_group",{p_name:cgRoomName(game), p_member_ids:[partnerId], p_notice:null});
+        if(result.error) throw result.error;
+        await loadRooms();
+        const room = (state.rooms || []).find((r) => r.id === result.data);
+        if(!room){ showToast("対戦チャットを作成しましたが、読み込みに失敗しました。もう一度お試しください。"); return null; }
+        return room;
+    }catch(error){
+        showToast("対戦チャットを作れませんでした：" + getErrorMessage(error));
+        return null;
+    }
+}
+// チャット上部に、個人チャット⇔対戦チャットを行き来する小さなボタンを出す
+function cgPaintHeaderLink(room){
+    const btn = feat.cg.jumpBtn; if(!btn) return;
+    if(!room){ btn.hidden = true; return; }
+    const ownGameKey = cgRoomGameKey(room);
+    if(ownGameKey){
+        const partnerId = (room.memberIds || []).find((id) => id !== state.user.id);
+        if(!partnerId){ btn.hidden = true; return; }
+        btn.hidden = false; btn.textContent = "💬"; btn.title = "個人チャットへ"; btn.setAttribute("aria-label","個人チャットへ戻る");
+        btn.onclick = () => openOrCreateDirectChat(partnerId);
+        return;
+    }
+    if(room.is_group || !room.partnerId){ btn.hidden = true; return; }
+    const gameRoom = cgFindAnyGameRoom(room.partnerId);
+    if(!gameRoom){ btn.hidden = true; return; }
+    const info = CG_GAMES[cgRoomGameKey(gameRoom)] || {icon:"🎮"};
+    btn.hidden = false; btn.textContent = info.icon; btn.title = "対戦チャットへ（" + gameRoom.name + "）"; btn.setAttribute("aria-label","対戦チャットへ");
+    btn.onclick = () => selectRoom(gameRoom,null);
+}
+// 部屋一覧にも、同じ行き来ボタンを小さく出す（開かなくても ひと目で分かるように）
+function cgPaintRoomList(){
+    if(!el.roomList) return;
+    el.roomList.querySelectorAll("[data-room-id]").forEach((rowBtn) => {
+        const old = rowBtn.querySelector(".cg-jump"); if(old) old.remove();
+        const room = (state.rooms || []).find((r) => r.id === rowBtn.dataset.roomId);
+        if(!room) return;
+        let onClick = null, icon = "", title = "";
+        if(!room.is_group && room.partnerId){
+            const gameRoom = cgFindAnyGameRoom(room.partnerId);
+            if(gameRoom){ icon = (CG_GAMES[cgRoomGameKey(gameRoom)] || {}).icon || "🎮"; title = "対戦チャットへ"; onClick = () => selectRoom(gameRoom,null); }
+        }else{
+            const gameKey = cgRoomGameKey(room);
+            if(gameKey){
+                const partnerId = (room.memberIds || []).find((id) => id !== state.user.id);
+                if(partnerId){ icon = "💬"; title = "個人チャットへ"; onClick = () => openOrCreateDirectChat(partnerId); }
+            }
+        }
+        if(!onClick) return;
+        const b = document.createElement("button");
+        b.type = "button"; b.className = "cg-jump"; b.textContent = icon; b.title = title; b.setAttribute("aria-label",title);
+        b.addEventListener("click",(event) => { event.preventDefault(); event.stopPropagation(); onClick(); });
+        rowBtn.appendChild(b);
+    });
+}
 
 function initCards(){
     registerTool("cg", onCgAction);
@@ -21,6 +105,23 @@ function initCards(){
         runTool(() => openCg(node.dataset.cgopen));
     });
     feat.cg.watchTimer = setInterval(() => { cgWatchTick().catch(() => {}); }, 6000);   // 画面をとじていても、勝負がついたら 知らせる
+
+    // ヘッダーの 行き来ボタン
+    const head = document.querySelector(".chat-header"), anchor = document.getElementById("refreshMessagesButton");
+    if(head && anchor){
+        const b = document.createElement("button");
+        b.type = "button"; b.id = "cgJumpBtn"; b.className = "button-secondary"; b.hidden = true;
+        head.insertBefore(b,anchor);
+        feat.cg.jumpBtn = b;
+    }
+    addRoomHook((room) => { try{ cgPaintHeaderLink(room); }catch(_e){} });
+
+    // 部屋一覧にも、同じボタンを描く（一覧が描きなおされるたびに付けなおす）
+    const origRenderRooms = renderRooms;
+    renderRooms = function(){
+        origRenderRooms.apply(this,arguments);
+        try{ cgPaintRoomList(); }catch(_e){ /* 続行 */ }
+    };
 }
 
 /** 勝負がついたときの 結果の文（例：「ゲーム終了！ ゆめさんの勝利です！」） */
@@ -104,12 +205,22 @@ async function onCgAction(action, node){
     if(action === "start"){
         const game = node.dataset.g;
         if(!CG_GAMES[game] || !state.currentRoom){ showToast("先にチャットを開いてください。"); return; }
+        const partnerId = cgCurrentPartnerId();
+        if(!partnerId){ showToast("1対1のチャット（または対戦チャット）から始めてください。"); return; }
         await cgFreshenForGuard();
         if(gameBusyBlocked()) return;
-        const result = await requireClient().rpc("cg_create", {p_room_id:state.currentRoom.id, p_game:game});
+        closeSheet();
+        // 個人チャットとは別の「対戦専用チャット」に切りかえてから、ゲームを始める（なければ新しく作る）
+        const gameRoom = await cgEnsureGameRoom(game,partnerId);
+        if(!gameRoom) return;
+        const result = await requireClient().rpc("cg_create", {p_room_id:gameRoom.id, p_game:game});
         if(result.error) throw result.error;
         const gid = result.data;
-        await sendMessagePayload({type:"game", game:"cg", cg:game, gid, kind:"start"});
+        // sendMessagePayload は「いま開いている部屋」に送る仕組みなので、部屋の切りかえと競合しないよう、
+        // 先に対戦専用チャットへ直接メッセージを送ってから、画面をその部屋に切りかえる
+        const sendResult = await sendPayloadToRoom(gameRoom.id,{type:"game", game:"cg", cg:game, gid, kind:"start"});
+        if(sendResult.error) throw sendResult.error;
+        await selectRoom(gameRoom,null);
         await openCg(gid);
         return;
     }
