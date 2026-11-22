@@ -133,7 +133,7 @@ function auUserCard(u){
     const seg = u.segment ? ('<span class="meta">' + (AU_SEG_LABEL[u.segment] || u.segment) + '</span> ') : "";
     const used = u.msg_count !== undefined ? ' ・送信 ' + u.msg_count + '件' : "";
     return '<div class="admin-card">' + (u.is_admin ? '' : '<label class="row" style="gap:6px;align-items:center"><input type="checkbox" data-selu="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '"> <span class="meta">選ぶ（まとめて削除）</span></label>') +
-        '<b>' + escapeHtml(u.display_name || "ユーザー") + '</b> ' + seg + '<span class="meta">ID：' + escapeHtml(u.login_id || "-") + (u.last_seen_at ? ' ・最終オンライン：' + escapeHtml(formatDate(u.last_seen_at)) : '') + escapeHtml(used) + '</span>' +
+        '<b>' + escapeHtml(u.display_name || "ユーザー") + '</b> ' + seg + '<span class="meta">ID：' + escapeHtml(u.login_id || "-") + (u.last_seen_at ? ' ・最終オンライン：' + escapeHtml(presenceDateText(u.last_seen_at)) : '') + escapeHtml(used) + '</span>' +
         '<div class="row"><button class="button-secondary" data-contact="' + escapeHtml(u.user_id) + '" type="button">連絡先を表示（閲覧は記録されます）</button></div>' + (u.is_admin ? '<div class="meta">管理者アカウント（再発行不可）</div>' : '<div class="row"><button class="button-secondary" data-edituser="' + escapeHtml(u.user_id) + '" type="button">編集</button><button class="button-secondary" data-reissue="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '" type="button">復旧コードを再発行</button><button class="button-danger" data-deluser="' + escapeHtml(u.user_id) + '" data-name="' + escapeHtml(u.display_name || "ユーザー") + '" type="button">アカウントを削除</button></div>') + '</div>';
 }
 function auPaintList(){
