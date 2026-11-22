@@ -8,8 +8,8 @@
 // ・開けるのは「このアプリの保存先（ARE_CONFIG.supabaseUrl）」のファイルだけ。ほかの URL は開かない。
 (function () {
     var MAX_TEXT_BYTES = 5 * 1024 * 1024;   // 文字のファイルは、5MB まで表示（それより大きいときはダウンロードだけ）
-    var MAX_PDF_BYTES = 80 * 1024 * 1024;   // PDF は、80MB まで表示
-    var MAX_PPTX_BYTES = 400 * 1024 * 1024;  // pptx は、400MB まで表示（それより大きいものは、ブラウザが固まらないよう ダウンロードだけにする）
+    var MAX_PDF_BYTES = 80 * 1024 * 1024;   // PDF は、80MB まで表示（チャットで送れるのは 50MB まで）
+    var MAX_PPTX_BYTES = 80 * 1024 * 1024;  // pptx も、80MB まで表示
     var $ = function (id) { return document.getElementById(id); };
     var main = $("fvMain"), nameEl = $("fvName"), metaEl = $("fvMeta"), copyBtn = $("fvCopy"), saveBtn = $("fvSave");
     var downloadParts = null, downloadMime = "application/octet-stream", downloadName = "file", copyText = "";

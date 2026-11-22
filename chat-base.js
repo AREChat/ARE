@@ -15,7 +15,7 @@ const MAX_IMAGES = 10;
 
 const MAX_VIDEO_SECONDS = 300;
 
-const MAX_FILE_BYTES = 2 * 1024 * 1024 * 1024;   // 2GB（これをこえるファイルは、これまでどおりドライブへのリンクで送る）
+const MAX_FILE_BYTES = 50 * 1024 * 1024;   // Supabase Free プランは1ファイル50MBが上限（プロジェクト全体の絶対上限）なので、これより大きくしない。これをこえるファイルは、これまでどおりドライブへのリンクで送る
 
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
