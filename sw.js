@@ -11,7 +11,7 @@
 // ・新しい版が入ったら、古い控えをすべて消す
 
 importScripts("precache-manifest.js", "sw-core.js");
-const CACHE = "are-v165-20261122";
+const CACHE = "are-v166-20261122";
 // オフライン用: 画面の骨組み（html/js/css/json）を 最初に まとめて保存 / 画像・音楽は「オフライン準備」ボタンで are-media に保存（sw-core.js）
 const core = self.areCore({shell: CACHE, root: "./", precache: true, fetch: false});
 const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
@@ -96,6 +96,12 @@ self.addEventListener("fetch", (event) => {
 self.addEventListener("push", (event) => {
     let data = {};
     try{ data = event.data ? event.data.json() : {}; }catch(_e){ data = {body: event.data ? event.data.text() : ""}; }
+    // 既読になったとき：ポップアップを出さず、他の端末に出ている同じチャットの通知だけ消す
+    if(data.type === "clear"){
+        const tag = String(data.tag || (data.room ? "room-" + data.room : ""));
+        if(tag) event.waitUntil(self.registration.getNotifications({tag}).then((list) => list.forEach((n) => n.close())));
+        return;
+    }
     const title = String(data.title || "ARE").slice(0, 80);
     const options = {
         body: String(data.body || "新しいメッセージがあります").slice(0, 140),

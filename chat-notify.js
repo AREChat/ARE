@@ -14,12 +14,15 @@ function nfLoad(){
 }
 function nfSave(){ try{ localStorage.setItem(nf.key, JSON.stringify(nf.seen)); }catch(_e){ /* 保存できなくても続ける */ } }
 
+nf.liveNotif = {};   // room_id -> いま出しているブラウザ通知（Notification）。既読になったら閉じる
 function nfMarkSeen(roomId, iso){
     if(!roomId) return;
     const now = new Date().toISOString();
     nf.seen[roomId] = iso && iso > now ? iso : now;
     nfSave();
     if(feat.unread[roomId]){ feat.unread[roomId] = 0; nfPaint(); }
+    if(nf.liveNotif[roomId]){ try{ nf.liveNotif[roomId].close(); }catch(_e){} delete nf.liveNotif[roomId]; }
+    try{ pushCloseRoomNotifications(roomId); }catch(_e){}
 }
 
 /** 一覧にある部屋の未読数を数え直す（部屋の一覧が変わったとき・戻ってきたとき） */
@@ -105,6 +108,7 @@ function nfPopup(room, m){
         try{
             const n = new Notification("ARE：" + who, {body, tag:room.id});
             n.onclick = () => { window.focus(); nfOpenRoom(room.id); n.close(); };
+            nf.liveNotif[room.id] = n;
         }catch(_e){ /* 通知できない端末 */ }
     }
 }

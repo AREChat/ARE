@@ -14,6 +14,24 @@ function pushIsStandalone(){
 }
 function pushSupported(){ return "serviceWorker" in navigator && "PushManager" in window && "Notification" in window; }
 
+// この端末に出ている、そのチャットの通知（ポップアップ）を消す。既読にしたときに呼ぶ
+function pushCloseRoomNotifications(roomId){
+    if(!roomId || !("serviceWorker" in navigator)) return;
+    navigator.serviceWorker.getRegistration().then((reg) => {
+        if(!reg || !reg.getNotifications) return [];
+        return reg.getNotifications({tag:"room-" + roomId});
+    }).then((list) => { (list || []).forEach((n) => { try{ n.close(); }catch(_e){} }); }).catch(() => {});
+}
+
+// 他の端末（PC／スマホなど、同じ人の別デバイス）に出ている、そのチャットの通知を消してもらう
+async function pushClearRoomOnOtherDevices(roomId){
+    if(!roomId || !state.user) return;
+    try{
+        const client = requireClient();
+        await client.functions.invoke("clear-push", {body:{room_id:roomId}});
+    }catch(_e){ /* 届かなくても致命的ではない（次に新着が来れば通知は入れ替わる） */ }
+}
+
 function pushKeyBytes(b64){
     const pad = "=".repeat((4 - b64.length % 4) % 4);
     const raw = atob((b64 + pad).replace(/-/g, "+").replace(/_/g, "/"));
