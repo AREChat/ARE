@@ -94,12 +94,38 @@ async function pbkRevoke(){
     await openPbKey();
 }
 function pbkBody(){ return '{"p_key":"' + pbk.key + '","p_lat":緯度,"p_lng":経度}'; }
-async function pbkCopy(k){
-    if(!pbk.key || Date.now() >= pbk.exp){ showToast("もう見られません。作りなおしてください。"); return; }
+/** 文字をコピーする。ふつうの方法がだめなときは、見えない入力欄を使う方法でも やってみる（どちらも だめなら false） */
+async function pbkWriteClipboard(t){
+    try{ if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(t); return true; } }catch(_e){ /* 次の方法へ */ }
+    const box = document.getElementById("pbKeyBox") || document.body;
+    const ta = document.createElement("textarea");
+    ta.value = t; ta.setAttribute("readonly", ""); ta.setAttribute("aria-hidden", "true");
+    ta.style.cssText = "position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;pointer-events:none";
+    box.appendChild(ta);
+    let ok = false;
+    try{ ta.focus(); ta.select(); ta.setSelectionRange(0, t.length); ok = document.execCommand("copy"); }catch(_e){ ok = false; }
+    ta.remove();
+    return ok;
+}
+/** コピーしたことは、この画面の中で見せる（下のほうに出る吹き出しは、この画面の うしろにかくれて見えないため） */
+function pbkCopyNote(node, ok){
+    const msg = ok ? "コピーしました。" : "コピーできませんでした。上の欄の文字を、手でえらんで コピーしてください。";
+    pbkSt(ok ? "✅ " + msg : "⚠️ " + msg);
+    if(node && node.dataset){
+        if(!node.dataset.pbkLabel) node.dataset.pbkLabel = node.textContent;
+        node.textContent = ok ? "✅ コピーしました" : "⚠️ コピーできません";
+        clearTimeout(Number(node.dataset.pbkTimer) || 0);
+        node.dataset.pbkTimer = String(setTimeout(() => { if(node.isConnected) node.textContent = node.dataset.pbkLabel; }, 2200));
+    }
+    showToast(msg);
+}
+async function pbkCopy(k, node){
+    if(!pbk.key || Date.now() >= pbk.exp){ showToast("もう見られません。作りなおしてください。"); pbkSt("もう見られません。作りなおしてください。"); return; }
     const t = k === "key" ? pbk.key : k === "url" ? pbkEndpoint() : k === "api" ? pbkPublicKey() : k === "body" ? pbkBody() : "";
     if(!t) return;
-    try{ await navigator.clipboard.writeText(t); showToast("コピーしました。"); }
-    catch(_e){ const i = document.getElementById(k === "key" ? "pbkKey" : k === "url" ? "pbkUrl" : "pbkApi"); if(i){ i.focus(); i.select(); } showToast("コピーできませんでした。選んだ文字を、手動でコピーしてください。"); }
+    const ok = await pbkWriteClipboard(t);
+    if(!ok){ const i = document.getElementById(k === "key" ? "pbkKey" : k === "url" ? "pbkUrl" : "pbkApi"); if(i){ i.focus(); i.select(); } }
+    pbkCopyNote(node, ok);
 }
 /** この端末の位置で、合いかぎが使えるかを、その場でためす（ショートカットと同じ入口を通ります） */
 async function pbkTest(){
@@ -127,6 +153,6 @@ async function onPbKeyAction(action, node){
     if(action === "keyopen") await openPbKey();
     else if(action === "keymake") await pbkMake();
     else if(action === "keyrevoke") await pbkRevoke();
-    else if(action === "keycopy") await pbkCopy(node && node.dataset ? node.dataset.k : "");
+    else if(action === "keycopy") await pbkCopy(node && node.dataset ? node.dataset.k : "", node);
     else if(action === "keytest") await pbkTest();
 }

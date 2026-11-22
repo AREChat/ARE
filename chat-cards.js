@@ -11,7 +11,7 @@ const CG_GAMES = {
 };
 const CG_SUIT = {S:"♠", H:"♥", D:"♦", C:"♣"};
 const CG_RANK_LABEL = ["", "A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
-feat.cg = {ended:{}, gid:null, view:null, sel:[], timer:null, busy:false, autoTimer:null};
+feat.cg = {ended:{}, gid:null, view:null, sel:[], timer:null, busy:false, autoTimer:null, done:{}, active:{}, skip:{}, watchTimer:null};
 
 function initCards(){
     registerTool("cg", onCgAction);
@@ -20,6 +20,60 @@ function initCards(){
         if(!node) return;
         runTool(() => openCg(node.dataset.cgopen));
     });
+    feat.cg.watchTimer = setInterval(() => { cgWatchTick().catch(() => {}); }, 6000);   // 画面をとじていても、勝負がついたら 知らせる
+}
+
+/** 勝負がついたときの 結果の文（例：「ゲーム終了！ ゆめさんの勝利です！」） */
+function cgResultText(v){
+    const w = v && v.winner;
+    if(!w) return "ゲーム終了！ 引き分けです。";
+    return "ゲーム終了！ " + (w === state.user.id ? "あなたの勝利です！" : vsName(w) + "さんの勝利です！");
+}
+/** 会話の中の「参加・続きを見る」のふきだしに、結果の1行を足す（もう足してあれば、文だけ入れかえる） */
+function cgPaintBubbleResult(gid){
+    const d = feat.cg.done[gid];
+    if(!d || !el.messages) return;
+    el.messages.querySelectorAll('[data-cgopen="' + gid + '"]').forEach((btn) => {
+        const bubble = btn.closest(".bubble"); if(!bubble) return;
+        let line = bubble.querySelector(".vs-result");
+        if(!line){ line = document.createElement("div"); line.className = "vs-result"; bubble.appendChild(line); }
+        line.textContent = "🏁 " + cgResultText(d);
+    });
+}
+/** サーバーから届いた最新の状態を見て、「いま終わった」と気づいたら、一度だけ 知らせる（はじめから終わっていたものは、静かに記録だけ） */
+function cgAnnounce(gid, v){
+    const cg = feat.cg;
+    if(!gid || !v) return;
+    if(v.status === "done"){
+        const first = !cg.done[gid];
+        cg.done[gid] = {winner:v.winner || null};
+        if(first && cg.active[gid]) showToast(cgResultText(v));
+        cgPaintBubbleResult(gid);
+    }else cg.active[gid] = true;
+}
+/** 部屋にある いちばん新しいカードゲームが、まだ終わっていなければ、ときどき様子を見にいく（開いている画面があるときは、その画面が見るので しない） */
+async function cgWatchTick(){
+    const cg = feat.cg;
+    if(document.hidden || !state.currentRoom || !state.user || $("cgBody") || cg.busy) return;
+    let gid = "";
+    const now = Date.now();
+    for(let i = state.messages.length - 1; i >= 0 && i >= state.messages.length - 60; i--){
+        const m = state.messages[i];
+        if(!m.content || m.content.indexOf('"cg"') < 0) continue;
+        const item = parseMessageContent(m.content);
+        if(!item || item.type !== "game" || item.game !== "cg" || item.kind !== "start") continue;
+        const g = String(item.gid || "").replace(/[^0-9a-f-]/gi, "");
+        if(!g || cg.done[g] || cg.ended[g] || cg.skip[g]) continue;
+        if(now - new Date(m.created_at).getTime() > 3 * 3600 * 1000) continue;   // 3時間より前のものは、見にいかない
+        gid = g; break;
+    }
+    if(!gid) return;
+    try{
+        const r = await requireClient().rpc("cg_view", {p_game:gid});
+        if(r.error || !r.data){ cg.skip[gid] = true; return; }   // 見られないもの（参加者でない など）は、もう見にいかない
+        const v = r.data;
+        if(v.status === "done" || (v.players || []).includes(state.user.id)) cgAnnounce(gid, v); else cg.skip[gid] = true;
+    }catch(_e){ /* つぎの機会に */ }
 }
 
 function cgLabel(c){ return c === "JK" ? "🃏" : (CG_SUIT[c[0]] || "") + CG_RANK_LABEL[Number(c.slice(1))]; }
@@ -39,8 +93,10 @@ function openCardGames(){
 function renderCgBubble(item){
     const info = CG_GAMES[item.cg];
     if(!info) return '<div class="bubble">🂡 カードゲーム</div>';
+    const gid0 = String(item.gid || "").replace(/[^0-9a-f-]/gi, ""), dn = feat.cg.done[gid0];
     return '<div class="bubble">' + info.icon + ' <b>' + escapeHtml(info.name) + '</b><br><span class="meta">手札かくしの2人対戦</span><br>' +
-        '<button type="button" class="button-secondary" data-cgopen="' + escapeHtml(String(item.gid || "").replace(/[^0-9a-f-]/gi, "")) + '">参加・続きを見る</button></div>';
+        '<button type="button" class="button-secondary" data-cgopen="' + escapeHtml(gid0) + '">参加・続きを見る</button>' +
+        (dn ? '<div class="vs-result">🏁 ' + escapeHtml(cgResultText(dn)) + '</div>' : '') + '</div>';
 }
 
 async function onCgAction(action, node){
@@ -89,6 +145,7 @@ async function cgCall(fn, args){
         const result = await requireClient().rpc(fn, args);
         if(result.error) throw result.error;
         cg.view = result.data;
+        cgAnnounce(cg.gid, cg.view);
         paintCg();
     }finally{ cg.busy = false; }
 }
@@ -121,6 +178,7 @@ async function cgRefresh(){
     if(result.error) throw result.error;
     const before = JSON.stringify(cg.view);
     cg.view = result.data;
+    cgAnnounce(cg.gid, cg.view);
     if(JSON.stringify(cg.view) !== before) paintCg();
 }
 
@@ -140,8 +198,7 @@ function paintCg(){
         return;
     }
     if(v.status === "done"){
-        const w = v.winner;
-        html += '<div class="admin-card"><b>' + (w ? (w === me ? "🎉 あなたの勝ち！" : (isPlayer ? "😢 " + escapeHtml(vsName(w)) + " の勝ち" : escapeHtml(vsName(w)) + " の勝ち")) : "引き分け") + '</b></div>';
+        html += '<div class="admin-card"><b>🏁 ' + escapeHtml(cgResultText(v)) + '</b></div>';
     }else{
         html += '<div class="admin-card">' + (!isPlayer ? "観戦中" : (myTurn ? "<b>あなたの番です</b>" : escapeHtml(vsName(opp)) + " の番です…")) + '</div>';
     }

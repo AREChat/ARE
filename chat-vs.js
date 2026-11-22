@@ -371,10 +371,38 @@ function vsCompute(gid){
     else S.players[0] = S.starter;
     list.forEach((x) => {
         if(S.over || x.item.kind === "start") return;
-        if(x.item.kind === "resign"){ vsResign(S, x.m.sender_id); return; }   // 「終了」はどのゲームも共通の処理
-        E.apply(S, x.item, x.m.sender_id, S.starter);
+        if(x.item.kind === "resign") vsResign(S, x.m.sender_id);   // 「終了」はどのゲームも共通の処理
+        else E.apply(S, x.item, x.m.sender_id, S.starter);
+        if(S.over && !S.endSig) S.endSig = JSON.stringify(x.item);   // このゲームを終わらせた手（あとで「結果」を、その手のところに出すため）
     });
     return S;
+}
+
+/** 計算のやり直しを減らす（メッセージが増えるまでは、同じゲームの盤面を使いまわす） */
+const vsCache = {key:"", map:new Map()};
+function vsComputeCached(gid){
+    const msgs = state.messages || [], last = msgs.length ? msgs[msgs.length - 1] : null;
+    const key = (state.currentRoom ? state.currentRoom.id : "") + ":" + msgs.length + ":" + (last ? (last.id || last.created_at || "") : "");
+    if(vsCache.key !== key){ vsCache.key = key; vsCache.map.clear(); }
+    if(!vsCache.map.has(gid)) vsCache.map.set(gid, vsCompute(gid));
+    return vsCache.map.get(gid);
+}
+
+/** ゲームが終わったときに出す、結果の文（例：「ゲーム終了！ 🅰️ ゆめさんの勝利です！」） */
+function vsResultText(S){
+    const info = VS_GAMES[S.game] || {marks:[]}, E = VS_ENGINES[S.game], marks = info.marks || [];
+    const resigned = S.reason === "終了";
+    const lead = resigned ? "ゲームを終了しました。" : "ゲーム終了！";
+    let why = S.reason && !resigned ? "（" + S.reason + "）" : "";
+    if(S.game === "mem" && S.score) why = "（" + marks[0] + " " + S.score[0] + "組 ／ " + marks[1] + " " + S.score[1] + "組）";
+    if(S.game === "esh" && S.rounds) why += "（" + S.rounds.length + "枚つながりました）";
+    const wi = S.winner, who = wi >= 0 ? S.players[wi] : null;
+    if(wi >= 0 && who){
+        const n = vsName(who);
+        return lead + " " + (marks[wi] ? marks[wi] + " " : "") + (n === "あなた" ? "あなた" : n + "さん") + "の勝利です！" + why;
+    }
+    if(E && E.score) return lead + " " + E.score(S) + (S.game === "esh" ? "" : why);
+    return (resigned ? "ゲームを終了しました。" : "ゲーム終了！ 引き分けです。") + why;
 }
 
 function vsMyTurn(S){
@@ -393,7 +421,12 @@ function renderGameBubble(item){
         let text = "手を打ちました";
         if(item.kind === "resign") text = "終了しました";
         else try{ text = E.moveText(item); }catch(_e){ /* そのまま */ }
-        return '<div class="bubble vs-move">' + info.icon + ' ' + escapeHtml(info.name) + '：' + escapeHtml(text) + '</div>';
+        let result = "";
+        try{
+            const S0 = vsComputeCached(item.gid);
+            if(S0 && S0.over && S0.endSig && S0.endSig === JSON.stringify(item)) result = '<div class="vs-result">🏁 ' + escapeHtml(vsResultText(S0)) + '</div>';
+        }catch(_e){ /* 結果が出せなくても、手のふきだしは出す */ }
+        return '<div class="bubble vs-move">' + info.icon + ' ' + escapeHtml(info.name) + '：' + escapeHtml(text) + result + '</div>';
     }
     const S = vsCompute(item.gid);
     if(!S) return '<div class="bubble">🎮 ' + escapeHtml(info.name) + '</div>';
@@ -402,10 +435,7 @@ function renderGameBubble(item){
     const ctx = {gid, myTurn, marks, btn:(i, label, enabled, win, extra) => '<button type="button" class="vs-cell' + (extra ? " " + extra : "") + (win ? " win" : "") + '" data-vs="' + gid + '" data-i="' + i + '"' + (enabled ? "" : " disabled") + ' aria-label="' + (Number(i) + 1) + '">' + label + '</button>'};
     let status;
     if(item.game === "sugo" && S.phase === "join") status = "参加者をぼしゅう中";
-    else if(S.over){
-        if(E.score) status = E.score(S) + (S.reason ? "（" + S.reason + "）" : "");
-        else status = S.winner >= 0 ? marks[S.winner] + " " + vsName(S.players[S.winner]) + " の勝ち！" : (S.reason === "終了" ? "ゲームを終了しました" : "引き分け");
-    }else if(S.players[S.turn] === null) status = "次は " + marks[S.turn] + "（相手の番：先に打つと後手になります）";
+    else if(S.over) status = "🏁 " + vsResultText(S);else if(S.players[S.turn] === null) status = "次は " + marks[S.turn] + "（相手の番：先に打つと後手になります）";
     else status = "次は " + marks[S.turn] + " " + vsName(S.players[S.turn]) + " の番";
     return '<div class="bubble vs-bubble"><b>' + info.icon + ' ' + escapeHtml(info.name) + '</b> <span class="meta">' + escapeHtml(vsName(S.starter)) + ' が開始</span>' + E.view(S, ctx) + vsEndButton(S, item.gid) + '<div class="vs-status">' + escapeHtml(status) + '</div></div>';
 }

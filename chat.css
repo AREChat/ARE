@@ -77,7 +77,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .status.error{color:#ffb1b1;background:#3b1e2b}
 .status.success{color:#9df2d0;background:#12382f}
 .status.info{color:#c9d7ff;background:#1c2b4b}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:10;padding:12px 16px;border-radius:10px;background:#26344d;color:white;box-shadow:0 10px 35px #0008;max-width:90vw;display:none}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:90;padding:12px 16px;border-radius:10px;background:#26344d;color:white;box-shadow:0 10px 35px #0008;max-width:90vw;display:none}
 .toast.show{display:block}
 .loading{opacity:.65;pointer-events:none}
 .status-select{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:6px;max-width:122px}
@@ -832,3 +832,6 @@ button:disabled#delRequestButton,button:disabled#delCancelButton{opacity:.55;cur
 .pbk-field{align-items:center}.pbk-field input{flex:1;min-width:0;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px}
 .pbk-list{line-height:1.75}.pbk-steps summary{cursor:pointer}.pbk-steps code{background:var(--panel2);padding:0 4px;border-radius:4px;font-size:12px;overflow-wrap:anywhere}
 .pbk-box{border-color:var(--accent)}
+.vspin-result{padding:2px 12px 8px;font-weight:700;color:var(--accent);line-height:1.5}
+.vspin-head .vspin-close{padding:4px 12px;font-size:13px}
+.vs-result{margin-top:6px;font-weight:700;color:var(--accent)}
