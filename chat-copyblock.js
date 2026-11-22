@@ -1,11 +1,43 @@
 "use strict";
-// ===== 「/c 」コピー専用メッセージ =====
-// ・メッセージの先頭に「/c 」と書いて送ると、そのあとの文章だけを「コピー用の枠」＋「📋コピー」ボタンで表示する。
-//   例：「/c aaa」と送ると、相手の画面には「aaa」だけが、コピーしやすい枠に入って表示される（「/c」自体は表示されない）。
+// ===== 「/c」コピー専用メッセージ =====
+// ・「/c」の使いかたは3とおり（cpExtractBody が判定）：
+//   ① 1行目に「/c あああ」のように、半角/全角スペースをはさんで文章を続ける → そのあとぜんぶをコピー対象にする
+//   ② 「/c」だけの行を文章の先頭につける → その行より下をぜんぶコピー対象にする
+//   ③ 「/c」だけの行を文章の最後につける → その行より上をぜんぶコピー対象にする
+//   ④ 「/c」だけの行を2つ（はさむように）置く → 2つの「/c」行のあいだだけをコピー対象にする
+//   そのコピー対象だけを「コピー用の枠」＋「📋コピー」ボタンで表示する（「/c」の行自体は表示されない）。
 // ・右クリック／長押しメニューを止めている画面でも、ボタン1つで確実にコピーできるようにするための機能。
 // ・メンション（@名前）やリンク化（link-copy.js）はしない。コピーしたときに、余計な印がつかないようにするため。
+
+// 「/c」だけの行かどうか（前後の半角・全角スペースは無視する）
+function cpIsMarkerLine(line){ return String(line).replace(/^[ 　]+|[ 　]+$/g,"") === "/c"; }
+
+// 送られた文章から、コピーしたい本文だけを取り出す。対象が無ければ null
+function cpExtractBody(raw){
+    raw = String(raw || "");
+    var lines = raw.split(/\r?\n/);
+    var markers = [];
+    for(var i = 0; i < lines.length; i++) if(cpIsMarkerLine(lines[i])) markers.push(i);
+
+    var body = null;
+    if(markers.length >= 2){
+        var first = markers[0], last = markers[markers.length - 1];
+        body = lines.slice(first + 1, last).join("\n");
+    }else if(markers.length === 1){
+        var idx = markers[0];
+        if(idx === lines.length - 1) body = lines.slice(0, idx).join("\n");   // 最後の行 →「ここより上」
+        else body = lines.slice(idx + 1).join("\n");                          // 先頭・途中の行 →「ここより下」
+    }else{
+        // 独立した「/c」行が無いときは、1行目の「/c 文章」（同じ行にスペースをはさんで続ける書きかた）を見る
+        var m = /^\/c[ 　]+/.exec(raw);
+        if(m) body = raw.slice(m[0].length);
+    }
+    if(body === null) return null;
+    body = body.replace(/^\n+/,"").replace(/\n+$/,"");   // 前後の空行だけ整える（打ちまちがいの余分な改行を減らす）
+    return body || null;
+}
+
 (function () {
-    var CMD_RE = /^\/c(?:[ 　]+|\r?\n|$)/;
 
     function toast(msg) {
         try { if (typeof window.showToast === "function") { window.showToast(msg); return; } } catch (_e) { /* 続行 */ }
@@ -37,11 +69,8 @@
         var prev = window.AREText.format;
         window.AREText.format = function (escaped, item) {
             var raw = item && typeof item.text === "string" ? item.text : "";
-            var m = CMD_RE.exec(raw);
-            if (m) {
-                var body = raw.slice(m[0].length);
-                if (body) return render(body);
-            }
+            var body = cpExtractBody(raw);
+            if (body) return render(body);
             return typeof prev === "function" ? prev.call(this, escaped, item) : escaped;
         };
         window.AREText.__copyBlock = true;

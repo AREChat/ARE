@@ -2,9 +2,7 @@
 // ===== メッセージ操作メニューに「コピー」ボタン（📋）を追加 =====
 // ・文章のメッセージに 📋 コピー ボタンを出す。押すと、その文章をそのままクリップボードにコピーする。
 // ・右クリック／長押しメニューを止めている画面でも、ボタン1つで確実にコピーできるようにするための機能。
-// ・「/c 」で始まるメッセージ（chat-copyblock.js の専用表示）は、「/c 」を取りのぞいた本文だけをコピーする。
-const CP_CMD_RE = /^\/c(?:[ 　]+|\r?\n|$)/;
-
+// ・「/c」つきのメッセージ（chat-copyblock.js の専用表示）は、同じ判定（cpExtractBody）でコピー対象の本文だけをコピーする。
 function cpFallbackCopy(text){
     const ta = document.createElement("textarea");
     ta.value = text; ta.setAttribute("readonly",""); ta.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
@@ -26,8 +24,8 @@ function initCopyTool(){
         when:(m,item) => item.type === "text" && !!String(item.text || "").trim(),
         run:(m,item) => {
             const raw = String(item.text || "");
-            const match = CP_CMD_RE.exec(raw);
-            cpCopyText(match ? raw.slice(match[0].length) : raw);
+            const body = cpExtractBody(raw);
+            cpCopyText(body !== null ? body : raw);
         }
     });
 }
