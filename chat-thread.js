@@ -77,7 +77,9 @@ async function onThreadAction(action, node){
 
 async function saveMedia(message, item){
     const row = el.messages.querySelector('article[data-mid="' + String(message.id).replace(/[^0-9a-f-]/gi, "") + '"]');
-    const node = row && row.querySelector("img, video, audio, a.file-card, source");
+    // 送信者のアバター画像（.message-avatar内）を誤って拾わないよう、本文（.bubble）の中だけを探す
+    const bubble = row && row.querySelector(".bubble");
+    const node = bubble && bubble.querySelector("img, video, audio, a.file-card, source");
     const url = node ? (node.currentSrc || node.src || node.href) : (item.url || "");
     if(!url){ showToast("保存できるファイルが見つかりません。読み込みが終わってからもう一度押してください。"); return; }
     try{

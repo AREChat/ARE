@@ -167,6 +167,9 @@ html,body{height:100%}
  .composer textarea{min-height:44px;resize:none;border-radius:22px;padding:11px 14px}
  .composer .button{min-height:44px;border-radius:22px;padding:0 18px}
  .char-count{display:none}
+ /* 文字入力中（キーボード表示中）は、ツール行をたたんで会話をより見やすくする */
+ .composer.kb-focus .composer-tools{display:none}
+ .composer.kb-focus{padding-bottom:calc(6px + env(safe-area-inset-bottom))}
  .schedule-panel{flex-direction:column;align-items:stretch}
  .admin-panel>header{padding:calc(10px + env(safe-area-inset-top)) 12px 10px}
  .admin-body{padding:12px 12px calc(12px + env(safe-area-inset-bottom))}
@@ -242,7 +245,7 @@ html,body{height:100%}
 #drReason{width:100%;box-sizing:border-box;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--panel);color:var(--text);resize:vertical}
 
 /* ===== 第1弾の機能（メニュー・返信・リアクション・固定・検索・入力中・音声・スタンプ・メンション） ===== */
-.pin-bar[hidden],#blockBtn[hidden],#voiceCancel[hidden],.reply-bar[hidden],.emoji-panel[hidden],.mention-box[hidden]{display:none}
+.pin-bar[hidden],#blockBtn[hidden],#voiceCancel[hidden],.reply-bar[hidden],.emoji-panel[hidden],.mention-box[hidden],.emoji-cattabs[hidden]{display:none}
 .pin-bar{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);background:#1d2a48;color:var(--text);padding:9px 16px;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .typing-line{min-height:16px;font-size:12px;color:var(--muted);padding:0 4px 4px}
 .msg-top{display:flex;flex-direction:column;gap:3px;margin:0 0 4px;font-size:11px;color:var(--muted)}
@@ -272,9 +275,16 @@ html,body{height:100%}
 .reply-bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .emoji-panel{margin-bottom:10px;padding:8px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
 .emoji-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}.emoji-tabs button{padding:5px 9px;font-size:12px}
-.emoji-grid{display:flex;flex-wrap:wrap;gap:2px;max-height:150px;overflow:auto}
+.emoji-search-row{margin-bottom:6px}
+.emoji-search{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:999px;background:var(--panel2);color:var(--text);font-size:14px;outline:none}
+.emoji-grid{display:flex;flex-wrap:wrap;gap:2px;max-height:190px;overflow:auto}
 .emoji-btn{border:0;background:none;font-size:22px;padding:4px 6px;border-radius:8px}.emoji-btn:hover{background:var(--panel2)}
 .emoji-grid.stamps .emoji-btn{font-size:36px;padding:6px 10px}
+.emoji-cattabs{display:flex;gap:2px;margin-top:6px;padding-top:6px;border-top:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
+.emoji-cattabs::-webkit-scrollbar{display:none}
+.emoji-cattab{flex:0 0 auto;border:0;background:none;font-size:18px;padding:5px 8px;border-radius:8px;opacity:.55}
+.emoji-cattab.on{opacity:1;background:var(--panel2)}
+.emoji-cattab:hover{opacity:1}
 .mention-box{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}.mention-box button{padding:4px 10px;font-size:13px}
 .sr-results{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
 .sr-item{text-align:left;color:var(--text);width:100%;font-size:14px}
@@ -652,6 +662,9 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .lt-btn{font:inherit;font-size:13px;font-weight:700;padding:5px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel2,#1b2a52);color:inherit;cursor:pointer}
 .lt-btn:hover{filter:brightness(1.15)}
 .lt-copy{opacity:.9}
+.lt-big{background:var(--accent2);color:#fff;border-color:var(--accent2)}
+.cg-jump{margin-left:auto;flex:0 0 auto;font-size:17px;line-height:1;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:var(--panel2);color:var(--text);cursor:pointer}
+.cg-jump:hover{filter:brightness(1.2)}
 
 /* 日付の区切り */
 .date-sep{align-self:center;text-align:center;margin:10px 0 4px;position:relative;width:100%}

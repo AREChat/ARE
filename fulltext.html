@@ -1,0 +1,141 @@
+<!doctype html>
+<!-- チャットの「500文字をこえる、すべて表示」専用ページ（chat-longtext.js の window.open から開く）
+     ・本文は sessionStorage 経由で受け取る（window.open 元の同じオリジンのタブでだけ引き継がれる）
+     ・右クリック・なぞってのコピー・F12などは、できるだけ止める（完全には止められないが、ふつうの操作では止まる）
+     ・コピーは、リンクの「📋コピー」ボタンと、「/c」の「📋 コピー」ボタンからだけ行える -->
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>すべて表示｜ARE</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#141b2d;--panel2:#1b253a;--line:#2b3851;--text:#edf2ff;--muted:#9aa8c2;--accent:#7c9cff;--accent2:#5578ed;--danger:#ff7777;--success:#5de0b0}
+*{box-sizing:border-box}
+html,body{min-height:100%}
+body{
+    margin:0;min-height:100vh;background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    display:flex;flex-direction:column;align-items:center;padding:28px 16px 56px;
+    -webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
+}
+.bg-glow{
+    position:fixed;inset:0;z-index:-1;pointer-events:none;
+    background-image:
+        radial-gradient(circle at 18% 12%, color-mix(in srgb,var(--accent) 24%,transparent), transparent 42%),
+        radial-gradient(circle at 85% 18%, color-mix(in srgb,var(--accent2) 18%,transparent), transparent 40%),
+        radial-gradient(circle at 70% 90%, color-mix(in srgb,var(--success) 10%,transparent), transparent 45%);
+}
+.card{
+    width:min(760px,100%);background:var(--panel);border:1px solid var(--line);border-radius:20px;
+    padding:22px 22px 26px;box-shadow:0 18px 48px rgba(0,0,0,.5);
+}
+.card header{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:14px;margin-bottom:16px}
+.card header h1{margin:0;font-size:18px;font-weight:800}
+.card header p{margin:0;color:var(--muted);font-size:12.5px}
+.content{
+    line-height:1.8;font-size:15.5px;white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;
+}
+.content .msg-link,.content a{color:var(--accent);word-break:break-all;text-decoration:underline;-webkit-user-select:none;user-select:none}
+.content .link-copy{margin-left:6px;padding:2px 9px;font-size:12px;line-height:1.5;border:1px solid currentColor;border-radius:999px;background:transparent;color:inherit;cursor:pointer;opacity:.85;-webkit-user-select:none;user-select:none}
+.content .link-copy:hover{opacity:1}
+.content .mention{color:#9ec1ff;font-weight:600}
+.content .mention.me{background:#3a4c86;border-radius:5px;padding:0 3px;color:#fff}
+.content .cb-block{margin:12px 0}
+.content .cb-text{
+    margin:0 0 8px;padding:10px 12px;border-radius:12px;background:rgba(127,127,127,.14);
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13.5px;line-height:1.6;
+    white-space:pre-wrap;word-break:break-all;-webkit-user-select:none;user-select:none;
+}
+.content .cb-copy{
+    padding:7px 16px;font-size:13.5px;font-weight:800;border:0;border-radius:999px;
+    background:var(--accent2);color:#fff;cursor:pointer;box-shadow:0 4px 14px color-mix(in srgb,var(--accent2) 45%,transparent);
+}
+.content .cb-copy:hover{filter:brightness(1.12)}
+.notice{margin-top:18px;padding-top:14px;border-top:1px solid var(--line);font-size:12px;line-height:1.7;color:var(--muted)}
+.actions{margin-top:16px;display:flex;justify-content:flex-end}
+.close-btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:10px;padding:9px 18px;font-size:14px;cursor:pointer;font-weight:700}
+.close-btn:hover{filter:brightness(1.15)}
+.empty{color:var(--muted);font-size:14px;line-height:1.8}
+.toast{
+    position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);
+    background:#222;color:#fff;padding:9px 18px;border-radius:999px;font-size:14px;z-index:9999;
+    opacity:0;pointer-events:none;transition:opacity .2s;max-width:88vw;text-align:center;
+}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="bg-glow" aria-hidden="true"></div>
+<main class="card">
+    <header>
+        <h1>📄 すべて表示</h1>
+        <p>コピーは、下の📋ボタンから行ってください（右クリック・なぞってのコピーはできません）</p>
+    </header>
+    <div class="content" id="ftContent"></div>
+    <div class="notice">このページは文章をまとめて見るための専用ページです。コピーは、リンクの「📋コピー」ボタンや「/c」の「📋 コピー」ボタンだけで行えます。</div>
+    <div class="actions"><button type="button" class="close-btn" id="ftClose">閉じる</button></div>
+</main>
+<div class="toast" id="ftToast" role="status" aria-live="polite"></div>
+<script>
+(function(){
+    "use strict";
+    function toast(msg){
+        var t = document.getElementById("ftToast"); if(!t) return;
+        t.textContent = msg; t.classList.add("show");
+        clearTimeout(toast._t); toast._t = setTimeout(function(){ t.classList.remove("show"); }, 2200);
+    }
+    function fallbackCopy(text){
+        var ta = document.createElement("textarea");
+        ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;left:-9999px;top:0;opacity:0";
+        document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+        var ok = false; try{ ok = document.execCommand("copy"); }catch(_e){ ok = false; }
+        ta.remove(); return ok;
+    }
+    function copyText(text){
+        function done(ok){ toast(ok ? "コピーしました 📋" : "コピーできませんでした。"); }
+        if(navigator.clipboard && window.isSecureContext){
+            navigator.clipboard.writeText(text).then(function(){ done(true); }, function(){ done(fallbackCopy(text)); });
+        }else{ done(fallbackCopy(text)); }
+    }
+
+    // ---- 本文の読みこみ（sessionStorage 経由：同じオリジンへ window.open で開くと引き継がれる）----
+    var box = document.getElementById("ftContent");
+    try{
+        var id = new URLSearchParams(location.search).get("id");
+        var raw = id ? sessionStorage.getItem("areFulltext:" + id) : null;
+        var data = raw ? JSON.parse(raw) : null;
+        if(data && typeof data.html === "string" && data.html.trim()){
+            box.innerHTML = data.html;
+        }else{
+            box.innerHTML = '<p class="empty">表示する文章が見つかりませんでした。チャット画面の「📄 すべて表示」ボタンから、開きなおしてください。</p>';
+        }
+    }catch(_e){
+        box.innerHTML = '<p class="empty">文章を読みこめませんでした。チャット画面から、開きなおしてください。</p>';
+    }
+
+    // ---- コピー用ボタン（リンクの📋コピー／「/c」の📋コピー）----
+    document.addEventListener("click", function(e){
+        var lc = e.target.closest && e.target.closest(".link-copy");
+        if(lc){ e.preventDefault(); e.stopPropagation(); copyText(lc.getAttribute("data-copy") || ""); return; }
+        var cb = e.target.closest && e.target.closest(".cb-copy");
+        if(cb){ e.preventDefault(); e.stopPropagation(); copyText(decodeURIComponent(cb.getAttribute("data-cb") || "")); return; }
+    }, true);
+
+    document.getElementById("ftClose").addEventListener("click", function(){ try{ window.close(); }catch(_e){} });
+
+    // ---- 右クリック・文字をなぞってのコピー・F12などを、できるだけ止める（完全には止められません）----
+    document.addEventListener("contextmenu", function(e){ e.preventDefault(); }, true);
+    document.addEventListener("selectstart", function(e){ e.preventDefault(); }, true);
+    document.addEventListener("dragstart", function(e){ e.preventDefault(); }, true);
+    document.addEventListener("keydown", function(e){
+        var k = e.key || "";
+        var devtoolKey = k === "F12" ||
+            ((e.ctrlKey || e.metaKey) && e.shiftKey && /^[IJCijc]$/.test(k)) ||
+            ((e.ctrlKey || e.metaKey) && /^[UuSs]$/.test(k));
+        if(devtoolKey){ e.preventDefault(); e.stopPropagation(); }
+    }, true);
+})();
+</script>
+</body>
+</html>

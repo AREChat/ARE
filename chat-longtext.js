@@ -1,11 +1,11 @@
 "use strict";
-// ===== チャットの長い文章：100文字をこえたら「すべて見る」で折りたたむ =====
-// ・100文字（絵文字も1文字）をこえる文字のメッセージは、最初の100文字だけ見せて、あとは「すべて見る」にします（長文が目立たない）。
-// ・「すべて見る」を押すと全文が出ます（最大4,000文字。入力欄の上限と同じ）。「閉じる」でもどせます。
+// ===== チャットの長い文章：500文字をこえたら新しいタブで「すべて表示」 =====
+// ・500文字以下のメッセージは、短くても長くても、そのまま全部その場に表示します（折りたたみはしません）。
+// ・500文字をこえるメッセージは（リンクが入っていても）、画面の中で広げず「すべて表示」ボタンから新しいタブ（fulltext.html）で見る。
+//   新しいタブは、コピーのしかたを決められた場所（リンクの📋ボタン・「/c」のコピーボタン）にしぼり、右クリックや文字をなぞってのコピーはできない。
 // ・全文は、文字をなぞって選べます（コピーできます）。「コピー」ボタンで全部をまとめてコピーもできます。
 (function(){
-    var LIM = 100, MAX = 4000;
-    var open = Object.create(null);           // 開いているメッセージ（再描画されても、開いたまま）
+    var LIM = 100, MAX = 4000, BIG = 500;
     var busy = false;
     function cps(s){ return Array.from(String(s || "")); }
 
@@ -33,54 +33,50 @@
     }
 
     function plain(b){ return cps(b.textContent).length; }
-    function isPlainText(b){
-        // リンク（URL）が入っているメッセージは、文字数に関係なく常に全文を表示する。
-        // 折りたたんだあとに別の処理でURLをリンク化する画面があり、折りたたみが先に起きると
-        // 「クリックできる文字」だけが途中で切れて、途中までのURLでリンクが作られてしまう
-        // （開こうとすると「ファイルが存在しません」になる）。それを防ぐため、まだ<a>になっていない
-        // 生の文字の時点でURLらしきものを見つけたら、その場で折りたたみをやめる。
-        if(b.classList.contains("edit") || b.classList.contains("itn-cd") || b.querySelector("textarea,input,audio,video,img,.attachment,iframe,canvas,a[href],.cb-block")) return false;
-        if(/https?:\/\//.test(b.textContent)) return false;
-        return true;
+    // 添付（画像・動画・音声・ファイルなど）や編集中の入力欄は、文章の折りたたみ・全文表示の対象にしない
+    function isMedia(b){
+        return b.classList.contains("edit") || b.classList.contains("itn-cd") ||
+            !!b.querySelector("textarea,input,audio,video,img,.attachment,iframe,canvas");
     }
-    function bar(label, kind){
-        return '<div class="lt-row"><button type="button" class="lt-btn" data-lt="' + kind + '">' + label + '</button>' +
-            (kind === "close" ? '<button type="button" class="lt-btn lt-copy" data-lt="copy">コピー</button>' : '') + '</div>';
+    // まだ <a> になっていない、生の文字のままの URL が残っていないか（別の画面の後処理でリンク化されるより前に
+    // ここで文字を切ってしまうと、途中までの URL で壊れたリンクができてしまうため、そのときは手を出さない）
+    function rawHasUnlinkedUrl(b){
+        return /https?:\/\//.test(b.textContent) && !b.querySelector("a[href]");
     }
-    function mid(b){ var row = b.closest("[data-mid]"); return row ? row.getAttribute("data-mid") : ""; }
+    function bar(label, kind, extraClass){
+        return '<div class="lt-row"><button type="button" class="lt-btn' + (extraClass ? " " + extraClass : "") + '" data-lt="' + kind + '">' + label + '</button></div>';
+    }
 
     function apply(b){
         if(b.getAttribute("data-lt")) return;
-        if(!isPlainText(b)) { b.setAttribute("data-lt", "x"); return; }
-        if(plain(b) <= LIM){ b.setAttribute("data-lt", "x"); return; }
+        if(isMedia(b)){ b.setAttribute("data-lt", "x"); return; }
+        if(rawHasUnlinkedUrl(b)){ b.setAttribute("data-lt", "x"); return; }
         var full = document.createElement("div"); full.innerHTML = b.innerHTML;
-        b.__ltFull = full;
-        var id = mid(b);
-        b.setAttribute("data-lt", open[id] ? "o" : "c");
-        if(open[id]) showFull(b); else showShort(b);
+        var len = plain({textContent: full.textContent});
+        // 500文字をこえるメッセージは、リンクや「/c」コピー枠が入っていても、新しいタブの「すべて表示」にする
+        if(len > BIG){
+            b.__ltFull = full;
+            b.setAttribute("data-lt", "b");
+            showBig(b, len);
+            return;
+        }
+        // 500文字以下は、短くても長くても折りたたまず、そのまま表示する
+        b.setAttribute("data-lt", "x");
     }
-    function showShort(b){
+    function showBig(b, len){
         var d = b.__ltFull.cloneNode(true);
         trim(d, LIM);
-        b.innerHTML = '<div class="lt-text">' + d.innerHTML + '…</div>' + bar("すべて見る（" + cps(b.__ltFull.textContent).length + "文字）", "more");
-        b.setAttribute("data-lt", "c");
+        b.innerHTML = '<div class="lt-text">' + d.innerHTML + '…</div>' + bar("📄 すべて表示（" + len + "文字）", "big", "lt-big");
+        b.setAttribute("data-lt", "b");
     }
-    function showFull(b){
-        var d = b.__ltFull.cloneNode(true), over = plain({textContent: d.textContent}) > MAX;
-        if(over) trim(d, MAX);
-        b.innerHTML = '<div class="lt-text lt-full">' + d.innerHTML + (over ? "…" : "") + '</div>' + bar("閉じる", "close");
-        b.setAttribute("data-lt", "o");
-    }
-    function copyText(t){
-        function fallback(){
-            var ta = document.createElement("textarea"); ta.value = t; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;left:-9999px;top:0";
-            document.body.appendChild(ta); ta.select(); var ok = false; try{ ok = document.execCommand("copy"); }catch(_e){} ta.remove(); return ok;
-        }
-        function done(ok){ try{ if(typeof showToast === "function") showToast(ok ? "コピーしました" : "コピーできませんでした。文字をなぞって、コピーしてください。"); }catch(_e){} }
+    // 新しいタブ（fulltext.html）に全文を渡す。同じオリジンへ window.open（noopener を付けない）で開くと、
+    // sessionStorage がそのまま引き継がれるので、それを使って本文（すでにリンク化・/c処理ずみのHTML）を渡す。
+    function openBig(b){
         try{
-            if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ done(true); }, function(){ done(fallback()); }); return; }
-        }catch(_e){}
-        done(fallback());
+            var id = (crypto && crypto.randomUUID) ? crypto.randomUUID() : ("ft" + Date.now() + Math.random().toString(36).slice(2));
+            sessionStorage.setItem("areFulltext:" + id, JSON.stringify({html: b.__ltFull.innerHTML, ts: Date.now()}));
+            window.open("fulltext.html?id=" + encodeURIComponent(id), "_blank");
+        }catch(_e){ try{ if(typeof showToast === "function") showToast("すべて表示を開けませんでした。"); }catch(_e2){} }
     }
 
     function scan(){
@@ -98,10 +94,8 @@
             var btn = ev.target.closest && ev.target.closest(".lt-btn"); if(!btn) return;
             ev.preventDefault(); ev.stopPropagation();
             var b = btn.closest(".bubble"); if(!b || !b.__ltFull) return;
-            var kind = btn.getAttribute("data-lt"), id = mid(b);
-            if(kind === "more"){ open[id] = 1; showFull(b); }
-            else if(kind === "close"){ delete open[id]; showShort(b); try{ b.scrollIntoView({block: "nearest"}); }catch(_e){} }
-            else if(kind === "copy"){ copyText(cps(b.__ltFull.textContent).slice(0, MAX).join("")); }
+            var kind = btn.getAttribute("data-lt");
+            if(kind === "big"){ openBig(b); }
         }, true);
         scan();
     }
