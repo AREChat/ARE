@@ -1,0 +1,51 @@
+name: ワークフロー履歴のおそうじ
+
+# 自動：毎日 0:00（日本時間）。手動（Actions タブ →「ワークフロー履歴のおそうじ」→ Run workflow）でも動きます。
+# 履歴が 10 件以上たまっていたら、いちばん新しい 1 件だけ残して、あとは削除します（10 件未満なら何もしません）。
+# ※ まだ動いている途中の実行は消せないので、そのまま残します。
+# ※ cron は UTC で書くため、日本時間の 0:00 ＝ UTC の 15:00。GitHub の混み具合で数分〜数十分おくれることがあります。
+on:
+  schedule:
+    - cron: "0 15 * * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+concurrency:
+  group: cleanup-runs
+  cancel-in-progress: false
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 履歴を数えて、古いものを削除する
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          THRESHOLD: "10"
+          KEEP: "1"
+        run: |
+          set -euo pipefail
+          # 新しい順に、全部の実行の id と状態を取ってくる
+          gh api --paginate "repos/$REPO/actions/runs?per_page=100" \
+            --jq '.workflow_runs[] | "\(.id) \(.status)"' > runs.txt
+          total=$(wc -l < runs.txt)
+          echo "いまの履歴：${total} 件"
+          if [ "$total" -lt "$THRESHOLD" ]; then
+            echo "${THRESHOLD} 件未満なので、何もしません。"
+            exit 0
+          fi
+          tail -n +"$((KEEP + 1))" runs.txt | while read -r id status; do
+            if [ "$id" = "${{ github.run_id }}" ] || [ "$status" != "completed" ]; then
+              echo "残す（動いている途中）：$id ($status)"
+              continue
+            fi
+            if gh api -X DELETE "repos/$REPO/actions/runs/$id" --silent; then
+              echo "削除：$id"
+            else
+              echo "::warning::削除できませんでした：$id"
+            fi
+          done
+          echo "おそうじ完了。"
