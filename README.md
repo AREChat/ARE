@@ -11,8 +11,8 @@ HTML・CSS・JavaScript だけで作った静的サイトを **GitHub Pages** �
 
 | 分類 | 機能 |
 |---|---|
-| アカウント | 登録（ログインID・表示名・パスワードだけ。電話・メールは求めない）、ログイン、パスワードの目のボタン、復旧コードでの再設定、「お試しではじめる」（登録不要。管理者とは無制限・ほかのユーザーへは合計5件まで。ログアウトで削除） |
-| チャット | 1対1／グループ、画像・動画・ファイル（PDF・Office・テキスト・ZIP など約114種類。危険な種類は送れない）、既読（オン・オフ可）、在席状況、編集、削除の申請（管理者が承認）、予約送信。**50MBをこえる動画・ファイルは、運営のGoogleドライブに置いてリンクで送る**（1つ1000GBまで・中断しても再開できる）。送ったファイルは30日たつとチャットから消え、運営のドライブの保管場所に移る |
+| アカウント | 登録（ログインID・表示名・パスワードだけ。電話・メールは求めない）、ログイン、パスワードの目のボタン、復旧コードでの再設定、「お試しではじめる」（登録不要。管理者とは無制限・ほかのユーザーへは合計5件まで。**ログアウトするか、タブを閉じる（ページを離れる）と、その場でアカウントごと削除**。合図が届かなかったときの保険として、10分以上まったく使われないものは5分ごとの自動処理で消え、さらに2日放置でも消える） |
+| チャット | 1対1／グループ、画像・動画・ファイル（PDF・Office・テキスト・ZIP など約114種類。危険な種類は送れない）、既読（オン・オフ可）、未読バッジ（**別の端末で読むと、この端末の未読も自動で消える**）、在席状況、編集、削除の申請（管理者が承認）、予約送信。**50MBをこえる動画・ファイルは、運営のGoogleドライブに置いてリンクで送る**（1つ1000GBまで・中断しても再開できる）。送ったファイルは30日たつとチャットから消え、運営のドライブの保管場所に移る |
 | メッセージ操作 | 返信・引用、転送、絵文字リアクション、重要メッセージの固定、メッセージ検索、入力中の表示、音声メッセージ、絵文字・スタンプ、メンション、ブロック・ミュート |
 | グループ | グループ名、注意事項、参考資料のリンク、アンケート、メンバーの追加・退出 |
 | つながり | プロフィール編集（アイコン・ステータス・自己紹介）、投稿、フォロー、ユーザー検索、おすすめの非表示 |
@@ -103,8 +103,8 @@ chatbot.txt           チャットボットの回答データ（自由に編集�
 1. **接続先**：`apikey.js` に、プロジェクトの URL と公開キー（`sb_publishable_…`）を書く。`service_role` キーは**絶対に書かない**。
 2. **データベース**：テーブル・関数・保護ルール（RLS）は、Supabase の「Database → Migrations」に順番に記録されています。別のプロジェクトへ移すときは、その順に実行してください。
 3. **Storage**（保存場所・本番の設定、2026-11-22 時点）：`chat-attachments`（非公開。バケットの設定値は大きいが、Supabase 無料プランの「1ファイル50MBまで」という全体の上限が効くので、実際に直接送れるのは50MBまで。これをこえる動画・ファイルは Googleドライブ側に置いてリンクで送る）、`post-images`（非公開・50MB。動画つき投稿のため sql/post_video_v1.sql で広げた）、`avatars`（公開・2MB）、`file-drop`（本人専用のファイル転送・50MB・7日で自動削除）、`ws-docs`（5MB）、`shop-content`（50MB）。
-4. **Edge Functions**（本番に入っているもの・2026-11-22 時点で13個）：`register-user`、`login-user`、`recover-account`、`guest-start`（お試し）、`change-display-name`、`admin-api`、`admin-delete-user`、`admin-manage-user`、`admin-storage`、`send-push`、`cleanup-stories`（ストーリー整理）、`refresh-info`（天気・電車の更新）、`archive-old-files`（30日たったファイルのドライブ移送）。コードの控えは `edge-functions/`（一部）。**本番に入っているものが正**です。
-5. **定期実行（pg_cron）**：拡張機能 `pg_cron` を有効にして登録します。本番は11件（2026-11-22 時点・すべて有効）：`deliver-scheduled-messages`・`deliver-scheduled-content`・`expire-timed-messages`（毎分）、`cleanup-stories-6h`（6時間ごと）、`refresh-info-hourly`・`file-archive-hourly`（毎時）、`live-loc-purge`（15分ごと）、`guest-purge-v1`・`purge-memo-trash`・`purge-old-story-archive`（毎日）、`weekly-admin-message`（毎週）。**GitHub Actions や GitHub の Secret は使いません。**
+4. **Edge Functions**（本番に入っているもの・2026-11-22 時点で15個）：`register-user`、`login-user`、`recover-account`、`guest-start`（お試し）、`guest-bye`（お試しのタブを閉じたときの削除）、`clear-push`（ほかの端末の通知を消す）、`change-display-name`、`admin-api`、`admin-delete-user`、`admin-manage-user`、`admin-storage`、`send-push`、`cleanup-stories`（ストーリー整理）、`refresh-info`（天気・電車の更新）、`archive-old-files`（30日たったファイルのドライブ移送）。コードの控えは `edge-functions/`（一部）。**本番に入っているものが正**です。
+5. **定期実行（pg_cron）**：拡張機能 `pg_cron` を有効にして登録します。本番は12件（2026-11-22 時点・すべて有効）：`deliver-scheduled-messages`・`deliver-scheduled-content`・`expire-timed-messages`（毎分）、`cleanup-stories-6h`（6時間ごと）、`refresh-info-hourly`・`file-archive-hourly`（毎時）、`live-loc-purge`（15分ごと）、`guest-offline-purge-v1`（5分ごと・10分以上使われないお試しを消す）、`guest-purge-v1`・`purge-memo-trash`・`purge-old-story-archive`（毎日）、`weekly-admin-message`（毎週）。**GitHub Actions や GitHub の Secret は使いません。**
 6. **Authentication**：メールの確認や新規登録の設定は、プロジェクトの方針に合わせて確認。パスワードの強さの設定にも、同じ条件（8文字以上・大文字・小文字・数字か記号）を入れておくと二重に守れます。
 7. **管理者の登録**：SQL Editor で、管理者にする人の ID を `private.user_roles` に `role = 'admin'` で入れる。
 

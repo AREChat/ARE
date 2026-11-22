@@ -19,7 +19,7 @@ union all select 'cron', md5(string_agg(jobname||':'||schedule, ',' order by job
 ```
 2つの結果（md5）が同じなら同じ構成です。
 # 定期実行（pg_cron）の確認
-本番は11件が有効のはずです（`cleanup-stories-6h`・`deliver-scheduled-content`・`deliver-scheduled-messages`・`expire-timed-messages`・`file-archive-hourly`・`guest-purge-v1`・`live-loc-purge`・`purge-memo-trash`・`purge-old-story-archive`・`refresh-info-hourly`・`weekly-admin-message`）。
+本番は12件が有効のはずです（`cleanup-stories-6h`・`deliver-scheduled-content`・`deliver-scheduled-messages`・`expire-timed-messages`・`file-archive-hourly`・`guest-offline-purge-v1`・`guest-purge-v1`・`live-loc-purge`・`purge-memo-trash`・`purge-old-story-archive`・`refresh-info-hourly`・`weekly-admin-message`）。
 ```sql
 select jobname, schedule, active from cron.job order by jobname;
 select status, start_time from cron.job_run_details order by start_time desc limit 5;

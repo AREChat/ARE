@@ -25,6 +25,7 @@ function hrHide(id){
         hr.ids.add(id); hrSave();
     // 隠す前までの未読は「読んだ」ことにする（隠した直後に、古い未読で すぐ戻ってしまわないように）
     try{ if(typeof nfMarkSeen === "function") nfMarkSeen(id); }catch(_e){ /* 続行 */ }
+    try{ Promise.resolve(requireClient().rpc("mark_room_read",{p_room_id:id})).catch(() => {}); }catch(_e){ /* ほかの端末への同期ができなくても続ける */ }
     hrPaint(); closeSheet();
     showToast("非表示にしました（メッセージは消えていません）。戻すときは「🙈 非表示のチャット」から。");
 }

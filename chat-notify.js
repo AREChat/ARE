@@ -2,11 +2,13 @@
 // ===== 未読バッジ・新着ポップアップ =====
 // ・チャット一覧に未読件数（赤い丸の数字）、左のタブにも合計、ブラウザのタブ名にも「(3)」と表示します。
 // ・新しいメッセージが来たら画面の上にポップアップ（押すとそのチャットが開く）。ブラウザの通知を許可すれば、別のタブを見ていても通知されます。
-// ・「どこまで読んだか」はこの端末のブラウザに保存します（サーバーは使いません）。
+// ・「どこまで読んだか」は、この端末のブラウザに保存するほか、サーバー（chat_room_members.last_read_at）にも記録されます。
+//   別の端末（PC とスマホなど）で そのチャットを読むと、この端末の未読バッジ・ポップアップも自動で消えます
+//   （サーバーの変更通知 ＋ 20 秒ごと／画面に戻ったときの確認。sql/read_sync_v1.sql）。
 // ・ARE のページを開いている間だけ動きます（アプリを閉じている間のプッシュ通知は、無料の範囲ではできません）。
 
 feat.unread = {};
-const nf = {seen:{}, key:"", baseTitle:"", rooms:"", pop:null, timer:null};
+const nf = {seen:{}, key:"", baseTitle:"", rooms:"", pop:null, timer:null, syncBusy:false, syncTimer:null, readTimer:null, readsChannel:null};
 
 function nfLoad(){
     nf.key = "are_seen_" + state.user.id;
@@ -25,13 +27,79 @@ function nfMarkSeen(roomId, iso){
     try{ pushCloseRoomNotifications(roomId); }catch(_e){}
 }
 
-/** 一覧にある部屋の未読数を数え直す（部屋の一覧が変わったとき・戻ってきたとき） */
-async function nfRecount(){
+/** サーバーに記録された「どこまで読んだか」（自分の分だけ）。取れなければ null */
+async function nfFetchReads(){
+    try{
+        const r = await requireClient().rpc("get_my_reads");
+        if(r.error || !Array.isArray(r.data)) return null;
+        const map = {};
+        r.data.forEach((row) => {
+            if(!row || !row.room_id || !row.last_read_at) return;
+            const d = new Date(row.last_read_at);
+            if(!isNaN(d.getTime())) map[row.room_id] = d.toISOString();
+        });
+        return map;
+    }catch(_e){ return null; }
+}
+
+/** 別の端末で読んだ時刻（サーバーの時刻）を取り込む。この端末の「既読の位置」より進んでいれば更新して true を返す。
+    （別の端末が読んだ位置が、この端末より古いときは何もしない） */
+function nfApplyRead(roomId, iso){
+    if(!roomId || !iso) return false;
+    const d = new Date(iso);
+    if(isNaN(d.getTime())) return false;
+    const v = d.toISOString();
+    if(v <= (nf.seen[roomId] || "")) return false;
+    nf.seen[roomId] = v;
+    nfSave();
+    if(feat.unread[roomId]){
+        // 別の端末で読まれた → この端末に出ている通知（ポップアップ・ブラウザ通知）も片づける
+        if(nf.liveNotif[roomId]){ try{ nf.liveNotif[roomId].close(); }catch(_e){} delete nf.liveNotif[roomId]; }
+        try{ pushCloseRoomNotifications(roomId); }catch(_e){}
+    }
+    return true;
+}
+
+/** 別の端末での既読を確認して、未読バッジを合わせる（20 秒ごと・画面に戻ったとき・通信が戻ったとき） */
+async function nfSyncReads(){
+    if(nf.syncBusy || !state.user || !(state.rooms || []).length) return;
+    nf.syncBusy = true;
+    try{
+        const reads = await nfFetchReads();
+        if(!reads) return;
+        let needRecount = false;
+        Object.keys(reads).forEach((id) => {
+            const had = feat.unread[id] > 0;
+            if(nfApplyRead(id, reads[id]) && had) needRecount = true;
+        });
+        if(needRecount) await nfRecount(true);
+    }finally{ nf.syncBusy = false; }
+}
+
+/** サーバーからの変更通知（自分の last_read_at が変わった）を受けたとき */
+function nfOnReadChange(row){
+    if(!row || row.user_id !== state.user.id || !row.room_id || !row.last_read_at) return;
+    const had = feat.unread[row.room_id] > 0;
+    if(nfApplyRead(row.room_id, row.last_read_at) && had){
+        clearTimeout(nf.readTimer);
+        nf.readTimer = setTimeout(() => { nfRecount(true); }, 300);
+    }
+}
+
+/** 一覧にある部屋の未読数を数え直す（部屋の一覧が変わったとき・戻ってきたとき）。
+    「どこまで読んだか」は、サーバーに記録がある部屋はその時刻まで進める（別の端末で読んだ分）。
+    この端末で初めて見る部屋は、サーバーの記録があればその続きから、なければ「いま」から数える */
+async function nfRecount(skipReads){
     const rooms = state.rooms || [];
     if(!rooms.length) return;
+    const reads = skipReads === true ? null : await nfFetchReads();
     const now = new Date().toISOString();
     let changed = false;
-    rooms.forEach((r) => { if(!nf.seen[r.id]){ nf.seen[r.id] = now; changed = true; } });   // 初めて見る部屋は「いま」から数える
+    rooms.forEach((r) => {
+        const sv = reads && reads[r.id];
+        if(!nf.seen[r.id]){ nf.seen[r.id] = sv && sv < now ? sv : now; changed = true; }
+        else if(sv && sv > nf.seen[r.id]){ nf.seen[r.id] = sv; changed = true; }
+    });
     if(changed) nfSave();
     const since = rooms.map((r) => nf.seen[r.id]).sort()[0];
     try{
@@ -118,7 +186,11 @@ function nfOnInsert(m){
     if(!m || m.sender_id === state.user.id) return;
     const room = (state.rooms || []).find((r) => r.id === m.room_id);
     if(!room){ if(typeof loadRooms === "function") setTimeout(loadRooms, 500); return; }
-    if(state.currentRoom && state.currentRoom.id === m.room_id && !document.hidden){ nfMarkSeen(m.room_id, m.created_at); return; }
+    if(state.currentRoom && state.currentRoom.id === m.room_id && !document.hidden){
+        nfMarkSeen(m.room_id, m.created_at);
+        try{ markRead(); }catch(_e){ /* 8 秒ごとの確認でも記録される */ }   // すぐサーバーに記録 → ほかの端末の未読も すぐ消える
+        return;
+    }
     feat.unread[m.room_id] = (feat.unread[m.room_id] || 0) + 1;
     try{ if(typeof cfTouch === "function") cfTouch(m.room_id, m.created_at); }catch(_e){}
     nfPaint();
@@ -144,5 +216,15 @@ function initNotify(){
     });
     requireClient().channel("are-inbox").on("postgres_changes", {event:"INSERT", schema:"public", table:TABLES.messages}, (payload) => nfOnInsert(payload.new)).subscribe();
     feat.timers.push(setInterval(() => { if(!document.hidden) nfRecount(); }, 60000));   // 取りこぼし対策
+    // ===== 未読の同期：ほかの端末で読んだら、この端末の未読も消える =====
+    // ① サーバーの変更通知：自分の last_read_at が変わったら すぐ反映（sql/read_sync_v1.sql で通知を有効にしてある）
+    try{
+        nf.readsChannel = requireClient().channel("are-reads").on("postgres_changes", {event:"UPDATE", schema:"public", table:TABLES.members, filter:"user_id=eq." + state.user.id}, (payload) => nfOnReadChange(payload.new)).subscribe();
+    }catch(_e){ /* 通知が使えなくても、下の ② ③ で同期される */ }
+    // ② 20 秒ごとの確認（通知の取りこぼし対策・画面が見えているときだけ）
+    feat.timers.push(setInterval(() => { if(!document.hidden) nfSyncReads(); }, 20000));
+    // ③ 画面に戻ったとき・ウィンドウが選ばれたとき・通信が戻ったとき
+    window.addEventListener("focus", () => { nfSyncReads(); });
+    window.addEventListener("online", () => { nfSyncReads(); });
     if(state.rooms && state.rooms.length){ nf.rooms = state.rooms.map((r) => r.id).join(","); nfRecount(); nfNotifyBanner(); }
 }
