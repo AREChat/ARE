@@ -232,7 +232,8 @@ const FEATURES = [
     ["guestpin","お試し：管理者チャットを一覧の先頭に固定",initGuestPin],
     ["emergency","緊急ボタン（管理者とチャット）",initEmergency],
     ["reco","友達・社員グループのおすすめ（ランダム・人数選択）",initReco],
-    ["fixreq","修正依頼の共通の部屋（一覧の いちばん上）",initFixReq]   // 一覧の並べ替えのあとに働かせるため、いちばん最後に置く
+    ["fixreq","修正依頼の共通の部屋（一覧の いちばん上）",initFixReq],   // 一覧の並べ替えのあとに働かせるため、いちばん最後に置く
+    ["passbypin","すれ違いタウンの入口を一覧の いちばん上に固定",initPassbyPin]   // これも並べ替えのあとに働かせるため、最後に置く
 ];
 
 function startFeatures(){
