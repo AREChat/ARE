@@ -421,6 +421,17 @@ function bindEvents(){
     el.messageInput.addEventListener("input",updateCharCount);
     el.messageInput.addEventListener("keydown",(event) => {
         if(event.key === "Enter" && !event.shiftKey && !event.isComposing){
+            // 「/c」だけ書いて Enter を押したときは、本文を書く途中とみなして改行だけ入れる（送信しない）。
+            // そのまま送ってしまうと、コピーする文章が無い「/c」だけのメッセージになってしまうため。
+            // （2行目以降を続けて書きたいときは、これまでどおり Shift+Enter でも改行できます）
+            if(el.messageInput.value.trim() === "/c"){
+                event.preventDefault();
+                const i = el.messageInput.selectionStart || el.messageInput.value.length;
+                el.messageInput.value = el.messageInput.value.slice(0,i) + "\n" + el.messageInput.value.slice(i);
+                el.messageInput.selectionStart = el.messageInput.selectionEnd = i + 1;
+                updateCharCount();
+                return;
+            }
             event.preventDefault();
             sendTextMessage();
         }
