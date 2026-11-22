@@ -234,6 +234,7 @@ const FEATURES = [
     ["firsttips","はじめて開く画面の案内ポップアップ",initFirstTips],
     ["adminusers","管理者：ユーザータブでグループ一覧",initAdminUsers],
     ["guestpin","お試し：管理者チャットを一覧の先頭に固定",initGuestPin],
+    ["guestbye","お試し：タブを閉じたら削除",initGuestBye],
     ["emergency","緊急ボタン（管理者とチャット）",initEmergency],
     ["reco","友達・社員グループのおすすめ（ランダム・人数選択）",initReco],
     ["fixreq","修正依頼の共通の部屋（一覧の いちばん上）",initFixReq],   // 一覧の並べ替えのあとに働かせるため、いちばん最後に置く
