@@ -37,6 +37,7 @@ chat-firsttips.js
 chat-reco.js
 chat-emergency.js
 chat-guestpin.js
+chat-guestbye.js
 chat-adminusers.js
 chat-fixreq.js
 chat-passby-pin.js
@@ -92,6 +93,7 @@ chat-split.js
 chat-board.js
 chat-livenote.js
 chat-report.js
+chat-copytool.js
 chat-live.js
 chat-ocr.js
 chat-contact.js
@@ -125,4 +127,5 @@ chat-layout.js
 sw-update.js
 chat-guest.js
 chat-longtext.js
+chat-copyblock.js
 chat-offlinegame.js

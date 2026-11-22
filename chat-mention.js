@@ -29,12 +29,19 @@ function mentionsMe(text){
 }
 
 function initMention(){
-    window.AREText.format = (escaped) => {
+    // link-copy.js・chat-copyblock.js は、ページ読み込み直後からポーリングして window.AREText.format を待つ・包むので、
+    // この初期化（ログイン後など、もっと遅く動く）より先に手を付けていることがある。
+    // ここで単純に上書きすると、先に付いていた分がすべて消えてしまうため、既存の処理があれば包んで残す。
+    const prevFormat = window.AREText.format;
+    const mentionFormat = (escaped) => {
         const regex = mentionRegex();
         if(!regex) return escaped;
         const me = escapeHtml(profileDisplayName(state.profile));
         return escaped.replace(regex,(match,name) => '<span class="mention' + (name === me ? ' me' : '') + '">@' + name + '</span>');
     };
+    window.AREText.format = (typeof prevFormat === "function")
+        ? function(escaped,item){ return prevFormat.call(this,mentionFormat(escaped),item); }
+        : mentionFormat;
     const box = document.createElement("div");
     box.id = "mentionBox";
     box.className = "mention-box";

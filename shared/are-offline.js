@@ -12,7 +12,8 @@
 
   // ---- サービスワーカー ----
   if("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1")){
-    window.addEventListener("load", function(){ try{ navigator.serviceWorker.register(ROOT + "sw.js", {scope: ROOT}).catch(function(){}); }catch(_e){} });
+    // updateViaCache:"none" → 更新確認のときは、GitHub Pages側の sw.js キャッシュ（10分）を無視して、必ず最新を取りに行く
+    window.addEventListener("load", function(){ try{ navigator.serviceWorker.register(ROOT + "sw.js", {scope: ROOT, updateViaCache: "none"}).catch(function(){}); }catch(_e){} });
   }
 
   // ---- 右上の表示 ----

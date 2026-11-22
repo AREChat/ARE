@@ -14,5 +14,12 @@
     if(!reg) return;
     if(reg.waiting) banner(reg);
     reg.addEventListener("updatefound", () => { const w = reg.installing; if(w) w.addEventListener("statechange", () => { if(w.state === "installed" && navigator.serviceWorker.controller) banner(reg); }); });
+    // GitHub Pages は sw.js を数分キャッシュする（CDN）ので、ブラウザまかせの確認を待たず、
+    // 画面を開くたび・フォアグラウンドに戻るたびに「新しい版があるか」を自分から聞きにいく
+    // （これをしないと、デプロイ直後に強制リロードしても、キャッシュされた古い sw.js のままのことがある）
+    const check = () => { reg.update().catch(() => {}); };
+    check();
+    document.addEventListener("visibilitychange", () => { if(!document.hidden) check(); });
+    setInterval(check, 5 * 60 * 1000);
   }).catch(() => {});
 })();

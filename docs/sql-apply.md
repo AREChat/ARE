@@ -1,5 +1,7 @@
 # SQL全適用手順（T413・T494）
-1. `supabase/migrations/` の中を **ファイル名の番号の小さい順** に実行する（開発用DB → 動作確認 → 本番DB）。
-2. 実行は Supabase の SQL Editor、または `supabase db push`。
+（2026-11-22 に、いまの置き場所に合わせて更新しました）
+1. SQL は `sql/` の中にあります。**新しく足すものだけ**、持ち主が Supabase の SQL Editor で実行します（開発用 ARE-dev → 動作確認 → 本番）。どれも、何度実行しても壊れない書き方にしています。
+2. 別のプロジェクトへ丸ごと移すときは、Supabase の「Database → Migrations」に記録された順に実行します。
 3. 終わったら `docs/free-tier-monitoring.md` の「差分チェック」SQLを両方で実行し、md5が一致するか見る。
 4. 消す操作(delete/drop)を含むものは、先に開発用で試し、バックアップ(`docs/backup.md`)を取ってから本番へ。
+5. 名前に `fulltest_` や `_test_` が付くものは、確認用です（最後に巻き戻す形）。本番の仕組みではありません。

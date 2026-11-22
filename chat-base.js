@@ -15,7 +15,7 @@ const MAX_IMAGES = 10;
 
 const MAX_VIDEO_SECONDS = 300;
 
-const MAX_FILE_BYTES = 2 * 1024 * 1024 * 1024;   // 2GB（これをこえるファイルは、これまでどおりドライブへのリンクで送る）
+const MAX_FILE_BYTES = 50 * 1024 * 1024;   // Supabase Free プランは1ファイル50MBが上限（プロジェクト全体の絶対上限）なので、これより大きくしない。これをこえるファイルは、これまでどおりドライブへのリンクで送る
 
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
@@ -55,7 +55,7 @@ async function compressChatImage(file){
     }
 }
 
-// ===== 送れるファイルの種類（ホワイトリスト）：ここに書いた拡張子だけ送れます（約110種類） =====
+// ===== 送れるファイルの種類（ホワイトリスト）：ここに書いた拡張子だけ送れます（約114種類） =====
 // 追加するときは、保存先（Supabase の chat-attachments）の許可リストにも 同じ種類を足してください（sql/chat_attachments_mime_v2.sql）。
 const FILE_MIME_BY_EXT = {
     // 画像・動画（ブラウザが教えてくれる種類をそのまま使う）
@@ -172,7 +172,7 @@ function cacheElements(){
         "refreshUsersButton","userSearch","recommendedUsers","refreshRoomsButton",
         "roomList","backButton","chatAvatar","chatTitle","chatSubtitle",
         "refreshMessagesButton","pageStatus","messages","imageInput","fileInput",
-        "videoInput","attachmentStatus","messageInput","sendButton","charCount","toast","delCard","delStatus","delRequestButton","delCancelButton","newGroupButton","exportOldButton","exportAllButton","postFilter","postVideo","toggleHiddenUsers","postBody","postImage","postImageName","postSubmit","postFeed","postMore","postsRefresh","profileText","profileEditButton","profileModal","profileSheet","sidebar","rail","readReceiptToggle","securityBanner","myStatus","scheduleButton","schedulePanel","scheduleAt","scheduleSubmit","scheduleList","scheduleClose","adminTabButton","adminBadge","adminPanel","adminBody","adminClose"
+        "videoInput","attachmentStatus","messageInput","sendButton","newlineButton","charCount","toast","delCard","delStatus","delRequestButton","delCancelButton","newGroupButton","exportOldButton","exportAllButton","postFilter","postVideo","toggleHiddenUsers","postBody","postImage","postImageName","postSubmit","postFeed","postMore","postsRefresh","profileText","profileEditButton","profileModal","profileSheet","sidebar","rail","readReceiptToggle","securityBanner","myStatus","scheduleButton","schedulePanel","scheduleAt","scheduleSubmit","scheduleList","scheduleClose","adminTabButton","adminBadge","adminPanel","adminBody","adminClose"
     ].forEach((id) => el[id] = $(id));
 }
 
@@ -196,7 +196,7 @@ function shortName(value){
 }
 
 // 日付の区切り（その日のはじめのメッセージの前に「今日」「昨日」「11月9日（月）」を出す）
-function dayKey(value){
+function msgDayKey(value){
     const d = new Date(value);
     return Number.isNaN(d.getTime()) ? "" : d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
 }
@@ -239,6 +239,14 @@ function formatBytes(bytes){
 function setStatus(message, type){
     el.pageStatus.textContent = message || "";
     el.pageStatus.className = "status" + (message ? " show " + (type || "info") : "");
+    window.clearTimeout(setStatus.timeout);
+    // エラー以外（「チャットに接続しました」などの一時的なお知らせ）は、5秒で自動的に消す
+    if(message && type !== "error"){
+        setStatus.timeout = window.setTimeout(() => {
+            el.pageStatus.textContent = "";
+            el.pageStatus.className = "status";
+        },5000);
+    }
 }
 
 function showToast(message){
@@ -326,6 +334,7 @@ function setTab(tab){
 function setChatEnabled(enabled){
     el.messageInput.disabled = !enabled;
     el.sendButton.disabled = !enabled;
+    el.newlineButton.disabled = !enabled;
     el.refreshMessagesButton.disabled = !enabled;
     el.scheduleButton.disabled = !enabled;
     document.querySelectorAll("[data-needs-room]").forEach((node) => { node.disabled = !enabled; });
@@ -418,9 +427,29 @@ function bindEvents(){
         searchTimer = setTimeout(loadRecommendations,250);
     });
     el.sendButton.addEventListener("click",sendTextMessage);
+    el.newlineButton.addEventListener("click",() => {
+        // スマホでは Shift+Enter が使いづらいので、改行専用ボタンで確実に改行だけできるようにする（送信しない）
+        const i = el.messageInput.selectionStart || el.messageInput.value.length;
+        const j = el.messageInput.selectionEnd || i;
+        el.messageInput.value = el.messageInput.value.slice(0,i) + "\n" + el.messageInput.value.slice(j);
+        el.messageInput.selectionStart = el.messageInput.selectionEnd = i + 1;
+        el.messageInput.focus();
+        updateCharCount();
+    });
     el.messageInput.addEventListener("input",updateCharCount);
     el.messageInput.addEventListener("keydown",(event) => {
         if(event.key === "Enter" && !event.shiftKey && !event.isComposing){
+            // 「/c」だけ書いて Enter を押したときは、本文を書く途中とみなして改行だけ入れる（送信しない）。
+            // そのまま送ってしまうと、コピーする文章が無い「/c」だけのメッセージになってしまうため。
+            // （2行目以降を続けて書きたいときは、これまでどおり Shift+Enter でも改行できます）
+            if(el.messageInput.value.trim() === "/c"){
+                event.preventDefault();
+                const i = el.messageInput.selectionStart || el.messageInput.value.length;
+                el.messageInput.value = el.messageInput.value.slice(0,i) + "\n" + el.messageInput.value.slice(i);
+                el.messageInput.selectionStart = el.messageInput.selectionEnd = i + 1;
+                updateCharCount();
+                return;
+            }
             event.preventDefault();
             sendTextMessage();
         }
@@ -889,7 +918,7 @@ function renderMessages(scrollToBottom, onlyIfChanged){
                 '</div>';
         }
 
-        const sep = (msgIdx === 0 || dayKey(state.messages[msgIdx - 1].created_at) !== dayKey(message.created_at)) ? dateSeparator(message.created_at) : "";
+        const sep = (msgIdx === 0 || msgDayKey(state.messages[msgIdx - 1].created_at) !== msgDayKey(message.created_at)) ? dateSeparator(message.created_at) : "";
         return sep + '<article class="message-row' + (own ? ' own' : '') + '" data-mid="' + id + '">' +
             avatar +
             '<div class="message-body"><div class="message-sender">' + escapeHtml(name) + '</div>' +

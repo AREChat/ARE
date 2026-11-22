@@ -92,9 +92,17 @@ function onActivity(){
     if(wasIdle) sendPresence();
 }
 
+const markReadCleared = {};   // room_id -> 最後に「他の端末の通知を消して」と頼んだ時刻（連打防止）
 async function markRead(){
     if(!state.currentRoom || document.hidden) return;
-    try{ await requireClient().rpc("mark_room_read",{p_room_id:state.currentRoom.id}); }catch(_e){}
+    const roomId = state.currentRoom.id;
+    try{ await requireClient().rpc("mark_room_read",{p_room_id:roomId}); }catch(_e){ return; }
+    try{ pushCloseRoomNotifications(roomId); }catch(_e){}
+    const now = Date.now();
+    if(now - (markReadCleared[roomId] || 0) > 8000){
+        markReadCleared[roomId] = now;
+        pushClearRoomOnOtherDevices(roomId);
+    }
 }
 
 async function loadPartnerRead(){

@@ -39,7 +39,7 @@
         // 「クリックできる文字」だけが途中で切れて、途中までのURLでリンクが作られてしまう
         // （開こうとすると「ファイルが存在しません」になる）。それを防ぐため、まだ<a>になっていない
         // 生の文字の時点でURLらしきものを見つけたら、その場で折りたたみをやめる。
-        if(b.classList.contains("edit") || b.classList.contains("itn-cd") || b.querySelector("textarea,input,audio,video,img,.attachment,iframe,canvas,a[href]")) return false;
+        if(b.classList.contains("edit") || b.classList.contains("itn-cd") || b.querySelector("textarea,input,audio,video,img,.attachment,iframe,canvas,a[href],.cb-block")) return false;
         if(/https?:\/\//.test(b.textContent)) return false;
         return true;
     }

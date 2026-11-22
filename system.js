@@ -256,9 +256,10 @@ try { if (window.top !== window.self) { window.top.location = window.self.locati
     async function logout(options) {
         const client = getClient();
 
-        // ログアウトボタンから呼ばれたとき（deleteGuest）だけ、お試しアカウントは その場で完全に消す
-        // （同じ人が何度も作り直して管理者への通知が増えるのを防ぐ。自動ログアウトなどでは消さない）
-        if (options && options.deleteGuest === true) {
+        // お試しアカウントは、どの経路のログアウト（ボタン・「登録する」・自動ログアウト）でも その場で完全に消す
+        // （同じ人が何度も作り直して管理者への通知が増えるのを防ぐ。2026-11-22 ご指示：ログアウトしたら強制削除）。
+        // 消したくない特別な場合だけ、呼ぶ側が { keepGuest: true } を渡す。
+        if (!(options && options.keepGuest === true)) {
             try {
                 const st = await client.rpc("guest_status_me");
                 if (st && st.data && st.data.guest === true) {

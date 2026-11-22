@@ -126,7 +126,8 @@
                 <div id="scheduleList" class="schedule-list"></div>
             </div>
             <div class="composer-bottom">
-                <textarea id="messageInput" maxlength="8000" placeholder="メッセージを入力...（Enterで送信、Shift+Enterで改行）" disabled></textarea>
+                <textarea id="messageInput" maxlength="8000" placeholder="メッセージを入力...（Enterで送信、Shift+Enterか ↵ ボタンで改行）" disabled></textarea>
+                <button class="button-secondary" id="newlineButton" type="button" title="改行（送信しません）" disabled>↵</button>
                 <button class="button" id="sendButton" type="button" disabled>送信</button>
             </div>
             <div class="char-count"><span id="charCount">0</span> / 4,000文字</div>
@@ -156,7 +157,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=142cde572e"></script>
+<script defer src="./chat.bundle.js?v=cf5781a1bd"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>
