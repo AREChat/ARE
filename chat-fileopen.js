@@ -48,6 +48,16 @@
         } catch (_e) { location.href = href; }
     }
 
+    // 添付のURL（メッセージに保存されているもの）は7日で切れる。data-path があれば、開く直前に
+    // 新しい（切れていない）リンクを取り直してから開く（取り直せなかったときは、元のリンクのまま開く）。
+    function freshUrl(u, path) {
+        if (!path || typeof requireClient !== "function" || typeof STORAGE_BUCKET === "undefined") return Promise.resolve(u);
+        return requireClient().storage.from(STORAGE_BUCKET).createSignedUrl(path, 3600).then(function (r) {
+            if (r && r.data && r.data.signedUrl) { try { return new URL(r.data.signedUrl, location.href); } catch (_e) { /* そのまま */ } }
+            return u;
+        }).catch(function () { return u; });
+    }
+
     function handle(e) {
         if (e.type === "auxclick" ? e.button !== 1 : e.button > 0) return;
         var a = e.target && e.target.closest ? e.target.closest("a[href]") : null;
@@ -60,9 +70,13 @@
         var now = Date.now();
         if (last.href === u.href && now - last.time < 600) return;   // 同じ操作を link-copy.js がやり直した分は、もう一度開かない
         last = { href: u.href, time: now };
-        var href = viewerHref(u, nameOf(a, u));
-        if (a.target === "_blank" || e.ctrlKey || e.metaKey || e.shiftKey || e.type === "auxclick") openNewTab(href);
-        else location.href = href;
+        var name = nameOf(a, u);
+        var newTab = a.target === "_blank" || e.ctrlKey || e.metaKey || e.shiftKey || e.type === "auxclick";
+        freshUrl(u, a.dataset.path).then(function (fresh) {
+            var href = viewerHref(fresh, name);
+            if (newTab) openNewTab(href);
+            else location.href = href;
+        });
     }
 
     window.addEventListener("click", handle, true);      // window の捕まえ段階 ＝ ほかのどの処理より先

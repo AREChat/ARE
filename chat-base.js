@@ -792,14 +792,14 @@ function renderMessageContent(content){
     }
 
     if(item.type === "image"){
-        return '<div class="bubble' + (item.stamp ? ' stamp-img' : '') + '"><div class="attachment"><a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer"><img' + dataPath + ' src="' + safeUrl + '" alt="' + safeName + '" loading="lazy"></a><div class="file-meta">' + safeName + '</div></div></div>';
+        return '<div class="bubble' + (item.stamp ? ' stamp-img' : '') + '"><div class="attachment"><a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer"' + dataPath + '><img' + dataPath + ' src="' + safeUrl + '" alt="' + safeName + '" loading="lazy"></a><div class="file-meta">' + safeName + '</div></div></div>';
     }
 
     if(item.type === "video"){
-        return '<div class="bubble"><div class="attachment"><video controls preload="metadata"' + dataPath + ' src="' + safeUrl + '"></video><a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer">' + safeName + '</a>' + size + '</div></div>';
+        return '<div class="bubble"><div class="attachment"><video controls preload="metadata"' + dataPath + ' src="' + safeUrl + '"></video><a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer"' + dataPath + '>' + safeName + '</a>' + size + '</div></div>';
     }
 
-    return '<div class="bubble"><div class="attachment"><a class="file-card" href="' + safeUrl + '" target="_blank" rel="noopener noreferrer" download="' + safeName + '"><span class="file-icon">📄</span><span><span class="file-name">' + safeName + '</span>' + size + '</span></a></div></div>';
+    return '<div class="bubble"><div class="attachment"><a class="file-card" href="' + safeUrl + '" target="_blank" rel="noopener noreferrer" download="' + safeName + '"' + dataPath + '><span class="file-icon">📄</span><span><span class="file-name">' + safeName + '</span>' + size + '</span></a></div></div>';
 }
 
 function mediaBusyInMessages(){

@@ -280,7 +280,7 @@
     }
 
     function showHtml(url, ext) {
-        var viewBtn = $("fvView"), runBtn = $("fvRun"), netBtn = $("fvNet");
+        var runBtn = $("fvRun"), netBtn = $("fvNet");
         return fetch(url.href, { credentials: "omit", cache: "no-store" }).then(function (r) {
             if (!r.ok) throw new Error("http " + r.status);
             return r.arrayBuffer();
@@ -305,18 +305,12 @@
                 return;
             }
             copyText = text; copyBtn.hidden = false;
-            var st = { code: false, run: true, net: false };
+            var st = { run: true, net: false };
             function draw() {
                 main.textContent = "";
-                viewBtn.hidden = false; runBtn.hidden = st.code; netBtn.hidden = st.code || !st.run;   // 外の画像は、プログラムを動かすときだけ 選べる（止めるときは、いちばん固い設定で 何も読まない）
-                viewBtn.textContent = st.code ? "🖥 ページの画面で見る" : "</> コードを見る";
+                runBtn.hidden = false; netBtn.hidden = !st.run;   // 外の画像は、プログラムを動かすときだけ 選べる（止めるときは、いちばん固い設定で 何も読まない）
                 runBtn.textContent = st.run ? "🛡 プログラムを止める" : "▶ プログラムを動かす";
                 netBtn.textContent = st.net ? "🔒 外の画像を読まない" : "🌐 外の画像も読む";
-                if (st.code) {
-                    var pre = document.createElement("pre"); pre.textContent = text; main.appendChild(pre);
-                    metaEl.textContent = "HTML のコード ・ 文字コード：" + label + " ・ " + text.length.toLocaleString() + " 文字";
-                    return;
-                }
                 var tip = document.createElement("div");
                 tip.className = "hnote";
                 tip.textContent = "🛡 安全な枠の中で表示しています（ログイン情報には さわれません・外へのデータ送信は止めています）。" + (st.run ? "" : "プログラム（スクリプト）は 止めています。") + (st.run && st.net ? "" : "ほかのファイル・外の画像やデザインは 読みません。");
@@ -324,7 +318,6 @@
                 main.appendChild(makeFrame(text, st.run, st.net));
                 metaEl.textContent = "HTML のページ ・ 文字コード：" + label;
             }
-            viewBtn.onclick = function () { st.code = !st.code; draw(); };
             runBtn.onclick = function () { st.run = !st.run; draw(); };
             netBtn.onclick = function () { st.net = !st.net; draw(); };
             draw();
