@@ -188,7 +188,7 @@ function cgSortHand(h){ return (h || []).slice().sort((a, b) => (a === "JK") - (
 function openCardGames(){
     if(!state.currentRoom){ showToast("先にチャットを開いてください。"); return; }
     openSheet(toolHead("🂡 カードゲーム（手札かくし）", "手札はサーバーで管理され、相手には見えません。始めると、チャットに参加ボタンが出ます。") +
-        Object.keys(CG_GAMES).map((k) => '<button type="button" class="admin-card more-item" data-t="cg:start" data-g="' + k + '">' + CG_GAMES[k].icon + ' ' + CG_GAMES[k].name + '<small class="meta">' + CG_GAMES[k].desc + '</small></button>').join("") + toolClose());
+        Object.keys(CG_GAMES).map((k) => '<button type="button" class="admin-card more-item" data-t="cg:start" data-g="' + k + '">' + CG_GAMES[k].icon + ' ' + escapeHtml(CG_GAMES[k].name) + '<small class="meta">' + escapeHtml(CG_GAMES[k].desc) + '</small></button>').join("") + toolClose());
 }
 
 function renderCgBubble(item){

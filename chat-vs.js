@@ -43,7 +43,7 @@ function initVs(){
 function openVsSheet(){
     if(!state.currentRoom){ showToast("先にチャットを開いてください。"); return; }
     openSheet(toolHead("🎮 対戦を始める", "相手が同じ画面から手を打つと、対戦が進みます。チャットの中に盤面が出ます。") +
-        Object.keys(VS_GAMES).map((k) => '<button type="button" class="admin-card more-item" data-t="vs:start" data-g="' + k + '">' + VS_GAMES[k].icon + ' ' + VS_GAMES[k].name + '<small class="meta">' + VS_GAMES[k].desc + '</small></button>').join("") + toolClose());
+        Object.keys(VS_GAMES).map((k) => '<button type="button" class="admin-card more-item" data-t="vs:start" data-g="' + k + '">' + VS_GAMES[k].icon + ' ' + escapeHtml(VS_GAMES[k].name) + '<small class="meta">' + escapeHtml(VS_GAMES[k].desc) + '</small></button>').join("") + toolClose());
 }
 
 async function onVsAction(action, node){
