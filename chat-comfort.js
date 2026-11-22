@@ -374,7 +374,7 @@ function openRoomMenu(roomId){
         '<button type="button" data-t="fd:fav" data-room="' + escapeHtml(roomId) + '">' + (F.favs.includes(roomId) ? "⭐ お気に入りを外す" : "⭐ お気に入りに入れる") + '</button>' +
         '<button type="button" data-t="fd:pin" data-room="' + escapeHtml(roomId) + '">' + (F.pins.includes(roomId) ? "📌 固定を外す" : "📌 いちばん上に固定") + '</button>' +
         (typeof isMuted === "function" ? '<button type="button" data-t="fd:mute" data-room="' + escapeHtml(roomId) + '">' + (isMuted(roomId) ? "🔕 通知を再開" : "🔔 このチャットの通知を止める") + '</button>' : "") +
-        (false ? "" : '<button type="button" data-t="fd:hide" data-room="' + escapeHtml(roomId) + '">🙈 このチャットを非表示にする（消えません）</button>') +
+        '<button type="button" data-t="fd:hide" data-room="' + escapeHtml(roomId) + '">🙈 このチャットを非表示にする（消えません）</button>' +
         '<button type="button" data-t="fd:move" data-room="' + escapeHtml(roomId) + '" data-f=""' + (!F.map[roomId] ? ' aria-current="true"' : "") + '>' + (!F.map[roomId] ? "✔ " : "") + '未分類</button>' +
         F.list.map((f) => '<button type="button" data-t="fd:move" data-room="' + escapeHtml(roomId) + '" data-f="' + escapeHtml(f.id) + '">' + (F.map[roomId] === f.id ? "✔ " : "") + '📁 ' + escapeHtml(f.name) + '</button>').join("") + '</div>' +
         (F.list.length ? "" : '<div class="meta">フォルダはまだありません。「その他」→「チャットの整理」で作れます。</div>') + toolClose());

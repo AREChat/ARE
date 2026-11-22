@@ -232,7 +232,7 @@ const FEATURES = [
     ["hiderooms","チャットの非表示（消さずに隠す）",initHideRooms],
     ["segments","ユーザー区分・友達追加・操作方法ボタン",initSegments],
     ["firsttips","はじめて開く画面の案内ポップアップ",initFirstTips],
-    ["adminusers","管理者：ユーザータブでグループ一覧",initAdminUsers],
+    ["adminusers","管理者：ユーザータブでグループ一覧",initAdminUsersBar],
     ["guestpin","お試し：管理者チャットを一覧の先頭に固定",initGuestPin],
     ["guestbye","お試し：タブを閉じたら削除",initGuestBye],
     ["emergency","緊急ボタン（管理者とチャット）",initEmergency],

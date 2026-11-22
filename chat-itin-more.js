@@ -77,7 +77,7 @@ function itnBadgeList(plan){
     if(its.length >= 3 && done.length + st.skip === its.length) B.push("🏁 ぜんぶ おわった");
     return B;
 }
-function itnWrap(g, text, maxW, maxLines){
+function itnWrapG(g, text, maxW, maxLines){
     const out = []; let line = "";
     for(const ch of Array.from(String(text))){
         if(g.measureText(line + ch).width > maxW && line){ out.push(line); line = ch; if(out.length >= maxLines) break; } else line += ch;
@@ -94,22 +94,22 @@ function itnMemoryCanvas(plan){
     const rr = (x, y, w, h, r, fill) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); g.fillStyle = fill; g.fill(); };
     g.textBaseline = "alphabetic"; g.fillStyle = "rgba(255,255,255,.85)"; g.font = "600 34px " + ITN_MFONT; g.fillText("🎴 きょうの 思い出カード", 70, 100);
     g.fillStyle = "#fff"; g.font = "800 74px " + ITN_MFONT;
-    const tl = itnWrap(g, plan.title, W - 140, 2); tl.forEach((s, i) => g.fillText(s, 70, 205 + i * 90));
+    const tl = itnWrapG(g, plan.title, W - 140, 2); tl.forEach((s, i) => g.fillText(s, 70, 205 + i * 90));
     let y = 205 + tl.length * 90 - 20;
     g.font = "500 36px " + ITN_MFONT; g.fillStyle = "rgba(255,255,255,.9)"; g.fillText(itnDateLabel(plan.date), 70, y + 30); y += 80;
     rr(50, y, W - 100, 700, 36, "rgba(255,255,255,.96)");
     const kp = [["完了", st.done + " / " + st.total, "#4b3bd6"], ["待ち時間 合計", st.waitN ? itnDur(st.actAll) : "—", "#e0457b"], ["平均の待ち", st.waitN ? itnDur(st.avg) : "—", "#0e9f6e"]];
     const tw = (W - 100 - 80 - 40) / 3;
-    kp.forEach((k, i) => { const x = 90 + i * (tw + 20); rr(x, y + 30, tw, 170, 24, "#f2f0ff"); g.fillStyle = "#6b7390"; g.font = "500 28px " + ITN_MFONT; g.fillText(k[0], x + 22, y + 78); g.fillStyle = k[2]; g.font = "800 52px " + ITN_MFONT; g.fillText(itnWrap(g, k[1], tw - 30, 1)[0] || "", x + 22, y + 156); });
+    kp.forEach((k, i) => { const x = 90 + i * (tw + 20); rr(x, y + 30, tw, 170, 24, "#f2f0ff"); g.fillStyle = "#6b7390"; g.font = "500 28px " + ITN_MFONT; g.fillText(k[0], x + 22, y + 78); g.fillStyle = k[2]; g.font = "800 52px " + ITN_MFONT; g.fillText(itnWrapG(g, k[1], tw - 30, 1)[0] || "", x + 22, y + 156); });
     let yy = y + 250; g.fillStyle = "#1b2033";
-    if(st.longest){ g.font = "700 36px " + ITN_MFONT; g.fillText("🐢 いちばん待った", 90, yy); g.font = "500 36px " + ITN_MFONT; g.fillStyle = "#4a5170"; itnWrap(g, st.longest.n + "（" + st.longest.aw + "分）", W - 200, 1).forEach((s) => g.fillText(s, 120, yy + 52)); yy += 110; }
+    if(st.longest){ g.font = "700 36px " + ITN_MFONT; g.fillText("🐢 いちばん待った", 90, yy); g.font = "500 36px " + ITN_MFONT; g.fillStyle = "#4a5170"; itnWrapG(g, st.longest.n + "（" + st.longest.aw + "分）", W - 200, 1).forEach((s) => g.fillText(s, 120, yy + 52)); yy += 110; }
     if(st.cmp){ const d = st.expDone - st.actDone; g.fillStyle = "#1b2033"; g.font = "700 36px " + ITN_MFONT; g.fillText("🎯 予想とくらべて", 90, yy); g.font = "600 40px " + ITN_MFONT; g.fillStyle = d >= 0 ? "#0e9f6e" : "#e0457b"; g.fillText(d >= 0 ? itnDur(d) + " 早かった ✨" : itnDur(-d) + " 長かった", 120, yy + 54); yy += 112; }
     const fav = plan.items.filter((x) => x.r >= 4 || x.nt).sort((a, b) => b.r - a.r).slice(0, 3);
     if(fav.length){ g.fillStyle = "#1b2033"; g.font = "700 36px " + ITN_MFONT; g.fillText("⭐ お気に入り・ひとこと", 90, yy); yy += 20;
-        fav.forEach((x) => { yy += 52; g.font = "600 34px " + ITN_MFONT; g.fillStyle = "#3a4163"; const t = (x.r ? "★".repeat(x.r) + " " : "") + x.n; g.fillText(itnWrap(g, t, W - 220, 1)[0], 120, yy); if(x.nt){ g.font = "500 28px " + ITN_MFONT; g.fillStyle = "#6b7390"; yy += 40; g.fillText(itnWrap(g, "「" + x.nt + "」", W - 240, 1)[0], 140, yy); } }); }
+        fav.forEach((x) => { yy += 52; g.font = "600 34px " + ITN_MFONT; g.fillStyle = "#3a4163"; const t = (x.r ? "★".repeat(x.r) + " " : "") + x.n; g.fillText(itnWrapG(g, t, W - 220, 1)[0], 120, yy); if(x.nt){ g.font = "500 28px " + ITN_MFONT; g.fillStyle = "#6b7390"; yy += 40; g.fillText(itnWrapG(g, "「" + x.nt + "」", W - 240, 1)[0], 140, yy); } }); }
     const B = itnBadgeList(plan).slice(0, 4);
     let by = y + 700 + 50;
-    if(B.length){ g.font = "600 34px " + ITN_MFONT; B.forEach((b, i) => { const bx = 70 + (i % 2) * ((W - 140) / 2), byy = by + Math.floor(i / 2) * 78; rr(bx, byy, (W - 140) / 2 - 14, 62, 31, "rgba(255,255,255,.2)"); g.fillStyle = "#fff"; g.fillText(itnWrap(g, b, (W - 140) / 2 - 60, 1)[0], bx + 24, byy + 43); }); }
+    if(B.length){ g.font = "600 34px " + ITN_MFONT; B.forEach((b, i) => { const bx = 70 + (i % 2) * ((W - 140) / 2), byy = by + Math.floor(i / 2) * 78; rr(bx, byy, (W - 140) / 2 - 14, 62, 31, "rgba(255,255,255,.2)"); g.fillStyle = "#fff"; g.fillText(itnWrapG(g, b, (W - 140) / 2 - 60, 1)[0], bx + 24, byy + 43); }); }
     g.fillStyle = "rgba(255,255,255,.8)"; g.font = "500 30px " + ITN_MFONT; g.fillText("ARE 行動予定表で 記録しました", 70, H - 60);
     return c;
 }

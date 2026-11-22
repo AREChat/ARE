@@ -32,7 +32,7 @@ function absPaintBar(){
     bar.innerHTML = '<span class="meta">管理者：グループを見る</span>' + ABS_SEGS.map((s) => '<button type="button" class="fl-chip" data-abs="' + s[0] + '" style="' + (absSt.seg === s[0] ? "border-color:var(--accent,#6aa0ff);font-weight:700" : "") + '">' + s[1] + '</button>').join("") +
         (absSt.seg ? '<button type="button" class="fl-chip" data-abs="' + absSt.seg + '">✕ やめる</button>' : "");
 }
-function initAdminUsers(){
+function initAdminUsersBar(){
     if(typeof refreshAdminBadge === "function"){
         const orig = refreshAdminBadge;
         refreshAdminBadge = async function(){ const r = await orig.apply(this, arguments); try{ absPaintBar(); }catch(_e){ /* 一覧の表示だけの話 */ } return r; };

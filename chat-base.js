@@ -196,7 +196,7 @@ function shortName(value){
 }
 
 // 日付の区切り（その日のはじめのメッセージの前に「今日」「昨日」「11月9日（月）」を出す）
-function dayKey(value){
+function msgDayKey(value){
     const d = new Date(value);
     return Number.isNaN(d.getTime()) ? "" : d.getFullYear() + "-" + d.getMonth() + "-" + d.getDate();
 }
@@ -918,7 +918,7 @@ function renderMessages(scrollToBottom, onlyIfChanged){
                 '</div>';
         }
 
-        const sep = (msgIdx === 0 || dayKey(state.messages[msgIdx - 1].created_at) !== dayKey(message.created_at)) ? dateSeparator(message.created_at) : "";
+        const sep = (msgIdx === 0 || msgDayKey(state.messages[msgIdx - 1].created_at) !== msgDayKey(message.created_at)) ? dateSeparator(message.created_at) : "";
         return sep + '<article class="message-row' + (own ? ' own' : '') + '" data-mid="' + id + '">' +
             avatar +
             '<div class="message-body"><div class="message-sender">' + escapeHtml(name) + '</div>' +
