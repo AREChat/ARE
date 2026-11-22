@@ -1,7 +1,7 @@
 "use strict";
 // ===== 対戦パネル：いま遊んでいる対戦の盤を、画面の上に固定して表示する =====
 // 盤は会話の上のほうに残り、「○○に置きました」は下に積まれていく。→ スクロールしなくても 盤が見えて そのまま打てるようにする。
-feat.vsPin = {panel:null, gid:"", open:false};   // はじめは たたんだ状態（「ゲームプレイ中」の1行だけ）。「ひらく」で盤を出す
+feat.vsPin = {panel:null, gid:"", open:false, closed:{}, announced:{}};   // はじめは たたんだ状態（「ゲームプレイ中」の1行だけ）。「ひらく」で盤を出す
 
 function vsPinFind(){
     if(typeof vsCompute !== "function" || !state.currentRoom) return "";
@@ -26,7 +26,14 @@ function vsPinFind(){
 function vsPinPaint(){
     const v = feat.vsPin;
     if(!v.panel) return;
-    const gid = state.currentRoom ? vsPinFind() : "";
+    let gid = state.currentRoom ? vsPinFind() : "";
+    // さっきまで 遊んでいた対戦が おわったとき：だまって消えずに、盤と結果を のこす（「とじる」を押すまで）
+    let fin = null;
+    if(!gid && v.gid && state.currentRoom && !v.closed[v.gid]){
+        let S = null;
+        try{ S = vsCompute(v.gid); }catch(_e){ S = null; }
+        if(S && S.over){ gid = v.gid; fin = S; }
+    }
     if(!gid){ v.gid = ""; v.panel.hidden = true; v.panel.innerHTML = ""; return; }
     const startMsg = state.messages.find((m) => m.content && m.content.indexOf(gid) >= 0 && (parseMessageContent(m.content) || {}).kind === "start");
     if(!startMsg){ v.panel.hidden = true; return; }
@@ -34,10 +41,12 @@ function vsPinPaint(){
     const body = v.panel.querySelector(".vspin-body");
     const keep = body ? body.scrollTop : 0;
     if(v.gid !== gid) v.open = false;   // あたらしい対戦は、いつも たたんだ状態から
+    const resultText = fin ? "🏁 " + vsResultText(fin) : "";
+    if(fin && !v.announced[gid]){ v.announced[gid] = true; v.open = true; showToast(vsResultText(fin)); }   // おわった瞬間に、一度だけ お知らせして、盤をひらく
     v.gid = gid; v.panel.hidden = false;
     let html = "";
     try{ html = renderGameBubble(item, true); }catch(error){ console.error("[ARE vs pin]", error); v.panel.hidden = true; return; }
-    v.panel.innerHTML = '<div class="vspin-head"><b>🎮 ゲームプレイ中</b>' + ((VS_GAMES[item.game] && VS_GAMES[item.game].name) ? '<span class="meta">' + escapeHtml(VS_GAMES[item.game].name) + '</span>' : '') + '<button type="button" class="button-secondary vspin-toggle" aria-expanded="' + (v.open ? "true" : "false") + '">' + (v.open ? "たたむ" : "ひらく") + '</button></div><div class="vspin-body"' + (v.open ? "" : " hidden") + '>' + html + '</div>';
+    v.panel.innerHTML = '<div class="vspin-head"><b>' + (fin ? '🏁 ゲーム終了' : '🎮 ゲームプレイ中') + '</b>' + ((VS_GAMES[item.game] && VS_GAMES[item.game].name) ? '<span class="meta">' + escapeHtml(VS_GAMES[item.game].name) + '</span>' : '') + '<button type="button" class="button-secondary vspin-toggle" aria-expanded="' + (v.open ? "true" : "false") + '">' + (v.open ? "たたむ" : "ひらく") + '</button>' + (fin ? '<button type="button" class="button-secondary vspin-close">とじる</button>' : '') + '</div>' + (resultText ? '<div class="vspin-result" role="status">' + escapeHtml(resultText) + '</div>' : '') + '<div class="vspin-body"' + (v.open ? "" : " hidden") + '>' + html + '</div>';
     const nb = v.panel.querySelector(".vspin-body"); if(nb) nb.scrollTop = keep;
 }
 
@@ -49,6 +58,7 @@ function initVsPin(){
     v.panel = panel;
     panel.addEventListener("click", (event) => {
         if(event.target.closest(".vspin-toggle")){ v.open = !v.open; vsPinPaint(); return; }
+        if(event.target.closest(".vspin-close")){ if(v.gid) v.closed[v.gid] = true; v.gid = ""; vsPinPaint(); return; }
         const node = event.target.closest("[data-vs]");
         if(!node || node.disabled) return;
         runTool(() => vsAction(node.dataset.vs, node.dataset.k || "move", node.dataset.i));
