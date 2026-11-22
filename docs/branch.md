@@ -1,4 +1,4 @@
 # ブランチ運用（T423）
-- `main`：公開中（GitHub Pages）。直接は 小さな直しだけ。
-- `dev`：作業用。まとまったら main へ プルリクエスト（`.github/pull_request_template.md` の確認欄を埋める）。
-- 大きな機能は `feature/名前`。
+- いまは、`main`（公開中・GitHub Pages）に **直接 push** しています（コミットメッセージは日本語で、何を直したかがわかるように）。push する前に `git fetch` して、ほかの変更とぶつからないか確かめます。
+- 大きな機能を、公開前に試したいときだけ、`feature/名前` の枝を作って、まとまったら main へ。
+- 公開の確認：Actions の「自動テスト」と「pages build and deployment」が緑になっていること。

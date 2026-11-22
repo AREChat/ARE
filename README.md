@@ -11,12 +11,12 @@ HTML・CSS・JavaScript だけで作った静的サイトを **GitHub Pages** �
 
 | 分類 | 機能 |
 |---|---|
-| アカウント | 登録（ログインID・表示名・パスワードだけ。電話・メールは求めない）、ログイン、パスワードの目のボタン、復旧コードでの再設定 |
-| チャット | 1対1／グループ、画像・動画・ファイル（PDF・Word・Excel・PowerPoint）、既読（オン・オフ可）、在席状況、編集、削除の申請（管理者が承認）、予約送信 |
+| アカウント | 登録（ログインID・表示名・パスワードだけ。電話・メールは求めない）、ログイン、パスワードの目のボタン、復旧コードでの再設定、「お試しではじめる」（登録不要。管理者とは無制限・ほかのユーザーへは合計5件まで。ログアウトで削除） |
+| チャット | 1対1／グループ、画像・動画・ファイル（PDF・Office・テキスト・ZIP など約114種類。危険な種類は送れない）、既読（オン・オフ可）、在席状況、編集、削除の申請（管理者が承認）、予約送信。**50MBをこえる動画・ファイルは、運営のGoogleドライブに置いてリンクで送る**（1つ1000GBまで・中断しても再開できる）。送ったファイルは30日たつとチャットから消え、運営のドライブの保管場所に移る |
 | メッセージ操作 | 返信・引用、転送、絵文字リアクション、重要メッセージの固定、メッセージ検索、入力中の表示、音声メッセージ、絵文字・スタンプ、メンション、ブロック・ミュート |
 | グループ | グループ名、注意事項、参考資料のリンク、アンケート、メンバーの追加・退出 |
 | つながり | プロフィール編集（アイコン・ステータス・自己紹介）、投稿、フォロー、ユーザー検索、おすすめの非表示 |
-| その他 | AIチャットボット（`chatbot.txt` を部分一致で検索）、天気予報、交通情報（外部サービスへのリンク）、1対1の通話（試験的） |
+| その他 | AIチャットボット（`chatbot.txt` を部分一致で検索）、天気予報・電車の情報（`info_cache` から表示し、`refresh-info` が1時間ごとに更新。電車は都道府県ごとのJR公式ページへのリンクつき）、行動予定表、すれ違いタウン（位置は暗号の区画だけ送る）、1対1の通話（試験的） |
 | データ | 会話履歴のZIP保存（端末へ）、アカウント削除の申請→承認→完全削除 |
 | 管理者 | 全会話の閲覧、削除申請の承認、アカウントの作成・編集・削除、復旧コードの再発行、ログイン失敗の確認、Googleドライブへの毎日のバックアップ |
 
@@ -42,7 +42,7 @@ HTML・CSS・JavaScript だけで作った静的サイトを **GitHub Pages** �
 
 ## 2. ファイル構成
 
-HTML・CSS・JavaScript を、画面ごと・機能ごとに別々のファイルにしています（例：`login.html` / `login.css` / `login.js`）。
+HTML・CSS・JavaScript を、画面ごと・機能ごとに別々のファイルにしています（例：`login.html` / `login.css` / `login.js`）。チャットの JS は、下の一覧のほかにも多くあり、**全部の一覧は `tools/chat-bundle-sources.txt`** です。それらを1つにまとめた `chat.bundle.js` を、`chat.html` が読み込みます（直したら `node tools/build-bundle.js`）。下の一覧は、おもなものだけです。
 
 ```
 index.html / index.css / index.js            起動画面
@@ -102,9 +102,9 @@ chatbot.txt           チャットボットの回答データ（自由に編集�
 
 1. **接続先**：`apikey.js` に、プロジェクトの URL と公開キー（`sb_publishable_…`）を書く。`service_role` キーは**絶対に書かない**。
 2. **データベース**：テーブル・関数・保護ルール（RLS）は、Supabase の「Database → Migrations」に順番に記録されています。別のプロジェクトへ移すときは、その順に実行してください。
-3. **Storage**（保存場所）：`chat-attachments`（非公開・50MB）、`post-images`（非公開・5MB。動画を受けるときは sql/post_video_v1.sql で50MBに）、`avatars`（公開・2MB）。
-4. **Edge Functions**：`register-user`、`login-user`、`recover-account`、`admin-api`、`admin-delete-user`、`admin-manage-user`。
-5. **自動送信（予約送信）**：拡張機能 `pg_cron` を有効にし、毎分 `deliver_due_scheduled_messages()` を実行するジョブを登録。
+3. **Storage**（保存場所）：`chat-attachments`（非公開・50MB。これをこえる動画・ファイルは Googleドライブ側に置く）、`post-images`（非公開・5MB。動画を受けるときは sql/post_video_v1.sql で50MBに）、`avatars`（公開・2MB）。
+4. **Edge Functions**（本番に入っているもの・2026-11-22 時点で13個）：`register-user`、`login-user`、`recover-account`、`guest-start`（お試し）、`change-display-name`、`admin-api`、`admin-delete-user`、`admin-manage-user`、`admin-storage`、`send-push`、`cleanup-stories`（ストーリー整理）、`refresh-info`（天気・電車の更新）、`archive-old-files`（30日たったファイルのドライブ移送）。コードの控えは `edge-functions/`（一部）。**本番に入っているものが正**です。
+5. **定期実行（pg_cron）**：拡張機能 `pg_cron` を有効にして登録します。本番は11件（2026-11-22 時点・すべて有効）：`deliver-scheduled-messages`・`deliver-scheduled-content`・`expire-timed-messages`（毎分）、`cleanup-stories-6h`（6時間ごと）、`refresh-info-hourly`・`file-archive-hourly`（毎時）、`live-loc-purge`（15分ごと）、`guest-purge-v1`・`purge-memo-trash`・`purge-old-story-archive`（毎日）、`weekly-admin-message`（毎週）。**GitHub Actions や GitHub の Secret は使いません。**
 6. **Authentication**：メールの確認や新規登録の設定は、プロジェクトの方針に合わせて確認。パスワードの強さの設定にも、同じ条件（8文字以上・大文字・小文字・数字か記号）を入れておくと二重に守れます。
 7. **管理者の登録**：SQL Editor で、管理者にする人の ID を `private.user_roles` に `role = 'admin'` で入れる。
 

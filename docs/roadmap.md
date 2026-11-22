@@ -1,13 +1,16 @@
 # 機能ロードマップ（T503）
-## いま（2026-10）
-共通⚙、game1の追加機能、実績ページ、自動チェック(Actions)、game3 本編 第21〜100話（最終話まで）
+（2026-11-22 に、いまの状態に合わせて書きなおしました。古い記録は `changelog.html` と Git の履歴にあります）
+## いま（2026-11）
+- チャット：送れるファイル約114種類・50MBをこえる動画／ファイルはドライブのリンク（1つ1000GBまで・中断しても再開）、30日たったファイルのドライブ移送、行動予定表、すれ違いタウン（合いかぎ）、pptx スライドショー、お試しアカウント（ログアウトで削除）、ユーザー区分（家庭／社員／友達／その他）
+- ゲーム：game（ARE QUEST）・game2〜game4・GAME5（推理）・game6・game7・GAME8（アクション＆レース）・ドリーム・フロンティア・OFFLINE PARADISE ほか（一覧は `game/index.html`）
+- 自動チェック：Actions（文法・リンク・バンドル・precache・sw の版）
 ## 次
-- 実機確認（iPhone/Android/iPad/Windows）→ `docs/qa-device-checklist.md`
-- game4 のデッキ編集・カード図鑑
+- 実機確認（iPhone/Android/iPad/Windows）→ `docs/qa-device-checklist.md`（位置情報・ショートカット・プロコンも）
+- privacy.html の位置情報の文面（案は運営の判断待ち）
 ## そのあと
-- game3 サブストーリー、専用BGM（ライセンス確認つき）
-- game1 装備の見た目（ドット絵が必要）
+- 30日移送の対象を、画像・動画・ボイスにも広げる（アルバム・写真の表示を直してから）
+- 専用BGM（ライセンス確認つき）
 ## 保留
 - game5（UE5版）は別途制作。配布は GitHub Releases 予定
 ## 方針
-すべて無料の範囲：GitHub Pages・Supabase無料枠（チャットだけ）・UE5。ゲーム(game1〜6)は Supabase を使わない。
+すべて無料の範囲：GitHub Pages・Supabase無料枠・Google ドライブ（運営のもの）。ゲームは基本的に Supabase を使わない（チャットのゲーム一覧・ランキングなど、チャット内のものは別）。

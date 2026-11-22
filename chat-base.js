@@ -55,7 +55,7 @@ async function compressChatImage(file){
     }
 }
 
-// ===== 送れるファイルの種類（ホワイトリスト）：ここに書いた拡張子だけ送れます（約110種類） =====
+// ===== 送れるファイルの種類（ホワイトリスト）：ここに書いた拡張子だけ送れます（約114種類） =====
 // 追加するときは、保存先（Supabase の chat-attachments）の許可リストにも 同じ種類を足してください（sql/chat_attachments_mime_v2.sql）。
 const FILE_MIME_BY_EXT = {
     // 画像・動画（ブラウザが教えてくれる種類をそのまま使う）
