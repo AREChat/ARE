@@ -217,6 +217,7 @@ const FEATURES = [
     ["vspin","対戦パネル（盤を上に固定）",initVsPin],
     ["bj","ブラックジャック",initBj],
     ["cards","手札かくしカードゲーム",initCards],
+    ["roomlink","チャットごとのピン留めリンク",initRoomLink],
     ["work","ワークスペース",initWork],
     ["thread","スレッド・保存ボタン",initThread],
     ["misc","GIF・要約・気分テーマ",initMisc],

@@ -80,6 +80,7 @@ chat-avatar.js
 chat-sites.js
 chat-bj.js
 chat-cards.js
+chat-roomlink.js
 chat-work.js
 chat-thread.js
 chat-misc.js
