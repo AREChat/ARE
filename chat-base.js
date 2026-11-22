@@ -15,7 +15,7 @@ const MAX_IMAGES = 10;
 
 const MAX_VIDEO_SECONDS = 300;
 
-const MAX_FILE_BYTES = 50 * 1024 * 1024;
+const MAX_FILE_BYTES = 2 * 1024 * 1024 * 1024;   // 2GB（これをこえるファイルは、これまでどおりドライブへのリンクで送る）
 
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
@@ -699,6 +699,7 @@ async function loadMessages(showFeedback,quiet){
     }
 }
 
+let msgSubRetry = 0;
 function subscribeToMessages(){
     if(!state.currentRoom) return;
 
@@ -726,8 +727,24 @@ function subscribeToMessages(){
             if(index >= 0 && !payload.new.deleted_at){ state.messages[index] = {...state.messages[index],...payload.new}; renderMessages(false); }
         })
         .subscribe((status) => {
-            if(status === "CHANNEL_ERROR" || status === "TIMED_OUT"){
+            // つながったら：取りこぼしがないよう、念のため最新をいちど静かに読みこみなおす
+            if(status === "SUBSCRIBED"){
+                msgSubRetry = 0;
+                if(state.currentRoom && state.currentRoom.id === roomId) loadMessages(false,true);
+                return;
+            }
+            // 切れた・つながらなかった：すぐに自前でつなぎ直す（supabase-jsの自動再試行だけだと、へやの中身が
+            // ずっと最新にならないことがあるため。8秒ごとの自動更新(pollRoom)だけに たよらない）
+            if(status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED"){
                 console.warn("Realtime subscription status:",status);
+                if(!state.currentRoom || state.currentRoom.id !== roomId) return;
+                msgSubRetry++;
+                const wait = Math.min(1000 * Math.pow(2,Math.min(msgSubRetry,5)),20000);
+                setTimeout(() => {
+                    if(!state.currentRoom || state.currentRoom.id !== roomId) return;
+                    cleanupSubscription();
+                    subscribeToMessages();
+                },wait);
             }
         });
 }
@@ -1034,7 +1051,7 @@ async function handleFiles(fileList,kind){
         }else if(uploadFile.size > MAX_FILE_BYTES){
             // 50MBをこえるファイルも、動画と同じように ドライブに置いて リンクで送る
             if(typeof openVideoLinkSheet === "function") tooBigVideos.push({file:uploadFile, reason:"size", kind:"file"});
-            else showToast(file.name + " は50MBを超えているため送信できません。");
+            else showToast(file.name + " は" + formatAttachmentSize(MAX_FILE_BYTES) + "を超えているため送信できません。");
             continue;
         }
 
