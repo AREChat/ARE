@@ -26,6 +26,8 @@ function absPaintBar(){
             const b = e.target.closest("[data-abs]"); if(!b) return;
             const v = b.dataset.abs;
             absSt.seg = absSt.seg === v ? null : v;
+            // 検索ボックスの文字や「非表示を表示」が残っていると、選んだグループより そちらが優先されてしまうため、クリア
+            if(absSt.seg){ if(el.userSearch) el.userSearch.value = ""; state.showHidden = false; }
             if(typeof loadRecommendations === "function") loadRecommendations();
         });
     }

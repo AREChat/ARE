@@ -57,6 +57,12 @@ function rcPick(list){
     if(!rcSt.plan) rcSt.plan = rcNewPlan();
     rcPaintCount();
     rcSt.peers = list;
+    // 表示人数「全員」が選ばれているときは、フォロー状況・チャット状況で絞り込まず、
+    // このグループの全員をそのまま表示する（「全員にしたのに全員表示されない」を防ぐため）
+    if(rcSt.count === 0 && !rcSt.custom){
+        const all = rcShuffle(list, rcSt.plan.seed);
+        return { list:all, title:"⭐ このグループの全員（" + all.length + "人）" };
+    }
     const g = rcGroups(list), plan = rcSt.plan;
     let kind = plan.list;
     if(kind === "follow" && !g.notFollowed.length) kind = "reg";
