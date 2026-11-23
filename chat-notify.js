@@ -202,6 +202,9 @@ function nfOnInsert(m){
     if(!m || m.sender_id === state.user.id) return;
     const room = (state.rooms || []).find((r) => r.id === m.room_id);
     if(!room){ if(typeof loadRooms === "function") setTimeout(loadRooms, 500); return; }
+    // すでに「読んだ」ことになっているメッセージ（別の端末で先に読んでいた・通信が不安定で同じ通知が遅れて／二重に届いた）は、
+    // いまさら未読にしない＝ポップアップも出さない。（通知が来ていないのにポップアップが出る不具合の原因だった）
+    if(m.created_at && nf.seen[m.room_id] && m.created_at <= nf.seen[m.room_id]) return;
     if(state.currentRoom && state.currentRoom.id === m.room_id && !document.hidden){
         nfMarkSeen(m.room_id, m.created_at);
         try{ markRead(); }catch(_e){ /* 8 秒ごとの確認でも記録される */ }   // すぐサーバーに記録 → ほかの端末の未読も すぐ消える
