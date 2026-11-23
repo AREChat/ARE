@@ -179,6 +179,24 @@ async function aiStudioShowAndDownload(response,mode){
     save.textContent = "もう一度ダウンロード";
     output.append(preview,save);
     save.click();
+    // つくった画像・動画は、Googleドライブ（ファイル保存）にも のこす（Supabase のストレージは使わない）
+    if(typeof driveFirstOn === "function" && driveFirstOn() && typeof driveStoreBlob === "function"){
+        const note = document.createElement("p");
+        note.className = "hint";
+        note.textContent = "Googleドライブにも保存しています…";
+        output.append(note);
+        const fname = "are-ai-" + new Date().toISOString().replace(/[:.]/g,"-") + "." + extension;
+        driveStoreBlob(blob, fname, mime, mode === "image" ? "image" : "video", (t) => { note.textContent = "ドライブに保存中：" + t; }).then((up) => {
+            note.textContent = "";
+            const link = document.createElement("a");
+            link.href = up.link; link.target = "_blank"; link.rel = "noopener noreferrer";
+            link.textContent = "✅ Googleドライブに保存しました（開く）";
+            note.append(link);
+        }).catch((error) => {
+            console.error("[ARE ai drive]", error);
+            note.textContent = "ドライブへの保存はできませんでした（ダウンロードは済んでいます）。";
+        });
+    }
 }
 
 function aiStudioErrorText(error){

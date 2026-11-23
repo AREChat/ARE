@@ -22,8 +22,8 @@ const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
 // Supabase の「ダウンロード通信量（Cached Egress）」を へらすため、動画と大きいファイルは、Googleドライブ（GAS）に置いて リンクで送る。
 // （GAS の URL が apikey.js に入っているときだけ。うまく置けなかったときは、これまでどおり Supabase に送る）
-const DRIVE_VIDEO_BYTES = 3 * 1024 * 1024;     // 動画は 3MB をこえたら ドライブへ
-const DRIVE_FILE_BYTES = 10 * 1024 * 1024;     // 写真・動画いがいのファイルは 10MB をこえたら ドライブへ
+const DRIVE_VIDEO_BYTES = 0;     // 動画は 1バイトでも ドライブへ（2026-11-24：Supabase の通信量をまもるため、ぜんぶドライブ）
+const DRIVE_FILE_BYTES = 0;     // 写真・動画いがいのファイルも 1バイトでも ドライブへ（写真・音声は uploadAndSend の中で ドライブへ）
 function driveFirstOn(){ try{ return typeof driveUploadUrl === "function" && !!driveUploadUrl(); }catch(_e){ return false; } }
 
 const MAX_VIDEOS_AT_ONCE = 5;   // 動画をまとめて選べる本数（1本ずつ順番に送る）
@@ -1000,7 +1000,7 @@ function renderMessageContent(content){
 
     const url = item.url || "";
     const name = item.name || "添付ファイル";
-    const dataPath = item.path ? ' data-path="' + escapeHtml(String(item.path)) + '"' : "";
+    const dataPath = (item.path ? ' data-path="' + escapeHtml(String(item.path)) + '"' : "") + ((item.type === "image" || item.type === "audio") && DRIVE_ID_RE.test(String(item.drive || "")) ? ' data-drive="' + escapeHtml(String(item.drive)) + '"' : "");
     const safeUrl = escapeHtml(safeHttpUrl(url));
     if(!safeUrl){
         return '<div class="bubble">' + escapeHtml(name) + '（添付ファイルのURLが不正なため表示できません）</div>';
@@ -1009,11 +1009,12 @@ function renderMessageContent(content){
     const size = item.size ? '<div class="file-meta">' + escapeHtml(formatBytes(Number(item.size))) + '</div>' : "";
 
     if(item.type === "audio"){
-        return '<div class="bubble"><div class="attachment">🎤 ボイスメッセージ<audio controls preload="metadata"' + dataPath + ' src="' + safeUrl + '"></audio>' + size + '</div></div>';
+        const dOpen = DRIVE_ID_RE.test(String(item.drive || "")) ? '<div class="file-meta"><a href="' + escapeHtml(driveViewUrl(String(item.drive))) + '" target="_blank" rel="noopener noreferrer">うまく聞けないときは ドライブで開く</a></div>' : "";
+        return '<div class="bubble"><div class="attachment">🎤 ボイスメッセージ<audio controls preload="metadata"' + dataPath + ' src="' + safeUrl + '"></audio>' + size + dOpen + '</div></div>';
     }
 
     if(item.type === "image"){
-        return '<div class="bubble' + (item.stamp ? ' stamp-img' : '') + '"><div class="attachment"><a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer"' + dataPath + '><img' + dataPath + ' src="' + safeUrl + '" alt="' + safeName + '" loading="lazy"></a><div class="file-meta">' + safeName + '</div></div></div>';
+        return '<div class="bubble' + (item.stamp ? ' stamp-img' : '') + '"><div class="attachment"><a href="' + (DRIVE_ID_RE.test(String(item.drive || "")) ? escapeHtml(driveViewUrl(String(item.drive))) : safeUrl) + '" target="_blank" rel="noopener noreferrer"' + dataPath + '><img' + dataPath + ' src="' + safeUrl + '" alt="' + safeName + '" loading="lazy" referrerpolicy="no-referrer"></a><div class="file-meta">' + safeName + '</div></div></div>';
     }
 
     if(item.type === "video"){
@@ -1308,13 +1309,17 @@ function getVideoDuration(file){
     });
 }
 
-async function uploadAndSend(file,kind,originalBytes,nthLabel,scheduleWhen){
+async function uploadAndSend(file,kind,originalBytes,nthLabel,scheduleWhen,opts){
     const sizeLabel = formatAttachmentSize(file.size) + (originalBytes !== undefined && originalBytes !== file.size ? "（元 " + formatAttachmentSize(originalBytes) + "）" : "");
     const nthPrefix = nthLabel ? "[" + nthLabel + "] " : "";
     el.attachmentStatus.textContent = nthPrefix + file.name + " ・ " + sizeLabel + " ・ アップロード中...";
     el.app.classList.add("loading");
 
     try{
+        // 写真・音声は、1バイトでも Googleドライブへ（スタンプ・対戦の絵は小さいので、これまでどおり）。置けなかったときだけ、下の Supabase に送る
+        if(driveFirstOn() && !(opts && opts.noDrive) && (kind === "image" || kind === "audio") && file.size > 0 && !feat.pendingStamp && !feat.pendingGame && typeof driveSendMedia === "function"){
+            if(await driveSendMedia(file, kind, nthPrefix + file.name + " ・ " + sizeLabel + " ・ ", scheduleWhen)) return;
+        }
         const client = requireClient();
         // Storageのキーは英数字のみ（日本語などを含むと "Invalid key" になる）。表示名はメッセージ側に保持する。
         const ext = fileExt(file);

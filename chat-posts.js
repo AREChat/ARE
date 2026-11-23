@@ -26,7 +26,7 @@ async function loadPosts(reset){
             (profiles.data || []).forEach((p) => feat.postProfiles.set(p.id,p));
         }
         await loadPostSocialState(feat.posts);
-        const paths = rows.map((r) => r.image_path).filter(Boolean);
+        const paths = driveFillSigned(rows.map((r) => r.image_path).filter(Boolean));
         if(paths.length){
             const signed = await client.storage.from("post-images").createSignedUrls(paths,3600);
             (signed.data || []).forEach((s) => { if(s.signedUrl) feat.signed.set(s.path,s.signedUrl); });
@@ -84,7 +84,7 @@ function renderPosts(){
         return '<article class="post"><div class="post-head">' + miniAvatar(author) +
             '<div><button class="post-name" type="button" data-author="' + escapeHtml(post.author_id) + '">' + escapeHtml(profileDisplayName(author)) + '</button><div class="post-time">' + escapeHtml(formatDateTime(post.created_at)) + (own ? ' ・' + visibility : '') + '</div></div></div>' +
             (post.body ? '<div class="post-body">' + linkifyPostBody(post.body) + '</div>' : '') +
-            (img ? (isPostPdfPath(post.image_path) ? '<a class="post-pdf" href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer">📄 <b>' + escapeHtml(postPdfName(post.image_path)) + '</b><span>PDFを開く</span></a>' : isPostVideoPath(post.image_path) ? '<video class="post-video" controls playsinline preload="metadata" src="' + escapeHtml(img) + '"></video>' : '<a href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer"><img class="post-img" src="' + escapeHtml(img) + '" alt="投稿画像" loading="lazy"></a>') : '') +
+            (img ? (isPostPdfPath(post.image_path) ? '<a class="post-pdf" href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer">📄 <b>' + escapeHtml(postPdfName(post.image_path)) + '</b><span>PDFを開く</span></a>' : (isPostVideoPath(post.image_path) && drivePathId(post.image_path)) ? '<a class="post-pdf" href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer">🎬 <b>動画</b><span>ドライブで開く</span></a>' : isPostVideoPath(post.image_path) ? '<video class="post-video" controls playsinline preload="metadata" src="' + escapeHtml(img) + '"></video>' : '<a href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer"><img class="post-img" src="' + escapeHtml(img) + '" alt="投稿画像" loading="lazy"></a>') : '') +
             '<div class="post-reactions">' + quickEmojis.map(rxChip).join("") +
             '<button type="button" class="post-reaction post-emoji-more' + (pickerOpen ? ' on' : '') + '" data-emoji-toggle="' + escapeHtml(post.id) + '" aria-expanded="' + pickerOpen + '" aria-label="ほかの絵文字">＋</button>' +
             '<button type="button" class="post-comment-toggle" data-comment-toggle="' + escapeHtml(post.id) + '">💬 ' + comments.length + '</button></div>' +
@@ -154,7 +154,15 @@ async function submitPost(extra, sendAtArg){
     const client = requireClient();
     let uploaded = null;
     try{
-        if(video){
+        let viaDrive = false;
+        if(video && driveFirstOn()){   // 写真・動画・PDF は、1バイトでも Googleドライブへ（Supabase の通信量をまもる）
+            try{
+                const isPdf0 = isPostPdfFile(video), ext0 = isPdf0 ? "pdf" : ((fileExt(video) || "mp4").replace(/[^a-z0-9]/gi,"").toLowerCase() || "mp4");
+                const dup = await driveUploadSimple(video, isPdf0 ? "file" : "video", (text) => { el.postImageName.textContent = (isPdf0 ? "📄 " : "🎬 ") + text; });
+                uploaded = drivePath(state.user.id, dup.id, isPdf0 ? "pdf" : (isPostVideoPath("x." + ext0) ? ext0 : "mp4")); viaDrive = true;
+            }catch(driveError){ console.error("[ARE drive post]", driveError); showToast("ドライブに置けなかったので、そのまま投稿します。"); }
+        }
+        if(video && !viaDrive){
             if(video.size > postVideoLimitBytes()){ openPostVideoLinkSheet(video,"size"); return; }
             const isPdf = isPostPdfFile(video);
             if(postVideoMimeBlocked(isPdf ? "pdf" : "video")){ openPostVideoLinkSheet(video,"upload"); return; }
@@ -172,11 +180,17 @@ async function submitPost(extra, sendAtArg){
                 throw up.error;
             }
             uploaded = path;
-        }else if(feat.postImageFile){
+        }else if(!video && feat.postImageFile){
             const blob = await resizeImage(feat.postImageFile,1280,0.85);
-            uploaded = state.user.id + "/" + crypto.randomUUID() + ".jpg";
-            const up = await client.storage.from("post-images").upload(uploaded,blob,{contentType:"image/jpeg",upsert:false});
-            if(up.error) throw up.error;
+            if(driveFirstOn()){   // 写真は ドライブへ。置けなかったときだけ、これまでどおり Supabase へ
+                try{ const dup = await driveStoreBlob(blob, "post.jpg", "image/jpeg", "image", (text) => { el.postImageName.textContent = "📷 " + text; }); uploaded = drivePath(state.user.id, dup.id, "jpg"); }
+                catch(driveError){ console.error("[ARE drive post]", driveError); showToast("ドライブに置けなかったので、そのまま投稿します。"); uploaded = null; }
+            }
+            if(!uploaded){
+                uploaded = state.user.id + "/" + crypto.randomUUID() + ".jpg";
+                const up = await client.storage.from("post-images").upload(uploaded,blob,{contentType:"image/jpeg",upsert:false});
+                if(up.error) throw up.error;
+            }
         }
         const visibility = document.getElementById("postVisibility")?.value || "public";
         const result = sendAt

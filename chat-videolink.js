@@ -11,6 +11,82 @@ const vlIcon = (cur) => cur && cur.kind === "file" ? "📎" : "🎬";
 
 function initVideoLink(){
     registerTool("vlink", onVideoLinkAction);
+    // ドライブの画像・音声が読みこめないときは、べつの読みこみ方（サムネイル用 → 元のファイル）を順番に試す。それでもだめなら、開くリンクにする
+    document.addEventListener("error", (event) => {
+        const node = event.target;
+        if(!node || !node.dataset || !node.dataset.drive || !DRIVE_ID_RE.test(node.dataset.drive)) return;
+        const id = node.dataset.drive, step = Number(node.dataset.dstep || 0);
+        if(node.tagName === "IMG"){
+            const next = [driveMediaUrl(id, "image", "thumb"), "https://lh3.googleusercontent.com/d/" + id][step];
+            if(next){ node.dataset.dstep = String(step + 1); node.src = next; return; }
+            if(node.dataset.dstep !== "x"){ node.dataset.dstep = "x"; const a = document.createElement("a"); a.href = driveViewUrl(id); a.target = "_blank"; a.rel = "noopener noreferrer"; a.textContent = "🖼️ 画像をドライブで開く"; if(node.parentNode) node.parentNode.replaceChild(a, node); }
+        }else if(node.tagName === "AUDIO"){
+            const next = ["https://docs.google.com/uc?export=download&id=" + id][step];
+            if(next){ node.dataset.dstep = String(step + 1); node.src = next; }
+        }
+    }, true);
+}
+
+// ===== すべての添付（1バイトでも）を Googleドライブに置く =====
+// ・Supabase の通信量（Cached Egress）を使わないため、写真・音声・動画・ファイルは ぜんぶ ドライブ（GAS「ファイル保存」）へ。
+// ・写真と音声は、メッセージにドライブの番号（drive）を入れて、チャットの中で そのまま見える／聞ける。動画とファイルは、リンクのメッセージにする。
+const DRIVE_ID_RE = /^[A-Za-z0-9_-]{10,100}$/;
+function driveViewUrl(id){ return "https://drive.google.com/file/d/" + id + "/view"; }
+function driveMediaUrl(id, kind, how){
+    if(kind === "audio") return "https://drive.google.com/uc?export=download&id=" + id;
+    return how === "thumb" ? "https://drive.google.com/thumbnail?id=" + id + "&sz=w1280" : "https://lh3.googleusercontent.com/d/" + id + "=w1280";
+}
+
+// 投稿・ストーリーなど「保存先のパス」を持つものは、ドライブに置いたとき  <ユーザー番号>/drive-<ドライブの番号>.<拡張子>  という形のパスを入れる
+// （サーバー側の「パスは自分の番号で始まる」という決まりに合うので、そのまま保存できる。Supabase には何も置かない）
+function drivePath(uid, id, ext){ return uid + "/drive-" + id + "." + String(ext || "bin").toLowerCase().replace(/[^a-z0-9]/g, "").slice(0, 5); }
+function drivePathId(path){ const m = /\/drive-([A-Za-z0-9_-]{10,100})\.[A-Za-z0-9]{1,5}$/.exec(String(path || "")); return m ? m[1] : ""; }
+function drivePathIsImage(path){ return /\.(jpe?g|png|webp|gif)$/i.test(String(path || "")); }
+/** ドライブのパスから、見る／開くためのURL（写真は そのまま表示できるURL、動画・PDFは ドライブで開くURL） */
+function drivePathUrl(path){ const id = drivePathId(path); if(!id) return ""; return drivePathIsImage(path) ? driveMediaUrl(id, "image") : driveViewUrl(id); }
+/** パスの一覧から、ドライブのものを feat.signed に入れて、残り（Supabase のもの）を返す */
+function driveFillSigned(paths){
+    const rest = [];
+    (paths || []).forEach((p) => { const u = drivePathUrl(p); if(u) feat.signed.set(p, u); else rest.push(p); });
+    return rest;
+}
+/** Blob・File を ドライブに置く（名前と種類つきの File にして）。返り値は driveUploadSimple と同じ */
+function driveStoreBlob(blob, name, mime, kind, onText){
+    const f = blob instanceof File ? blob : new File([blob], name, {type:mime || blob.type || "application/octet-stream"});
+    return driveUploadSimple(f, kind, onText);
+}
+
+/** ファイルを ドライブに置いて、{id, link, retentionDays} を返す（進み具合は onText に文字で渡す）。失敗したら例外。 */
+async function driveUploadSimple(file, kind, onText){
+    const say = typeof onText === "function" ? onText : () => {};
+    if(!dq.running) dq.cancel = false;
+    say("ドライブに置く準備をしています…");
+    const s = await gasCall({action:"start", name:file.name || kind, size:file.size, mime:file.type || (kind === "audio" ? "audio/webm" : kind === "image" ? "image/jpeg" : "application/octet-stream"), kind});
+    const t0 = Date.now();
+    const id = await driveUploadChunks(s.sessionUrl, file, (sent) => {
+        const pct = Math.min(99, Math.floor(sent / Math.max(1, file.size) * 100)), secs = (Date.now() - t0) / 1000;
+        const left = secs >= 1 && sent > 0 ? (file.size - sent) / (sent / secs) : 0;
+        say("アップロード中 " + pct + "%" + (left > 3 ? "（のこり" + videoWaitLabel(left) + "）" : ""));
+    }, 0);
+    say("リンクを作っています…");
+    const f = await gasCall({action:"finish", fileId:id});
+    return {id, link:f.link, retentionDays:typeof f.retentionDays === "number" ? f.retentionDays : 0};
+}
+
+/** 写真・音声を ドライブに置いて、メッセージとして送る。ドライブに置けなかったときは false（呼んだ側が、これまでの送り方に戻す）。 */
+async function driveSendMedia(file, kind, prefix, scheduleWhen){
+    let up;
+    try{
+        up = await driveUploadSimple(file, kind, (t) => { el.attachmentStatus.textContent = prefix + t; });
+    }catch(error){
+        console.error("[ARE drive media]", error);
+        showToast("ドライブに置けなかったので、そのまま送ります。");
+        return false;
+    }
+    const payload = {type:kind, name:String(file.name || "attachment").slice(0, 120), url:driveMediaUrl(up.id, kind), drive:up.id, mimeType:file.type || "", size:file.size};
+    if(scheduleWhen && typeof scheduleAttachmentPayload === "function") await scheduleAttachmentPayload(payload, scheduleWhen);
+    else await sendMessagePayload(payload);
+    return true;
 }
 
 /** reason: "size"（50MB超）｜"long"（5分超）｜"upload"（アップロードで容量エラー）。
@@ -284,7 +360,7 @@ async function runDriveQueue(){
             driveProgressSheet(nth, total, file.name || vlWord(cur), file.size, cur);
             const setText = (t) => { const e = document.getElementById("dqText"); if(e) e.textContent = t; };
             const setBar = (pct) => { const e = document.getElementById("dqBar"); if(e) e.value = pct; };
-            let link = null, retention = 14;
+            let link = null, retention = 0;
             const kind = cur.kind === "file" ? "file" : "video";
             try{
                 let sessionUrl = null, id = null, resumedFrom = 0;
@@ -299,7 +375,7 @@ async function runDriveQueue(){
                 if(!id && !sessionUrl){
                     setText("ドライブに置く準備をしています…");
                     const s = await gasCall({action:"start", name:file.name || (kind === "file" ? "file" : "video"), size:file.size, mime:file.type || (kind === "file" ? "application/octet-stream" : "video/mp4"), kind});
-                    retention = s.retentionDays || retention;
+                    if(typeof s.retentionDays === "number") retention = s.retentionDays;
                     sessionUrl = s.sessionUrl;
                     saveResume(file, kind, sessionUrl);   // ここで覚えておけば、この先 途中で止まっても再開できる
                 }
@@ -319,7 +395,7 @@ async function runDriveQueue(){
                 if(dq.cancel) throw new Error("やめました。");
                 setBar(100); setText("リンクを作っています…");
                 const f = await gasCall({action:"finish", fileId:id});
-                link = f.link; retention = f.retentionDays || retention;
+                link = f.link; if(typeof f.retentionDays === "number") retention = f.retentionDays;
                 clearResume(file, kind);   // 最後までできたので、再開用の記録は消す
             }catch(error){
                 if(dq.cancel) break;
@@ -331,7 +407,7 @@ async function runDriveQueue(){
                     if(okLen && file.size <= (kind === "video" ? MAX_VIDEO_BYTES : MAX_FILE_BYTES) && typeof uploadAndSend === "function"){
                         closeSheet();
                         showToast("ドライブに置けなかったので、そのまま送ります。");
-                        await uploadAndSend(file, kind, file.size, "", cur.when || null);
+                        await uploadAndSend(file, kind, file.size, "", cur.when || null, {noDrive:true});
                         vl.index++;
                         continue;
                     }
@@ -343,7 +419,7 @@ async function runDriveQueue(){
                 return;
             }
             const sizeText = "（" + formatAttachmentSize(file.size) + "）";
-            const text = [vlIcon(cur) + " " + vlWord(cur) + "のリンク", String(file.name || vlWord(cur)).slice(0, 100) + sizeText, link, "※" + retention + "日たつと自動で消えます。"].join("\n");
+            const text = [vlIcon(cur) + " " + vlWord(cur) + "のリンク", String(file.name || vlWord(cur)).slice(0, 100) + sizeText, link].concat(retention > 0 ? ["※" + retention + "日たつと自動で消えます。"] : []).join("\n");
             closeSheet();
             // 予約送信パネルで日時が選ばれていたら、リンクのメッセージも その日時に予約する
             if(cur.when && typeof scheduleAttachmentPayload === "function") await scheduleAttachmentPayload(buildTextPayload(text), cur.when);

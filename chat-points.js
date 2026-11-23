@@ -166,7 +166,10 @@ async function ptView(id){
     const r = await c.rpc("shop_content", {p_item:id}); if(r.error) throw r.error;
     const d = r.data || {};
     let inner;
-    if(d.kind === "video" && d.video_path){
+    if(d.kind === "video" && d.video_path && String(d.video_path).indexOf("drive:") === 0 && DRIVE_ID_RE.test(String(d.video_path).slice(6))){
+        // ドライブ（GAS）に置いた動画：ドライブの画面で見る
+        inner = '<div class="meta" style="text-align:center">この動画は Googleドライブで再生します。</div><a class="button" style="display:block;text-align:center" href="' + escapeHtml(driveViewUrl(String(d.video_path).slice(6))) + '" target="_blank" rel="noopener noreferrer">▶ 動画を見る</a>';
+    }else if(d.kind === "video" && d.video_path){
         const s = await c.storage.from("shop-content").createSignedUrl(d.video_path, 3600); if(s.error) throw s.error;
         inner = '<video controls controlsList="nodownload noremoteplayback" disablePictureInPicture playsinline style="width:100%;border-radius:10px;background:#000" src="' + escapeHtml(s.data.signedUrl) + '"></video>';
     }else{
@@ -233,7 +236,7 @@ async function renderAdminShop(client){
         '<select id="shKind" class="status-select"><option value="video">動画（500円目安）</option><option value="story">物語（100円目安）</option></select>' +
         '<input id="shTitle" type="text" maxlength="60" placeholder="タイトル"><input id="shDesc" type="text" maxlength="300" placeholder="説明（任意）">' +
         '<input id="shPrice" type="number" min="0" value="500"><textarea id="shBody" rows="5" placeholder="物語の本文（物語のとき）"></textarea>' +
-        '<label>動画ファイル（動画のとき・50MBまで・mp4/webm）</label><input id="shFile" type="file" accept="video/mp4,video/webm">' +
+        '<label>動画ファイル（動画のとき・Googleドライブに保管・mp4/webm）</label><input id="shFile" type="file" accept="video/mp4,video/webm">' +
         '<div class="row"><button type="button" class="button" id="shSave">追加する</button></div></div>' +
         '<b>商品一覧</b>' + (items.length ? items.map((x) => '<div class="admin-card"><b>' + (x.kind === "video" ? "🎬 " : "📖 ") + escapeHtml(x.title) + '</b> <span class="meta">' + x.price + '円 ・購入 ' + x.buyers + '人' + (x.active ? "" : " ・非公開") + '</span><div class="row"><button type="button" class="button-secondary" data-sh-del="' + x.id + '">削除</button></div></div>').join("") : '<div class="empty-list">まだありません</div>') +
         '<b>最近のスパム凍結</b>' + (locks.length ? locks.map((x) => '<div class="admin-card">' + escapeHtml(x.name || x.user_id) + ' <span class="meta">' + escapeHtml(formatDate(x.until)) + '</span></div>').join("") : '<div class="empty-list">なし（詳細は「通報」に出ます）</div>');
@@ -250,9 +253,14 @@ document.addEventListener("click", (e) => {
             const file = $("shFile").files && $("shFile").files[0];
             if(kind === "video"){
                 if(!file){ showToast("動画ファイルを選んでください。"); return; }
-                if(file.size > 50 * 1024 * 1024){ showToast("動画は50MBまでです。"); return; }
-                path = crypto.randomUUID() + (file.type === "video/webm" ? ".webm" : ".mp4");
-                const up = await c.storage.from("shop-content").upload(path, file, {contentType:file.type, upsert:false}); if(up.error) throw up.error;
+                if(driveFirstOn()){   // ショップの動画は Google ドライブ（GAS）へ
+                    const dup = await driveUploadSimple(file, "video", (t) => showToast(t));
+                    path = "drive:" + dup.id;
+                }else{
+                    if(file.size > 50 * 1024 * 1024){ showToast("動画は50MBまでです。"); return; }
+                    path = crypto.randomUUID() + (file.type === "video/webm" ? ".webm" : ".mp4");
+                    const up = await c.storage.from("shop-content").upload(path, file, {contentType:file.type, upsert:false}); if(up.error) throw up.error;
+                }
             }
             const r = await c.rpc("admin_shop_upsert", {p_id:null, p_kind:kind, p_title:title, p_desc:$("shDesc").value.trim(), p_price:Number($("shPrice").value) || 0, p_active:true, p_body:kind === "story" ? $("shBody").value : null, p_video_path:path});
             if(r.error) throw r.error;

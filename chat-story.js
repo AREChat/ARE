@@ -58,14 +58,14 @@ async function storyCacheRemote(row){
     if(existing){ await storyAckLocal(row.id); return existing; }
     let blob = null;
     const isVideo = isPostVideoPath(row.image_path);
-    if(row.image_path && !isVideo){
+    if(row.image_path && !isVideo && !drivePathId(row.image_path)){
         const signedUrl = feat.signed.get(row.image_path);
         if(!signedUrl) throw new Error("ストーリー画像の保存リンクを取得できませんでした。");
         const response = await fetch(signedUrl);
         if(!response.ok) throw new Error("ストーリー画像を端末へ保存できませんでした。");
         blob = await response.blob();
     }
-    const record = {id:row.id,user_id:row.user_id,body:row.body || "",bg:row.bg || "blue",created_at:row.created_at,expires_at:row.expires_at,blob,content_type:blob?.type || "",had_video:isVideo,saved_at:new Date().toISOString()};
+    const record = {id:row.id,user_id:row.user_id,body:row.body || "",bg:row.bg || "blue",created_at:row.created_at,expires_at:row.expires_at,blob,image_path:drivePathId(row.image_path) ? row.image_path : "",content_type:blob?.type || "",had_video:isVideo && !drivePathId(row.image_path),saved_at:new Date().toISOString()};
     await storyLocalPut(record);
     await storyAckLocal(row.id);
     return record;
@@ -93,7 +93,7 @@ function openStory(){
 }
 
 async function signStoryImages(rows){
-    const paths = [...new Set(rows.map((r) => r.image_path).filter(Boolean))];
+    const paths = driveFillSigned([...new Set(rows.map((r) => r.image_path).filter(Boolean))]);
     if(!paths.length) return;
     for(let index = 0; index < paths.length; index += 100){
         const signed = await requireClient().storage.from("post-images").createSignedUrls(paths.slice(index,index + 100),3600);
@@ -136,9 +136,10 @@ function storyCard(story, archived){
     const name = own ? "あなた" : profileDisplayName(feat.known.get(story.user_id));
     const color = STORY_BG[story.bg] || STORY_BG.blue;
     const isVideo = isPostVideoPath(story.image_path);
-    const signedUrl = story.image_path ? safeHttpUrl(feat.signed.get(story.image_path) || "") : "";
+    const signedUrl = story.image_path ? safeHttpUrl(feat.signed.get(story.image_path) || drivePathUrl(story.image_path) || "") : "";
+    const driveVideo = isVideo && !!drivePathId(story.image_path);
     const imageUrl = isVideo ? "" : (story.localBlob ? storyObjectUrl({id:story.id,blob:story.localBlob}) : signedUrl);
-    const videoUrl = isVideo ? signedUrl : "";
+    const videoUrl = isVideo && !driveVideo ? signedUrl : "";
     let foot;
     if(archived){
         foot = '<span>' + escapeHtml(storyDate(story.created_at)) + ' に投稿' + (story.localOnly ? ' ・端末に保存済み' : '') + '</span><span class="st-actions"><button type="button" class="button-secondary" data-t="story:repost" data-id="' + escapeHtml(story.id) + '">もう一度投稿</button>' +
@@ -151,6 +152,7 @@ function storyCard(story, archived){
     }
     return '<div class="st-card" style="background:' + color + '" data-sid="' + escapeHtml(story.id) + '">' +
         (imageUrl ? '<img src="' + escapeHtml(imageUrl) + '" alt="ストーリーの写真" loading="lazy">' : "") +
+        (driveVideo && signedUrl ? '<a class="button-secondary" href="' + escapeHtml(signedUrl) + '" target="_blank" rel="noopener noreferrer">🎬 動画をドライブで開く</a>' : "") +
         (videoUrl ? '<video class="st-video" controls playsinline preload="metadata" src="' + escapeHtml(videoUrl) + '"></video>' : "") +
         (story.hadVideo ? '<div class="meta" style="color:#fff">🎬 動画は、公開終了から7日で削除されました。</div>' : "") +
         (story.body ? '<div class="st-body">' + linkifyPostBody(story.body) + '</div>' : "") +
@@ -179,7 +181,7 @@ async function loadArchive(first){
             const localRows = await storyLocalList(state.user.id).catch(() => []);
             const serverIds = new Set(serverRows.map((row) => row.id));
             const merged = serverRows.slice();
-            for(const local of localRows) if(!serverIds.has(local.id) && !merged.some((row) => row.id === local.id)) merged.push({id:local.id,user_id:local.user_id,body:local.body,bg:local.bg,created_at:local.created_at,expires_at:local.expires_at,localBlob:local.blob,hadVideo:!!local.had_video,localOnly:true});
+            for(const local of localRows) if(!serverIds.has(local.id) && !merged.some((row) => row.id === local.id)) merged.push({id:local.id,user_id:local.user_id,body:local.body,bg:local.bg,created_at:local.created_at,expires_at:local.expires_at,localBlob:local.blob,image_path:local.image_path || "",hadVideo:!!local.had_video,localOnly:true});
             merged.sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
             feat.story.archiveRows = merged;
             feat.story.archiveTotal = merged.length;
@@ -215,6 +217,8 @@ async function repostStory(button){
             copied = state.user.id + "/" + crypto.randomUUID() + ".jpg";
             const copy = await client.storage.from("post-images").upload(copied,local.blob,{contentType:local.content_type || "image/jpeg",upsert:false});
             if(copy.error){ copied = null; throw copy.error; }
+        }else if(story.image_path && drivePathId(story.image_path)){
+            copied = state.user.id + "/drive-" + drivePathId(story.image_path) + "." + ((/\.([A-Za-z0-9]{1,5})$/.exec(story.image_path) || [0, "jpg"])[1].toLowerCase());   // ドライブのファイルは コピーせず、同じものを使う
         }else if(story.image_path){
             const ext = (/\.([A-Za-z0-9]{2,5})$/.exec(story.image_path) || [0, "jpg"])[1].toLowerCase();
             copied = state.user.id + "/" + crypto.randomUUID() + "." + ext;
@@ -283,7 +287,7 @@ function storyCompose(keep){
         '<div class="row" style="justify-content:flex-start;align-items:center"><button type="button" class="tool-button" data-t="story:photo">📷 写真を付ける</button><button type="button" class="tool-button" data-t="story:video">🎬 動画を付ける</button>' +
         (s.file ? '<span class="meta">' + escapeHtml(s.file.name) + '</span><button type="button" class="button-secondary" data-t="story:unphoto">外す</button>' : "") +
         (s.video ? '<span class="meta">🎬 ' + escapeHtml(s.video.name) + '（' + escapeHtml(formatAttachmentSize(s.video.size)) + '）</span><button type="button" class="button-secondary" data-t="story:unphoto">外す</button>' : "") + '</div>' +
-        '<div class="meta">動画は50MB・5分まで。大きい動画は、YouTube／ドライブなどのリンクにして投稿します。動画は公開終了の7日後に削除されます（端末には保存しません）。</div>' +
+        '<div class="meta">写真・動画はGoogleドライブに保管します（動画は 見るためのリンクになります）。ドライブの中身は自動では消えません。</div>' +
         '<div class="row"><button type="button" class="button-secondary" data-t="story:list">キャンセル</button><button type="button" class="button-secondary" data-t="story:schedule">🕒 予約</button><button type="button" class="button" data-t="story:post">投稿する</button></div>');
 }
 
@@ -303,7 +307,15 @@ async function postStory(button, sendAtArg, linkText){
     let uploaded = null, localBlob = null, postedId = null;
     const idle = () => { if(button) button.disabled = false; };
     try{
-        if(video){
+        let viaDrive = false;
+        if(video && driveFirstOn()){   // 写真・動画は、1バイトでも Googleドライブへ
+            try{
+                const ext0 = (fileExt(video) || "mp4").replace(/[^a-z0-9]/gi,"").toLowerCase() || "mp4";
+                const dup = await driveUploadSimple(video, "video", (text) => { if(button) button.textContent = "🎬 " + text; });
+                uploaded = drivePath(state.user.id, dup.id, isPostVideoPath("x." + ext0) ? ext0 : "mp4"); viaDrive = true;
+            }catch(driveError){ console.error("[ARE drive story]", driveError); showToast("ドライブに置けなかったので、そのまま投稿します。"); }
+        }
+        if(video && !viaDrive){
             // 動画：50MB・5分までは そのまま。大きすぎる／長すぎる／保存場所がことわった動画は、リンクにして投稿する
             if(video.size > postVideoLimitBytes()){ openStoryVideoLinkSheet(video,"size"); return; }
             if(postVideoMimeBlocked("video")){ openStoryVideoLinkSheet(video,"upload"); return; }
@@ -319,11 +331,17 @@ async function postStory(button, sendAtArg, linkText){
                 throw up.error;
             }
             uploaded = path;
-        }else if(file){
+        }else if(!video && file){
             const blob = await resizeImage(file,1080,0.85); localBlob = blob;
-            uploaded = state.user.id + "/" + crypto.randomUUID() + ".jpg";
-            const up = await client.storage.from("post-images").upload(uploaded, blob, {contentType:"image/jpeg", upsert:false});
-            if(up.error) throw up.error;
+            if(driveFirstOn()){
+                try{ const dup = await driveStoreBlob(blob, "story.jpg", "image/jpeg", "image", (text) => { if(button) button.textContent = "📷 " + text; }); uploaded = drivePath(state.user.id, dup.id, "jpg"); }
+                catch(driveError){ console.error("[ARE drive story]", driveError); showToast("ドライブに置けなかったので、そのまま投稿します。"); uploaded = null; }
+            }
+            if(!uploaded){
+                uploaded = state.user.id + "/" + crypto.randomUUID() + ".jpg";
+                const up = await client.storage.from("post-images").upload(uploaded, blob, {contentType:"image/jpeg", upsert:false});
+                if(up.error) throw up.error;
+            }
         }
         if(sendAt){
             const scheduled = await client.rpc("schedule_story",{p_body:body || null,p_image_path:uploaded,p_bg:st.bg,p_send_at:sendAt.toISOString()});

@@ -96,7 +96,9 @@ async function openSharedPostFromUrl(){
     const author = (profile && profile.data) || {};
     if(author.id) feat.postProfiles.set(author.id, author);
     let img = "";
-    if(post.image_path){
+    if(post.image_path && drivePathId(post.image_path)){
+        img = drivePathIsImage(post.image_path) ? safeHttpUrl(drivePathUrl(post.image_path)) : "";
+    }else if(post.image_path){
         const signed = await client.storage.from("post-images").createSignedUrl(post.image_path, 3600);
         if(signed && signed.data && signed.data.signedUrl) img = safeHttpUrl(signed.data.signedUrl);
     }

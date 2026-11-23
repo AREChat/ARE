@@ -184,7 +184,7 @@ async function wkDocsHtml(){
     const folders = [...new Set(docs.map((d) => d.folder || ""))].sort();
     return '<h4 style="margin:6px 0">📁 文書管理</h4>' +
         '<div class="admin-card"><label for="wkFolder">フォルダ名（空なら「未分類」）</label><input id="wkFolder" type="text" maxlength="40" list="wkFolderList" placeholder="例：契約書"><datalist id="wkFolderList">' + folders.filter(Boolean).map((f) => '<option value="' + escapeHtml(f) + '">').join("") + '</datalist>' +
-        '<label for="wkFile">ファイル（5MBまで）</label><input id="wkFile" type="file"><div class="row"><button type="button" class="button" data-t="wk:upload">アップロード</button></div></div>' +
+        '<label for="wkFile">ファイル（' + (driveFirstOn() ? 'Googleドライブに保管・大きさの上限なし' : '5MBまで') + '）</label><input id="wkFile" type="file"><div class="row"><button type="button" class="button" data-t="wk:upload">アップロード</button></div></div>' +
         (folders.length ? folders.map((f) => '<h4 style="margin:10px 0 4px">📂 ' + escapeHtml(f || "未分類") + '</h4>' + docs.filter((d) => (d.folder || "") === f).map((d) =>
             '<div class="admin-card">📄 ' + escapeHtml(d.name) + ' <span class="meta">' + Math.max(1, Math.round(d.size / 1024)) + 'KB / ' + escapeHtml(wkName(d.uploaded_by)) + '</span><div class="row"><button type="button" class="button-secondary" data-t="wk:dl" data-p="' + escapeHtml(d.path) + '" data-n="' + escapeHtml(d.name) + '">ダウンロード</button>' +
             (d.uploaded_by === state.user.id || w.isAdmin ? '<button type="button" class="button-danger" data-t="wk:docdel" data-id="' + escapeHtml(d.id) + '">削除</button>' : "") + '</div></div>').join("")).join("") : '<div class="empty-list">文書がありません。</div>');
@@ -331,23 +331,32 @@ async function onWkAction(action, node){
         else if(action === "upload"){
             const file = $("wkFile").files && $("wkFile").files[0];
             if(!file){ showToast("ファイルを選んでください。"); return; }
-            if(file.size > 5242880){ showToast("5MBまでのファイルを選んでください。"); return; }
-            const safe = file.name.replace(/[^\w.\-぀-ヿ一-鿿]/g, "_").slice(-80) || "file";
-            const id = (self.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now())).slice(0, 8);
-            const path = w.ws.id + "/" + id + "-" + safe.replace(/[^\x20-\x7e]/g, "_");
-            const up = await requireClient().storage.from("ws-docs").upload(path, file, {contentType:file.type || "application/octet-stream", upsert:false});
-            if(up.error) throw up.error;
-            try{ await wkRpc("doc_register", {p_ws:w.ws.id, p_folder:$("wkFolder").value || "", p_name:file.name, p_path:path, p_size:file.size, p_mime:file.type || null}); }
-            catch(e){ await requireClient().storage.from("ws-docs").remove([path]); throw e; }
-            showToast("アップロードしました。");
+            if(driveFirstOn()){   // 文書は Google ドライブ（GAS）へ。Supabase Storage には置かない
+                if(!file.size){ showToast("空のファイルは置けません。"); return; }
+                const dup = await driveUploadSimple(file, "file", (t) => showToast(t));
+                const ext = (/\.([A-Za-z0-9]{1,5})$/.exec(file.name) || [0, "bin"])[1].toLowerCase();
+                await wkRpc("doc_register", {p_ws:w.ws.id, p_folder:$("wkFolder").value || "", p_name:file.name, p_path:w.ws.id + "/drive-" + dup.id + "." + ext, p_size:Math.min(file.size, 2147483647), p_mime:file.type || null});
+                showToast("アップロードしました。");
+            }else{
+                if(file.size > 5242880){ showToast("5MBまでのファイルを選んでください。"); return; }
+                const safe = file.name.replace(/[^\w.\-぀-ヿ一-鿿]/g, "_").slice(-80) || "file";
+                const id = (self.crypto && crypto.randomUUID ? crypto.randomUUID() : String(Date.now())).slice(0, 8);
+                const path = w.ws.id + "/" + id + "-" + safe.replace(/[^\x20-\x7e]/g, "_");
+                const up = await requireClient().storage.from("ws-docs").upload(path, file, {contentType:file.type || "application/octet-stream", upsert:false});
+                if(up.error) throw up.error;
+                try{ await wkRpc("doc_register", {p_ws:w.ws.id, p_folder:$("wkFolder").value || "", p_name:file.name, p_path:path, p_size:file.size, p_mime:file.type || null}); }
+                catch(e){ await requireClient().storage.from("ws-docs").remove([path]); throw e; }
+                showToast("アップロードしました。");
+            }
         }else if(action === "dl"){
+            if(drivePathId(node.dataset.p)){ const da = document.createElement("a"); da.href = "https://drive.google.com/uc?export=download&id=" + drivePathId(node.dataset.p); da.target = "_blank"; da.rel = "noopener noreferrer"; document.body.appendChild(da); da.click(); da.remove(); return; }
             const r = await requireClient().storage.from("ws-docs").createSignedUrl(node.dataset.p, 60, {download:node.dataset.n});
             if(r.error) throw r.error;
             const a = document.createElement("a"); a.href = r.data.signedUrl; a.rel = "noopener noreferrer"; document.body.appendChild(a); a.click(); a.remove(); return;
         }else if(action === "docdel"){
             if(!confirm("この文書を削除します。よいですか？")) return;
             const path = await wkRpc("doc_delete", {p_id:node.dataset.id});
-            if(path) await requireClient().storage.from("ws-docs").remove([path]);
+            if(path && !drivePathId(path)) await requireClient().storage.from("ws-docs").remove([path]);
         }else if(action === "notenew"){ if(!($("wkNewNote").value || "").trim()){ showToast("タイトルを入力してください。"); return; } await wkRpc("note_create", {p_ws:w.ws.id, p_title:$("wkNewNote").value}); }
         else if(action === "noteopen"){ w.note = {id:node.dataset.id, title:node.dataset.title, editing:false}; }
         else if(action === "notelist"){ if(w.note && w.note.editing) await wkRpc("note_release", {p_id:w.note.id}).catch(() => {}); w.note = null; }

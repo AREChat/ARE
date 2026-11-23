@@ -9,8 +9,23 @@ function fdrParse(o){ const m = /^(\d{10,})_(.+)$/.exec(o.name || ""); return m 
 function fdrTime(t){ const d = new Date(t); return (d.getMonth() + 1) + "/" + d.getDate() + " " + String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0"); }
 const fdrErr = (e) => { const m = String((e && e.message) || e); return /not found|bucket/i.test(m) ? "転送の置き場がまだ用意されていません（管理者がSQLを実行すると使えます）。" : /size|exceed|too large|413/i.test(m) ? "大きすぎます（50MBまで）。" : featError(e); };
 
+// ファイルは Google ドライブ（GAS）に置き、file_drop_items に「名前と番号」だけ控える（Supabase Storage は使わない）
+const fdrDrive = () => { try{ return driveFirstOn(); }catch(_e){ return false; } };
+function fdrDownload(id, name){
+  const a = document.createElement("a"); a.href = "https://drive.google.com/uc?export=download&id=" + id; a.target = "_blank"; a.rel = "noopener noreferrer"; if(name) a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
 async function fdrLoad(s){
   s.loading = true; ftPaint();
+  if(fdrDrive()){
+    try{
+      const r = await requireClient().from("file_drop_items").select("id,name,size,drive_id,created_at").eq("user_id", state.user.id).order("created_at", {ascending: false}).limit(100);
+      if(r.error) throw r.error;
+      s.items = (r.data || []).map((x) => ({key: x.id, t: new Date(x.created_at).getTime(), name: x.name, size: x.size, drive: x.drive_id})); s.ready = true;
+    }catch(e){ s.items = []; s.ready = false; s.msg = fdrErr(e); }
+    s.loading = false; ftPaint(); return;
+  }
   try{
     const uid = state.user.id, st = requireClient().storage.from(FDR_BUCKET);
     const r = await st.list(uid, {limit: 200, sortBy: {column: "name", order: "desc"}});
@@ -25,7 +40,7 @@ async function fdrLoad(s){
 ftPainters.drop = (s) => {
   if(!s.started){ s.started = true; setTimeout(() => fdrLoad(s), 0); }
   const items = s.items || [];
-  return '<div class="meta">ここに入れたファイルは、同じアカウントの別の端末から ダウンロードできます（' + FDR_DAYS + '日で消えます）。</div>' +
+  return '<div class="meta">ここに入れたファイルは、同じアカウントの別の端末から ダウンロードできます（' + (fdrDrive() ? 'Googleドライブに保管します。大きさの上限はありません' : FDR_DAYS + '日で消えます') + '）。</div>' +
     ftPick("drop", "add", "📤 ファイルを送る（いくつでも）", "", true) +
     (s.busy ? '<div class="meta" role="status">送っています… ' + escapeHtml(s.busy) + '</div>' : "") +
     (s.loading ? '<div class="meta">読み込み中…</div>' : "") +
@@ -34,6 +49,27 @@ ftPainters.drop = (s) => {
 };
 ftActs.drop = async (a, node, s) => {
   if(a === "reload"){ await fdrLoad(s); return; }
+  if(fdrDrive()){
+    const c = requireClient();
+    if(a === "add"){
+      const list = Array.from(node.files); node.value = ""; if(!list.length) return;
+      let ok = 0, bad = "";
+      for(const f of list){
+        if(!f.size){ bad = "「" + f.name + "」は空のファイルです。"; continue; }
+        s.busy = f.name; ftPaint();
+        try{
+          const up = await driveUploadSimple(f, "file", (t) => { s.busy = f.name + "（" + t + "）"; ftPaint(); });
+          const ins = await c.from("file_drop_items").insert({user_id: state.user.id, name: String(f.name || "file").slice(0, 200), size: f.size, drive_id: up.id});
+          if(ins.error) throw ins.error; ok++;
+        }catch(e){ bad = fdrErr(e); break; }
+      }
+      s.busy = ""; s.msg = (ok ? ok + "個 送りました。" : "") + (bad ? " " + bad : ""); await fdrLoad(s); return;
+    }
+    const mm = /^(get|del)-(\d+)$/.exec(a); const item = mm && (s.items || [])[Number(mm[2])]; if(!item) return;
+    if(mm[1] === "get"){ fdrDownload(item.drive, item.name); s.msg = "「" + escapeHtml(item.name) + "」を受け取ります（ダウンロードが始まらないときは、もう一度押してください）。"; ftPaint(); return; }
+    try{ const r = await c.from("file_drop_items").delete().eq("id", item.key); if(r.error) throw r.error; s.msg = "一覧から消しました。"; }catch(e){ s.msg = fdrErr(e); }
+    await fdrLoad(s); return;
+  }
   const uid = state.user.id, st = requireClient().storage.from(FDR_BUCKET);
   if(a === "add"){
     const list = Array.from(node.files); node.value = ""; if(!list.length) return;
