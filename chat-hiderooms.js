@@ -135,11 +135,16 @@ function hrAddButtons(){
     const css = document.createElement("style");
     css.textContent = ".room-item.hr-hide{display:none!important}.hr-btn{width:100%;min-height:44px;margin:6px 0}body:not(.seg-no-users) #hrBtnChats{display:none}";
     document.head.appendChild(css);
-    const mk = (id) => { const b = document.createElement("button"); b.type = "button"; b.id = id; b.className = "button-secondary hr-btn"; b.textContent = "🙈 非表示のチャット（0）"; b.addEventListener("click", hrOpenList); return b; };
+    const mk = (id, compact) => {
+        const b = document.createElement("button");
+        b.type = "button"; b.id = id; b.className = "button-secondary hr-btn"; b.textContent = "🙈 非表示のチャット（0）";
+        if(compact) b.style.cssText = "width:auto;min-height:0;margin:0;padding:3px 6px;font-size:10px;border-radius:999px;white-space:nowrap;flex:0 0 auto";
+        b.addEventListener("click", hrOpenList); return b;
+    };
     // ユーザータブでは「未登録」の右どなりに、1行表示の小さいボタンとして出す
     const heading = document.getElementById("usersStatsHeading");
-    if(heading) heading.appendChild(mk("hrBtnUsers"));
-    else{ const u = document.querySelector(".pane-users #recommendedUsers"); if(u) u.insertAdjacentElement("beforebegin", mk("hrBtnUsers")); }
+    if(heading) heading.appendChild(mk("hrBtnUsers", true));
+    else{ const u = document.querySelector(".pane-users #recommendedUsers"); if(u) u.insertAdjacentElement("beforebegin", mk("hrBtnUsers", true)); }
     const c = document.getElementById("roomList"); if(c) c.insertAdjacentElement("beforebegin", mk("hrBtnChats"));
 }
 

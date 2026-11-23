@@ -64,12 +64,23 @@ if (!sources.length) { console.error("chat-bundle-sources.txt が空です。");
     const tag = '<script defer src="./chat.bundle.js?v=' + hash + '"></script>';
     const re = /<script defer src="\.\/chat\.bundle\.js\?v=[0-9a-f]+"><\/script>/;
     if (!re.test(html)) { console.error("chat.html に chat.bundle.js の <script> がありません。"); process.exit(2); }
-    const newHtml = html.replace(re, tag);
+    let newHtml = html.replace(re, tag);
+
+    // chat.css も同じしくみで ?v= を付ける。これが無いと、sw.js の「控え先・裏で更新」により
+    // 直した CSS が 1回の更新（リロード）では反映されず、もう一度 更新しないと効かないことがある
+    const cssFile = path.join(root, "chat.css");
+    const cssRe = /<link rel="stylesheet" href="\.\/chat\.css(?:\?v=[0-9a-f]+)?">/;
+    let cssHash = null;
+    if (fs.existsSync(cssFile) && cssRe.test(newHtml)) {
+        const css = fs.readFileSync(cssFile, "utf8");
+        cssHash = crypto.createHash("sha1").update(css).digest("hex").slice(0, 10);
+        newHtml = newHtml.replace(cssRe, '<link rel="stylesheet" href="./chat.css?v=' + cssHash + '">');
+    }
 
     if (checkOnly) {
         const curBundle = fs.existsSync(outFile) ? fs.readFileSync(outFile, "utf8") : "";
         if (curBundle !== bundle || newHtml !== html) {
-            console.error("chat.bundle.js または chat.html の ?v= が古いです。  node tools/build-bundle.js  を実行して、できたファイルをコミットしてください。");
+            console.error("chat.bundle.js／chat.css または chat.html の ?v= が古いです。  node tools/build-bundle.js  を実行して、できたファイルをコミットしてください。");
             process.exit(1);
         }
         console.log("OK: chat.bundle.js は最新です（" + sources.length + " ファイル, " + hash + "）");
@@ -77,5 +88,5 @@ if (!sources.length) { console.error("chat-bundle-sources.txt が空です。");
     }
     fs.writeFileSync(outFile, bundle);
     fs.writeFileSync(htmlFile, newHtml);
-    console.log("chat.bundle.js を作りました: " + sources.length + " ファイル, " + bundle.length + " 文字, v=" + hash);
+    console.log("chat.bundle.js を作りました: " + sources.length + " ファイル, " + bundle.length + " 文字, v=" + hash + (cssHash ? " / chat.css v=" + cssHash : ""));
 })();
