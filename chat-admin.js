@@ -143,6 +143,13 @@ function auPaintList(){
     list.innerHTML = rows.length ? rows.map(auUserCard).join("") : '<div class="empty-list">このグループのユーザーはいません。</div>';
     const bar = el.adminBody.querySelector("#auBar"); if(bar) bar.innerHTML = auFilterBar();
 }
+function auGroupCard(r){
+    const title = r.group_name || (r.members || []).map((m) => m.name || "ユーザー").join(" / ") || "グループ";
+    return '<div class="admin-card"><b>👥 ' + escapeHtml(title) + '</b> <span class="meta">' + escapeHtml(String((r.members || []).length)) + '人 ・ ' + escapeHtml(String(r.message_count || 0)) + '件' +
+        (r.last_message_at ? ' ・最終：' + escapeHtml(formatDate(r.last_message_at)) : '') + '</span>' +
+        '<div class="row"><button class="button-secondary" data-admin-room="' + escapeHtml(r.room_id) + '" data-title="' + escapeHtml(title) + '" type="button">会話を見る</button>' +
+        '<button class="button-danger" data-delgroup="' + escapeHtml(r.room_id) + '" data-gname="' + escapeHtml(title) + '" type="button">グループを削除</button></div></div>';
+}
 async function renderAdminUsers(client){
     let rows, hasSeg = true;
     const v2 = await client.rpc("admin_list_profiles_v2");
@@ -153,9 +160,18 @@ async function renderAdminUsers(client){
         rows = v1.data;
     }else{ rows = v2.data; }
     auSt.rows = rows;
+    let groupsHtml = "";
+    try{
+        const rr = await client.rpc("admin_list_rooms",{p_limit:200});
+        if(!rr.error){
+            const groups = (rr.data || []).filter((r) => r.is_group);
+            groupsHtml = '<div class="section-heading"><h2>👥 グループ管理（' + groups.length + '件）</h2></div>' +
+                (groups.length ? groups.map(auGroupCard).join("") : '<div class="empty-list">グループはありません。</div>');
+        }
+    }catch(_e){ /* グループ一覧が取れなくてもユーザー管理は続ける */ }
     el.adminBody.innerHTML = '<div class="row"><button class="button" id="adminCreateUser" type="button">＋ 新規アカウントを作成</button></div><div class="row"><button class="button-secondary" data-bulk="all" type="button">全員を選ぶ／解除</button><button class="button-secondary" data-bulk="noname" type="button">名前なし（「ユーザー」）だけ選ぶ</button><button class="button-secondary" data-bulk="orphan" type="button">削除ずみユーザーの残りチャットを消す</button><button class="button-danger" data-bulk="del" id="adminBulkDel" type="button" disabled>選んだユーザーを削除（0人）</button></div><div class="admin-card meta">復旧コードを失くした利用者に対する再発行です。必ず本人確認を行ってから実行してください。新しいコードは画面に1回だけ表示され、保存されません。旧コードは無効になり、利用者本人にも再発行の通知が表示されます。</div>' +
         (hasSeg ? '<div id="auBar">' + auFilterBar() + '</div>' : '<div class="meta">（グループ・使用頻度の表示には admin_list_profiles_v2.sql の実行が必要です）</div>') +
-        '<div id="auList"></div>';
+        '<div id="auList"></div>' + groupsHtml;
     if(hasSeg) auPaintList();
     else el.adminBody.querySelector("#auList").innerHTML = rows.length ? rows.map(auUserCard).join("") : '<div class="empty-list">ユーザーがいません。</div>';
     el.adminBody.onchange = updateBulkCount;
@@ -205,6 +221,15 @@ async function onAdminClick(event){
     }
     if(target.id === "adminCreateUser") return openCreateUser();
     if(target.dataset.edituser) return openEditUser(target.dataset.edituser);
+    if(target.dataset.delgroup){
+        feat.delGroupTarget = {id:target.dataset.delgroup, name:target.dataset.gname};
+        openSheet('<h3 style="margin:0">⚠️ グループを削除します</h3><div><b>' + escapeHtml(target.dataset.gname) + '</b></div>' +
+            '<div class="meta">このグループのメッセージ・参加情報がすべて消えます。元に戻せません。</div>' +
+            '<label for="delGroupReason">削除理由（任意・監査ログに記録されます）</label><input id="delGroupReason" type="text" autocomplete="off">' +
+            '<div id="bdMsg" class="meta" role="status"></div>' +
+            '<div class="row" style="justify-content:stretch"><button type="button" class="button-danger" data-bd="delgroup">はい、削除する</button><button type="button" class="button-secondary" data-pm="close">やめる</button></div>');
+        return;
+    }
     if(target.dataset.bulk === "all"){
         const boxes = Array.from(el.adminBody.querySelectorAll("input[data-selu]"));
         const on = boxes.some((c) => !c.checked); boxes.forEach((c) => { c.checked = on; }); updateBulkCount(); return;
@@ -378,6 +403,24 @@ async function renderAdminAcctDel(client){
 }
 
 feat.delTarget = null;
+feat.delGroupTarget = null;
+
+async function runGroupDelete(button){
+    const t = feat.delGroupTarget; if(!t) return;
+    const reason = (document.getElementById("delGroupReason")?.value || "").trim();
+    el.profileSheet.querySelectorAll("button").forEach((x) => { x.disabled = true; });
+    const msg = document.getElementById("bdMsg"); if(msg) msg.textContent = "削除しています…";
+    try{
+        const r = await requireClient().rpc("admin_delete_group_v1",{p_room_id:t.id, p_reason:reason || null});
+        if(r.error) throw r.error;
+        feat.delGroupTarget = null; closeSheet();
+        showToast(t.name + " を削除しました。");
+        renderAdmin();
+    }catch(error){
+        el.profileSheet.querySelectorAll("button").forEach((x) => { x.disabled = false; });
+        showToast(featError(error));
+    }
+}
 
 function onAcctDelClick(event){
     const b = event.target.closest("[data-acctdel]");
@@ -400,7 +443,12 @@ function onAcctDelClick(event){
 
 async function onDelSheet(event){
     const bd = event.target.closest("[data-bd]");
-    if(bd) return bd.dataset.bd === "orphanroom" ? runOrphanRoomDelete() : (bd.dataset.bd === "orphan" ? runOrphanPurge() : runBulkDelete(bd));
+    if(bd){
+        if(bd.dataset.bd === "orphanroom") return runOrphanRoomDelete();
+        if(bd.dataset.bd === "orphan") return runOrphanPurge();
+        if(bd.dataset.bd === "delgroup") return runGroupDelete(bd);
+        return runBulkDelete(bd);
+    }
     const dr = event.target.closest("[data-dr]");
     if(dr) return submitDeleteRequest(dr);
     const b = event.target.closest("[data-d]");
