@@ -10,7 +10,7 @@ const TABLES = Object.freeze({
 const STORAGE_BUCKET = "chat-attachments";
 
 const MAX_TEXT_LENGTH = 4000;
-const SCHEDULE_MAX_TEXT = 1000;   // 予約送信（文章）は1,000文字まで（サーバー側 schedule_message も同じ。sql/schedule_text_limit_v1.sql）
+const SCHEDULE_MAX_TEXT = 4000;   // 予約送信（文章）も、ふつうの送信と同じ4,000文字まで（サーバー側 schedule_message も同じ。sql/schedule_text_limit_v2.sql）
 
 const MAX_IMAGES = 10;
 
@@ -385,9 +385,9 @@ function composerMaxHeight(){
 
 function updateCharCount(){
     const length = Array.from(el.messageInput.value).length;
-    // 予約送信パネルが開いているあいだは、上限の表示を「1,000」に。ふつうの送信は今までどおり4,000文字まで
+    // 予約送信も、ふつうの送信と同じ 4,000 文字まで
     const sched = !!(el.schedulePanel && !el.schedulePanel.hidden), limit = sched ? SCHEDULE_MAX_TEXT : MAX_TEXT_LENGTH;
-    const limitEl = document.getElementById("charLimit"); if(limitEl) limitEl.textContent = sched ? "1,000（予約）" : "4,000";
+    const limitEl = document.getElementById("charLimit"); if(limitEl) limitEl.textContent = "4,000";
     if(el.scheduleSubmit) el.scheduleSubmit.disabled = sched && length > SCHEDULE_MAX_TEXT;
     el.charCount.textContent = String(length);
     el.charCount.style.color = length > limit ? "var(--danger)" : "var(--muted)";

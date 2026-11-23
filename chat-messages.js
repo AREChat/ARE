@@ -72,7 +72,7 @@ function toggleSchedule(){
         if(!el.scheduleAt.value) el.scheduleAt.value = localInput(new Date(Date.now() + 10 * 60000));
         loadScheduled();
     }
-    updateCharCount();   // 上限の表示（予約は1,000文字）を切りかえる
+    updateCharCount();   // 上限の表示を更新する
 }
 
 // 📎・📷・🎬で選んだ写真・動画・ファイルも予約できるようにする：
@@ -88,7 +88,7 @@ async function scheduleSend(){
     if(!state.currentRoom) return;
     const text = el.messageInput.value;
     if(!text.trim()){ showToast("予約するメッセージを入力欄に入力してください。"); return; }
-    if(Array.from(text).length > SCHEDULE_MAX_TEXT){ showToast("予約送信は1,000文字までです（いま " + Array.from(text).length + " 文字）。短くするか、すぐ送信にしてください。"); return; }
+    if(Array.from(text).length > SCHEDULE_MAX_TEXT){ showToast("予約送信は4,000文字までです（いま " + Array.from(text).length + " 文字）。短くしてください。"); return; }
     const when = new Date(el.scheduleAt.value);
     if(isNaN(when.getTime()) || when.getTime() < Date.now() + 45000){ showToast("送信日時は1分以上先を指定してください。"); return; }
     el.scheduleSubmit.disabled = true;
