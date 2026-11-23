@@ -291,6 +291,82 @@ async function runOrphanRoomDelete(){
     }
 }
 
+// ===== メッセージの一括選択・一括「管理者として削除」 =====
+// ・1件ずつ「管理者として削除」を押すのが大変なので、チェックボックスで複数選択、または日付の範囲で選んで、まとめて削除できるようにする
+// ・ヘッダーの「☑️ 一括削除」ボタンで選択モードに入る（管理者のみ・チャットを開いているときだけ表示）
+function initMsgBulk(){
+    const b = document.getElementById("msgBulkBtn");
+    if(!b || b.dataset.ready) return; b.dataset.ready = "1";
+    el.messages.addEventListener("click",onMsgBulkClick);
+    el.messages.addEventListener("input",(event) => {
+        if(event.target.id === "msgBulkFrom") feat.msgBulkFrom = event.target.value;
+        else if(event.target.id === "msgBulkTo") feat.msgBulkTo = event.target.value;
+    });
+    addRoomHook((room) => {
+        b.hidden = !(feat.isAdmin && room);
+        feat.msgBulkMode = false; feat.msgSelect = new Set(); feat.msgBulkFrom = ""; feat.msgBulkTo = "";
+        b.textContent = "☑️ 一括削除"; b.classList.remove("on"); el.messages.classList.remove("msg-bulk-active");
+    });
+    b.addEventListener("click",() => {
+        if(!feat.isAdmin || !state.currentRoom) return;
+        feat.msgBulkMode = !feat.msgBulkMode;
+        if(!feat.msgBulkMode) feat.msgSelect = new Set();
+        b.textContent = feat.msgBulkMode ? "✖️ 一括削除をやめる" : "☑️ 一括削除";
+        b.classList.toggle("on", feat.msgBulkMode);
+        el.messages.classList.toggle("msg-bulk-active", feat.msgBulkMode);
+        renderMessages(false);
+    });
+}
+function msgBulkBarHtml(){
+    const count = feat.msgSelect.size;
+    return '<div class="msg-bulkbar" id="msgBulkBar">' +
+        '<div class="msg-bulkbar-row"><input type="date" id="msgBulkFrom" value="' + escapeHtml(feat.msgBulkFrom) + '" aria-label="開始日">〜<input type="date" id="msgBulkTo" value="' + escapeHtml(feat.msgBulkTo) + '" aria-label="終了日">' +
+        '<button type="button" class="button-secondary" data-msgbulk-range="1">この期間を選択</button></div>' +
+        '<div class="msg-bulkbar-row"><span class="meta">' + count + '件を選択中</span>' +
+        '<button type="button" class="button-secondary" data-msgbulk-all="1">すべて選択</button>' +
+        '<button type="button" class="button-secondary" data-msgbulk-clear="1">選択を解除</button>' +
+        '<button type="button" class="button-danger" data-msgbulk-del="1"' + (count ? "" : " disabled") + '>選択した' + count + '件を管理者として削除</button></div></div>';
+}
+async function onMsgBulkClick(event){
+    const range = event.target.closest("[data-msgbulk-range]");
+    const all = event.target.closest("[data-msgbulk-all]");
+    const clear = event.target.closest("[data-msgbulk-clear]");
+    const del = event.target.closest("[data-msgbulk-del]");
+    if(range){
+        const from = document.getElementById("msgBulkFrom")?.value || "", to = document.getElementById("msgBulkTo")?.value || "";
+        feat.msgBulkFrom = from; feat.msgBulkTo = to;
+        if(!from && !to){ showToast("開始日・終了日のどちらかを入力してください。"); return; }
+        const fromMs = from ? new Date(from + "T00:00:00").getTime() : -Infinity;
+        const toMs = to ? new Date(to + "T23:59:59.999").getTime() : Infinity;
+        let added = 0;
+        state.messages.forEach((m) => { const t = new Date(m.created_at).getTime(); if(t >= fromMs && t <= toMs){ feat.msgSelect.add(m.id); added++; } });
+        showToast(added + "件を選択に追加しました。");
+        renderMessages(false);
+        return;
+    }
+    if(all){ state.messages.forEach((m) => feat.msgSelect.add(m.id)); renderMessages(false); return; }
+    if(clear){ feat.msgSelect.clear(); renderMessages(false); return; }
+    if(del){
+        const ids = Array.from(feat.msgSelect);
+        if(!ids.length) return;
+        const reason = window.prompt("選択した" + ids.length + "件のメッセージを管理者として削除します。理由を入力してください（監査ログに記録されます）。","");
+        if(reason === null) return;
+        if(!reason.trim() || Array.from(reason).length > 500){ showToast("削除理由を1〜500文字で入力してください。"); return; }
+        del.disabled = true;
+        let ok = 0, fail = 0;
+        for(const id of ids){
+            try{
+                const result = await requireClient().functions.invoke("admin-api",{body:{action:"delete-message",messageId:id,reason:reason.trim()}});
+                if(result.error) throw new Error(result.data?.error || result.error.message);
+                ok++;
+            }catch(_error){ fail++; }
+        }
+        feat.msgSelect.clear();
+        await loadMessages(true,true);
+        showToast(fail ? (ok + "件削除しました（" + fail + "件は失敗）") : (ok + "件削除し、操作記録を保存しました。"));
+    }
+}
+
 // すでに消えたユーザーの「チャットだけ残っている」ものを、管理者が消す（確認は「はい」1回）
 async function orphanSheet(){
     let n = 0;

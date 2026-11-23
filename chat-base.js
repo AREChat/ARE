@@ -747,7 +747,7 @@ async function selectRoom(room,partner){
     state.currentPartner = partner || room.partner || null;
     state.messages = [];
     if(typeof runRoomHooks === "function") runRoomHooks();
-    feat.partnerReadAt = null; feat.readTimes = []; feat.readKey = ""; feat.pending = new Set(); feat.editingId = null; el.schedulePanel.hidden = true;
+    feat.partnerReadAt = null; feat.readTimes = []; feat.readKey = ""; feat.pending = new Set(); feat.editingId = null; feat.msgSelect = new Set(); el.schedulePanel.hidden = true;
 
     const name = room.is_group ? (room.name || "グループ") : profileDisplayName(state.currentPartner);
     el.chatTitle.textContent = name;
@@ -990,7 +990,9 @@ function renderMessages(scrollToBottom, onlyIfChanged){
         if(!editing && (own || feat.isAdmin)){
             actions = '<div class="message-actions">' +
                 (own ? (item.type === "text" ? '<button type="button" data-act="edit" data-id="' + id + '">編集</button>' : '') + (feat.pending.has(message.id) ? '<span class="pending">削除申請中（管理者の承認待ち）</span>' : '<button type="button" data-act="del" data-id="' + id + '">削除申請</button>') : '') +
-                (feat.isAdmin ? '<button type="button" class="admin-message-delete" data-act="admin-del" data-id="' + id + '">管理者として削除</button>' : '') +
+                (feat.isAdmin ? (feat.msgBulkMode
+                    ? '<label class="msg-select"><input type="checkbox" data-msg-select="' + id + '" data-msg-at="' + escapeHtml(message.created_at) + '"' + (feat.msgSelect.has(message.id) ? " checked" : "") + '> 選択</label>'
+                    : '<button type="button" class="admin-message-delete" data-act="admin-del" data-id="' + id + '">管理者として削除</button>') : '') +
                 '</div>';
         }
 
@@ -1000,14 +1002,15 @@ function renderMessages(scrollToBottom, onlyIfChanged){
             '<div class="message-body"><div class="message-sender">' + escapeHtml(name) + '</div>' +
             body + '<div class="message-time">' + meta + '</div>' + actions + '</div></article>';
     }).join("");
+    const html2 = ((feat.isAdmin && feat.msgBulkMode && typeof msgBulkBarHtml === "function") ? msgBulkBarHtml() : "") + html;
 
     // 8秒ごとの自動更新などで、中身が前とまったく同じなら、作り直さない。
     // （作り直すと、メッセージ全体が一瞬消えて また出るので、画面がチカチカ点滅して 目が疲れるため）
-    if(onlyIfChanged && el.messages.__lastHtml === html && el.messages.__lastFirst && el.messages.__lastFirst === el.messages.firstElementChild) return;
+    if(onlyIfChanged && el.messages.__lastHtml === html2 && el.messages.__lastFirst && el.messages.__lastFirst === el.messages.firstElementChild) return;
 
-    el.messages.innerHTML = html;
+    el.messages.innerHTML = html2;
     if(typeof afterRenderMessages === "function") afterRenderMessages();
-    el.messages.__lastHtml = html; el.messages.__lastFirst = el.messages.firstElementChild;
+    el.messages.__lastHtml = html2; el.messages.__lastFirst = el.messages.firstElementChild;
     el.messages.scrollTop = stick ? el.messages.scrollHeight : prevTop;
 }
 

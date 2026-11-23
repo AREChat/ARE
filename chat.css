@@ -89,6 +89,13 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .message-actions button{background:none;border:0;color:var(--muted);text-decoration:underline;padding:0}
 .message-actions .pending{color:#ffcc66}
 .message-actions .admin-message-delete{color:var(--danger);font-weight:700}
+.message-actions .msg-select{display:inline-flex;align-items:center;gap:4px;color:var(--danger);cursor:pointer;text-decoration:none}
+.message-actions .msg-select input{margin:0}
+.msg-bulkbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;margin:0 0 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);position:sticky;top:0;z-index:2}
+.msg-bulkbar-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
+.msg-bulkbar-row input[type="date"]{font-size:12px;padding:3px 4px}
+.msg-bulkbar .button,.msg-bulkbar .button-secondary,.msg-bulkbar .button-danger{padding:5px 10px;font-size:12px;min-height:0}
+#msgBulkBtn.on{border-color:var(--danger);color:var(--danger)}
 .bubble.edit{display:flex;flex-direction:column;gap:8px;white-space:normal}
 .edit-box{width:100%;min-height:70px;background:var(--bg);color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px}
 .edit-actions{display:flex;gap:8px;justify-content:flex-end}
@@ -127,6 +134,7 @@ html,body{height:100%}
  .rail-btn{width:64px}
  .messages{padding:24px clamp(20px,3vw,48px);gap:12px}
  .message-actions{opacity:.0;transition:opacity .15s}.message-row:hover .message-actions,.message-row:focus-within .message-actions{opacity:1}
+ .messages.msg-bulk-active .message-actions{opacity:1}
  .composer{padding:14px 32px 20px}
  .composer textarea{border-radius:10px}
 }
