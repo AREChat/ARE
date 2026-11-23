@@ -176,7 +176,7 @@ async function ptView(id){
 }
 async function ptHistory(){
     const r = await requireClient().rpc("point_history"); if(r.error) throw r.error;
-    const names = {chat:"チャット", login:"ログインボーナス", streak:"7日連続ボーナス", diary:"日記", habit:"習慣", admin:"運営より"};
+    const names = {chat:"チャット", login:"ログインボーナス", streak:"7日連続ボーナス", diary:"日記", habit:"習慣", admin:"運営より", "ad:watched":"広告を最後まで見た", "ad:skipped":"広告をスキップ"};
     openSheet(toolHead("ポイントの履歴", "最近50件") + ((r.data || []).length ? r.data.map((x) => '<div class="admin-card" style="display:flex;justify-content:space-between"><span>' + escapeHtml(x.reason.startsWith("shop:") ? "ショップで交換" : (names[x.reason] || x.reason)) + '<small class="meta"> ' + escapeHtml(formatDate(x.created_at)) + '</small></span><b style="color:' + (x.delta < 0 ? "#e03131" : "#2b8a3e") + '">' + (x.delta > 0 ? "+" : "") + x.delta + '</b></div>').join("") : '<div class="empty-list">まだありません</div>') +
         '<div class="row"><button type="button" class="button-secondary" data-t="pt:shop">ショップへ</button><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
 }

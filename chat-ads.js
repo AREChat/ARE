@@ -3,10 +3,12 @@
 // ・映像は ads/ に 100本（AD001.mp4〜AD100.mp4）。一覧は ads/manifest.json。収入はなし。
 // ・500ポイントで30日間 広告なし（AREShop の上に出る）。管理者と家庭は ずっと広告なし。社員・友人は1時間ごと、その他は10分ごと。広告は はじまって10秒でスキップできる。
 // ・見つからない映像／広告なし か わからないとき（サーバー未準備など）は、広告を出さずに静かに飛ばす。
+// ・広告が終わったら、自動で閉じる。ポイント：最後まで見た＝1000／スキップした＝100／途中で閉じた・ブラウザを強制終了した＝0
+//   （サーバーが「はじまった時刻」を覚えていて、時間が足りないときは0。sql/ad_reward_v1.sql の ad_view_start / ad_view_finish。管理者・家庭・テスト表示はポイントなし）
 const AD = {
     START: Date.parse("2027-01-01T00:00:00+09:00"),
     HOUR: 3600000,
-    introDone: false, introTries: 0, free: null, admin: false, exempt: false, interval: 60, until: null, price: 500, days: 30, SKIP_MS: 10000,
+    PT_DONE: 1000, PT_SKIP: 100, introDone: false, introTries: 0, free: null, admin: false, exempt: false, interval: 60, until: null, price: 500, days: 30, SKIP_MS: 10000,
     list: null, busy: false, confirm: false, bad: {}
 };
 // 管理者は、どんな時も 広告を出さない（サーバーの返事・ポイントの情報・画面の管理者の印、どれか1つでも「管理者」なら出さない）
@@ -153,9 +155,23 @@ async function adCheck(){
     }finally{ AD.busy = false; }
 }
 
+// 広告の「終わった」を サーバーに連絡して、ポイントをもらう（時間が足りない・9分以内に もらったばかり、のときは 0）
+async function adReward(rec, kind){
+    try{
+        const id = await rec; if(!id) return;
+        const r = await requireClient().rpc("ad_view_finish", {p_id: id, p_kind: kind});
+        const d = r && r.data;
+        if(d && d.paid > 0){
+            showToast(kind === "done" ? "🎉 最後まで見てくれて ありがとう！ +" + d.paid + "ポイント" : "+" + d.paid + "ポイント（スキップ）");
+            try{ if(typeof ptRefresh === "function") ptRefresh(); }catch(_e){}
+        }
+    }catch(_e){ /* ポイントが付かなかっただけ。広告そのものは終わっている */ }
+}
+
 // 再生が はじまったら true（映像が見つからない／読めない時は false）
 function adPlay(ad, srcUrl, test){
     return new Promise((resolve) => {
+        const pays = test !== "test" && !AD.exempt;       // ポイントがもらえる広告か（管理者のテスト表示・管理者・家庭は なし）
         const ov = document.createElement("div");
         ov.id = "adOverlay"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "広告");
         ov.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:12px;color:#fff;font-size:14px";
@@ -166,26 +182,39 @@ function adPlay(ad, srcUrl, test){
         v.style.cssText = "width:min(100%,960px);max-height:62vh;background:#000;border-radius:10px";
         const cap = document.createElement("div"); cap.style.cssText = "font-weight:700;font-size:16px;text-align:center"; cap.textContent = ad.title || "";
         const cnt = document.createElement("div"); cnt.setAttribute("aria-live", "off"); cnt.textContent = "あと " + 15 + " 秒";
+        const prize = document.createElement("div"); prize.style.cssText = "font-size:13px;opacity:.9;text-align:center;line-height:1.5";
+        prize.textContent = pays ? "🎁 最後まで見ると +" + AD.PT_DONE + "ポイント（スキップは +" + AD.PT_SKIP + "ポイント。途中で閉じると 0 ポイント）" : "";
         const row = document.createElement("div"); row.style.cssText = "display:flex;gap:8px;flex-wrap:wrap;justify-content:center";
         const mk = (t, cls) => { const b = document.createElement("button"); b.type = "button"; b.className = cls || "button-secondary"; b.textContent = t; return b; };
-        const snd = mk("🔊 音を出す"); const close = mk("スキップ ▶", "button"); const buy = mk("🚫 " + AD.price + "ポイントで" + AD.days + "日間 広告なし");
+        const snd = mk("🔊 音を出す"); const close = mk("スキップ ▶" + (pays ? "（+" + AD.PT_SKIP + "ポイント）" : ""), "button"); const buy = mk("🚫 " + AD.price + "ポイントで" + AD.days + "日間 広告なし");
         close.hidden = true; buy.hidden = true;
         row.append(snd, close, buy);
-        ov.append(tag, v, cap, cnt, row);
-        let started = false, done = false, hard = null, boot = null;
-        const finish = (ok) => { if(done) return; done = true; clearTimeout(hard); clearTimeout(boot); try{ v.pause(); v.removeAttribute("src"); v.load(); }catch(_e){} ov.remove(); resolve(ok); };
+        ov.append(tag, v, cap, cnt, prize, row);
+        let started = false, done = false, hard = null, boot = null, rec = null;
+        // kind: "done"（最後まで）／"skip"（スキップ）／なし（映像が読めない など＝ポイントなし）
+        const finish = (ok, kind) => {
+            if(done) return; done = true; clearTimeout(hard); clearTimeout(boot); try{ v.pause(); v.removeAttribute("src"); v.load(); }catch(_e){} ov.remove(); resolve(ok);
+            if(kind && rec) adReward(rec, kind);
+        };
         const allow = () => { close.hidden = false; buy.hidden = !!test; cnt.textContent = "スキップできます（広告はあと少しで終わります）"; };
         v.addEventListener("playing", () => {
             if(started) return; started = true; clearTimeout(boot);
+            if(pays){   // 再生がはじまった時刻を、サーバーに覚えてもらう（ポイントは、最後に「終わった」と連絡して、時間が足りていれば もらえる）
+                try{ rec = Promise.resolve(requireClient().rpc("ad_view_start", {p_ad: String(ad.id || "")})).then((r) => (r && !r.error && r.data) || null).catch(() => null); }catch(_e){ rec = null; }
+            }
             hard = setTimeout(allow, AD.SKIP_MS);          // 広告がはじまって 10秒たったら、スキップできる
         });
-        v.addEventListener("timeupdate", () => { const left = Math.max(0, Math.ceil((v.duration && isFinite(v.duration) ? v.duration : 15) - v.currentTime)); if(!close.hidden) return; cnt.textContent = "あと " + left + " 秒"; });
-        v.addEventListener("ended", allow);
+        v.addEventListener("timeupdate", () => {
+            const dur = v.duration && isFinite(v.duration) ? v.duration : 15;
+            if(started && v.currentTime >= dur - 0.05){ finish(true, "done"); return; }   // 終わりまで来たら、自動で閉じる（ended が来ない端末の保険）
+            const left = Math.max(0, Math.ceil(dur - v.currentTime)); if(!close.hidden) return; cnt.textContent = "あと " + left + " 秒";
+        });
+        v.addEventListener("ended", () => { if(started) finish(true, "done"); else allow(); });   // 広告が終わったら、自動で閉じる
         v.addEventListener("error", () => { if(!started) finish(false); else allow(); });
         boot = setTimeout(() => { if(!started) finish(false); }, 8000);
         snd.addEventListener("click", () => { v.muted = !v.muted; snd.textContent = v.muted ? "🔊 音を出す" : "🔇 音を消す"; });
-        close.addEventListener("click", () => finish(true));
-        buy.addEventListener("click", () => { finish(true); try{ if(typeof openPtShop === "function") openPtShop("pack"); }catch(_e){} });
+        close.addEventListener("click", () => finish(true, "skip"));
+        buy.addEventListener("click", () => { finish(true, "skip"); try{ if(typeof openPtShop === "function") openPtShop("pack"); }catch(_e){} });
         document.body.appendChild(ov);
         v.src = srcUrl;
         const p = v.play(); if(p && p.catch) p.catch(() => {});
@@ -205,6 +234,7 @@ function adFreeCardHtml(pts){
     let btn;
     if(AD.confirm) btn = '<button type="button" class="button" data-t="pt:adbuy">本当に ' + AD.price + '円 と交換する</button><button type="button" class="button-secondary" data-t="pt:adcancel">やめる</button>';
     else btn = '<button type="button" class="button' + (lack ? " button-secondary" : "") + '" data-t="pt:adask"' + (lack ? " disabled" : "") + '>' + AD.price + '円 で ' + AD.days + '日間 広告なし</button>' + (lack ? '<span class="meta">あと ' + (AD.price - pts) + '円</span>' : "");
+    state1 += '<div class="meta">🎁 広告は、最後まで見ると ' + AD.PT_DONE + 'ポイント、スキップすると ' + AD.PT_SKIP + 'ポイント もらえます（途中で閉じる・ブラウザを強制終了すると 0 ポイント）。</div>';
     return '<div class="admin-card"><b>🚫 広告なし（' + AD.days + '日間）</b>' + state1 + '<div class="row" style="justify-content:space-between;align-items:center"><span><b>' + AD.price + '</b> 円</span><span>' + btn + '</span></div></div>';
 }
 // ===== お試し表示：2027年より前に、全員（管理者・家庭の人も）に 1回だけ 広告を流す =====
