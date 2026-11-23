@@ -8,14 +8,14 @@ function relativeAgo(ms){
     return hours < 24 ? hours + "時間前" : Math.floor(hours / 24) + "日前";
 }
 
-// オフライン時の表記：「最終オンライン2時間前（26年11/17 14:16）」（日本時間）
+// オフライン時の表記：「最終2時間前（26年11/17 14:16）」（日本時間）
 function presenceDateText(ms){
     const q = {};
     new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Tokyo",year:"2-digit",month:"numeric",day:"numeric",hour:"numeric",minute:"2-digit",hour12:false}).formatToParts(new Date(ms)).forEach((x) => { q[x.type] = x.value; });
     return q.year + "年" + q.month + "/" + q.day + " " + (parseInt(q.hour,10) % 24) + ":" + q.minute;
 }
 function offlineText(seen){
-    return seen ? "最終オンライン" + relativeAgo(Date.now() - seen) + "（" + presenceDateText(seen) + "）" : "オフライン";
+    return seen ? "最終" + relativeAgo(Date.now() - seen) + "（" + presenceDateText(seen) + "）" : "オフライン";
 }
 
 // 管理者だけ（日本時間・平日＝月〜金）：
