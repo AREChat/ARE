@@ -631,6 +631,8 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 @media(max-width:560px){.post-tools{align-items:flex-start}.post-tools .post-visibility-label{width:100%;justify-content:space-between}.p3d-colors{grid-template-columns:1fr}}
 .ba-posts .post-visibility-label{font-size:13px}
 .ba-posts .post-visibility-label select{min-height:38px}
+/* ヘッダーの中に置いた select（公開範囲・すべて・ステータス）は、設定画面のものより小さく・1行に収まるように */
+.ba .status-select{max-width:128px;min-height:38px;padding:7px 8px}
 
 /* 対戦パネル（盤を画面の上に固定） */
 .vspin{flex:0 0 auto;max-height:52vh;overflow:hidden;display:flex;flex-direction:column;background:var(--panel);border-bottom:2px solid var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.18);z-index:3}
@@ -855,9 +857,10 @@ button:disabled#delRequestButton,button:disabled#delCancelButton{opacity:.55;cur
 .brand{gap:10px}
 .brand>div:first-child{flex:0 0 auto}
 .brand-title{min-width:0}
-.brand-title .bt{display:none;margin:0}
+.brand-title .bt{display:none;margin:0;font-size:14px;letter-spacing:normal;white-space:nowrap}
 .brand-title .bt.bt-me{align-items:center;gap:10px;min-width:0}
 .brand-title .bt.bt-me .avatar{cursor:pointer}
+.brand-title .bt.bt-me .user-info strong{font-size:14px}
 .brand-actions{flex:1 1 auto;min-width:0;display:flex;justify-content:flex-end}
 .brand-actions .ba{display:none;align-items:center;justify-content:flex-end;gap:8px;min-width:0;flex:1 1 auto;flex-wrap:wrap}
 .sidebar[data-tab="chats"] .ba-chats,.sidebar[data-tab="chats"] .bt-chats,

@@ -46,9 +46,9 @@
             <div class="brand-actions" id="brandActions">
                 <div class="ba ba-chats"><button class="button-secondary hdr-btn" id="refreshRoomsButton" type="button" title="ページを強制的に最新版に更新します（パソコンのShift+Ctrl+Rと同じ）" aria-label="ページを強制的に最新版に更新">更新</button><button class="button-secondary hdr-icon" id="installAppButton" type="button" title="アプリとして追加（ホーム画面・デスクトップ）" aria-label="アプリとして追加" hidden>📲</button></div>
                 <div class="ba ba-users"><input class="search" id="userSearch" type="search" placeholder="🔎 ユーザー名を検索" autocomplete="off" enterkeyhint="search"><button class="button-secondary hdr-btn" id="refreshUsersButton" type="button">更新</button></div>
-                <div class="ba ba-posts"><label class="post-visibility-label">公開範囲<select id="postVisibility" aria-label="投稿の公開範囲"><option value="public">全体公開</option><option value="followers">フォロワーのみ</option><option value="private">自分のみ</option></select></label><select id="postFilter" data-feature="posts" class="status-select" aria-label="表示する投稿"><option value="all">すべて</option><option value="following">フォロー中</option></select><button class="button-secondary hdr-btn" id="postsRefresh" data-feature="posts" type="button">更新</button></div>
+                <div class="ba ba-posts"><select id="postVisibility" class="status-select" aria-label="投稿の公開範囲"><option value="public">全体公開</option><option value="followers">フォロワーのみ</option><option value="private">自分のみ</option></select><select id="postFilter" data-feature="posts" class="status-select" aria-label="表示する投稿"><option value="all">すべて</option><option value="following">フォロー中</option></select><button class="button-secondary hdr-btn" id="postsRefresh" data-feature="posts" type="button">更新</button></div>
                 <div class="ba ba-more"></div>
-                <div class="ba ba-me"><select id="myStatus" class="status-select" aria-label="ステータス"><option value="online">🟢 オンライン</option><option value="busy">🔴 取り込み中</option><option value="away">🟡 待機中</option></select><button class="button-secondary" id="logoutButton" type="button">ログアウト</button></div>
+                <div class="ba ba-me"><select id="myStatus" class="status-select" aria-label="ステータス"><option value="online">🟢 オンライン</option><option value="busy">🔴 取り込み中</option><option value="away">🟡 待機中</option></select><button class="button-secondary hdr-btn" id="logoutButton" type="button">ログアウト</button></div>
             </div>
         </div>
         <div class="sidebar-content">
@@ -81,11 +81,11 @@
             <p class="security-banner pane-me" id="securityBanner" hidden></p>
             <label class="me-toggle pane-me"><input type="checkbox" id="readReceiptToggle" checked> 既読を相手に表示する<small>オフにすると、あなたが読んでも相手には「既読」と表示されません。</small></label>
             <div class="pane pane-users">
-            <div class="section-heading" style="justify-content:flex-end"><button class="button-secondary" id="toggleHiddenUsers" data-feature="follow" type="button">非表示（0）</button></div>
+            <div class="section-heading" style="justify-content:flex-start"><button class="button-secondary" id="toggleHiddenUsers" data-feature="follow" type="button">非表示（0）</button></div>
             <div class="user-list" id="recommendedUsers"><div class="empty-list">上の検索バーに名前を入力すると、ユーザーが表示されます。</div></div>
             </div>
             <div class="pane pane-chats">
-            <div class="section-heading"><h2>💬 チャット</h2><button class="button-secondary" id="newGroupButton" data-feature="groups" type="button">👥 グループ作成</button></div>
+            <div class="section-heading" style="justify-content:flex-end"><button class="button-secondary" id="newGroupButton" data-feature="groups" type="button">👥 グループ作成</button></div>
             <div class="room-list" id="roomList"><div class="empty-list">チャットを読み込んでいます...</div></div>
             </div>
         </div>
@@ -170,7 +170,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=923c2535d7"></script>
+<script defer src="./chat.bundle.js?v=f4b5d12a4e"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>
