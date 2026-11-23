@@ -74,7 +74,7 @@ function rcStatsHtml(){
         : '<span class="fl-chip"><b>' + n + '</b> ' + label + '</span>';
     const fw = chip(c ? c.followers : "–", "フォロワー", "followers");
     const fg = chip(c ? c.following : "–", "フォロー中", "following");
-    const nf = chip(g.notFollowed.length, "フォローしていない");
+    const nf = chip(g.notFollowed.length, "未フォロー");
     const rg = chip(g.reg, "登録済み"), ur = chip(g.unreg.length, "未登録");
     const v = rcSt.plan.stats;
     return v === 0 ? ur + rg : (v === 1 ? fg + nf + fw : ur + rg + fg + nf + fw);

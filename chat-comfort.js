@@ -309,16 +309,20 @@ function cfPaintRooms(){
     if(!items.length) return;
     const F = cf.folders;
     // 絞り込みの候補（フォルダが消えていたら「すべて」）
-    if(F.filter !== "all" && F.filter !== "pin" && F.filter !== "none" && !F.list.some((f) => f.id === F.filter)) F.filter = "all";
-    // 目印（📌 固定・✏️ 下書き・🔕 ミュート）
+    if(F.filter !== "all" && F.filter !== "pin" && F.filter !== "none" && F.filter !== "group" && F.filter !== "game" && !F.list.some((f) => f.id === F.filter)) F.filter = "all";
+    const roomOf = (id) => (state.rooms || []).find((x) => x.id === id);
+    // 神経衰弱・ババ抜きなどの対戦のために自動で作られる「対戦専用チャット」は、ふつうのグループ（人が自分で作ったグループ）とは別あつかいにする。
+    const isGameRoom = (id) => { const r = roomOf(id); return !!(r && r.is_group && typeof cgRoomGameKey === "function" && cgRoomGameKey(r)); };
+    const isGroupRoom = (id) => { const r = roomOf(id); return !!(r && r.is_group) && !isGameRoom(id); };
+    // 目印（📌 固定・✏️ 下書き・🔕 ミュート・🎮 対戦専用チャット）
     items.forEach((b) => {
         const id = b.dataset.roomId;
         let m = b.querySelector(".cf-marks");
         if(!m){ m = document.createElement("span"); m.className = "cf-marks"; b.appendChild(m); }
-        m.textContent = (F.favs.includes(id) ? "⭐" : "") + (F.pins.includes(id) ? "📌" : "") + (cf.drafts[id] ? "✏️" : "") + (typeof isMuted === "function" && isMuted(id) ? "🔕" : "");
+        m.textContent = (F.favs.includes(id) ? "⭐" : "") + (F.pins.includes(id) ? "📌" : "") + (cf.drafts[id] ? "✏️" : "") + (typeof isMuted === "function" && isMuted(id) ? "🔕" : "") + (isGameRoom(id) ? "🎮" : "");
         let g = b.querySelector(".cf-menu");
         if(!g){ g = document.createElement("span"); g.className = "cf-menu"; g.setAttribute("role", "button"); g.setAttribute("tabindex", "0"); g.setAttribute("aria-label", "整理メニュー"); g.textContent = "⋯"; b.appendChild(g); }
-        const show = F.filter === "all" || (F.filter === "pin" && F.pins.includes(id)) || (F.filter === "none" && !F.map[id]) || F.map[id] === F.filter;
+        const show = F.filter === "all" || (F.filter === "pin" && F.pins.includes(id)) || (F.filter === "group" && isGroupRoom(id)) || (F.filter === "game" && isGameRoom(id)) || (F.filter === "none" && !F.map[id]) || F.map[id] === F.filter;
         b.hidden = !show;
         b.style.display = show ? "" : "none";
     });
@@ -356,13 +360,15 @@ async function cfLoadLast(){
 function cfTouch(roomId, at){ if(!roomId) return; if(!cf.last[roomId] || at > cf.last[roomId]) cf.last[roomId] = at; try{ cfPaintRooms(); }catch(_e){} }
 function cfPaintChips(){
     const F = cf.folders;
+    const hasGroup = (state.rooms || []).some((r) => r.is_group);
     let chips = document.getElementById("cfChips");
-    const need = F.list.length > 0 || F.pins.length > 0;
+    const need = F.list.length > 0 || F.pins.length > 0 || hasGroup;
     if(!need){ if(chips) chips.remove(); return; }
     if(!chips){ chips = document.createElement("div"); chips.id = "cfChips"; chips.className = "cf-chips"; el.roomList.insertAdjacentElement("beforebegin", chips);
         chips.addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if(!b) return; cf.folders.filter = b.dataset.f; fdSave(); cfPaintRooms(); }); }
     const opts = [["all", "すべて"]];
     if(F.pins.length) opts.push(["pin", "📌 固定"]);
+    if(hasGroup) opts.push(["group", "👥 グループのみ"]);
     F.list.forEach((f) => opts.push([f.id, "📁 " + f.name]));
     if(F.list.length) opts.push(["none", "未分類"]);
     chips.innerHTML = opts.map((o) => '<button type="button" class="cf-chip' + (F.filter === o[0] ? " on" : "") + '" data-f="' + escapeHtml(o[0]) + '">' + escapeHtml(o[1]) + '</button>').join("");

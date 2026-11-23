@@ -111,7 +111,8 @@ async function saveProfile(button){
 async function onSheetClick(event){
     const copy = event.target.closest("[data-copycode]");
     if(copy){ try{ await navigator.clipboard.writeText(copy.dataset.copycode); showToast("コピーしました。"); }catch(_e){ showToast("手動で選択してコピーしてください。"); } return; }
-    if(event.target === el.profileModal){ closeSheet(); return; }
+    // 背景（枠の外）をクリックしても閉じない：グループ作成中などに マウスを少しドラッグしただけで
+    // 画面が消えてしまう不具合があったため。右上の「✕」か、各画面の「閉じる／キャンセル」ボタンでのみ閉じる。
     const button = event.target.closest("[data-pm]");
     if(!button) return;
     if(button.dataset.pm === "close") closeSheet();
