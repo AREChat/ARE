@@ -557,8 +557,10 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 /* 「非表示」ボタンと同じ折り返し（flex-wrap）に参加させ、入る分だけ1行・入りきらない分だけ自然に2行目へ */
 .section-heading .fl-counts{display:contents}
 #usersStatsHeading{margin:4px 0 8px;justify-content:flex-start}
-.pane-users .section-heading .button-secondary,.pane-chats .section-heading>.button-secondary{padding:5px 10px;font-size:12px;min-height:0}
-.pane-chats .section-heading{margin:4px 0 8px}
+.pane-users .section-heading .button-secondary,.pane-chats .section-heading>.button-secondary{padding:4px 8px;font-size:11px;min-height:0}
+.pane-chats .section-heading{margin:4px 0 8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
+.pane-chats .section-heading .cf-chips{display:contents}
+.pane-chats .section-heading .cf-chip{flex:0 0 auto;padding:4px 7px;font-size:10.5px}
 .pane-users>.fl-counts{margin:0 0 8px}
 .fl-chip{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:999px;padding:4px 9px;font-size:11px;cursor:pointer;white-space:nowrap}
 .fl-chip b{font-size:12.5px;margin-right:1px}
@@ -695,6 +697,7 @@ button:disabled#delRequestButton,button:disabled#delCancelButton{opacity:.55;cur
 .pane-more.mo-on .more-search{padding:6px 0 4px;margin-bottom:6px}
 .pane-more.mo-on .more-search .meta{min-height:0;margin-top:0}
 .pane-more.mo-on .section-heading{margin:6px 0 4px}
+.pane-more>.section-heading:first-child{display:none} /* 上のタブ見出し（🧰 その他）と重複するため非表示 */
 .shf-bar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:8px;max-width:calc(100vw - 24px);padding:6px 8px 6px 6px;border-radius:999px;background:var(--surface,#fff);color:var(--text,#222);box-shadow:0 4px 18px rgba(0,0,0,.25)}
 .shf-bar[hidden]{display:none}
 .shf-go{border:0;border-radius:999px;padding:8px 14px;background:var(--accent,#06c755);color:#fff;font-weight:700;cursor:pointer}

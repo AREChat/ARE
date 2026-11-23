@@ -111,7 +111,7 @@ function ptPaintCard(err){
     else status = "お試し期間は終了。機能はポイントで解放します";
     box.innerHTML = '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div><div class="meta">ポイント</div><b style="font-size:26px" id="ptNum">' + a.points + '</b> <span class="meta">円</span></div>' +
         '<div style="flex:1;min-width:140px" class="meta">' + escapeHtml(status) + '</div></div>' +
-        '<div class="row"><button type="button" class="button" data-t="pt:shop">🛍️ AREShop</button><button type="button" class="button-secondary" data-t="pt:history">履歴</button></div>';
+        (a.admin ? '' : '<div class="row"><button type="button" class="button" data-t="pt:shop">🛍️ AREShop</button><button type="button" class="button-secondary" data-t="pt:history">履歴</button></div>');
 }
 
 // ---------- 入口が閉じているときの案内 ----------

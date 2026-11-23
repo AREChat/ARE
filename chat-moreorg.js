@@ -88,7 +88,10 @@ function moApply(){
     if(bar){
         const count = (cat) => items.filter((it) => { const id = it.dataset.moId; return cat === "fav" ? mo.favs.includes(id) : cat === "recent" ? mo.recent.includes(id) : moCatOf(id) === cat; }).length;
         const chips = [["all", "すべて", items.length], ["fav", "★ お気に入り", count("fav")], ["recent", "🕘 最近", count("recent")]].concat(MO_CATS.map((c) => [c[0], c[1], count(c[0])]));
-        bar.innerHTML = chips.map((c) => '<button type="button" class="mo-chip' + (mo.cat === c[0] ? " on" : "") + '" data-mo-cat="' + c[0] + '" aria-pressed="' + (mo.cat === c[0] ? "true" : "false") + '">' + c[1] + ' <small>' + c[2] + '</small></button>').join("");
+        const i = chips.findIndex((c) => c[0] === mo.cat);
+        const cur = chips[i < 0 ? 0 : i];
+        bar.innerHTML = '<button type="button" class="mo-chip on" data-mo-cyc="1">🔁 ' + cur[1] + ' <small>' + cur[2] + '</small></button>';
+        bar.dataset.moCycLen = chips.length;
     }
     const none = pane.querySelector("#moNone");
     if(none){ const shown = items.filter((it) => !it.classList.contains("mo-hide")).length; none.hidden = shown > 0 || mo.cat === "all"; none.textContent = mo.cat === "fav" ? "お気に入りはまだありません。カードの右上の ☆ を押すと ここに集まります。" : mo.cat === "recent" ? "まだ開いた機能がありません。" : "この分類の機能はありません。"; none.style.order = "-1700"; }
@@ -118,6 +121,14 @@ function initMoreOrg(){
         if(star){ e.preventDefault(); e.stopPropagation(); const id = star.closest(".more-item").dataset.moId; const at = mo.favs.indexOf(id); if(at >= 0) mo.favs.splice(at, 1); else mo.favs.unshift(id); moSave(); moApply(); return; }
         const chip = e.target.closest("[data-mo-cat]");
         if(chip){ mo.cat = chip.dataset.moCat; moApply(); return; }
+        const cyc = e.target.closest("[data-mo-cyc]");
+        if(cyc){
+            const order = ["all", "fav", "recent"].concat(MO_CATS.map((c) => c[0]));
+            const i = order.indexOf(mo.cat);
+            mo.cat = order[(i < 0 ? 0 : i + 1) % order.length];
+            moApply();
+            return;
+        }
         const item = e.target.closest(".more-item");
         if(item && item.dataset.moId){ const id = item.dataset.moId; mo.recent = [id].concat(mo.recent.filter((x) => x !== id)).slice(0, MO_RECENT_MAX); moSave(); moSchedule(); }
     }, true);
