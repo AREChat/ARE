@@ -12,18 +12,9 @@ function rcSetCount(n, custom){
     try{ localStorage.setItem(rcKey(), String(n)); }catch(_e){ /* 何もしない */ }
     if(typeof renderRecommendations === "function") renderRecommendations();
 }
-/** 表示人数の選択（10人・20人・全員・人数指定） */
+/** 表示人数の選択（10人・20人・全員・人数指定）：見ればわかるので、選ぶUIは出さない（既定のまま使う） */
 function rcPaintCount(){
-    const box = document.getElementById("rcCount"); if(!box) return;
-    if(!state.recommendedMode || (el.userSearch && el.userSearch.value.trim()) || state.showHidden){ box.style.display = "none"; return; }
-    box.style.display = "";
-    const typing = document.activeElement && document.activeElement.id === "rcCustomN";
-    if(typing) return;
-    const b = (label, n, on) => '<button type="button" class="fl-chip" data-rcn="' + n + '" style="' + (on ? "border-color:var(--accent,#6aa0ff);font-weight:700" : "") + '">' + label + '</button>';
-    const c = rcSt.count;
-    box.innerHTML = '<span class="meta">表示人数</span> ' + b("10人", 10, !rcSt.custom && c === 10) + b("20人", 20, !rcSt.custom && c === 20) + b("全員", 0, !rcSt.custom && c === 0) +
-        b("人数指定", "custom", rcSt.custom) +
-        (rcSt.custom ? ' <input type="number" id="rcCustomN" min="1" max="300" value="' + (c > 0 ? c : 10) + '" style="width:72px;padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--panel2);color:var(--text)"> 人 <button type="button" class="button-secondary qk-mini" data-rcset="1">決定</button>' : "");
+    const box = document.getElementById("rcCount"); if(box) box.style.display = "none";
 }
 
 function rcNewPlan(){
