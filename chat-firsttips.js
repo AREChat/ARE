@@ -43,7 +43,7 @@ function ftipEnsureUi(){
     m.innerHTML = '<div class="ftip-card"><h3 id="ftipTitle"></h3><p class="ftip-sub">はじめて開く画面の案内です</p><div id="ftipBody"></div><button type="button" class="button ftip-ok" id="ftipOk">わかった</button><button type="button" class="ftip-off" id="ftipOff">案内を今後ぜんぶ出さない</button></div>';
     document.body.appendChild(m);
     document.getElementById("ftipOk").addEventListener("click", ftipNext);
-    document.getElementById("ftipOff").addEventListener("click", () => { ftip.off = true; ftip.queue = []; try{ localStorage.setItem(ftip.offKey, "1"); }catch(_e){} ftipNext(); showToast("案内をオフにしました。操作ガイド（📖 操作方法）のページから、もう一度出せます。"); });
+    document.getElementById("ftipOff").addEventListener("click", () => { ftip.off = true; ftip.queue = []; try{ localStorage.setItem(ftip.offKey, "1"); }catch(_e){} ftipNext(); showToast("案内をオフにしました。操作ガイド（📖 マニュアル）のページから、もう一度出せます。"); });
     m.addEventListener("keydown", (e) => { if(e.key === "Escape") ftipNext(); });
 }
 function ftipNext(){
