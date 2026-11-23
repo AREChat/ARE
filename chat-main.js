@@ -233,6 +233,7 @@ const FEATURES = [
     ["archive","ストーリーのアーカイブ",() => {}],
     ["quick","ショートカット・その他の検索・フォロー一覧",initQuick],
     ["passby","すれ違いタウン",initPassby],
+    ["passbytown","すれ違いタウン：町の成長・ミッション・バッジ",initPassbyTown],
     ["moreorg","その他の分類・お気に入り・最近",initMoreOrg],
     ["sharefile","ファイル共有",initShareFile],
     ["hiderooms","チャットの非表示（消さずに隠す）",initHideRooms],

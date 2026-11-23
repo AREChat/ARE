@@ -124,6 +124,7 @@ chat-back.js
 chat-videolink.js
 chat-passby.js
 chat-passby-key.js
+chat-passby-town.js
 chat-postshare.js
 chat-schedcontent.js
 chat-main.js

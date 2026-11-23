@@ -262,24 +262,35 @@ function pbStatusHtml(){
 async function openPassby(){
     if(pb.avail !== true){ showToast(pb.avail === false ? "すれ違いタウンは、いまは使えません（準備中か、お試しアカウントです）。" : "つながっていません。少し待ってからもう一度どうぞ。"); return; }
     openSheet(toolHead("📡 すれ違いタウン", "近くにいた人と、自動で「すれ違い」。かけらを集めよう") + '<div class="meta">読み込み中…</div>');
-    const [stats, inbox] = await Promise.all([pbRpc("passby_stats_v1"), pbRpc("passby_inbox_v1", {p_limit:4})]);
+    const [stats, inbox, mis] = await Promise.all([pbRpc("passby_stats_v1"), pbRpc("passby_inbox_v1", {p_limit:4}), typeof pbtMissions === "function" ? pbtMissions() : Promise.resolve(null)]);
     if(!stats || stats.ok === false){ closeSheet(); showToast("すれ違いタウンは、いまは使えません。"); return; }
     pb.stats = stats;
     const have = new Set((stats.pieces || []).map((p) => p.piece)), done = [0, 1, 2, 3, 4, 5].filter((s) => [0, 1, 2, 3, 4, 5, 6, 7, 8].every((k) => have.has(s * 9 + k))).length;
-    const nx = pbNextLevel(stats.unique);
+    const nx = pbNextLevel(stats.unique), claimable = typeof pbtClaimable === "function" ? pbtClaimable(mis) : 0;
     openSheet(toolHead("📡 すれ違いタウン", "近くにいた人と、自動で「すれ違い」。かけらを集めよう") + pbStatusHtml() +
         '<div class="pb-stats"><div><b>' + stats.today_meets + '</b><small>きょう</small></div><div><b>' + stats.unique + '</b><small>すれ違った人</small></div><div><b>' + stats.meets + '</b><small>ぜんぶで</small></div><div><b>' + stats.streak + '</b><small>れんぞく日</small></div></div>' +
         '<div class="meta" style="text-align:center">称号：<b>' + pbLevel(stats.unique) + '</b>' + (nx ? "（あと " + (nx[0] - stats.unique) + " 人で「" + nx[1] + "」）" : "") + ' ・ 🧩 かけら ' + have.size + ' / 54（完成 ' + done + ' / 6）</div>' +
-        '<div class="row pb-menu"><button type="button" data-t="pb:inbox">📖 すれ違った人' + (pb.unseen ? "（新しい " + pb.unseen + "）" : "") + '</button><button type="button" data-t="pb:puzzle">🧩 かけらパズル</button><button type="button" data-t="pb:qr">📷 かざし合い</button><button type="button" data-t="pb:settings">⚙️ 設定</button></div>' +
+        '<div class="row pb-menu"><button type="button" data-t="pb:inbox">📖 すれ違った人' + (pb.unseen ? "（新しい " + pb.unseen + "）" : "") + '</button><button type="button" data-t="pb:puzzle">🧩 かけらパズル</button><button type="button" data-t="pb:qr">📷 かざし合い</button><button type="button" data-t="pb:settings">⚙️ 設定</button>' +
+            (typeof pbTownMenu === "function" ? pbTownMenu(!!mis, claimable) : "") + '</div>' +
         ((inbox || []).length ? '<div class="meta" style="margin-top:6px">さいきんの すれ違い</div>' + inbox.map((c) => pbCardHtml(c)).join("") : '<div class="admin-card"><div class="meta">まだ すれ違いはありません。AREを開いたまま お出かけしてみよう。友だちとは「かざし合い」で すぐ試せます。</div></div>') +
         '<div class="meta">・位置は、ざっくりの区画を暗号のような文字にして送るだけです（正確な場所は送りません・保存しません）。<br>・同じ場所に20分以内にいた人と すれ違えます（少しあとに来た人とも）。<br>・すれ違いポイントは 1日30までです。</div>' + toolClose());
 }
 
+const PB_FILTERS = [["all", "すべて"], ["new", "NEW"], ["friend", "友だち"], ["qr", "かざし合い"], ["rep", "3回以上"]];
+const pbFilterOk = (c, f) => f === "all" || (f === "new" && c.seen === false) || (f === "friend" && !!c.friend) || (f === "qr" && c.kind === "qr") || (f === "rep" && (c.count || 1) >= 3);
+function pbInboxPaint(){
+    const st = pb.inbox || {list:[], f:"all"}, f = st.f, list = st.list.filter((c) => pbFilterOk(c, f));
+    const chips = PB_FILTERS.map((x) => '<button type="button" class="pb-chip' + (x[0] === f ? " on" : "") + '" data-t="pbt:filt" data-f="' + x[0] + '">' + x[1] + ' ' + st.list.filter((c) => pbFilterOk(c, x[0])).length + '</button>').join("");
+    openSheet(toolHead("📖 すれ違った人", st.list.length + " 人") + '<div class="pb-chips">' + chips + '</div>' +
+        (list.length ? list.map((c) => pbCardHtml(c)).join("") : '<div class="admin-card"><div class="meta">' + (st.list.length ? "この しぼりこみに あてはまる人は いません。" : "まだ すれ違いはありません。") + '</div></div>') +
+        '<div class="row"><button type="button" class="button-secondary" data-t="pb:main">← もどる</button><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
+}
+function pbInboxFilter(f){ if(!pb.inbox || !PB_FILTERS.some((x) => x[0] === f)) return; pb.inbox.f = f; pbInboxPaint(); }
 async function openPbInbox(){
     openSheet(toolHead("📖 すれ違った人") + '<div class="meta">読み込み中…</div>');
     const list = await pbRpc("passby_inbox_v1", {p_limit:60}) || [];
-    openSheet(toolHead("📖 すれ違った人", list.length + " 人") + (list.length ? list.map((c) => pbCardHtml(c)).join("") : '<div class="admin-card"><div class="meta">まだ すれ違いはありません。</div></div>') +
-        '<div class="row"><button type="button" class="button-secondary" data-t="pb:main">← もどる</button><button type="button" class="button-secondary" data-pm="close">閉じる</button></div>');
+    pb.inbox = {list, f:"all"};
+    pbInboxPaint();
     if(list.some((c) => !c.seen)){ pbRpc("passby_mark_seen_v1", {p_ids:null}).catch(() => {}); pb.unseen = 0; pbPaintCard(); }
 }
 
