@@ -4,7 +4,7 @@
 //   この画面は my_ui_flags() が返す「タブを出すか」だけを受け取ります（区分の名前は受け取りません）。
 // ・sql/segments_v1.sql をまだ実行していない間は、何も変えずに今までどおり動きます。
 // ・ここでやること
-//    1) ユーザー／投稿タブの出し分け   2) 「📖 操作方法はこちら」ボタン
+//    1) ユーザー／投稿タブの出し分け   2) 「📖 マニュアル」ボタン
 //    3) 「➕ 友達追加」（QRコード／リンク）  4) 連絡の申請（家庭の人 ⇔ 家庭以外の人）
 //    5) 管理者：ユーザーごとの区分の設定と、連絡の申請の承認
 
@@ -56,13 +56,13 @@ function segApplyTabs(){
 
 function segRequestRoomId(){ return segSt.flags && segSt.flags.request_room || null; }
 
-// ---------- 2) 操作方法はこちら ----------
+// ---------- 2) マニュアル（操作方法） ----------
 function segAddHelpButton(){
     const pane = document.querySelector(".pane-chats");
     if(!pane || document.getElementById("segHelpLink")) return;
     const a = document.createElement("a");
     a.id = "segHelpLink"; a.className = "button seg-help"; a.href = "./help.html"; a.target = "_blank"; a.rel = "noopener";
-    a.textContent = "📖 操作方法はこちら";
+    a.textContent = "📖 マニュアル";
     const head = pane.querySelector(".section-heading");
     if(head) head.insertAdjacentElement("afterend", a); else pane.prepend(a);
 }
