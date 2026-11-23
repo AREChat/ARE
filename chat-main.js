@@ -197,6 +197,7 @@ const FEATURES = [
     ["ng","NGワード制裁",initNg],
     ["points","ポイント・AREShop",initPoints],
     ["ads","広告",initAds],
+    ["prefsync","端末をまたいだ設定の同期",initPrefSync],
     ["story","ストーリー",initStory],
     ["album","アルバム",initAlbum],
     ["filefresh","ファイルのリンク更新",initFileFresh],

@@ -414,7 +414,7 @@ async function initialize(){
         el.myLoginStatus.textContent = "ログイン中";
 
         bindEvents();
-        await Promise.all([profileTask,loadRecommendations(),loadRooms()]);
+        await Promise.all([profileTask,loadRecommendations(),loadRooms(),Promise.race([prefSyncStart(),new Promise((r) => setTimeout(r,4000))])]);
         setStatus("チャットの準備ができました。ユーザーを選択してください。","success");
         startFeatures();
 

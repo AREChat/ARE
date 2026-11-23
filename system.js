@@ -272,6 +272,8 @@ try { if (window.top !== window.self) { window.top.location = window.self.locati
             } catch (_e) { /* 失敗しても、ふつうのログアウトにもどる */ }
         }
 
+        // 端末ごとに保存していた設定（非表示の部屋・下書き・テーマなど）を、サインアウトの前にサーバーへ送り終える（次にログインした端末が、最新の状態になる）
+        try { if (window.ARESync && window.ARESync.flush) { await Promise.race([window.ARESync.flush(), new Promise((r) => setTimeout(r, 6000))]); } } catch (_e) { /* 送れなくても、ログアウトは続ける */ }
         try { localStorage.removeItem("are_is_admin_ui"); } catch (_e) { /* 何もしない */ }
         const result = await client.auth.signOut();
 
