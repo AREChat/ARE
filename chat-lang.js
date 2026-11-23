@@ -4,7 +4,7 @@
 const I18N_EN = {
     "チャット":"Chats", "ユーザー":"Users", "投稿":"Posts", "その他":"More", "マイページ":"My page", "ログアウト":"Log out",
     "💬 チャット":"💬 Chats", "👥 グループ作成":"👥 New group", "更新":"Refresh", "🔎 ユーザーを探す":"🔎 Find users", "🙈（0）":"🙈 (0)",
-    "📷 投稿":"📷 Posts", "すべて":"All", "フォロー中":"Following", "📎 ファイル":"📎 File", "投稿する":"Post", "さらに読み込む":"Load more",
+    "📷 投稿":"📷 Posts", "すべて":"All", "フォロー中":"Following", "📎 ファイル":"📎 File", "投稿":"Post", "さらに読み込む":"Load more",
     "🧰 その他":"🧰 More", "📖 操作方法":"📖 How to use", "📖 操作方法はこちら":"📖 How to use", "📖 マニュアル":"📖 Manual", "🤖 AIチャットボット":"🤖 Chatbot", "☀️ 天気予報":"☀️ Weather", "🚆 交通情報":"🚆 Transit",
     "🧩 ツール":"🧩 Tools", "📖 ストーリー（24時間）":"📖 Stories (24h)", "🖼️ アルバム":"🖼️ Album", "🎨 画像編集":"🎨 Photo editor", "📍 位置情報を送る":"📍 Share location",
     "🔗 プロフィール共有・QR":"🔗 Share profile / QR", "🎮 ゲーム":"🎮 Games", "📅 タスク・カレンダー":"📅 Tasks & calendar", "⚙️ 表示設定・言語":"⚙️ Display & language",
