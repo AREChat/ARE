@@ -19,7 +19,11 @@ function hdrPlace(){
         const a = document.getElementById("segHelpLink"), slot = document.querySelector(".ba-chats");
         if(a && slot){
             a.className = "button-secondary hdr-btn hdr-help"; a.textContent = "📖 マニュアル"; a.title = "マニュアル（使い方ガイドを開く）";
-            slot.insertAdjacentElement("afterbegin", a); hdrSt.help = true;
+            slot.insertAdjacentElement("afterbegin", a);
+            // 「📲 アプリ化」は、マニュアルの左にくるように
+            const instBtn = document.getElementById("installAppButton");
+            if(instBtn) slot.insertAdjacentElement("afterbegin", instBtn);
+            hdrSt.help = true;
         }
     }
     if(!hdrSt.more){
@@ -42,10 +46,11 @@ function hdrPlace(){
     else if(++hdrSt.tries > 60){ clearInterval(hdrSt.timer); hdrSt.timer = 0; }   // 30秒たっても無ければ あきらめる（今までの場所のまま 使える）
 }
 
-// ---------- 📲 アプリとして追加 ----------
+// ---------- 📲 アプリ化 ----------
+// ・チャットタブの上のバー（マニュアルの左）に出す。気になる人は設定で非表示にできる（既定はオン）
 function hdrInstallPaint(){
-    // チャットタブの上のバーの 📲 は出さない（持ち主の指示 2026-11-23）。「その他」→ 操作方法の となりの「📲 アプリとして追加」だけに出す
-    const b = document.getElementById("installAppButton"); if(b) b.hidden = true;
+    const b = document.getElementById("installAppButton");
+    if(b) b.hidden = hdrIsStandalone() || (typeof prefGet === "function" && prefGet("are_show_install", "1") !== "1");
     const it = document.getElementById("installAppItem"); if(it) it.hidden = hdrIsStandalone();
 }
 function hdrPlatform(){

@@ -44,7 +44,7 @@
                 </div>
             </div>
             <div class="brand-actions" id="brandActions">
-                <div class="ba ba-chats"><button class="button-secondary hdr-btn" id="refreshRoomsButton" type="button" title="ページを強制的に最新版に更新します（パソコンのShift+Ctrl+Rと同じ）" aria-label="ページを強制的に最新版に更新">更新</button><button class="button-secondary hdr-icon" id="installAppButton" type="button" title="アプリとして追加（ホーム画面・デスクトップ）" aria-label="アプリとして追加" hidden>📲</button></div>
+                <div class="ba ba-chats"><button class="button-secondary hdr-btn" id="refreshRoomsButton" type="button" title="ページを強制的に最新版に更新します（パソコンのShift+Ctrl+Rと同じ）" aria-label="ページを強制的に最新版に更新">更新</button><button class="button-secondary hdr-icon" id="installAppButton" type="button" title="アプリ化（ホーム画面・デスクトップに追加）" aria-label="アプリ化" hidden>📲</button></div>
                 <div class="ba ba-users"><input class="search" id="userSearch" type="search" placeholder="🔎 ユーザー名を検索" autocomplete="off" enterkeyhint="search"><button class="button-secondary hdr-btn" id="refreshUsersButton" type="button">更新</button></div>
                 <div class="ba ba-posts"><select id="postVisibility" class="status-select" aria-label="投稿の公開範囲"><option value="public">全体公開</option><option value="followers">フォロワーのみ</option><option value="private">自分のみ</option></select><select id="postFilter" data-feature="posts" class="status-select" aria-label="表示する投稿"><option value="all">すべて</option><option value="following">フォロー中</option></select><button class="button-secondary hdr-btn" id="postsRefresh" data-feature="posts" type="button">更新</button></div>
                 <div class="ba ba-more"></div>
@@ -63,7 +63,7 @@
             <div class="pane pane-more">
                 <div class="section-heading"><h2>🧰 その他</h2></div>
                 <a class="admin-card more-item" href="./help.html" target="_blank" rel="noopener" style="text-decoration:none">📖 操作方法<small class="meta">使い方ガイド（スマホ・パソコン共通）</small></a>
-                <button class="admin-card more-item" id="installAppItem" type="button" hidden>📲 アプリとして追加<small class="meta">ホーム画面・デスクトップに追加（手順つき）</small></button>
+                <button class="admin-card more-item" id="installAppItem" type="button" hidden>📲 アプリ化<small class="meta">ホーム画面・デスクトップに追加（手順つき）</small></button>
                 <button class="admin-card more-item" data-extra="chatbot" data-feature="extras" type="button">🤖 AIチャットボット<small class="meta">よくある質問に自動で答えます</small></button>
                 <button class="admin-card more-item" data-extra="weather" data-feature="extras" type="button">☀️ 天気予報<small class="meta">地名で検索・7日間の予報</small></button>
                 <button class="admin-card more-item" data-extra="transit" data-feature="extras" type="button">🚆 交通情報<small class="meta">乗換案内・運行状況</small></button>
@@ -169,7 +169,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=65a9f25568"></script>
+<script defer src="./chat.bundle.js?v=bd5755cd87"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

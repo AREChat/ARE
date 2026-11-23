@@ -31,7 +31,7 @@ function absPaintBar(){
             if(typeof loadRecommendations === "function") loadRecommendations();
         });
     }
-    bar.innerHTML = '<span class="meta">(管)：グループ閲覧</span>' + ABS_SEGS.map((s) => '<button type="button" class="fl-chip" data-abs="' + s[0] + '" style="' + (absSt.seg === s[0] ? "border-color:var(--accent,#6aa0ff);font-weight:700" : "") + '">' + s[1] + '</button>').join("") +
+    bar.innerHTML = ABS_SEGS.map((s) => '<button type="button" class="fl-chip" data-abs="' + s[0] + '" style="' + (absSt.seg === s[0] ? "border-color:var(--accent,#6aa0ff);font-weight:700" : "") + '">' + s[1] + '</button>').join("") +
         (absSt.seg ? '<button type="button" class="fl-chip" data-abs="' + absSt.seg + '">✕ やめる</button>' : "");
 }
 function initAdminUsersBar(){
