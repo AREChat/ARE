@@ -11,7 +11,7 @@
 // ・新しい版が入ったら、古い控えをすべて消す
 
 importScripts("precache-manifest.js", "sw-core.js");
-const CACHE = "are-v188-20261123";
+const CACHE = "are-v189-20261123";
 // オフライン用: 画面の骨組み（html/js/css/json）を 最初に まとめて保存 / 画像・音楽は「オフライン準備」ボタンで are-media に保存（sw-core.js）
 const core = self.areCore({shell: CACHE, root: "./", precache: true, fetch: false});
 const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
@@ -25,7 +25,7 @@ self.addEventListener("message", (event) => {
 self.addEventListener("activate", (event) => {
     event.waitUntil((async () => {
         const keys = await caches.keys();
-        await Promise.all(keys.filter((k) => k !== CACHE && k !== "are-media" && k.indexOf("tq-game-") !== 0).map((k) => caches.delete(k)));
+        await Promise.all(keys.filter((k) => k !== CACHE && k !== "are-media" && k !== "are-ads" && k.indexOf("tq-game-") !== 0).map((k) => caches.delete(k)));
         await self.clients.claim();
     })());
 });

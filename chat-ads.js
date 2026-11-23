@@ -27,13 +27,60 @@ async function adStatusLoad(){
     }catch(_e){ AD.free = null; }
 }
 
+function adsUrl(){ return String((window.ARE_CONFIG || {}).adsUrl || "").trim(); }
+
+// 映像の一覧。adsUrl（Googleドライブの「広告」フォルダを配るGAS）があれば、ドライブに「いま入っているもの」だけ。なければ ads/ のもの
 async function adManifest(){
     if(AD.list) return AD.list;
     const res = await fetch("./ads/manifest.json", {cache: "no-cache"});
     if(!res.ok) throw new Error("manifest");
     const j = await res.json();
-    AD.list = (j.ads || []).filter((a) => a && a.file);
+    const base = (j.ads || []).filter((a) => a && a.file);
+    const url = adsUrl();
+    if(!url){ AD.list = base; return AD.list; }
+    const r = await adFetch(url + "?action=list", 20000);
+    const g = await r.json();
+    if(!g || !g.ok) throw new Error("ads list");
+    const by = {}; base.forEach((a) => { by[a.id] = a; });
+    AD.list = (g.ads || []).map((m) => Object.assign({}, by[m.id] || {id: m.id, file: m.id + ".mp4", title: ""}, {gas: m}));
     return AD.list;
+}
+async function adFetch(url, ms){
+    const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), ms);
+    try{
+        const r = await fetch(url, {signal: ctl.signal});
+        if(!r.ok) throw new Error("http " + r.status);
+        return r;
+    }finally{ clearTimeout(t); }
+}
+
+// ドライブの映像を、3MBずつ受け取って1本にする。いちど受け取ったら、この端末の Cache Storage に残す（2回目からは通信しない）
+async function adGasBlob(ad){
+    const m = ad.gas, key = new Request("https://are-ads.invalid/" + m.id + "-" + m.v + "-" + m.size);
+    let cache = null; try{ cache = await caches.open("are-ads"); }catch(_e){ cache = null; }
+    if(cache){ const hit = await cache.match(key); if(hit) return await hit.blob(); }
+    const parts = [];
+    for(let i = 0; i < m.parts; i++){
+        const r = await adFetch(adsUrl() + "?action=part&id=" + encodeURIComponent(m.id) + "&i=" + i, 60000);
+        const j = await r.json(); if(!j || !j.ok || typeof j.b64 !== "string") throw new Error("part " + i);
+        const bin = atob(j.b64), u = new Uint8Array(bin.length);
+        for(let k = 0; k < bin.length; k++) u[k] = bin.charCodeAt(k);
+        parts.push(u);
+    }
+    const blob = new Blob(parts, {type: "video/mp4"});
+    if(blob.size !== m.size) throw new Error("size");
+    if(cache){
+        try{
+            for(const k of await cache.keys()){ if(k.url.indexOf("https://are-ads.invalid/" + m.id + "-") === 0) await cache.delete(k); }   // 古い版は消す
+            await cache.put(key, new Response(blob, {headers: {"content-type": "video/mp4"}}));
+        }catch(_e){ /* 残せなくても、今回は流せる */ }
+    }
+    return blob;
+}
+// 流す映像のアドレスを用意する（ドライブ経由は、受け取り終わってから）
+async function adSource(ad){
+    if(ad.gas){ const blob = await adGasBlob(ad); return {url: URL.createObjectURL(blob), revoke: true}; }
+    return {url: "./ads/" + encodeURIComponent(ad.file), revoke: false};
 }
 
 // 100本を ひととおり見てから 2周目（前回の最後と同じものが 続けて出ない）
@@ -49,6 +96,20 @@ function adPick(list, st){
     const id = bag.shift();
     st.bag = bag; st.last = id;
     return list.find((a) => a.id === id) || null;
+}
+
+// つぎに流す1本を決めておく（先に受け取っておけるように、保存しておく）
+function adNext(list, st){
+    if(st.next && !AD.bad[st.next]){ const a = list.find((x) => x.id === st.next); if(a) return a; }
+    const a = adPick(list, st); st.next = a ? a.id : null; return a;
+}
+async function adPrefetch(){
+    if(AD.free !== false || AD.busy || !adsUrl() || adNow() < AD.START - 2 * 86400000) return;
+    try{
+        const list = await adManifest(); const st = adLoad();
+        const ad = adNext(list, st); adSave(st);
+        if(ad && ad.gas) await adGasBlob(ad);
+    }catch(_e){ /* あとで もう一度 */ }
 }
 
 function adComposerBusy(){
@@ -69,10 +130,12 @@ async function adCheck(){
         const list = await adManifest();
         const st = adLoad(); const hour = adHourIndex(adNow());
         for(let n = 0; n < 3; n++){
-            const ad = adPick(list, st); if(!ad) break;
-            const ok = await adPlay(ad);
-            if(ok){ st.hour = hour; adSave(st); return; }
-            AD.bad[ad.id] = true;
+            const ad = adNext(list, st); if(!ad) break;
+            let ok = false, src = null;
+            try{ src = await adSource(ad); ok = await adPlay(ad, src.url); }catch(_e){ ok = false; }
+            finally{ if(src && src.revoke){ try{ URL.revokeObjectURL(src.url); }catch(_e){} } }
+            if(ok){ st.hour = hour; st.next = null; adSave(st); adPrefetch(); return; }
+            AD.bad[ad.id] = true; st.next = null; adSave(st);
         }
         st.hour = hour; adSave(st);          // 3本とも だめなら、この1時間は あきらめる（くり返さない）
     }catch(_e){
@@ -81,7 +144,7 @@ async function adCheck(){
 }
 
 // 再生が はじまったら true（映像が見つからない／読めない時は false）
-function adPlay(ad){
+function adPlay(ad, srcUrl){
     return new Promise((resolve) => {
         const ov = document.createElement("div");
         ov.id = "adOverlay"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "広告");
@@ -114,7 +177,7 @@ function adPlay(ad){
         close.addEventListener("click", () => finish(true));
         buy.addEventListener("click", () => { finish(true); try{ if(typeof openPtShop === "function") openPtShop("pack"); }catch(_e){} });
         document.body.appendChild(ov);
-        v.src = "./ads/" + encodeURIComponent(ad.file);
+        v.src = srcUrl;
         const p = v.play(); if(p && p.catch) p.catch(() => {});
     });
 }
@@ -145,7 +208,7 @@ async function adFreeAction(action){
 }
 
 function initAds(){
-    adStatusLoad().then(() => adCheck());
+    adStatusLoad().then(() => { adCheck(); adPrefetch(); });
     feat.timers.push(setInterval(adCheck, 30000));
     feat.timers.push(setInterval(adStatusLoad, 30 * 60000));
     document.addEventListener("visibilitychange", () => { if(!document.hidden) adCheck(); });
