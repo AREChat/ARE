@@ -9,7 +9,7 @@ const I18N_EN = {
     "🧩 ツール":"🧩 Tools", "📖 ストーリー（24時間）":"📖 Stories (24h)", "🖼️ アルバム":"🖼️ Album", "🎨 画像編集":"🎨 Photo editor", "📍 位置情報を送る":"📍 Share location",
     "🔗 プロフィール共有・QR":"🔗 Share profile / QR", "🎮 ゲーム":"🎮 Games", "📅 タスク・カレンダー":"📅 Tasks & calendar", "⚙️ 表示設定・言語":"⚙️ Display & language",
     "✏️ プロフィールを編集":"✏️ Edit profile", "🔗 プロフィールを共有（QR）":"🔗 Share my profile (QR)", "アカウントの削除":"Delete account", "アカウント削除を申請":"Request account deletion",
-    "申請を取り消す":"Cancel request", "会話履歴の保存":"Save chat history", "すべてZIP保存":"Save all (ZIP)",
+    "申請を取り消す":"Cancel request", "会話履歴の保存（ZIP形式）":"Save chat history (ZIP)",
     "既読を相手に表示する":"Show read receipts to others", "🛡️ 管理者パネル":"🛡️ Admin panel", "← 戻る":"← Back", "会話を始めよう":"Start a conversation", "AREへようこそ":"Welcome to ARE",
     "🖼️ 画像を選択":"🖼️ Image", "📎 ファイルを選択":"📎 File", "🎬 動画を選択":"🎬 Video", "😊 絵文字・スタンプ":"😊 Emoji & stamps", "🎤 音声":"🎤 Voice", "✖ 録音を取消":"✖ Cancel recording",
     "🕒 予約送信":"🕒 Schedule", "送信":"Send", "この日時に予約":"Schedule for this time", "閉じる":"Close", "読み込み中...":"Loading...", "接続を確認しています":"Checking connection",
