@@ -556,7 +556,7 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .fl-counts{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
 /* 「非表示」ボタンと同じ折り返し（flex-wrap）に参加させ、入る分だけ1行・入りきらない分だけ自然に2行目へ */
 .section-heading .fl-counts{display:contents}
-#usersStatsHeading{margin:4px 0 8px}
+#usersStatsHeading{margin:4px 0 8px;justify-content:flex-start}
 .pane-users .section-heading .button-secondary,.pane-chats .section-heading>.button-secondary{padding:5px 10px;font-size:12px;min-height:0}
 .pane-chats .section-heading{margin:4px 0 8px}
 .pane-users>.fl-counts{margin:0 0 8px}
