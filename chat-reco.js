@@ -83,7 +83,11 @@ function rcStatsHtml(){
     const nf = chip(g.notFollowed.length, "未フォロー");
     const rg = chip(g.reg, "登録済み"), ur = chip(g.unreg.length, "未登録");
     const v = rcSt.plan.stats;
-    return v === 0 ? ur + rg : (v === 1 ? fg + nf + fw : ur + rg + fg + nf + fw);
+    // 「非表示」ボタンと同じ行に並ぶグループ（未登録・登録済み）と、次の行に並ぶグループ（フォロー中・未フォロー・フォロワー）に分け、
+    // 最大でも2行に収まるようにする（改行は .fl-break で強制的に区切る）
+    const group1 = v === 1 ? "" : (ur + rg);
+    const group2 = v === 0 ? "" : (fg + nf + fw);
+    return group1 + (group1 && group2 ? '<span class="fl-break"></span>' : "") + group2;
 }
 /** チャット一覧が読み込まれて「登録済み」が変わったときだけ、表示を更新する（選び直しはしない） */
 function rcOnRooms(){

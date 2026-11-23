@@ -554,6 +554,9 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .mo-chip.on{background:#5b73ff;border-color:#5b73ff;color:#fff}
 .mo-chip:hover{border-color:#5b73ff}
 .fl-counts{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+.fl-break{flex-basis:100%;width:0;height:0}
+.section-heading .fl-counts{margin:0}
+.pane-users .section-heading{flex-wrap:nowrap;align-items:flex-start}
 .pane-users>.fl-counts{margin:0 0 8px}
 .fl-chip{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
 .fl-chip b{font-size:15px;margin-right:2px}
@@ -632,7 +635,7 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .ba-posts .post-visibility-label{font-size:13px}
 .ba-posts .post-visibility-label select{min-height:38px}
 /* ヘッダーの中に置いた select（公開範囲・すべて・ステータス）は、設定画面のものより小さく・1行に収まるように */
-.ba .status-select{max-width:128px;min-height:38px;padding:7px 8px}
+.ba .status-select{max-width:104px;min-height:38px;padding:7px 6px}
 
 /* 対戦パネル（盤を画面の上に固定） */
 .vspin{flex:0 0 auto;max-height:52vh;overflow:hidden;display:flex;flex-direction:column;background:var(--panel);border-bottom:2px solid var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.18);z-index:3}
@@ -863,6 +866,7 @@ button:disabled#delRequestButton,button:disabled#delCancelButton{opacity:.55;cur
 .brand-title .bt.bt-me .user-info strong{font-size:14px}
 .brand-actions{flex:1 1 auto;min-width:0;display:flex;justify-content:flex-end}
 .brand-actions .ba{display:none;align-items:center;justify-content:flex-end;gap:8px;min-width:0;flex:1 1 auto;flex-wrap:wrap}
+#brandActions .ba-posts,#brandActions .ba-me{flex-wrap:nowrap;gap:6px}
 .sidebar[data-tab="chats"] .ba-chats,.sidebar[data-tab="chats"] .bt-chats,
 .sidebar[data-tab="users"] .ba-users,.sidebar[data-tab="users"] .bt-users,
 .sidebar[data-tab="posts"] .ba-posts,.sidebar[data-tab="posts"] .bt-posts,
