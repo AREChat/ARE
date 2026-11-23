@@ -15,6 +15,8 @@
         // 大きい動画・ファイルを Googleドライブに置いてリンクにする GAS ウェブアプリのURL（https://script.google.com/macros/s/…/exec）。
         // 空のままなら、動画のリンクを自分で貼る画面になります（ファイルは50MBまでに制限されます）。
         videoUploadUrl: "https://script.google.com/macros/s/AKfycbwFTUvhKYlxWMpd4G3gaAT2qdk-Pxcc-gYQXiskWGIUI-w4R531CG1oi3thVSvmlPQ2nw/exec",
+        // 広告の映像（Googleドライブの「広告」フォルダ）を配る GAS のURL（ファイル保存の受け口と同じ GAS に入っています）。空のままなら、ads/ フォルダの映像を使います。
+        adsUrl: "",
         requestTimeoutMs: 20000
     });
 })();

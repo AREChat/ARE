@@ -1,8 +1,9 @@
 # ads（広告の映像）
 
 - 2027年1月1日から、1時間ごとに、ここの映像（15秒）が1本ずつ流れます（100本をひととおり見てから2周目）。
-- 映像は `AD001.mp4` 〜 `AD100.mp4`。一覧は `manifest.json`（プロンプトは Drive「広告」フォルダ／プロジェクトの「ARE_広告動画100本_プロンプト集」）。
-- 1本あたり **4MB以内**（横長1280×720、15秒、mp4/H.264、音あり）を目安に。7MBほどのものは `ffmpeg -i 入力.mp4 -c:v libx264 -crf 27 -preset veryfast -maxrate 2000k -bufsize 4000k -pix_fmt yuv420p -c:a aac -b:a 96k -movflags +faststart 出力.mp4` で縮める（画質はほぼ そのまま）。100本で約300〜400MB（GitHub Pages の上限1GBの半分以下）。
-- 入っている映像：AD001〜AD010（2026-11-23。元は約7.5MB → 約2.5MBに縮めた）。
+- **映像は Google ドライブの「広告」フォルダに置きます**（マイドライブの直下。`AD001.mp4` 〜 `AD100.mp4`）。チャットは、「ファイル保存」の GAS（`docs/file-archive-gas.js`、`apikey.js` の `adsUrl`）から、3MBずつ受け取って流します。受け取った映像は、各端末の Cache Storage（`are-ads`）に残るので、同じ映像は1回しか通信しません。GitHub には映像を置きません。
+- ドライブに「いま入っているもの」だけが流れます（足すと、5分以内に反映）。タイトルなどの文は、ここの `manifest.json`（100本ぶん）から取ります。
+- `adsUrl` が空のときだけ、このフォルダ（`ads/AD001.mp4` …）の映像を使います（試験用）。
+- 1本あたり **4MB以内**（横長1280×720、15秒、mp4/H.264、音あり）を目安に。7MBほどのものは `ffmpeg -i 入力.mp4 -c:v libx264 -crf 27 -preset veryfast -maxrate 2000k -bufsize 4000k -pix_fmt yuv420p -c:a aac -b:a 96k -movflags +faststart 出力.mp4` で縮められます（画質はほぼ そのまま）。大きいほど、はじめて受け取るときに時間がかかります。
 - 映像が見つからないときは、広告を出さずに飛ばします（アプリは止まりません）。
 - `sw.js` と `precache` からは外してあります（アプリの更新のたびに取り直さないため）。
