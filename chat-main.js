@@ -32,7 +32,7 @@ function initPresence(){
 function initMessageTools(){
     el.messages.addEventListener("click",onMessageAction);
     el.scheduleButton.addEventListener("click",toggleSchedule);
-    el.scheduleClose.addEventListener("click",() => { el.schedulePanel.hidden = true; });
+    el.scheduleClose.addEventListener("click",() => { el.schedulePanel.hidden = true; updateCharCount(); });
     el.scheduleSubmit.addEventListener("click",scheduleSend);
     el.scheduleList.addEventListener("click",onScheduleListClick);
 }

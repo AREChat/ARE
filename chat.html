@@ -135,7 +135,7 @@
                 <label>送信日時 <input type="datetime-local" id="scheduleAt"></label>
                 <button class="button" id="scheduleSubmit" type="button">この日時に予約（文章）</button>
                 <button class="button-secondary" id="scheduleClose" type="button">閉じる</button>
-                <div class="meta">写真・動画・ファイルも予約できます：この日時を決めたまま、上の「📷 写真」「📎 ファイルを選択」「🎬 動画を選択」で選ぶと、すぐアップロードだけ行われ、この日時になったら送信されます。</div>
+                <div class="meta">予約できる文章は <b>1,000文字まで</b>です（ふつうの送信は4,000文字まで）。写真・動画・ファイルも予約できます：この日時を決めたまま、上の「📷 写真」「📎 ファイルを選択」「🎬 動画を選択」で選ぶと、すぐアップロードだけ行われ、この日時になったら送信されます。</div>
                 <div id="scheduleList" class="schedule-list"></div>
             </div>
             <div class="composer-bottom">
@@ -143,7 +143,7 @@
                 <button class="button-secondary" id="newlineButton" type="button" title="改行（送信しません）" disabled>↵</button>
                 <button class="button" id="sendButton" type="button" disabled>送信</button>
             </div>
-            <div class="char-count"><span id="charCount">0</span> / 4,000文字</div>
+            <div class="char-count"><span id="charCount">0</span> / <span id="charLimit">4,000</span>文字</div>
         </section>
     </main>
 </div>
@@ -170,7 +170,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=e94f15f67a"></script>
+<script defer src="./chat.bundle.js?v=32630083a2"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>
