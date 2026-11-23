@@ -173,6 +173,7 @@ const FEATURES = [
     ["contact","連絡先・QR友だち追加",initContact],
     ["report","通報",initReport],
     ["copytool","コピーボタン",initCopyTool],
+    ["selcopy","選んでコピー",initSelCopy],
     ["diary","日記",initDiary],
     ["habit","習慣トラッカー",initHabit],
     ["budget","家計簿",initBudget],

@@ -96,6 +96,7 @@ chat-board.js
 chat-livenote.js
 chat-report.js
 chat-copytool.js
+chat-selcopy.js
 chat-live.js
 chat-ocr.js
 chat-contact.js

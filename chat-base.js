@@ -404,14 +404,17 @@ async function initialize(){
         }
 
         state.user = session.user;
-        state.profile = await getProfile(state.user.id).catch(() => null);
-
-        el.myName.textContent = profileDisplayName(state.profile);
+        // 読み込みを速くするため、「自分のプロフィール」「おすすめユーザー」「チャット一覧」は、順番に待たず、同時に取りに行く
+        const profileTask = getProfile(state.user.id).catch(() => null).then((profile) => {
+            state.profile = profile;
+            el.myName.textContent = profileDisplayName(state.profile);
+            el.myLoginStatus.textContent = "ログイン中";
+            setAvatar(el.myAvatar,state.profile);
+        });
         el.myLoginStatus.textContent = "ログイン中";
-        setAvatar(el.myAvatar,state.profile);
 
         bindEvents();
-        await Promise.all([loadRecommendations(),loadRooms()]);
+        await Promise.all([profileTask,loadRecommendations(),loadRooms()]);
         setStatus("チャットの準備ができました。ユーザーを選択してください。","success");
         startFeatures();
 
@@ -627,12 +630,15 @@ async function loadRooms(){
             return;
         }
 
-        const roomsResult = await client.from(TABLES.rooms).select("*").in("id",roomIds).order("created_at",{ascending:false});
+        // 「部屋の情報」と「メンバー一覧」は、たがいに待つ必要がないので 同時に取る（問い合わせ 1 回ぶん速い）
+        const [roomsResult,membersResult] = await Promise.all([
+            client.from(TABLES.rooms).select("*").in("id",roomIds).order("created_at",{ascending:false}),
+            client.from(TABLES.members).select("room_id,user_id").in("room_id",roomIds)
+        ]);
         if(roomsResult.error) throw roomsResult.error;
+        if(membersResult.error) throw membersResult.error;
 
         const roomRows = roomsResult.data || [];
-        const membersResult = await client.from(TABLES.members).select("room_id,user_id").in("room_id",roomIds);
-        if(membersResult.error) throw membersResult.error;
 
         const otherIds = [...new Set((membersResult.data || []).map((row) => row.user_id).filter((id) => id && id !== state.user.id))];
         let profiles = [];

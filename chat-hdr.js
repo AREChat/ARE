@@ -82,7 +82,23 @@ async function hdrInstallClick(){
     openSheet(hdrGuideHtml(hdrPlatform()));
 }
 
+/** スマホ幅：会話の上の小さなボタン（画面サイズ・検索・ブロック・通知・名前変更など）は 最初は隠して、「⋯」で出す */
+function hdrInitDots(){
+    const head = document.querySelector(".chat-header"), person = head && head.querySelector(".person-text");
+    if(!head || !person || document.getElementById("hdrMoreBtn")) return;
+    const b = document.createElement("button");
+    b.type = "button"; b.id = "hdrMoreBtn"; b.className = "button-secondary hdr-dots"; b.textContent = "⋯";
+    b.title = "そのほかのボタン（画面サイズ・検索・名前変更など）"; b.setAttribute("aria-label", "そのほかのボタンを出す・かくす"); b.setAttribute("aria-expanded", "false");
+    person.insertAdjacentElement("afterend", b);
+    const set = (on) => { head.classList.toggle("hdr-open", on); b.setAttribute("aria-expanded", on ? "true" : "false"); };
+    b.addEventListener("click", () => set(!head.classList.contains("hdr-open")));
+    // 別の相手のチャットを開いたら、また かくす
+    const t = document.getElementById("chatTitle");
+    if(t && window.MutationObserver) new MutationObserver(() => set(false)).observe(t, {childList: true, characterData: true, subtree: true});
+}
+
 function initHdr(){
+    hdrInitDots();
     const css = document.createElement("style");
     css.textContent = "#hdrInstallSheet .hdr-steps{margin:10px 0 6px;padding-left:22px;line-height:1.7}#hdrInstallSheet .hdr-steps li{margin:4px 0}#hdrInstallSheet .meta{margin:6px 0}";
     document.head.appendChild(css);

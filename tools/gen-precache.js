@@ -14,6 +14,21 @@ const shell = [], image = [], audio = [], size = {};
     if(AUDIO.test(n.name)) audio.push(rel); else if(MEDIA.test(n.name)) image.push(rel); else if(SHELL.test(n.name)) shell.push(rel);
   }
 })(".");
+// チャットの JS は 1 つにまとめた chat.bundle.js だけを使う。元ファイル（約1.6MB）は、どの html からも読まれないものを控えから外す
+// （更新のたびに みんなの端末が 裏で取り直す量を へらして、読み込みを 軽くする）。html が直接読んでいるもの（system.js など）は残す。
+try{
+  const bundled = new Set(fs.readFileSync("tools/chat-bundle-sources.txt", "utf8").split(/\r?\n/).map((l) => l.trim()).filter((l) => l && l[0] !== "#"));
+  bundled.add("chat.js");   // 古い一枚岩の chat.js（どの html も読んでいない）
+  const used = new Set();
+  for(const f of shell) if(/\.html$/i.test(f)){
+    const t = fs.readFileSync(f, "utf8"), re = /<script[^>]+src=["']([^"'?#]+)/gi; let m;
+    while((m = re.exec(t))) used.add(path.posix.normalize(path.posix.join(path.posix.dirname(f), m[1])));
+  }
+  for(let i = shell.length - 1; i >= 0; i--) if(bundled.has(shell[i]) && !used.has(shell[i])) shell.splice(i, 1);
+}catch(_e){}
+// 大きくて、使うときだけ読めば足りるもの（AIボットの QA.json 1.5MB／3Dアイコンの three.module.js 1.2MB）は、更新のたびの取り直しから外す。
+// 初めて使ったときに読み込まれ、そのあとは控えに入る（オフラインで初めて開く場合だけ使えない）。
+for(let i = shell.length - 1; i >= 0; i--) if(/^(QA\.json|vendor\/three\/three\.module\.js)$/.test(shell[i])) shell.splice(i, 1);
 for(const f of shell.slice()) if(/(^|\/)index\.html$/.test(f)) shell.push(f.replace(/index\.html$/, "") || "./");
 shell.sort(); image.sort(); audio.sort();
 const sum = (a) => a.reduce((t, f) => t + (size[f] || 0), 0);

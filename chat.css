@@ -861,6 +861,26 @@ button:disabled#delRequestButton,button:disabled#delCancelButton{opacity:.55;cur
 .brand .search{flex:1 1 90px;min-width:0;width:auto;margin:0;min-height:38px;padding:6px 14px;font-size:14px;border-radius:19px}
 /* タブレット幅（左の列が せまい）では、「操作方法」だけに みじかくする */
 .hdr-help .hdr-short{display:none}
+/* 選んでコピー（chat-selcopy.js） */
+.sel-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px clamp(12px,3vw,32px) calc(10px + env(safe-area-inset-bottom));border-top:1px solid var(--line);background:#0f1627}
+.sel-bar[hidden]{display:none}
+.sel-bar .sel-count{flex:1 1 0;min-width:0;font-size:13px;color:var(--muted)}
+.sel-bar button{min-height:42px;padding:8px 12px;white-space:nowrap}
+body.sel-mode .composer{display:none}
+body.sel-mode .tool-row{display:none}
+body.sel-mode .message-row{cursor:pointer;-webkit-user-select:none;user-select:none}
+.message-row.sel-on .bubble{outline:3px solid var(--accent);outline-offset:2px}
+.message-row.sel-on .message-body::before{content:"✓ 選んでいます";display:block;font-size:12px;color:var(--accent);margin-bottom:2px}
+/* 会話の上の「⋯」ボタン：パソコン・タブレットでは出さない（スマホ幅だけ） */
+.chat-header .hdr-dots{display:none}
+#roomLinkBtn{order:1}
+@media(max-width:700px){
+ .chat-header .hdr-dots{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:40px;padding:6px 10px;font-size:20px;line-height:1;font-weight:700}
+ .chat-header:not(.hdr-open)>button:not(.mobile-back):not(#hdrMoreBtn):not(#roomLinkBtn){display:none!important}
+ .chat-header .hdr-dots{order:2}
+ .chat-header.hdr-open>button:not(.mobile-back):not(#hdrMoreBtn):not(#roomLinkBtn){order:3}
+ .chat-header.hdr-open .hdr-dots{background:var(--accent,#3a4a8a);color:#fff}
+}
 @media(min-width:701px) and (max-width:1099px){.hdr-help .hdr-long{display:none}.hdr-help .hdr-short{display:inline}.brand{padding-left:14px;padding-right:14px}.brand h1{font-size:20px}}
 .more-search.hdr-moved{padding:0;margin:0}
 .more-search.hdr-moved .meta{min-height:0;margin:0}
@@ -874,7 +894,7 @@ button:disabled#delRequestButton,button:disabled#delCancelButton{opacity:.55;cur
  body.kb-open .app.chat-open .chat-header{min-height:0;padding-top:calc(4px + env(safe-area-inset-top));padding-bottom:4px;gap:8px;flex-wrap:nowrap}
  body.kb-open .chat-header .person-text p{display:none}
  body.kb-open .chat-header .avatar{width:34px;height:34px;flex-basis:34px;font-size:15px}
- body.kb-open .chat-header>button:not(.mobile-back):not(#searchBtn){display:none!important}
+ body.kb-open .chat-header:not(.hdr-open)>button:not(.mobile-back):not(#hdrMoreBtn):not(#roomLinkBtn){display:none!important}
  body.kb-open .chat-header .mobile-back{min-height:36px;padding:4px 10px}
  body.kb-open .composer textarea{padding-top:8px;padding-bottom:8px}
 }
