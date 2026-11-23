@@ -987,17 +987,16 @@ function renderMessages(scrollToBottom, onlyIfChanged){
         }
 
         let actions = "";
-        if(!editing && (own || feat.isAdmin)){
+        const bulkPick = !!(feat.isAdmin && feat.msgBulkMode);   // 一括選択モード中は、メッセージをタッチするだけで選ぶ／外す（個別のボタンは出さない）
+        if(!editing && !bulkPick && (own || feat.isAdmin)){
             actions = '<div class="message-actions">' +
                 (own ? (item.type === "text" ? '<button type="button" data-act="edit" data-id="' + id + '">編集</button>' : '') + (feat.pending.has(message.id) ? '<span class="pending">削除申請中（管理者の承認待ち）</span>' : '<button type="button" data-act="del" data-id="' + id + '">削除申請</button>') : '') +
-                (feat.isAdmin ? (feat.msgBulkMode
-                    ? '<label class="msg-select"><input type="checkbox" data-msg-select="' + id + '" data-msg-at="' + escapeHtml(message.created_at) + '"' + (feat.msgSelect.has(message.id) ? " checked" : "") + '> 選択</label>'
-                    : '<button type="button" class="admin-message-delete" data-act="admin-del" data-id="' + id + '">管理者として削除</button>') : '') +
+                (feat.isAdmin ? '<button type="button" class="admin-message-delete" data-act="admin-del" data-id="' + id + '">管理者として削除</button>' : '') +
                 '</div>';
         }
 
         const sep = (msgIdx === 0 || msgDayKey(state.messages[msgIdx - 1].created_at) !== msgDayKey(message.created_at)) ? dateSeparator(message.created_at) : "";
-        return sep + '<article class="message-row' + (own ? ' own' : '') + '" data-mid="' + id + '">' +
+        return sep + '<article class="message-row' + (own ? ' own' : '') + (bulkPick && feat.msgSelect.has(message.id) ? ' msg-picked' : '') + (bulkPick ? ' msg-pickable' : '') + '" data-mid="' + id + '">' +
             avatar +
             '<div class="message-body"><div class="message-sender">' + escapeHtml(name) + '</div>' +
             body + '<div class="message-time">' + meta + '</div>' + actions + '</div></article>';

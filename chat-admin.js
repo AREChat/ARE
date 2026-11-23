@@ -292,11 +292,24 @@ async function runOrphanRoomDelete(){
 }
 
 // ===== メッセージの一括選択・一括「管理者として削除」 =====
-// ・1件ずつ「管理者として削除」を押すのが大変なので、チェックボックスで複数選択、または日付の範囲で選んで、まとめて削除できるようにする
-// ・ヘッダーの「☑️ 一括削除」ボタンで選択モードに入る（管理者のみ・チャットを開いているときだけ表示）
+// ・ヘッダーの「☑️ 一括削除」で選択モードに入る（管理者のみ・チャットを開いているときだけ表示）
+// ・選択モード中は、メッセージ（相手・自分どちらも）を「タッチするだけ」で 選ぶ／外す。日付（開始日〜終了日）で選ぶこともできる
+// ・削除のときの「理由」は入力しない（監査ログには「管理者による一括削除」と自動で記録）
+const MSG_BULK_REASON = "管理者による一括削除";
 function initMsgBulk(){
     const b = document.getElementById("msgBulkBtn");
     if(!b || b.dataset.ready) return; b.dataset.ready = "1";
+    // タッチで選ぶ：ほかの クリック処理（選んでコピー・メニュー・画像を開く など）より先に受けて、選ぶ／外すだけにする
+    el.messages.addEventListener("click",(event) => {
+        if(!feat.isAdmin || !feat.msgBulkMode) return;
+        if(event.target.closest("#msgBulkBar")) return;   // 上のバーのボタン・日付欄は ふつうに動かす
+        const row = event.target.closest("article[data-mid]");
+        if(!row) return;
+        event.preventDefault(); event.stopPropagation();
+        const id = row.dataset.mid;
+        if(feat.msgSelect.has(id)) feat.msgSelect.delete(id); else feat.msgSelect.add(id);
+        msgBulkPaint();
+    },true);
     el.messages.addEventListener("click",onMsgBulkClick);
     el.messages.addEventListener("input",(event) => {
         if(event.target.id === "msgBulkFrom") feat.msgBulkFrom = event.target.value;
@@ -310,6 +323,7 @@ function initMsgBulk(){
     b.addEventListener("click",() => {
         if(!feat.isAdmin || !state.currentRoom) return;
         feat.msgBulkMode = !feat.msgBulkMode;
+        if(feat.msgBulkMode && typeof selcExit === "function") selcExit();   // 「選んでコピー」のモードが残っていると、タッチを横取りされるため
         if(!feat.msgBulkMode) feat.msgSelect = new Set();
         b.textContent = feat.msgBulkMode ? "✖️ 一括削除をやめる" : "☑️ 一括削除";
         b.classList.toggle("on", feat.msgBulkMode);
@@ -320,50 +334,91 @@ function initMsgBulk(){
 function msgBulkBarHtml(){
     const count = feat.msgSelect.size;
     return '<div class="msg-bulkbar" id="msgBulkBar">' +
+        '<div class="msg-bulkbar-row"><span class="meta">メッセージをタッチすると選べます</span> <b id="msgBulkCount">' + count + '件を選択中</b></div>' +
         '<div class="msg-bulkbar-row"><input type="date" id="msgBulkFrom" value="' + escapeHtml(feat.msgBulkFrom) + '" aria-label="開始日">〜<input type="date" id="msgBulkTo" value="' + escapeHtml(feat.msgBulkTo) + '" aria-label="終了日">' +
-        '<button type="button" class="button-secondary" data-msgbulk-range="1">この期間を選択</button></div>' +
-        '<div class="msg-bulkbar-row"><span class="meta">' + count + '件を選択中</span>' +
+        '<button type="button" class="button-secondary" data-msgbulk-range="1">この期間を選択</button>' +
+        '<button type="button" class="button-danger" data-msgbulk-range-del="1">この期間を削除</button></div>' +
+        '<div class="msg-bulkbar-row">' +
         '<button type="button" class="button-secondary" data-msgbulk-all="1">すべて選択</button>' +
         '<button type="button" class="button-secondary" data-msgbulk-clear="1">選択を解除</button>' +
-        '<button type="button" class="button-danger" data-msgbulk-del="1"' + (count ? "" : " disabled") + '>選択した' + count + '件を管理者として削除</button></div></div>';
+        '<button type="button" class="button-danger" id="msgBulkDel" data-msgbulk-del="1"' + (count ? "" : " disabled") + '>選択した' + count + '件を削除</button></div></div>';
+}
+/** 全体を描き直さずに、選んだ状態（色・件数・削除ボタン）だけ更新する */
+function msgBulkPaint(){
+    el.messages.querySelectorAll("article[data-mid]").forEach((row) => row.classList.toggle("msg-picked", feat.msgSelect.has(row.dataset.mid)));
+    const n = feat.msgSelect.size;
+    const c = document.getElementById("msgBulkCount"); if(c) c.textContent = n + "件を選択中";
+    const d = document.getElementById("msgBulkDel"); if(d){ d.disabled = !n; d.textContent = "選んだ" + n + "件を削除"; }
+}
+/** 指定した日付の範囲（開始日の0時〜終了日の終わり）の期間を、ミリ秒で返す */
+function msgBulkRange(){
+    const from = document.getElementById("msgBulkFrom")?.value || feat.msgBulkFrom || "", to = document.getElementById("msgBulkTo")?.value || feat.msgBulkTo || "";
+    feat.msgBulkFrom = from; feat.msgBulkTo = to;
+    if(!from && !to){ showToast("開始日・終了日のどちらかを入力してください。"); return null; }
+    return {fromMs: from ? new Date(from + "T00:00:00").getTime() : -Infinity, toMs: to ? new Date(to + "T23:59:59.999").getTime() : Infinity};
+}
+/** メッセージを順に管理者削除する（理由は入力させない）。同時に5件ずつ。成功／失敗の件数を返す */
+async function msgBulkRun(ids){
+    let ok = 0, fail = 0, next = 0;
+    const worker = async () => {
+        while(next < ids.length){
+            const id = ids[next++];
+            try{
+                const result = await requireClient().functions.invoke("admin-api",{body:{action:"delete-message",messageId:id,reason:MSG_BULK_REASON}});
+                if(result.error) throw new Error(result.data?.error || result.error.message);
+                ok++;
+            }catch(_error){ fail++; }
+            if((ok + fail) % 10 === 0) showToast("削除中… " + (ok + fail) + " / " + ids.length);
+        }
+    };
+    await Promise.all([worker(), worker(), worker(), worker(), worker()]);
+    return {ok, fail};
+}
+async function msgBulkFinish(r){
+    feat.msgSelect.clear();
+    await loadMessages(true,true);
+    showToast(r.fail ? (r.ok + "件削除しました（" + r.fail + "件は失敗）") : (r.ok + "件を管理者として削除し、操作記録を保存しました。"));
 }
 async function onMsgBulkClick(event){
     const range = event.target.closest("[data-msgbulk-range]");
+    const rangeDel = event.target.closest("[data-msgbulk-range-del]");
     const all = event.target.closest("[data-msgbulk-all]");
     const clear = event.target.closest("[data-msgbulk-clear]");
     const del = event.target.closest("[data-msgbulk-del]");
     if(range){
-        const from = document.getElementById("msgBulkFrom")?.value || "", to = document.getElementById("msgBulkTo")?.value || "";
-        feat.msgBulkFrom = from; feat.msgBulkTo = to;
-        if(!from && !to){ showToast("開始日・終了日のどちらかを入力してください。"); return; }
-        const fromMs = from ? new Date(from + "T00:00:00").getTime() : -Infinity;
-        const toMs = to ? new Date(to + "T23:59:59.999").getTime() : Infinity;
+        const r = msgBulkRange(); if(!r) return;
         let added = 0;
-        state.messages.forEach((m) => { const t = new Date(m.created_at).getTime(); if(t >= fromMs && t <= toMs){ feat.msgSelect.add(m.id); added++; } });
+        state.messages.forEach((m) => { const t = new Date(m.created_at).getTime(); if(t >= r.fromMs && t <= r.toMs){ feat.msgSelect.add(m.id); added++; } });
         showToast(added + "件を選択に追加しました。");
-        renderMessages(false);
+        msgBulkPaint();
         return;
     }
-    if(all){ state.messages.forEach((m) => feat.msgSelect.add(m.id)); renderMessages(false); return; }
-    if(clear){ feat.msgSelect.clear(); renderMessages(false); return; }
+    if(rangeDel){
+        // 日付だけで直接削除：サーバーから この期間のメッセージを探して（画面に出ていない古い分も含む）、確認のあと まとめて削除
+        const r = msgBulkRange(); if(!r || !state.currentRoom) return;
+        rangeDel.disabled = true;
+        try{
+            let q = requireClient().from(TABLES.messages).select("id").eq("room_id",state.currentRoom.id).order("created_at",{ascending:false}).limit(1000);
+            if(Number.isFinite(r.fromMs)) q = q.gte("created_at",new Date(r.fromMs).toISOString());
+            if(Number.isFinite(r.toMs)) q = q.lte("created_at",new Date(r.toMs).toISOString());
+            const found = await q;
+            if(found.error) throw found.error;
+            const ids = (found.data || []).map((m) => m.id);
+            if(!ids.length){ showToast("この期間のメッセージはありません。"); return; }
+            if(!window.confirm("この期間のメッセージ " + ids.length + "件を、管理者としてすべて削除します。元に戻せません。よろしいですか？")) return;
+            await msgBulkFinish(await msgBulkRun(ids));
+        }catch(error){ setStatus(featError(error),"error"); }
+        finally{ rangeDel.disabled = false; }
+        return;
+    }
+    if(all){ state.messages.forEach((m) => feat.msgSelect.add(m.id)); msgBulkPaint(); return; }
+    if(clear){ feat.msgSelect.clear(); msgBulkPaint(); return; }
     if(del){
         const ids = Array.from(feat.msgSelect);
         if(!ids.length) return;
-        const reason = window.prompt("選択した" + ids.length + "件のメッセージを管理者として削除します。理由を入力してください（監査ログに記録されます）。","");
-        if(reason === null) return;
-        if(!reason.trim() || Array.from(reason).length > 500){ showToast("削除理由を1〜500文字で入力してください。"); return; }
+        if(!window.confirm("選んだ" + ids.length + "件のメッセージを、管理者として削除します。元に戻せません。よろしいですか？")) return;
         del.disabled = true;
-        let ok = 0, fail = 0;
-        for(const id of ids){
-            try{
-                const result = await requireClient().functions.invoke("admin-api",{body:{action:"delete-message",messageId:id,reason:reason.trim()}});
-                if(result.error) throw new Error(result.data?.error || result.error.message);
-                ok++;
-            }catch(_error){ fail++; }
-        }
-        feat.msgSelect.clear();
-        await loadMessages(true,true);
-        showToast(fail ? (ok + "件削除しました（" + fail + "件は失敗）") : (ok + "件削除し、操作記録を保存しました。"));
+        await msgBulkFinish(await msgBulkRun(ids));
     }
 }
 

@@ -11,7 +11,7 @@
 // ・新しい版が入ったら、古い控えをすべて消す
 
 importScripts("precache-manifest.js", "sw-core.js");
-const CACHE = "are-v230-20261123";
+const CACHE = "are-v231-20261123";
 // オフライン用: 画面の骨組み（html/js/css/json）を 最初に まとめて保存 / 画像・音楽は「オフライン準備」ボタンで are-media に保存（sw-core.js）
 const core = self.areCore({shell: CACHE, root: "./", precache: true, fetch: false});
 const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
@@ -25,7 +25,7 @@ self.addEventListener("message", (event) => {
 self.addEventListener("activate", (event) => {
     event.waitUntil((async () => {
         const keys = await caches.keys();
-        await Promise.all(keys.filter((k) => k !== CACHE && k !== "are-media" && k !== "are-ads" && k.indexOf("tq-game-") !== 0).map((k) => caches.delete(k)));
+        await Promise.all(keys.filter((k) => k !== CACHE && k !== "are-media" && k !== "are-ads" && k !== "are-prefs" && k.indexOf("tq-game-") !== 0).map((k) => caches.delete(k)));
         await self.clients.claim();
     })());
 });
@@ -104,6 +104,7 @@ self.addEventListener("push", (event) => {
         return;
     }
     const title = String(data.title || "ARE").slice(0, 80);
+    const morning = data.type === "morning";
     const options = {
         body: String(data.body || "新しいメッセージがあります").slice(0, 140),
         icon: "icon-192.png", badge: "icon-192.png",
@@ -111,11 +112,21 @@ self.addEventListener("push", (event) => {
         data: {room: typeof data.room === "string" ? data.room : ""}
     };
     event.waitUntil((async () => {
+        // 管理者・家庭の人は ミュート（音もバイブもなし）。そのほかの人は、アラームのようなバイブ。（画面側が are-prefs に書いている）
+        let muted = false;
+        try{
+            const c = await caches.open("are-prefs"), r = await c.match(new URL("are-prefs.json", self.registration.scope).href);
+            if(r){ const j = await r.json(); muted = !!(j && j.muted); }
+        }catch(_e){ muted = false; }
+        if(muted){ options.silent = true; }
+        else{ options.vibrate = morning ? [400, 150, 400, 150, 400, 150, 400] : [200, 100, 200, 100, 200]; }
+        if(morning) options.requireInteraction = !muted;
+        const list = await self.clients.matchAll({type: "window", includeUncontrolled: true});
         const apple = /iPhone|iPad|iPod|Macintosh/i.test(self.navigator.userAgent || "");
-        if(!apple){
-            const list = await self.clients.matchAll({type: "window", includeUncontrolled: true});
-            if(list.some((c) => c.visibilityState === "visible" && c.focused)) return;
-        }
+        const seen = list.some((c) => c.visibilityState === "visible" && c.focused);
+        // 画面を開いて見ているときは、アプリ内のポップアップ＋アラーム音に任せる（朝の通知は画面側へ知らせる）
+        if(seen && morning) list.forEach((c) => { try{ c.postMessage({type: "morning-alarm"}); }catch(_e){} });
+        if(!apple && seen) return;
         await self.registration.showNotification(title, options);
     })());
 });

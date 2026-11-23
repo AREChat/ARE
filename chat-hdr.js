@@ -96,6 +96,67 @@ async function hdrInstallClick(){
     openSheet(hdrGuideHtml(hdrPlatform()));
 }
 
+// ---------- 📲 アプリ化の「強制」表示 ----------
+// ・管理者以外の全員に、ARE を開いた（ログインした）直後、「アプリ化」を押すまで 先へ進めない全画面の案内を出す
+// ・「アプリ化」を押した回数（この端末）が 3回に なるまでは、開くたびに出す。3回以上押したら、もう強制しない
+// ・すでにアプリとして開いている（ホーム画面から起動）ときは出さない
+// ・iPhone／iPad：Apple の決まりで、ボタン1つでは追加できないので、「共有 → ホーム画面に追加」の手順を出す（Safari がいちばん確実）
+// ・Android：Chrome のインストール画面を出す（出せないときは、メニューからの手順）
+// ・LINE／Instagram などの「アプリ内ブラウザ」では追加できないので、ブラウザで開き直す案内（リンクのコピー）を出す
+const HDR_FORCE_KEY = "are_install_taps";
+function hdrForceTaps(){ try{ return parseInt(localStorage.getItem(HDR_FORCE_KEY) || "0", 10) || 0; }catch(_e){ return 0; } }
+function hdrInAppBrowser(){ return /(Line\/|FBAN|FBAV|Instagram|MicroMessenger|Twitter|TikTok|Snapchat|; wv\))/i.test(navigator.userAgent); }
+function hdrForceClose(){ const o = document.getElementById("hdrForce"); if(o) o.remove(); }
+function hdrForceCss(){
+    if(document.getElementById("hdrForceCss")) return;
+    const css = document.createElement("style"); css.id = "hdrForceCss";
+    css.textContent = "#hdrForce{position:fixed;inset:0;z-index:2147483000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(6,10,22,.94);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}" +
+        "#hdrForce .hf-box{max-width:420px;width:100%;box-sizing:border-box;padding:26px 22px;border-radius:20px;background:var(--panel,#121a33);border:1px solid var(--line,#2a3558);text-align:center;color:var(--text,#fff)}" +
+        "#hdrForce h2{margin:10px 0 8px;font-size:20px}#hdrForce p{margin:6px 0;line-height:1.6}#hdrForce .hf-big{width:100%;min-height:56px;margin-top:16px;font-size:18px;font-weight:800;border-radius:14px}" +
+        "#hdrForce .meta{margin-top:10px;font-size:12px}#hdrForce .hf-steps{text-align:left;margin:12px 0 0;padding-left:22px;line-height:1.7;font-size:14px}";
+    document.head.appendChild(css);
+}
+function hdrForceShow(){
+    if(document.getElementById("hdrForce")) return;
+    if(hdrIsStandalone() || hdrForceTaps() >= 3) return;
+    if(typeof feat !== "undefined" && feat.isAdmin) return;
+    let cachedAdmin = "0"; try{ cachedAdmin = localStorage.getItem("are_is_admin_ui") || "0"; }catch(_e){}
+    if(cachedAdmin === "1") return;
+    hdrForceCss();
+    const plat = hdrPlatform(), ios = plat === "ios", inapp = hdrInAppBrowser();
+    const o = document.createElement("div"); o.id = "hdrForce"; o.setAttribute("role", "dialog"); o.setAttribute("aria-modal", "true"); o.setAttribute("aria-label", "アプリ化のお願い");
+    let hint, btn;
+    if(inapp){
+        hint = '<p><b>いまのブラウザ（アプリ内ブラウザ）では、アプリ化できません。</b></p><p>' + (ios ? 'Safari' : 'Chrome') + ' で開き直してください。下のボタンでリンクをコピーして、' + (ios ? 'Safari' : 'Chrome') + ' のアドレス欄に貼りつけると開けます。</p>';
+        btn = '<button type="button" class="button hf-big" id="hdrForceCopy">🔗 リンクをコピー</button><button type="button" class="button-secondary hf-big" id="hdrForceLater" style="min-height:44px;font-size:14px;font-weight:600">あとで</button>';
+    }else if(ios){
+        hint = '<p>ホーム画面にアイコンができて、アプリのように すぐ開けます。通知も受け取れます。</p><ol class="hf-steps"><li>画面の下（iPad は上）の <b>共有ボタン</b>（四角に矢印）</li><li><b>「ホーム画面に追加」</b></li><li>右上の <b>「追加」</b></li></ol>';
+        btn = '<button type="button" class="button hf-big" id="hdrForceBtn">📲 アプリ化する（手順を見る）</button>';
+    }else{
+        hint = '<p>ホーム画面（パソコンはデスクトップ）にアイコンができて、アプリのように すぐ開けます。通知も受け取れます。</p>';
+        btn = '<button type="button" class="button hf-big" id="hdrForceBtn">📲 アプリ化する</button>';
+    }
+    o.innerHTML = '<div class="hf-box"><div style="font-size:52px" aria-hidden="true">📲</div><h2>ARE を「アプリ化」しましょう</h2>' + hint + btn +
+        '<div class="meta">' + (inapp ? "" : "「アプリ化する」を押すと、先へ進めます。") + '</div></div>';
+    document.body.appendChild(o);
+    const go = o.querySelector("#hdrForceBtn");
+    if(go) go.addEventListener("click", () => {
+        try{ localStorage.setItem(HDR_FORCE_KEY, String(hdrForceTaps() + 1)); }catch(_e){}
+        hdrForceClose();
+        if(typeof runTool === "function") runTool(hdrInstallClick); else hdrInstallClick();
+    });
+    const cp = o.querySelector("#hdrForceCopy");
+    if(cp) cp.addEventListener("click", async () => {
+        const url = location.origin + location.pathname.replace(/[^/]*$/, "") + "index.html";
+        try{ await navigator.clipboard.writeText(url); showToast("リンクをコピーしました。" + (ios ? "Safari" : "Chrome") + " に貼りつけて開いてください。"); }
+        catch(_e){ window.prompt("このリンクをコピーして、" + (ios ? "Safari" : "Chrome") + " で開いてください。", url); }
+    });
+    const later = o.querySelector("#hdrForceLater"); if(later) later.addEventListener("click", hdrForceClose);
+    window.addEventListener("are-installed", hdrForceClose, {once:true});   // 追加できたら、すぐ閉じる
+    // 管理者だとわかったら、すぐ消す（管理者かどうかは、サーバーに聞くので すこし遅れてわかる）
+    let n = 0; const t = setInterval(() => { if((typeof feat !== "undefined" && feat.isAdmin) || ++n > 20){ clearInterval(t); if(typeof feat !== "undefined" && feat.isAdmin) hdrForceClose(); } }, 500);
+}
+
 /** スマホ幅：会話の上の小さなボタン（画面サイズ・検索・ブロック・通知・名前変更など）は 最初は隠して、「⋯」で出す */
 function hdrInitDots(){
     const head = document.querySelector(".chat-header"), person = head && head.querySelector(".person-text");
@@ -130,4 +191,5 @@ function initHdr(){
     }
     hdrPlace();
     if(!(hdrSt.help && hdrSt.more && hdrSt.moreChips)) hdrSt.timer = setInterval(hdrPlace, 500);
+    setTimeout(hdrForceShow, 1200);   // 開いた（ログインした）直後に、アプリ化の案内を出す（管理者は除く）
 }

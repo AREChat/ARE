@@ -3,14 +3,6 @@
 async function onMessageAction(event){
     const pollBtn = event.target.closest("[data-openpoll]");
     if(pollBtn){ openGroupInfo(pollBtn.dataset.openpoll); return; }
-    const select = event.target.closest("[data-msg-select]");
-    if(select){
-        if(!feat.isAdmin) return;
-        const id = select.dataset.msgSelect;
-        if(select.checked) feat.msgSelect.add(id); else feat.msgSelect.delete(id);
-        renderMessages(false);
-        return;
-    }
     const button = event.target.closest("[data-act]");
     if(!button) return;
     const id = button.dataset.id, act = button.dataset.act;

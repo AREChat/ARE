@@ -89,8 +89,10 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .message-actions button{background:none;border:0;color:var(--muted);text-decoration:underline;padding:0}
 .message-actions .pending{color:#ffcc66}
 .message-actions .admin-message-delete{color:var(--danger);font-weight:700}
-.message-actions .msg-select{display:inline-flex;align-items:center;gap:4px;color:var(--danger);cursor:pointer;text-decoration:none}
-.message-actions .msg-select input{margin:0}
+.msg-pickable{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+.message-row.msg-picked{background:rgba(255,90,110,.16);outline:2px solid var(--danger);outline-offset:3px;border-radius:12px}
+.message-row.msg-picked .message-sender::before{content:"✓ 選択中　";color:var(--danger);font-weight:700}
+.msg-pickable .message-body *{pointer-events:none}
 .msg-bulkbar{display:flex;flex-direction:column;gap:6px;padding:8px 10px;margin:0 0 10px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);position:sticky;top:0;z-index:2}
 .msg-bulkbar-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px}
 .msg-bulkbar-row input[type="date"]{font-size:12px;padding:3px 4px}

@@ -1,10 +1,13 @@
 "use strict";
 // ===== おしおき画面（演出）=====
-// 11回目のNG発言のあとにだけ開きます。「ごめんなさい、申しません」を押すと、サーバー側でアカウントが完全に消えます。
+// ・11回目のNG発言のあと：「ごめんなさい、申しません」を押すと、サーバー側でアカウントが完全に消えます。
+// ・2回目〜（3回目以降も毎回）のNG発言のあと（?warn=1）：同じ画面の「演出だけ」。数秒あとにボタンが押せるようになり、押すとチャットにもどります（アカウントは消えません）
 // ・押すまでは：ページを離れる操作に確認を出す／全画面化を試みる／キー操作・右クリックを止める（ブラウザの仕様上、タブを閉じる操作そのものは止められません）
 // ・閉じても、サーバー側が「削除待ち」のままなので、次にログインしたとき必ずこの画面に戻ります
 (function(){
     var params = new URLSearchParams(location.search), preview = params.get("preview") === "1";
+    var warn = params.get("warn") === "1", warnN = parseInt(params.get("n"), 10) || 0;
+    var soft = preview || warn;   // 演出だけ（アカウントは消えない・画面ロックもゆるめる）。サーバーが「削除待ち」のときだけ、あとで false にもどす
     var $ = function(id){ return document.getElementById(id); };
     var done = false, locked = false;
     var client = null;
@@ -23,10 +26,10 @@
     }, 450);
 
     // ---- 他の操作ができないようにする ----
-    window.addEventListener("beforeunload", function(e){ if(done || preview) return; e.preventDefault(); e.returnValue = "ウイルスが残っています。反省して あやまるまで 閉じられません。"; return e.returnValue; });
+    window.addEventListener("beforeunload", function(e){ if(done || soft) return; e.preventDefault(); e.returnValue = "ウイルスが残っています。反省して あやまるまで 閉じられません。"; return e.returnValue; });
     ["contextmenu","selectstart","dragstart","copy","cut","paste"].forEach(function(t){ document.addEventListener(t, function(e){ e.preventDefault(); }, true); });
     document.addEventListener("keydown", function(e){
-        if(done) return;
+        if(done || soft) return;
         var onBtn = e.target === $("vxSorry");
         if(onBtn && (e.key === "Enter" || e.key === " ")) return; // ボタンはキーボードでも押せる
         e.preventDefault(); e.stopPropagation();
@@ -39,8 +42,8 @@
             }
         }catch(_e){}
     }
-    ["pointerdown","touchstart"].forEach(function(t){ document.addEventListener(t, function(){ if(!done && !preview) goFull(); }, true); });
-    document.addEventListener("fullscreenchange", function(){ if(!document.fullscreenElement && !done && !preview) msg("画面を もどします。どこかを タップしてください。"); });
+    ["pointerdown","touchstart"].forEach(function(t){ document.addEventListener(t, function(){ if(!done && !soft) goFull(); }, true); });
+    document.addEventListener("fullscreenchange", function(){ if(!document.fullscreenElement && !done && !soft) msg("画面を もどします。どこかを タップしてください。"); });
     document.addEventListener("visibilitychange", function(){ if(!document.hidden && !done) $("vxSorry").focus(); });
 
     // ---- サーバーとの連携 ----
@@ -55,11 +58,27 @@
             if(preview){
                 if(!a.admin){ location.replace("./chat.html"); return; }
                 $("vxPrev").textContent = "（管理者プレビュー：ボタンを押してもアカウントは消えません）";
-            }else if(!a.ng_pending){
+            }else if(a.ng_pending){
+                soft = false;   // 本物（11回目）：これまでどおり
+            }else if(warn && !a.admin){
+                $("vxPrev").textContent = "（警告の演出です。これで" + (warnN || "2") + "回目です。アカウントは消えません。10回で1日凍結、11回目でアカウントが削除されます）";
+            }else{
                 location.replace("./chat.html"); return;
             }
-            locked = true; $("vxSorry").disabled = false; $("vxSorry").focus();
-            msg(preview ? "" : "どこかを タップすると 全画面になります。");
+            locked = true;
+            if(warn && soft && !preview){
+                // 演出だけの警告：5秒ほど反省してから、ボタンが押せるようになる
+                var left = 5; $("vxSorry").disabled = true;
+                var timer = setInterval(function(){
+                    left--; if(left > 0){ $("vxSorry").textContent = "反省しています… " + left; return; }
+                    clearInterval(timer); $("vxSorry").textContent = "ごめんなさい、申しません"; $("vxSorry").disabled = false; $("vxSorry").focus();
+                }, 1000);
+                $("vxSorry").textContent = "反省しています… " + left;
+                msg("");
+            }else{
+                $("vxSorry").disabled = false; $("vxSorry").focus();
+                msg(soft ? "" : "どこかを タップすると 全画面になります。");
+            }
         }catch(error){
             console.error("[ARE virus]", error);
             msg("つながりません。通信を 確認して ページを 開きなおしてください。");
@@ -69,7 +88,7 @@
         if(!locked || done) return;
         $("vxSorry").disabled = true; msg("あやまっています…");
         try{
-            if(preview){ location.replace("./chat.html"); return; }
+            if(soft){ location.replace("./chat.html"); return; }
             var r = await client.rpc("ng_apologize");
             if(r.error) throw r.error;
             done = true;
