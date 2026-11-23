@@ -105,13 +105,12 @@ function ptPaintCard(err){
     const box = $("ptCard"); if(!box) return;
     if(!pt.acc){ box.innerHTML = '<div class="meta">' + (err ? "ポイントはまだ使えません（サーバー側の準備ができていません）" : "読み込み中…") + '</div>'; return; }
     const a = pt.acc;
-    let status;
-    if(a.admin) status = "管理者：すべての機能が使えます";
-    else if(a.trial_active) status = "お試し期間：全機能OK・あと" + ptDaysLeft() + "日";
-    else status = "お試し期間は終了。機能はポイントで解放します";
+    if(a.admin){ box.hidden = true; box.innerHTML = ""; return; } // 管理者にはポイント・AREShopは不要なのでカードごと非表示
+    box.hidden = false;
+    const status = a.trial_active ? "お試し期間：全機能OK・あと" + ptDaysLeft() + "日" : "お試し期間は終了。機能はポイントで解放します";
     box.innerHTML = '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><div><div class="meta">ポイント</div><b style="font-size:26px" id="ptNum">' + a.points + '</b> <span class="meta">円</span></div>' +
         '<div style="flex:1;min-width:140px" class="meta">' + escapeHtml(status) + '</div></div>' +
-        (a.admin ? '' : '<div class="row"><button type="button" class="button" data-t="pt:shop">🛍️ AREShop</button><button type="button" class="button-secondary" data-t="pt:history">履歴</button></div>');
+        '<div class="row"><button type="button" class="button" data-t="pt:shop">🛍️ AREShop</button><button type="button" class="button-secondary" data-t="pt:history">履歴</button></div>';
 }
 
 // ---------- 入口が閉じているときの案内 ----------
