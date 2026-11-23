@@ -36,8 +36,9 @@ function hdrPlace(){
 
 // ---------- 📲 アプリとして追加 ----------
 function hdrInstallPaint(){
-    const b = document.getElementById("installAppButton"); if(!b) return;
-    b.hidden = hdrIsStandalone();
+    // チャットタブの上のバーの 📲 は出さない（持ち主の指示 2026-11-23）。「その他」→ 操作方法の となりの「📲 アプリとして追加」だけに出す
+    const b = document.getElementById("installAppButton"); if(b) b.hidden = true;
+    const it = document.getElementById("installAppItem"); if(it) it.hidden = hdrIsStandalone();
 }
 function hdrPlatform(){
     const ua = navigator.userAgent;
@@ -102,9 +103,10 @@ function initHdr(){
     const css = document.createElement("style");
     css.textContent = "#hdrInstallSheet .hdr-steps{margin:10px 0 6px;padding-left:22px;line-height:1.7}#hdrInstallSheet .hdr-steps li{margin:4px 0}#hdrInstallSheet .meta{margin:6px 0}";
     document.head.appendChild(css);
-    const b = document.getElementById("installAppButton");
-    if(b){
-        b.addEventListener("click", () => runTool ? runTool(hdrInstallClick) : hdrInstallClick());
+    const b = document.getElementById("installAppButton"), it = document.getElementById("installAppItem");
+    if(it) it.addEventListener("click", () => runTool ? runTool(hdrInstallClick) : hdrInstallClick());
+    if(b || it){
+        if(b) b.addEventListener("click", () => runTool ? runTool(hdrInstallClick) : hdrInstallClick());
         hdrInstallPaint();
         try{ window.matchMedia("(display-mode: standalone)").addEventListener("change", hdrInstallPaint); }catch(_e){ /* 古いブラウザ */ }
         window.addEventListener("are-installed", hdrInstallPaint);
