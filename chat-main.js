@@ -87,9 +87,7 @@ function initGroups(){
 }
 
 function initHistory(){
-    el.exportOldButton.addEventListener("click",() => exportHistory("old"));
     el.exportAllButton.addEventListener("click",() => exportHistory("all"));
-    setTimeout(maybePromptExport,4000);
 }
 
 function initAccount(){

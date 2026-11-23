@@ -58,8 +58,8 @@
                 <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button-danger" id="delRequestButton" data-feature="account" type="button" disabled>アカウント削除を申請</button><button class="button-secondary" id="delCancelButton" type="button" hidden>申請を取り消す</button></div>
             </div>
             <div class="profile-card pane-me">
-                <div class="profile-text"><b>会話履歴の保存</b><div class="bio">30日を過ぎた会話は、ZIPファイルとしてこの端末に保存できます（添付ファイルの中身は含まれません）。</div></div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button" id="exportOldButton" data-feature="history" type="button">30日より前をZIP保存</button><button class="button-secondary" id="exportAllButton" data-feature="history" type="button">すべてZIP保存</button></div>
+                <div class="profile-text"><b>会話履歴の保存</b></div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="button-secondary" id="exportAllButton" data-feature="history" type="button">すべてZIP保存</button></div>
             </div>
             <div class="pane pane-more">
                 <div class="section-heading"><h2>🧰 その他</h2></div>
@@ -170,7 +170,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=82df05416a"></script>
+<script defer src="./chat.bundle.js?v=6bf182ea15"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

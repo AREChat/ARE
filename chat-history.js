@@ -73,7 +73,6 @@ async function exportHistory(mode){
     let since = null;
     try{ since = mode === "old" ? localStorage.getItem(exportKey()) : null; }catch(_e){ /* 保存できなくても続ける */ }
     const files = [], used = new Set();
-    el.exportOldButton.disabled = true;
     el.exportAllButton.disabled = true;
     try{
         for(const room of state.rooms){
@@ -113,24 +112,8 @@ async function exportHistory(mode){
         showToast(featError(error));
         return false;
     }finally{
-        el.exportOldButton.disabled = false;
         el.exportAllButton.disabled = false;
     }
-}
-
-async function maybePromptExport(){
-    try{
-        const today = new Date().toISOString().slice(0,10);
-        if(localStorage.getItem("are_export_prompt_day") === today) return;
-        const since = localStorage.getItem(exportKey());
-        const cutoff = new Date(Date.now() - 30 * 86400000).toISOString();
-        let q = requireClient().from(TABLES.messages).select("id",{count:"exact",head:true}).lt("created_at",cutoff);
-        if(since) q = q.gt("created_at",since);
-        const r = await q;
-        if(r.error || !r.count) return;
-        localStorage.setItem("are_export_prompt_day",today);
-        if(window.confirm("30日を過ぎた会話履歴が " + r.count + " 件あります。\nZIPファイルとして、この端末に保存しますか？\n（サーバー上の履歴は消えません）")) await exportHistory("old");
-    }catch(_e){ /* お知らせが出せなくても他の機能は続ける */ }
 }
 
 /** 自分のストーリー（アーカイブ含む）・メモ・CO2記録をZIPに足す。失敗しても会話履歴の保存は続ける */
