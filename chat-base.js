@@ -1061,6 +1061,10 @@ async function handleFiles(fileList,kind){
     const files = Array.from(fileList || []);
     if(!files.length) return;
 
+    // 予約送信パネルが開いていて、日時が選べているときは、このあと upload されるファイルを「すぐ送信」ではなく「その日時に予約」にする。
+    // （途中でパネルを閉じたり日時を変えたりしても、この一回の選択ぶんは最初に決めた日時のまま予約される）
+    const scheduleWhen = typeof schedulePickedWhen === "function" ? schedulePickedWhen() : null;
+
     if(!state.currentRoom){
         showToast("先にチャット相手を選択してください。");
         clearFileInputs();
@@ -1160,7 +1164,7 @@ async function handleFiles(fileList,kind){
             continue;
         }
 
-        await uploadAndSend(uploadFile,kind,file.size, files.length > 1 ? (files.indexOf(file) + 1) + " / " + files.length + " 本目" : "");
+        await uploadAndSend(uploadFile,kind,file.size, files.length > 1 ? (files.indexOf(file) + 1) + " / " + files.length + " 本目" : "", scheduleWhen);
     }
 
     clearFileInputs();
@@ -1197,7 +1201,7 @@ function getVideoDuration(file){
     });
 }
 
-async function uploadAndSend(file,kind,originalBytes,nthLabel){
+async function uploadAndSend(file,kind,originalBytes,nthLabel,scheduleWhen){
     const sizeLabel = formatAttachmentSize(file.size) + (originalBytes !== undefined && originalBytes !== file.size ? "（元 " + formatAttachmentSize(originalBytes) + "）" : "");
     const nthPrefix = nthLabel ? "[" + nthLabel + "] " : "";
     el.attachmentStatus.textContent = nthPrefix + file.name + " ・ " + sizeLabel + " ・ アップロード中...";
@@ -1247,7 +1251,9 @@ async function uploadAndSend(file,kind,originalBytes,nthLabel){
         if(feat.pendingStamp && kind === "image") payload.stamp = true;
         if(feat.pendingGame && kind === "image") payload = Object.assign({}, feat.pendingGame, {type:"game", name:payload.name, url:payload.url, path:payload.path, size:payload.size});
 
-        await sendMessagePayload(payload);
+        // 予約送信パネルで日時が選ばれていたら、アップロードが終わったこの添付は「すぐ送る」のではなく、その日時に予約する。
+        if(scheduleWhen && typeof scheduleAttachmentPayload === "function") await scheduleAttachmentPayload(payload,scheduleWhen);
+        else await sendMessagePayload(payload);
     }catch(error){
         console.error("Attachment upload error:",error);
         if(kind === "video" && typeof openVideoLinkSheet === "function" && typeof videoLinkErrorIsSize === "function" && videoLinkErrorIsSize(error)){

@@ -74,6 +74,15 @@ function toggleSchedule(){
     }
 }
 
+// 📎・📷・🎬で選んだ写真・動画・ファイルも予約できるようにする：
+// 予約パネルが開いていて、日時がちゃんと選べているときだけ、有効な日時を返す（それ以外は null＝今までどおり すぐ送信）。
+function schedulePickedWhen(){
+    if(!el.schedulePanel || el.schedulePanel.hidden) return null;
+    const when = new Date(el.scheduleAt.value);
+    if(isNaN(when.getTime()) || when.getTime() < Date.now() + 45000) return null;
+    return when;
+}
+
 async function scheduleSend(){
     if(!state.currentRoom) return;
     const text = el.messageInput.value;
@@ -92,6 +101,18 @@ async function scheduleSend(){
     finally{ el.scheduleSubmit.disabled = false; }
 }
 
+// アップロード済みの添付（写真・動画・ファイル・ボイス等）を、選んでおいた日時に予約する。
+// アップロード自体は、いつもどおり すぐ行う（アップロードが終わってから、予約した時間に送られる）。
+async function scheduleAttachmentPayload(payload,when){
+    try{
+        const result = await requireClient().rpc("schedule_message",{p_room_id:state.currentRoom.id,p_content:JSON.stringify(payload),p_send_at:when.toISOString()});
+        if(result.error) throw result.error;
+        showToast(formatDate(when.toISOString()) + " に送信を予約しました。");
+        await loadScheduled();
+        return true;
+    }catch(error){ setStatus(featError(error),"error"); return false; }
+}
+
 async function loadScheduled(){
     if(!state.currentRoom) return;
     const roomId = state.currentRoom.id;
@@ -99,7 +120,7 @@ async function loadScheduled(){
     if(result.error || state.currentRoom?.id !== roomId) return;
     const rows = result.data || [];
     el.scheduleList.innerHTML = rows.length
-        ? rows.map((row) => '<div class="sched-item"><span>' + escapeHtml(formatDate(row.send_at)) + '　' + escapeHtml(String(parseMessageContent(row.content).text || "").slice(0,40)) + '</span><button type="button" class="button-danger" data-cancel="' + escapeHtml(row.id) + '">取消</button></div>').join("")
+        ? rows.map((row) => '<div class="sched-item"><span>' + escapeHtml(formatDate(row.send_at)) + '　' + escapeHtml(messageSummary(parseMessageContent(row.content)).slice(0,40)) + '</span><button type="button" class="button-danger" data-cancel="' + escapeHtml(row.id) + '">取消</button></div>').join("")
         : '<div class="empty-list">予約中のメッセージはありません。</div>';
 }
 
