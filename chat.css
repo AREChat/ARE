@@ -953,3 +953,31 @@ body.sel-mode .message-row{cursor:pointer;-webkit-user-select:none;user-select:n
  body.kb-open .chat-header .mobile-back{min-height:36px;padding:4px 10px}
  body.kb-open .composer textarea{padding-top:8px;padding-bottom:8px}
 }
+
+/* ===== 入力欄の「＋」（スマホ）：写真・ファイル・そのほかの機能の プルダウンメニュー ===== */
+.composer{position:relative}
+.attach-menu[hidden]{display:none}
+.attach-menu{position:absolute;left:10px;bottom:calc(100% - 4px);width:min(calc(100% - 20px),380px);max-height:56vh;overflow-y:auto;overscroll-behavior:contain;background:linear-gradient(180deg,#1a2342,#111a33);border:1px solid #3a4f8f;border-radius:16px;box-shadow:0 -6px 28px rgba(0,0,0,.55);padding:10px 10px 12px;z-index:60;animation:amIn .16s ease-out}
+.attach-menu .am-head{font-size:12px;color:var(--muted);margin:0 4px 8px}
+.attach-menu .am-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.attach-menu .am-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:74px;padding:8px 4px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);color:var(--text);font-size:12px;line-height:1.25;text-align:center}
+.attach-menu .am-item:active{background:#2a4a9a;border-color:#7aa2ff}
+.attach-menu .am-item:disabled{opacity:.4}
+.attach-menu .am-ic{font-size:26px;line-height:1}
+.attach-menu .am-tx{font-weight:700;overflow-wrap:anywhere}
+.attach-menu .am-item small{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+#newlineButton.attach-plus{font-size:26px;font-weight:700;line-height:1;min-width:46px;padding:0 12px;border-radius:22px;min-height:44px}
+#newlineButton.attach-plus.on{background:#2a4a9a;color:#fff;border-color:#7aa2ff}
+@keyframes amIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(max-width:700px){
+ .composer.has-plus .composer-tools .tool-button{display:none!important}
+ .composer.has-plus .composer-tools{margin:0;min-height:0}
+ .composer.has-plus #attachmentStatus:empty{display:none}
+}
+@media(max-height:500px) and (max-width:950px){ .composer.has-plus .composer-tools{display:flex!important;margin:0} .composer.has-plus .composer-tools .tool-button{display:none!important} }
+
+/* 「＋」に おさまらなかった機能は、上の「⋯」を おすと ならぶ */
+.chat-header>.hdr-tool{order:4;font-size:12.5px;padding:6px 9px;white-space:nowrap}
+.chat-header .hdr-dots.hdr-pulse{animation:hdrPulse .5s ease-in-out 3}
+@keyframes hdrPulse{0%,100%{box-shadow:0 0 0 0 rgba(122,162,255,.0)}50%{box-shadow:0 0 0 6px rgba(122,162,255,.55)}}
+@media(min-width:701px){.chat-header>.hdr-tool{display:none!important}}

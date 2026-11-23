@@ -178,6 +178,7 @@ function cacheElements(){
 }
 
 // スマホなど「指で操作する」端末かどうか（Shift+Enter が押しづらい端末では、キーボードの Enter を送信ではなく改行にする）
+function composerElIsPlus(){ const b = document.getElementById("newlineButton"); return !!(b && b.classList.contains("attach-plus")); }
 function isCoarsePointer(){
     try{ return !!(window.matchMedia && matchMedia("(pointer: coarse)").matches); }catch(_e){ return false; }
 }
@@ -485,18 +486,105 @@ function bindEvents(){
         const composerEl = el.messageInput.closest(".composer");
         if(!composerEl) return;
         let kbTimer = 0;
-        el.messageInput.addEventListener("focus",() => { if(isCoarsePointer()){ clearTimeout(kbTimer); composerEl.classList.add("kb-focus"); document.body.classList.add("kb-open"); updateCharCount(); } });
+        // 画面の高さ（キーボードが出ていないときの高さ）をおぼえておいて、いまの高さと くらべて「キーボードが本当に出ているか」を調べる
+        let baseH = Math.max(window.innerHeight || 0,window.visualViewport ? window.visualViewport.height : 0);
+        const kbShown = () => { const h = window.visualViewport ? window.visualViewport.height : window.innerHeight; return h < baseH * 0.82; };
+        el.messageInput.addEventListener("focus",() => { if(isCoarsePointer()){ clearTimeout(kbTimer); composerEl.classList.remove("tools-open"); composerEl.classList.add("kb-focus"); document.body.classList.add("kb-open"); const pb = document.getElementById("newlineButton"); if(pb) pb.classList.remove("on"); updateCharCount(); } });
+        const kbSync = () => {
+            if(!isCoarsePointer()) return;
+            if(document.activeElement !== el.messageInput){ baseH = Math.max(baseH,window.visualViewport ? window.visualViewport.height : window.innerHeight); return; }
+            // 入力欄に カーソルが残っていても、キーボードを閉じたら ツール行（📷写真・📎ファイル など）を もどす
+            composerEl.classList.toggle("kb-focus",kbShown());
+        };
+        window.addEventListener("resize",kbSync);
         el.messageInput.addEventListener("blur",() => {
             composerEl.classList.remove("kb-focus");
             // 画面のボタンを押した瞬間に 上のバーや入力欄の大きさが変わると、押したはずのボタンが ずれて 反応しなくなる。少しだけ待ってから もとの大きさにもどす
             clearTimeout(kbTimer);
             kbTimer = setTimeout(() => { if(document.activeElement !== el.messageInput){ document.body.classList.remove("kb-open"); updateCharCount(); } },450);
         });
-        if(window.visualViewport) window.visualViewport.addEventListener("resize",() => { if(document.body.classList.contains("kb-open")) updateCharCount(); });
+        if(window.visualViewport) window.visualViewport.addEventListener("resize",() => { kbSync(); if(document.body.classList.contains("kb-open")) updateCharCount(); });
     })();
     el.sendButton.addEventListener("click",sendTextMessage);
+    // スマホでは、改行ボタン「↵」を「＋」に変える。＋をおすと「プルダウンメニュー」が ひらいて、
+    //   📷写真・📎ファイル・🎬動画・😊スタンプ・🎤音声・🕒予約送信 … など、入力欄まわりの ぜんぶの機能を えらべる。
+    //   （メニューの中身は、画面の ツール行（.composer-tools）の ボタンから その場で作る → あとから足された機能も 自動で入る）
+    //   改行は キーボードの Enter／改行キーで できる（スマホでは Enter を おしても 送信しない）。
+    (function(){
+        const b = el.newlineButton, composerEl = el.messageInput.closest(".composer");
+        if(!b || !composerEl) return;
+        const mq = window.matchMedia("(max-width:700px), (max-height:500px) and (max-width:950px)");
+        const mobileUI = () => isCoarsePointer() && mq.matches;
+        const tools = () => composerEl.querySelector(".composer-tools");
+        let menu = null;
+        const closeMenu = () => { if(menu){ menu.hidden = true; } b.classList.remove("on"); b.setAttribute("aria-expanded","false"); };
+        const labelOf = (node) => { const raw = (node.textContent || "").replace(/\s+/g," ").trim(); const m = raw.match(/^(\S+)\s+(.*)$/); let icon = "•", txt = raw; if(m && !/^[\w\u3040-\u30ff\u4e00-\u9fff]/.test(m[1])){ icon = m[1]; txt = m[2]; } let sub = ""; const k = txt.indexOf("（"); if(k > 0){ sub = txt.slice(k); txt = txt.slice(0,k); } return {icon, txt: txt || raw, sub}; };
+        // あふれた機能を 上の「⋯」（会話の上のバー）へ うつす：ならんだボタンは 「⋯」を おすと 出る
+        const hdrEl = () => document.querySelector(".chat-header");
+        const clearProxies = () => { document.querySelectorAll(".chat-header>.hdr-tool").forEach((x) => x.remove()); };
+        const openHdr = () => { const h = hdrEl(), d = document.getElementById("hdrMoreBtn"); if(h){ h.classList.add("hdr-open"); if(d){ d.setAttribute("aria-expanded","true"); d.classList.add("hdr-pulse"); setTimeout(() => d.classList.remove("hdr-pulse"),1600); } window.scrollTo(0,0); } };
+        const liveTools = () => { const t = tools(); return t ? Array.from(t.children).filter((n) => n.classList && n.classList.contains("tool-button") && !n.hidden) : []; };
+        // いちど に 見せられる 数（スクロールなしで おさまる分。さいごの1つは「⋯ そのほか」に あてる）
+        const capacity = () => { const avail = Math.min(window.innerHeight * 0.52,Math.max(160,composerEl.getBoundingClientRect().top - 60)); const rows = Math.max(1,Math.floor((avail - 56 + 8) / 82)); return rows * 3; };
+        const syncOverflow = () => {
+            clearProxies();
+            if(!mobileUI()) return {shown:liveTools(),rest:[]};
+            const all = liveTools(), cap = capacity();
+            if(all.length <= cap) return {shown:all,rest:[]};
+            const shown = all.slice(0,cap - 1), rest = all.slice(cap - 1), h = hdrEl();
+            if(h) rest.forEach((node) => {
+                const L = labelOf(node), px = document.createElement("button"); px.type = "button"; px.className = "button-secondary hdr-tool";
+                px.textContent = L.icon + " " + L.txt; px.title = L.txt + L.sub; px.disabled = !!node.disabled;
+                px.addEventListener("click",() => { h.classList.remove("hdr-open"); const d = document.getElementById("hdrMoreBtn"); if(d) d.setAttribute("aria-expanded","false"); try{ node.click(); }catch(_e){} });
+                h.appendChild(px);
+            });
+            return {shown,rest};
+        };
+        const build = () => {
+            if(!menu){
+                menu = document.createElement("div"); menu.id = "attachMenu"; menu.className = "attach-menu"; menu.setAttribute("role","menu"); menu.hidden = true;
+                composerEl.appendChild(menu);
+                document.addEventListener("pointerdown",(ev) => { if(menu.hidden) return; if(menu.contains(ev.target) || b.contains(ev.target)) return; closeMenu(); },true);
+                document.addEventListener("keydown",(ev) => { if(ev.key === "Escape" && !menu.hidden) closeMenu(); });
+                el.messageInput.addEventListener("focus",closeMenu);
+            }
+            menu.textContent = "";
+            const head = document.createElement("div"); head.className = "am-head"; head.textContent = "送るもの・つかう機能を えらんでね"; menu.appendChild(head);
+            const grid = document.createElement("div"); grid.className = "am-grid"; menu.appendChild(grid);
+            const {shown,rest} = syncOverflow();
+            const addTile = (icon,txt,sub,dis,fn) => {
+                const it = document.createElement("button"); it.type = "button"; it.className = "am-item"; it.setAttribute("role","menuitem");
+                const ic = document.createElement("span"); ic.className = "am-ic"; ic.textContent = icon; const tx = document.createElement("span"); tx.className = "am-tx"; tx.textContent = txt;
+                it.appendChild(ic); it.appendChild(tx); if(sub){ const sb = document.createElement("small"); sb.textContent = sub; it.appendChild(sb); }
+                if(dis){ it.disabled = true; it.title = "会話を ひらくと つかえます"; }
+                it.addEventListener("click",() => { closeMenu(); fn(); }); grid.appendChild(it);
+            };
+            shown.forEach((node) => { const L = labelOf(node); addTile(L.icon,L.txt,L.sub,node.disabled,() => { try{ node.click(); }catch(_e){} }); });
+            if(rest.length) addTile("⋯","そのほか",rest.length + "こ は 上の「⋯」へ",false,openHdr);
+        };
+        const apply = () => {
+            if(mobileUI()){ b.textContent = "＋"; b.classList.add("attach-plus"); b.title = "写真・ファイル・動画などを送る"; b.setAttribute("aria-label","写真・ファイル・そのほかの機能のメニューをひらく"); b.setAttribute("aria-haspopup","menu"); b.setAttribute("aria-expanded","false"); composerEl.classList.add("has-plus"); }
+            else { b.textContent = "↵"; b.classList.remove("attach-plus","on"); b.title = "改行（送信しません）"; b.removeAttribute("aria-label"); b.removeAttribute("aria-haspopup"); b.removeAttribute("aria-expanded"); composerEl.classList.remove("has-plus"); if(menu) menu.hidden = true; }
+        };
+        apply();
+        const dots = () => { const d = document.getElementById("hdrMoreBtn"); if(d && !d.__plusSync){ d.__plusSync = true; d.addEventListener("click",() => { if(mobileUI()) syncOverflow(); },true); } };
+        window.addEventListener("resize",() => { if(mobileUI()){ dots(); syncOverflow(); } else clearProxies(); });
+        setTimeout(() => { dots(); if(mobileUI()) syncOverflow(); },1500);
+        if(mq.addEventListener) mq.addEventListener("change",apply); else if(mq.addListener) mq.addListener(apply);
+        b.addEventListener("click",(ev) => {
+            if(!mobileUI()) return;      // パソコンでは 下の「改行ボタン」として はたらく
+            ev.stopImmediatePropagation();
+            if(b.disabled) return;
+            if(menu && !menu.hidden){ closeMenu(); return; }
+            try{ el.messageInput.blur(); }catch(_e){}
+            build(); menu.hidden = false; b.classList.add("on"); b.setAttribute("aria-expanded","true");
+        },true);
+        // ファイルを選んだら メニューを とじる
+        ["imageInput","fileInput","videoInput"].forEach((id) => { const inp = el[id]; if(inp) inp.addEventListener("change",closeMenu); });
+    })();
     el.newlineButton.addEventListener("click",() => {
-        // スマホでは Shift+Enter が使いづらいので、改行専用ボタンで確実に改行だけできるようにする（送信しない）
+        if(isCoarsePointer() && composerElIsPlus()) return;   // スマホでは「＋」ボタン（メニュー）として はたらく（上）
+        // パソコンでは Shift+Enter が使えるが、改行専用ボタンでも改行だけできるようにする（送信しない）
         const i = el.messageInput.selectionStart || el.messageInput.value.length;
         const j = el.messageInput.selectionEnd || i;
         el.messageInput.value = el.messageInput.value.slice(0,i) + "\n" + el.messageInput.value.slice(j);
