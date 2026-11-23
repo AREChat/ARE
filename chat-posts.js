@@ -171,7 +171,7 @@ async function submitPost(extra, sendAtArg){
         }
         clearPostAttachments();
         feat.postSendAt = null;
-        if(sendAt){ showToast(formatDateTime(sendAt.toISOString()) + " に投稿を予約しました。（「📋 予約中」で確認・取り消しできます）"); return; }
+        if(sendAt){ showToast(formatDateTime(sendAt.toISOString()) + " に投稿を予約しました。（「📋 予約中」で確認・取り消しできます）"); if(typeof schedUpdatePostBadge === "function") schedUpdatePostBadge(); return; }
         showToast("投稿しました。");
         await loadPosts(true);
     }catch(error){

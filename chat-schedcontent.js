@@ -12,12 +12,23 @@ function initSchedContent(){
         const b1 = document.createElement("button");
         b1.type = "button"; b1.className = "button-secondary"; b1.id = "postSchedule"; b1.setAttribute("data-feature", "posts"); b1.textContent = "🕒 予約";
         const b2 = document.createElement("button");
-        b2.type = "button"; b2.className = "button-secondary"; b2.id = "postScheduledList"; b2.setAttribute("data-feature", "posts"); b2.textContent = "📋 予約中";
+        b2.type = "button"; b2.className = "button-secondary"; b2.id = "postScheduledList"; b2.setAttribute("data-feature", "posts"); b2.textContent = "📋 予約中"; b2.hidden = true;
         submit.parentNode.insertBefore(b1, submit);
         submit.parentNode.insertBefore(b2, submit);
         b1.addEventListener("click", startSchedulePost);
         b2.addEventListener("click", () => openSchedList());
+        schedUpdatePostBadge();
     }
+}
+
+/** 予約中（失敗もふくむ）の投稿が1件もなければ「📋 予約中」ボタンをかくす */
+async function schedUpdatePostBadge(){
+    const b = document.getElementById("postScheduledList"); if(!b) return;
+    try{
+        const r = await requireClient().from("scheduled_posts").select("id", {count: "exact", head: true}).in("status", ["pending", "failed"]);
+        if(r.error) throw r.error;
+        b.hidden = !r.count;
+    }catch(_e){ /* 失敗時は今の表示のままにする */ }
 }
 
 function schedLocalInput(date){
@@ -128,6 +139,7 @@ async function cancelSched(node){
         if(result.data) client.storage.from("post-images").remove([result.data]);
         showToast("予約を削除しました。");
         await loadSchedList();
+        if(node.dataset.kind !== "story") schedUpdatePostBadge();
     }catch(error){ showToast(featError(error)); node.disabled = false; }
 }
 
