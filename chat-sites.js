@@ -52,19 +52,22 @@ function initSites(){
     card.className = "profile-card pane-me"; card.id = "favSites";
     first.insertAdjacentElement("afterend", card);
     card.addEventListener("click", (event) => {
-        const b = event.target.closest("[data-site]");
-        if(b){ sitesOpen(feat.sites.list[Number(b.dataset.site)]); return; }
-        if(event.target.closest("[data-sites-edit]")) runTool(openSitesEditor);
+        if(event.target.closest("[data-sites-open]")) runTool(() => feat.sites.list.length ? openSitesList() : openSitesEditor());
     });
     feat.sites.card = card;
     sitesPaint();
 }
 
 function sitesPaint(){
+    feat.sites.card.innerHTML = '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="button-secondary" data-sites-open>★よく使うサイト</button></div>';
+}
+
+/** 登録ずみのサイト一覧（タップで開く）＋登録を変えるボタン */
+function openSitesList(){
     const l = feat.sites.list;
-    feat.sites.card.innerHTML = '<div class="profile-text"><b>⭐ よく使うサイト</b><div class="bio">タップするだけで開きます（最大' + SITES_MAX + 'つ）。</div></div>' +
-        '<div class="sites-grid">' + (l.length ? l.map((x, i) => '<button type="button" class="button sites-btn" data-site="' + i + '">' + escapeHtml(x.name || new URL(x.url).hostname) + (x.app && sitesIsMobile() ? ' <small>（アプリ）</small>' : '') + '</button>').join("") : '<div class="meta">まだ登録がありません。</div>') + '</div>' +
-        '<div style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="button-secondary" data-sites-edit>' + (l.length ? "✏️ 登録を変える" : "＋ サイトを登録する") + '</button></div>';
+    openSheet(toolHead("⭐ よく使うサイト", "タップするだけで開きます（最大" + SITES_MAX + "つ）。") +
+        '<div class="sites-grid">' + l.map((x, i) => '<button type="button" class="button sites-btn" data-t="sites:open" data-i="' + i + '">' + escapeHtml(x.name || new URL(x.url).hostname) + (x.app && sitesIsMobile() ? ' <small>（アプリ）</small>' : '') + '</button>').join("") + '</div>' +
+        toolClose('<button type="button" class="button-secondary" data-t="sites:edit">✏️ 登録を変える</button>'));
 }
 
 function sitesOpen(site){
@@ -101,6 +104,8 @@ function openSitesEditor(){
 }
 
 function onSitesAction(action, node){
+    if(action === "open"){ sitesOpen(feat.sites.list[Number(node.dataset.i)]); return; }
+    if(action === "edit"){ openSitesEditor(); return; }
     if(action === "preset"){
         const p = SITES_PRESETS[Number(node.dataset.i)]; if(!p) return;
         const rows = Array.from(document.querySelectorAll("#stRows .admin-card"));
