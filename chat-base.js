@@ -366,12 +366,19 @@ function setChatEnabled(enabled){
     updateCharCount();
 }
 
+/** 入力欄の高さの上限。スマホでキーボードが出ている間は、前の会話が見えるように 低くする（いっぱいになったら 入力欄の中でスクロール） */
+function composerMaxHeight(){
+    const vh = (window.visualViewport && window.visualViewport.height) || window.innerHeight || 700;
+    if(document.body.classList.contains("kb-open")) return Math.max(72,Math.min(112,Math.round(vh * 0.24)));
+    return vh < 520 ? Math.max(72,Math.round(vh * 0.26)) : 140;
+}
+
 function updateCharCount(){
     const length = Array.from(el.messageInput.value).length;
     el.charCount.textContent = String(length);
     el.charCount.style.color = length > MAX_TEXT_LENGTH ? "var(--danger)" : "var(--muted)";
     el.messageInput.style.height = "auto";
-    el.messageInput.style.height = Math.min(el.messageInput.scrollHeight,140) + "px";
+    el.messageInput.style.height = Math.min(el.messageInput.scrollHeight,composerMaxHeight()) + "px";
     el.sendButton.disabled = !state.currentRoom || state.sending || length > MAX_TEXT_LENGTH;
 }
 
@@ -449,17 +456,26 @@ function bindEvents(){
         clearTimeout(searchTimer);
         searchTimer = setTimeout(loadRecommendations,250);
     });
-    // スマホ（指で操作する端末）では「Enterで送信」ではなく「Enterで改行、送信は送信ボタン」に切りかえる案内にする
+    // スマホ（指で操作する端末）では「Enterで送信」ではなく「Enterで改行、送信は送信ボタン」にする。
+    // 説明文を長く書くと、空のときの入力欄が 2〜3 行ぶんの高さになって 会話が狭くなるので、1 行におさめる（Enter は改行・送信は「送信」ボタン、は ↵ ボタンと「送信」ボタンの見た目で わかる）
     if(isCoarsePointer()){
-        el.messageInput.placeholder = "メッセージを入力...（Enterか ↵ ボタンで改行、送信は送信ボタンから）";
+        el.messageInput.placeholder = "メッセージを入力...";
+        el.messageInput.rows = 1;
         el.messageInput.setAttribute("enterkeyhint","enter");
     }
     // スマホで文字を入力中（キーボードが出ている間）は、ツール行をたたんで、会話がより見えるようにする
     (function(){
         const composerEl = el.messageInput.closest(".composer");
         if(!composerEl) return;
-        el.messageInput.addEventListener("focus",() => { if(isCoarsePointer()) composerEl.classList.add("kb-focus"); });
-        el.messageInput.addEventListener("blur",() => { composerEl.classList.remove("kb-focus"); });
+        let kbTimer = 0;
+        el.messageInput.addEventListener("focus",() => { if(isCoarsePointer()){ clearTimeout(kbTimer); composerEl.classList.add("kb-focus"); document.body.classList.add("kb-open"); updateCharCount(); } });
+        el.messageInput.addEventListener("blur",() => {
+            composerEl.classList.remove("kb-focus");
+            // 画面のボタンを押した瞬間に 上のバーや入力欄の大きさが変わると、押したはずのボタンが ずれて 反応しなくなる。少しだけ待ってから もとの大きさにもどす
+            clearTimeout(kbTimer);
+            kbTimer = setTimeout(() => { if(document.activeElement !== el.messageInput){ document.body.classList.remove("kb-open"); updateCharCount(); } },450);
+        });
+        if(window.visualViewport) window.visualViewport.addEventListener("resize",() => { if(document.body.classList.contains("kb-open")) updateCharCount(); });
     })();
     el.sendButton.addEventListener("click",sendTextMessage);
     el.newlineButton.addEventListener("click",() => {

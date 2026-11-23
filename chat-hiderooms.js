@@ -80,7 +80,8 @@ function hrAddButtons(){
     css.textContent = ".room-item.hr-hide{display:none!important}.hr-btn{width:100%;min-height:44px;margin:6px 0}body:not(.seg-no-users) #hrBtnChats{display:none}";
     document.head.appendChild(css);
     const mk = (id) => { const b = document.createElement("button"); b.type = "button"; b.id = id; b.className = "button-secondary hr-btn"; b.textContent = "🙈 非表示のチャット（0）"; b.addEventListener("click", hrOpenList); return b; };
-    const u = document.querySelector(".pane-users #userSearch"); if(u) u.insertAdjacentElement("beforebegin", mk("hrBtnUsers"));
+    // （検索欄は ヘッダーに うつったので、ユーザー一覧の すぐ上に おく）
+    const u = document.querySelector(".pane-users #recommendedUsers"); if(u) u.insertAdjacentElement("beforebegin", mk("hrBtnUsers"));
     const c = document.getElementById("roomList"); if(c) c.insertAdjacentElement("beforebegin", mk("hrBtnChats"));
 }
 

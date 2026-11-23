@@ -849,3 +849,32 @@ button:disabled#delRequestButton,button:disabled#delCancelButton{opacity:.55;cur
 .vspin-result{padding:2px 12px 8px;font-weight:700;color:var(--accent);line-height:1.5}
 .vspin-head .vspin-close{padding:4px 12px;font-size:13px}
 .vs-result{margin-top:6px;font-weight:700;color:var(--accent)}
+/* ===== 上のバー：タブごとのボタン（ログアウトは マイページだけ）／キーボード中の入力欄 ===== */
+.brand{gap:10px}
+.brand>div:first-child{flex:0 0 auto}
+.brand-actions{flex:1 1 auto;min-width:0;display:flex;justify-content:flex-end}
+.brand-actions .ba{display:none;align-items:center;justify-content:flex-end;gap:8px;min-width:0;flex:1 1 auto;flex-wrap:wrap}
+.sidebar[data-tab="chats"] .ba-chats,.sidebar[data-tab="users"] .ba-users,.sidebar[data-tab="posts"] .ba-posts,.sidebar[data-tab="more"] .ba-more,.sidebar[data-tab="me"] .ba-me{display:flex}
+.hdr-btn{flex:0 0 auto;white-space:nowrap;padding:7px 11px;font-size:13px;min-height:38px;display:inline-flex;align-items:center;text-decoration:none}
+.hdr-icon{flex:0 0 auto;min-width:40px;min-height:38px;padding:0 9px;font-size:18px;line-height:1}
+.hdr-icon[hidden]{display:none}
+.brand .search{flex:1 1 90px;min-width:0;width:auto;margin:0;min-height:38px;padding:6px 14px;font-size:14px;border-radius:19px}
+/* タブレット幅（左の列が せまい）では、「操作方法」だけに みじかくする */
+.hdr-help .hdr-short{display:none}
+@media(min-width:701px) and (max-width:1099px){.hdr-help .hdr-long{display:none}.hdr-help .hdr-short{display:inline}.brand{padding-left:14px;padding-right:14px}.brand h1{font-size:20px}}
+.more-search.hdr-moved{padding:0;margin:0}
+.more-search.hdr-moved .meta{min-height:0;margin:0}
+.more-search.hdr-moved .meta:not(:empty){margin:4px 0 2px}
+@media(max-width:700px){
+ .brand{padding-left:12px;padding-right:12px}
+ .brand h1{font-size:20px}
+ .brand .search{font-size:16px}   /* 16px 未満だと、iPhone で 入力欄をタップしたとき 画面が 勝手に拡大される */
+ .hdr-btn{padding:6px 9px;font-size:12.5px}
+ /* 文字を入力中（キーボードが出ている間）：会話が見えるように、上のバーと入力欄を 小さくする */
+ body.kb-open .app.chat-open .chat-header{min-height:0;padding-top:calc(4px + env(safe-area-inset-top));padding-bottom:4px;gap:8px;flex-wrap:nowrap}
+ body.kb-open .chat-header .person-text p{display:none}
+ body.kb-open .chat-header .avatar{width:34px;height:34px;flex-basis:34px;font-size:15px}
+ body.kb-open .chat-header>button:not(.mobile-back):not(#searchBtn){display:none!important}
+ body.kb-open .chat-header .mobile-back{min-height:36px;padding:4px 10px}
+ body.kb-open .composer textarea{padding-top:8px;padding-bottom:8px}
+}

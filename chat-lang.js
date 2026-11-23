@@ -5,7 +5,7 @@ const I18N_EN = {
     "チャット":"Chats", "ユーザー":"Users", "投稿":"Posts", "その他":"More", "マイページ":"My page", "ログアウト":"Log out",
     "💬 チャット":"💬 Chats", "👥 グループ作成":"👥 New group", "更新":"Refresh", "🔎 ユーザーを探す":"🔎 Find users", "非表示（0）":"Hidden (0)",
     "📷 投稿":"📷 Posts", "すべて":"All", "フォロー中":"Following", "🖼️ 写真":"🖼️ Photo", "投稿する":"Post", "さらに読み込む":"Load more",
-    "🧰 その他":"🧰 More", "📖 操作方法":"📖 How to use", "🤖 AIチャットボット":"🤖 Chatbot", "☀️ 天気予報":"☀️ Weather", "🚆 交通情報":"🚆 Transit",
+    "🧰 その他":"🧰 More", "📖 操作方法":"📖 How to use", "📖 操作方法はこちら":"📖 How to use", "🤖 AIチャットボット":"🤖 Chatbot", "☀️ 天気予報":"☀️ Weather", "🚆 交通情報":"🚆 Transit",
     "🧩 ツール":"🧩 Tools", "📖 ストーリー（24時間）":"📖 Stories (24h)", "🖼️ アルバム":"🖼️ Album", "🎨 画像編集":"🎨 Photo editor", "📍 位置情報を送る":"📍 Share location",
     "🔗 プロフィール共有・QR":"🔗 Share profile / QR", "🎮 ゲーム":"🎮 Games", "📅 タスク・カレンダー":"📅 Tasks & calendar", "⚙️ 表示設定・言語":"⚙️ Display & language",
     "✏️ プロフィールを編集":"✏️ Edit profile", "🔗 プロフィールを共有（QR）":"🔗 Share my profile (QR)", "アカウントの削除":"Delete account", "アカウント削除を申請":"Request account deletion",
@@ -18,7 +18,7 @@ const I18N_EN = {
 
 const I18N_EN_PLACEHOLDERS = {
     "メッセージを入力...（Enterで送信、Shift+Enterで改行）":"Type a message... (Enter to send, Shift+Enter for a new line)",
-    "ユーザー名を検索...":"Search users...", "いまどうしてる？（500文字まで）":"What's up? (max 500 characters)"
+    "ユーザー名を検索...":"Search users...", "🔎 ユーザー名を検索":"🔎 Search users", "メッセージを入力...":"Type a message...", "いまどうしてる？（500文字まで）":"What's up? (max 500 characters)"
 };
 
 const i18nOriginal = new WeakMap();
