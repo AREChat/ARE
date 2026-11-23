@@ -115,6 +115,7 @@ chat-fun.js
 chat-rpg.js
 chat-ng.js
 chat-points.js
+chat-ads.js
 chat-quick.js
 chat-ai-studio.js
 chat-back.js

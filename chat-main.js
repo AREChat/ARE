@@ -196,6 +196,7 @@ const FEATURES = [
     ["study124","学習サイト",initStudy124],
     ["ng","NGワード制裁",initNg],
     ["points","ポイント・AREShop",initPoints],
+    ["ads","広告",initAds],
     ["story","ストーリー",initStory],
     ["album","アルバム",initAlbum],
     ["filefresh","ファイルのリンク更新",initFileFresh],

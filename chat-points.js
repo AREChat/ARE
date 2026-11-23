@@ -159,7 +159,7 @@ function ptShopPaint(){
         body = list.length ? list.map((i) => '<div class="admin-card"><b>' + escapeHtml(i.title) + '</b>' + (i.description ? '<div class="meta">' + escapeHtml(i.description) + '</div>' : "") +
             '<div class="row" style="justify-content:space-between;align-items:center"><span><b>' + i.price + '</b> 円</span><span>' + btn(i) + '</span></div></div>').join("") : '<div class="empty-list">まだ商品がありません</div>';
     }
-    box.innerHTML = '<div class="row" style="justify-content:flex-start;flex-wrap:wrap">' + tabs.map((t) => '<button type="button" class="' + (t[0] === pt.tab ? "button" : "button-secondary") + '" data-t="pt:tab" data-tab="' + t[0] + '">' + t[1] + '</button>').join("") + '</div>' +
+    box.innerHTML = (typeof adFreeCardHtml === "function" ? adFreeCardHtml(pts) : "") + '<div class="row" style="justify-content:flex-start;flex-wrap:wrap">' + tabs.map((t) => '<button type="button" class="' + (t[0] === pt.tab ? "button" : "button-secondary") + '" data-t="pt:tab" data-tab="' + t[0] + '">' + t[1] + '</button>').join("") + '</div>' +
         '<div class="meta">あなたのポイント：<b>' + pts + '</b> 円 ／ 集め方：ログイン+10、チャット1回+5（1日100円まで）、日記+5、習慣+2、7日連続+30</div>' + body + toolClose();
 }
 async function ptView(id){
@@ -194,6 +194,7 @@ async function onPointsAction(action, node){
             pt.confirm = null; showToast("交換しました 🎉"); await ptRefresh(); await ptShopLoad(); return;
         }
         if(action === "view"){ await ptView(node.dataset.id); return; }
+        if(/^ad(ask|cancel|buy)$/.test(action)){ await adFreeAction(action); return; }
     }catch(error){
         console.error("[ARE points]", error);
         if(/not_enough_points|already_owned/.test(String(error && error.message))) await ptRefresh();

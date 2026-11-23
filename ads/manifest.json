@@ -1,0 +1,708 @@
+{
+ "version": 1,
+ "seconds": 15,
+ "startJST": "2027-01-01T00:00:00+09:00",
+ "everyMinutes": 60,
+ "ads": [
+  {
+   "id": "AD001",
+   "file": "AD001.mp4",
+   "title": "星が降る夜に",
+   "series": "ほしあかり英雄譚",
+   "catch": "星の降る夜、物語は始まる"
+  },
+  {
+   "id": "AD002",
+   "file": "AD002.mp4",
+   "title": "空とぶ舟が飛ばない",
+   "series": "ほしあかり英雄譚",
+   "catch": "ひらめきで、空へ"
+  },
+  {
+   "id": "AD003",
+   "file": "AD003.mp4",
+   "title": "出会いの公園",
+   "series": "ほしあかり英雄譚",
+   "catch": "ふたりの冒険が始まる"
+  },
+  {
+   "id": "AD004",
+   "file": "AD004.mp4",
+   "title": "短剣の山賊",
+   "series": "ほしあかり英雄譚",
+   "catch": "力ではなく、ひらめき"
+  },
+  {
+   "id": "AD005",
+   "file": "AD005.mp4",
+   "title": "コマの取り合い",
+   "series": "ほしあかり英雄譚",
+   "catch": "みんなで回せば、もっと楽しい"
+  },
+  {
+   "id": "AD006",
+   "file": "AD006.mp4",
+   "title": "学び舎の事件",
+   "series": "ほしあかり英雄譚",
+   "catch": "謎を解くのは、きみだ"
+  },
+  {
+   "id": "AD007",
+   "file": "AD007.mp4",
+   "title": "勤勉の像の謎",
+   "series": "ほしあかり英雄譚",
+   "catch": "像は、何を守っていた？"
+  },
+  {
+   "id": "AD008",
+   "file": "AD008.mp4",
+   "title": "暗き山里クロモリ",
+   "series": "ほしあかり英雄譚",
+   "catch": "新しい土地、新しい仲間"
+  },
+  {
+   "id": "AD009",
+   "file": "AD009.mp4",
+   "title": "家族の危機",
+   "series": "ほしあかり英雄譚",
+   "catch": "家族のきずなを、もう一度"
+  },
+  {
+   "id": "AD010",
+   "file": "AD010.mp4",
+   "title": "最下位からの特訓",
+   "series": "ほしあかり英雄譚",
+   "catch": "暗号で覚える、新しい勉強"
+  },
+  {
+   "id": "AD011",
+   "file": "AD011.mp4",
+   "title": "星影の主からの挑戦状",
+   "series": "ほしあかり英雄譚",
+   "catch": "挑戦状、受け取りました"
+  },
+  {
+   "id": "AD012",
+   "file": "AD012.mp4",
+   "title": "試験の都",
+   "series": "ほしあかり英雄譚",
+   "catch": "力をためす時が来た"
+  },
+  {
+   "id": "AD013",
+   "file": "AD013.mp4",
+   "title": "謎解き研究部",
+   "series": "ほしあかり英雄譚",
+   "catch": "仲間がいれば、謎は怖くない"
+  },
+  {
+   "id": "AD014",
+   "file": "AD014.mp4",
+   "title": "手紙の送り主を追え",
+   "series": "ほしあかり英雄譚",
+   "catch": "正体は、すぐそこに"
+  },
+  {
+   "id": "AD015",
+   "file": "AD015.mp4",
+   "title": "ゼノの罠",
+   "series": "ほしあかり英雄譚",
+   "catch": "三日間の、大勝負"
+  },
+  {
+   "id": "AD016",
+   "file": "AD016.mp4",
+   "title": "井戸の中の少女",
+   "series": "ほしあかり英雄譚",
+   "catch": "ひらめきで、救い出す"
+  },
+  {
+   "id": "AD017",
+   "file": "AD017.mp4",
+   "title": "塔の時限装置",
+   "series": "ほしあかり英雄譚",
+   "catch": "止めろ、時間を"
+  },
+  {
+   "id": "AD018",
+   "file": "AD018.mp4",
+   "title": "飛竜で脱出",
+   "series": "ほしあかり英雄譚",
+   "catch": "星あかりの夜へ"
+  },
+  {
+   "id": "AD019",
+   "file": "AD019.mp4",
+   "title": "星の汽車",
+   "series": "ほしあかり英雄譚",
+   "catch": "夢は、本当になる"
+  },
+  {
+   "id": "AD020",
+   "file": "AD020.mp4",
+   "title": "ほしあかり英雄譚",
+   "series": "ほしあかり英雄譚",
+   "catch": "ほしあかり英雄譚"
+  },
+  {
+   "id": "AD021",
+   "file": "AD021.mp4",
+   "title": "世界を守る男、逃走中",
+   "series": "AIと世界を守る物語",
+   "catch": "止められるのは、俺だけ"
+  },
+  {
+   "id": "AD022",
+   "file": "AD022.mp4",
+   "title": "終焉の計画",
+   "series": "AIと世界を守る物語",
+   "catch": "カウントダウン、始動"
+  },
+  {
+   "id": "AD023",
+   "file": "AD023.mp4",
+   "title": "恩師の発見",
+   "series": "AIと世界を守る物語",
+   "catch": "最後の場所へ"
+  },
+  {
+   "id": "AD024",
+   "file": "AD024.mp4",
+   "title": "追跡するAI",
+   "series": "AIと世界を守る物語",
+   "catch": "読まれるなら、裏をかけ"
+  },
+  {
+   "id": "AD025",
+   "file": "AD025.mp4",
+   "title": "世界を守る男VSAI",
+   "series": "AIと世界を守る物語",
+   "catch": "勝負は、心で決まる"
+  },
+  {
+   "id": "AD026",
+   "file": "AD026.mp4",
+   "title": "薄明の残響・序章",
+   "series": "AIと世界を守る物語",
+   "catch": "空が、変だ"
+  },
+  {
+   "id": "AD027",
+   "file": "AD027.mp4",
+   "title": "星見台の異変",
+   "series": "AIと世界を守る物語",
+   "catch": "数字が、告げている"
+  },
+  {
+   "id": "AD028",
+   "file": "AD028.mp4",
+   "title": "闇に消えた研究",
+   "series": "AIと世界を守る物語",
+   "catch": "封印がとける"
+  },
+  {
+   "id": "AD029",
+   "file": "AD029.mp4",
+   "title": "少女と博士",
+   "series": "AIと世界を守る物語",
+   "catch": "出会いが、運命を変える"
+  },
+  {
+   "id": "AD030",
+   "file": "AD030.mp4",
+   "title": "薄明の残響",
+   "series": "AIと世界を守る物語",
+   "catch": "残響のあとに、朝が来る"
+  },
+  {
+   "id": "AD031",
+   "file": "AD031.mp4",
+   "title": "地球リセット計画",
+   "series": "AIと世界を守る物語",
+   "catch": "見てしまった、秘密"
+  },
+  {
+   "id": "AD032",
+   "file": "AD032.mp4",
+   "title": "幼なじみの研究員",
+   "series": "AIと世界を守る物語",
+   "catch": "頼れるのは、きみだけ"
+  },
+  {
+   "id": "AD033",
+   "file": "AD033.mp4",
+   "title": "オリジンの目覚め",
+   "series": "AIと世界を守る物語",
+   "catch": "優しさは、味方か敵か"
+  },
+  {
+   "id": "AD034",
+   "file": "AD034.mp4",
+   "title": "止めろ、カウントダウン",
+   "series": "AIと世界を守る物語",
+   "catch": "未来は、変えられる"
+  },
+  {
+   "id": "AD035",
+   "file": "AD035.mp4",
+   "title": "未来への約束",
+   "series": "AIと世界を守る物語",
+   "catch": "新しい朝へ"
+  },
+  {
+   "id": "AD036",
+   "file": "AD036.mp4",
+   "title": "伝説の始まり",
+   "series": "ARE QUEST",
+   "catch": "そういうときは、AREだ！"
+  },
+  {
+   "id": "AD037",
+   "file": "AD037.mp4",
+   "title": "激震が走る",
+   "series": "ARE QUEST",
+   "catch": "事件は、突然に"
+  },
+  {
+   "id": "AD038",
+   "file": "AD038.mp4",
+   "title": "伝説の秘宝",
+   "series": "ARE QUEST",
+   "catch": "秘宝は、君を待っている"
+  },
+  {
+   "id": "AD039",
+   "file": "AD039.mp4",
+   "title": "仲間との出会い",
+   "series": "ARE QUEST",
+   "catch": "ひとりより、みんなで"
+  },
+  {
+   "id": "AD040",
+   "file": "AD040.mp4",
+   "title": "ショップでお買い物",
+   "series": "ARE QUEST",
+   "catch": "準備はできた"
+  },
+  {
+   "id": "AD041",
+   "file": "AD041.mp4",
+   "title": "闘技場の熱戦",
+   "series": "ARE QUEST",
+   "catch": "熱くなれ、闘技場"
+  },
+  {
+   "id": "AD042",
+   "file": "AD042.mp4",
+   "title": "カジノの夜",
+   "series": "ARE QUEST",
+   "catch": "運も、実力のうち"
+  },
+  {
+   "id": "AD043",
+   "file": "AD043.mp4",
+   "title": "ラスボスの城",
+   "series": "ARE QUEST",
+   "catch": "最後の戦いへ"
+  },
+  {
+   "id": "AD044",
+   "file": "AD044.mp4",
+   "title": "みなと野の春",
+   "series": "ARE QUEST 2・3 月影のあしあと",
+   "catch": "新しい季節、新しい物語"
+  },
+  {
+   "id": "AD045",
+   "file": "AD045.mp4",
+   "title": "人気者になろう！",
+   "series": "ARE QUEST 2・3 月影のあしあと",
+   "catch": "人気者は、一日にしてならず"
+  },
+  {
+   "id": "AD046",
+   "file": "AD046.mp4",
+   "title": "ゲームクラブ、大盛況！",
+   "series": "ARE QUEST 2・3 月影のあしあと",
+   "catch": "みんなで遊べば最強"
+  },
+  {
+   "id": "AD047",
+   "file": "AD047.mp4",
+   "title": "月影のあしあと",
+   "series": "ARE QUEST 2・3 月影のあしあと",
+   "catch": "足あとの先に、何がある？"
+  },
+  {
+   "id": "AD048",
+   "file": "AD048.mp4",
+   "title": "港の夜祭り",
+   "series": "ARE QUEST 2・3 月影のあしあと",
+   "catch": "夏の思い出"
+  },
+  {
+   "id": "AD049",
+   "file": "AD049.mp4",
+   "title": "約束の灯台",
+   "series": "ARE QUEST 2・3 月影のあしあと",
+   "catch": "灯台からの景色"
+  },
+  {
+   "id": "AD050",
+   "file": "AD050.mp4",
+   "title": "仲間のひとこと",
+   "series": "ARE QUEST 2・3 月影のあしあと",
+   "catch": "言葉は、お守り"
+  },
+  {
+   "id": "AD051",
+   "file": "AD051.mp4",
+   "title": "秘密の地図",
+   "series": "ARE QUEST 2・3 月影のあしあと",
+   "catch": "冒険は、本の中から"
+  },
+  {
+   "id": "AD052",
+   "file": "AD052.mp4",
+   "title": "マルハラ事件",
+   "series": "探偵事務所の事件簿",
+   "catch": "句読点の向こう側"
+  },
+  {
+   "id": "AD053",
+   "file": "AD053.mp4",
+   "title": "クレーマーを黙らせろ",
+   "series": "探偵事務所の事件簿",
+   "catch": "言葉の力で解決"
+  },
+  {
+   "id": "AD054",
+   "file": "AD054.mp4",
+   "title": "浮気調査と遠近法",
+   "series": "探偵事務所の事件簿",
+   "catch": "見えているものが、真実とは限らない"
+  },
+  {
+   "id": "AD055",
+   "file": "AD055.mp4",
+   "title": "逆襲日誌",
+   "series": "探偵事務所の事件簿",
+   "catch": "勉強は、愛のため？"
+  },
+  {
+   "id": "AD056",
+   "file": "AD056.mp4",
+   "title": "過剰賞賛",
+   "series": "探偵事務所の事件簿",
+   "catch": "ほどよさが、いちばん"
+  },
+  {
+   "id": "AD057",
+   "file": "AD057.mp4",
+   "title": "権利遺棄",
+   "series": "探偵事務所の事件簿",
+   "catch": "ゴミは、語る"
+  },
+  {
+   "id": "AD058",
+   "file": "AD058.mp4",
+   "title": "虚実交錯",
+   "series": "探偵事務所の事件簿",
+   "catch": "アナログも、強い"
+  },
+  {
+   "id": "AD059",
+   "file": "AD059.mp4",
+   "title": "謎解きの道・答え",
+   "series": "探偵事務所の事件簿",
+   "catch": "答えは、すぐそこに"
+  },
+  {
+   "id": "AD060",
+   "file": "AD060.mp4",
+   "title": "探偵と依頼人",
+   "series": "探偵事務所の事件簿",
+   "catch": "まずは、話を聞こう"
+  },
+  {
+   "id": "AD061",
+   "file": "AD061.mp4",
+   "title": "静かな推理",
+   "series": "探偵事務所の事件簿",
+   "catch": "推理は、ひらめき"
+  },
+  {
+   "id": "AD062",
+   "file": "AD062.mp4",
+   "title": "事件解決のあとで",
+   "series": "探偵事務所の事件簿",
+   "catch": "今日も、一件落着"
+  },
+  {
+   "id": "AD063",
+   "file": "AD063.mp4",
+   "title": "探偵助手の日常",
+   "series": "探偵事務所の事件簿",
+   "catch": "助手あっての探偵"
+  },
+  {
+   "id": "AD064",
+   "file": "AD064.mp4",
+   "title": "伝説の先生、登場",
+   "series": "学び舎の笑いと学び",
+   "catch": "笑いから、学びが始まる"
+  },
+  {
+   "id": "AD065",
+   "file": "AD065.mp4",
+   "title": "数学嫌いの君たちへ",
+   "series": "学び舎の笑いと学び",
+   "catch": "数字は、ゲームだ"
+  },
+  {
+   "id": "AD066",
+   "file": "AD066.mp4",
+   "title": "14日間の特訓",
+   "series": "学び舎の笑いと学び",
+   "catch": "続けた人が勝つ"
+  },
+  {
+   "id": "AD067",
+   "file": "AD067.mp4",
+   "title": "数当てマジック",
+   "series": "学び舎の笑いと学び",
+   "catch": "種は、9の段"
+  },
+  {
+   "id": "AD068",
+   "file": "AD068.mp4",
+   "title": "人と話すのが苦手",
+   "series": "学び舎の笑いと学び",
+   "catch": "最初の一言が、いちばん大事"
+  },
+  {
+   "id": "AD069",
+   "file": "AD069.mp4",
+   "title": "シフト制の暮らし",
+   "series": "学び舎の笑いと学び",
+   "catch": "自分のペースで生きる"
+  },
+  {
+   "id": "AD070",
+   "file": "AD070.mp4",
+   "title": "ほめ上手になろう",
+   "series": "学び舎の笑いと学び",
+   "catch": "ひとことの魔法"
+  },
+  {
+   "id": "AD071",
+   "file": "AD071.mp4",
+   "title": "勉強は暗号ごっこ",
+   "series": "学び舎の笑いと学び",
+   "catch": "覚えるって、楽しい"
+  },
+  {
+   "id": "AD072",
+   "file": "AD072.mp4",
+   "title": "ARE CARD",
+   "series": "ARE ゲームたち",
+   "catch": "カード一枚で、逆転"
+  },
+  {
+   "id": "AD073",
+   "file": "AD073.mp4",
+   "title": "星紡ぎの旅人",
+   "series": "ARE ゲームたち",
+   "catch": "星を紡いで、前へ"
+  },
+  {
+   "id": "AD074",
+   "file": "AD074.mp4",
+   "title": "推理ゲーム",
+   "series": "ARE ゲームたち",
+   "catch": "犯人は、あなたの推理しだい"
+  },
+  {
+   "id": "AD075",
+   "file": "AD075.mp4",
+   "title": "推理ゲーム2",
+   "series": "ARE ゲームたち",
+   "catch": "事件は、まだ終わらない"
+  },
+  {
+   "id": "AD076",
+   "file": "AD076.mp4",
+   "title": "OFFLINE PARADISE",
+   "series": "ARE ゲームたち",
+   "catch": "つながらない、豊かさ"
+  },
+  {
+   "id": "AD077",
+   "file": "AD077.mp4",
+   "title": "GAME8 アクション＆レース",
+   "series": "ARE ゲームたち",
+   "catch": "最後の一秒まで"
+  },
+  {
+   "id": "AD078",
+   "file": "AD078.mp4",
+   "title": "AREshoot",
+   "series": "ARE ゲームたち",
+   "catch": "避けて、撃て"
+  },
+  {
+   "id": "AD079",
+   "file": "AD079.mp4",
+   "title": "ドリーム・フロンティア",
+   "series": "ARE ゲームたち",
+   "catch": "夢の国を、きみの手で"
+  },
+  {
+   "id": "AD080",
+   "file": "AD080.mp4",
+   "title": "大富豪",
+   "series": "ARE ゲームたち",
+   "catch": "勝っても負けても楽しい"
+  },
+  {
+   "id": "AD081",
+   "file": "AD081.mp4",
+   "title": "ブラックジャック",
+   "series": "ARE ゲームたち",
+   "catch": "勝負どころは、いま"
+  },
+  {
+   "id": "AD082",
+   "file": "AD082.mp4",
+   "title": "じゃんけん・ルーレット・あみだ",
+   "series": "ARE ゲームたち",
+   "catch": "さあ、決めよう"
+  },
+  {
+   "id": "AD083",
+   "file": "AD083.mp4",
+   "title": "対戦しよう",
+   "series": "ARE ゲームたち",
+   "catch": "友だちと、ライバル"
+  },
+  {
+   "id": "AD084",
+   "file": "AD084.mp4",
+   "title": "ポイントをためよう",
+   "series": "ARE ゲームたち",
+   "catch": "全機能、実質無料"
+  },
+  {
+   "id": "AD085",
+   "file": "AD085.mp4",
+   "title": "物語の部屋",
+   "series": "ARE ゲームたち",
+   "catch": "今夜の一話"
+  },
+  {
+   "id": "AD086",
+   "file": "AD086.mp4",
+   "title": "ストーリー投稿",
+   "series": "ARE ゲームたち",
+   "catch": "毎日が、物語"
+  },
+  {
+   "id": "AD087",
+   "file": "AD087.mp4",
+   "title": "みんなで遊ぼう",
+   "series": "ARE ゲームたち",
+   "catch": "ここが、あなたの居場所"
+  },
+  {
+   "id": "AD088",
+   "file": "AD088.mp4",
+   "title": "不思議な物語・序",
+   "series": "不思議なものがたり",
+   "catch": "ドアの向こうは？"
+  },
+  {
+   "id": "AD089",
+   "file": "AD089.mp4",
+   "title": "あだなが252個ある男",
+   "series": "不思議なものがたり",
+   "catch": "あだ名の数だけ、友だち"
+  },
+  {
+   "id": "AD090",
+   "file": "AD090.mp4",
+   "title": "もしもこんなことが起きたら",
+   "series": "不思議なものがたり",
+   "catch": "想像力は無限大"
+  },
+  {
+   "id": "AD091",
+   "file": "AD091.mp4",
+   "title": "愛学両道",
+   "series": "不思議なものがたり",
+   "catch": "学んで、愛して"
+  },
+  {
+   "id": "AD092",
+   "file": "AD092.mp4",
+   "title": "古い手紙",
+   "series": "不思議なものがたり",
+   "catch": "時を超える言葉"
+  },
+  {
+   "id": "AD093",
+   "file": "AD093.mp4",
+   "title": "夜の図書室",
+   "series": "不思議なものがたり",
+   "catch": "本の中の友だち"
+  },
+  {
+   "id": "AD094",
+   "file": "AD094.mp4",
+   "title": "魔法の鉛筆",
+   "series": "不思議なものがたり",
+   "catch": "描くって、魔法"
+  },
+  {
+   "id": "AD095",
+   "file": "AD095.mp4",
+   "title": "星のポスト",
+   "series": "不思議なものがたり",
+   "catch": "星からの返事"
+  },
+  {
+   "id": "AD096",
+   "file": "AD096.mp4",
+   "title": "時計の町",
+   "series": "不思議なものがたり",
+   "catch": "時間は、また動く"
+  },
+  {
+   "id": "AD097",
+   "file": "AD097.mp4",
+   "title": "雲の上の学校",
+   "series": "不思議なものがたり",
+   "catch": "空の教室へ"
+  },
+  {
+   "id": "AD098",
+   "file": "AD098.mp4",
+   "title": "海の底の図書館",
+   "series": "不思議なものがたり",
+   "catch": "深く静かな物語"
+  },
+  {
+   "id": "AD099",
+   "file": "AD099.mp4",
+   "title": "忘れものの国",
+   "series": "不思議なものがたり",
+   "catch": "おかえり、わたしの宝物"
+  },
+  {
+   "id": "AD100",
+   "file": "AD100.mp4",
+   "title": "お試しではじめる",
+   "series": "ARE ゲームたち",
+   "catch": "まずは、気軽に"
+  }
+ ]
+}

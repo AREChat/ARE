@@ -11,7 +11,7 @@
 // ・新しい版が入ったら、古い控えをすべて消す
 
 importScripts("precache-manifest.js", "sw-core.js");
-const CACHE = "are-v186-20261123";
+const CACHE = "are-v187-20261123";
 // オフライン用: 画面の骨組み（html/js/css/json）を 最初に まとめて保存 / 画像・音楽は「オフライン準備」ボタンで are-media に保存（sw-core.js）
 const core = self.areCore({shell: CACHE, root: "./", precache: true, fetch: false});
 const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
@@ -77,6 +77,7 @@ self.addEventListener("fetch", (event) => {
     let url;
     try{ url = new URL(request.url); }catch(_e){ return; }
     if(url.origin !== self.location.origin) return;
+    if(/\/ads\/[^/]+\.mp4$/i.test(url.pathname)) return;   // 広告の映像（100本）は 控えに入れず、そのままネットから
     if(core.isAudio(url.pathname)){ core.audio(event); return; }   // 保存ずみの音楽は オフラインでも 再生できる
     if(request.headers.has("range")) return;
     if(url.pathname.indexOf("/game/") !== -1){ event.respondWith(networkFirst(request)); return; }   // RPG（/game/）は ゲーム専用の sw.js が先に 担当する。まだ 入っていない ときは ここで ネット優先（オフラインは 控え）
