@@ -64,7 +64,7 @@ function rcPick(list){
     const src = kind === "follow" ? g.notFollowed : g.unreg;
     if(!src.length) return null;
     const all = rcShuffle(src, plan.seed), picked = rcSt.count > 0 ? all.slice(0, rcSt.count) : all;
-    return { list:picked, title:kind === "follow" ? "⭐ おすすめ：まだフォローしていない人（" + picked.length + "人）" : "⭐ おすすめ：まだチャットしていない人（" + picked.length + "人）" };
+    return { list:picked, title:kind === "follow" ? "⭐ おすすめ：未フォローの人（" + picked.length + "人）" : "⭐ おすすめ：未チャットの人（" + picked.length + "人）" };
 }
 function rcStatsHtml(){
     if(!state.recommendedMode || !rcSt.plan || !rcSt.peers.length) return "";
