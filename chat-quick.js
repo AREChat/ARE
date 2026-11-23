@@ -290,7 +290,11 @@ function initQuick(){
     el.profileModal.addEventListener("click", (e) => { const b = e.target.closest("[data-qk]"); if(b) qkClick(b); });
     el.profileModal.addEventListener("input", (e) => { if(e.target.id === "qkSearch") qkPaintMenu(e.target.value); });
     // フォロワー／フォロー中のボタン（マイページ・ユーザータブ）
-    document.addEventListener("click", (e) => { const b = e.target.closest("[data-fl]"); if(b) runTool(() => openFollowList(b.dataset.fl)); });
+    document.addEventListener("click", (e) => {
+        const cyc = e.target.closest("[data-rc-stat-cyc]");
+        if(cyc){ if(typeof rcStatCycleClick === "function") rcStatCycleClick(); return; }
+        const b = e.target.closest("[data-fl]"); if(b) runTool(() => openFollowList(b.dataset.fl));
+    });
     const users = document.querySelector(".pane-users");
     if(users && !users.querySelector("[data-flcount]")){
         const bar2 = document.createElement("div"); bar2.className = "fl-counts"; bar2.setAttribute("data-flcount", "1");

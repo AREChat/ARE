@@ -598,10 +598,15 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 
 .post-visibility-label{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12px}
 .post-visibility-label select{max-width:160px;min-height:36px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);padding:6px;font:inherit}
-.post-reactions{display:flex;align-items:center;gap:5px;flex-wrap:wrap;margin-top:10px}
-.post-reaction,.post-comment-toggle{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;background:var(--panel2);color:var(--text);padding:5px 9px;cursor:pointer}
+.post-reactions{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;margin-top:10px}
+.post-reactions::-webkit-scrollbar{display:none}
+.post-reaction,.post-comment-toggle{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:999px;background:var(--panel2);color:var(--text);padding:5px 9px;cursor:pointer;flex:0 0 auto;white-space:nowrap}
 .post-reaction.on{border-color:var(--accent,#6aa0ff);background:var(--accent2,#28437a)}
 .post-reaction span{font-size:12px;color:var(--muted)}
+.post-emoji-more{font-size:15px;font-weight:700;padding:5px 11px}
+.post-emoji-picker{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;padding:8px;border:1px solid var(--line);border-radius:12px;background:var(--panel2);max-height:160px;overflow-y:auto}
+.post-emoji-pick{border:1px solid transparent;background:none;font-size:19px;line-height:1;padding:4px;border-radius:8px;cursor:pointer}
+.post-emoji-pick:hover,.post-emoji-pick.on{background:var(--accent2,#28437a);border-color:var(--accent,#6aa0ff)}
 .post-comments{display:grid;gap:8px;margin-top:10px;padding:10px;border-radius:10px;background:var(--panel2)}
 .post-comment{display:flex;align-items:flex-start;gap:8px}
 .post-comment>div{min-width:0;flex:1;overflow-wrap:anywhere}

@@ -116,19 +116,22 @@ function initMoreOrg(){
     const html = '<div class="mo-chips" id="moChips" role="toolbar" aria-label="分類で絞る"></div>';
     if(ms) ms.insertAdjacentHTML("beforeend", html); else if(holder) holder.insertAdjacentHTML("afterend", '<div class="more-search">' + html + '</div>');
     pane.insertAdjacentHTML("beforeend", '<div class="empty-list" id="moNone" hidden></div>');
+    // この切替ボタンは、あとで検索欄のとなり（上のバー）へ移されるため、pane の委任クリックではなく
+    // ボタン自身に直接リスナーをつける（移動先でも押せるように）
+    const chipsBar = document.getElementById("moChips");
+    if(chipsBar) chipsBar.addEventListener("click", (e) => {
+        const cyc = e.target.closest("[data-mo-cyc]");
+        if(!cyc) return;
+        const order = ["all", "fav", "recent"].concat(MO_CATS.map((c) => c[0]));
+        const i = order.indexOf(mo.cat);
+        mo.cat = order[(i < 0 ? 0 : i + 1) % order.length];
+        moApply();
+    });
     pane.addEventListener("click", (e) => {
         const star = e.target.closest(".mo-star");
         if(star){ e.preventDefault(); e.stopPropagation(); const id = star.closest(".more-item").dataset.moId; const at = mo.favs.indexOf(id); if(at >= 0) mo.favs.splice(at, 1); else mo.favs.unshift(id); moSave(); moApply(); return; }
         const chip = e.target.closest("[data-mo-cat]");
         if(chip){ mo.cat = chip.dataset.moCat; moApply(); return; }
-        const cyc = e.target.closest("[data-mo-cyc]");
-        if(cyc){
-            const order = ["all", "fav", "recent"].concat(MO_CATS.map((c) => c[0]));
-            const i = order.indexOf(mo.cat);
-            mo.cat = order[(i < 0 ? 0 : i + 1) % order.length];
-            moApply();
-            return;
-        }
         const item = e.target.closest(".more-item");
         if(item && item.dataset.moId){ const id = item.dataset.moId; mo.recent = [id].concat(mo.recent.filter((x) => x !== id)).slice(0, MO_RECENT_MAX); moSave(); moSchedule(); }
     }, true);

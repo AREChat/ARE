@@ -1,6 +1,10 @@
 "use strict";
 
-feat.posts = []; feat.postProfiles = new Map(); feat.postImageFile = null; feat.postVideoFile = null; feat.postsLoadedAt = 0; feat.postReactions = new Map(); feat.postComments = new Map(); feat.commentProfiles = new Map(); feat.commentOpen = new Set();
+feat.posts = []; feat.postProfiles = new Map(); feat.postImageFile = null; feat.postVideoFile = null; feat.postsLoadedAt = 0; feat.postReactions = new Map(); feat.postComments = new Map(); feat.commentProfiles = new Map(); feat.commentOpen = new Set(); feat.postEmojiPicker = new Set();
+
+// 投稿リアクション：ふだん出す4種類＋「＋」で全種類（虫は入れない）
+const POST_REACTIONS_DEFAULT = ["👍","❤️","😂","😢"];
+const POST_REACTIONS_ALL = ["👍","👎","👏","🙌","👐","🤲","🙏","✍️","💪","🤝","👋","❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💖","💗","💘","💝","💕","💞","💓","💔","😀","😄","😁","😆","😅","😂","🤣","☺️","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤔","🤨","😐","😑","😶","🙄","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","😳","🥵","🥶","😱","😨","😰","😥","😓","🤗","🤭","🤫","🤥","😴","🤤","😪","🎉","🎊","✨","🎈","🎁","🥳","🔥","💯","😮","😲","😯","😎","👀"];
 
 async function loadPosts(reset){
     const client = requireClient();
@@ -66,11 +70,19 @@ function renderPosts(){
         const comments = feat.postComments.get(post.id) || [];
         const visibleComments = comments.slice(0,3);
         const visibility = {public:"🌐 全体公開",followers:"👥 フォロワーのみ",private:"🔒 自分のみ"}[post.visibility] || "🌐 全体公開";
+        // 既定は4種類。すでに誰かが押した絵文字（既定の4種類以外）は、カウントが消えないよう引き続き表示する
+        const extraEmojis = Object.keys(social.counts).filter((e) => !POST_REACTIONS_DEFAULT.includes(e) && social.counts[e] > 0);
+        const quickEmojis = POST_REACTIONS_DEFAULT.concat(extraEmojis);
+        const rxChip = (emoji) => '<button type="button" class="post-reaction' + (social.mine === emoji ? ' on' : '') + '" data-reaction="' + emoji + '" data-post="' + escapeHtml(post.id) + '" aria-pressed="' + (social.mine === emoji) + '">' + emoji + '<span>' + (social.counts[emoji] || 0) + '</span></button>';
+        const pickerOpen = feat.postEmojiPicker.has(post.id);
         return '<article class="post"><div class="post-head">' + miniAvatar(author) +
             '<div><button class="post-name" type="button" data-author="' + escapeHtml(post.author_id) + '">' + escapeHtml(profileDisplayName(author)) + '</button><div class="post-time">' + escapeHtml(formatDateTime(post.created_at)) + (own ? ' ・' + visibility : '') + '</div></div></div>' +
             (post.body ? '<div class="post-body">' + linkifyPostBody(post.body) + '</div>' : '') +
             (img ? (isPostPdfPath(post.image_path) ? '<a class="post-pdf" href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer">📄 <b>' + escapeHtml(postPdfName(post.image_path)) + '</b><span>PDFを開く</span></a>' : isPostVideoPath(post.image_path) ? '<video class="post-video" controls playsinline preload="metadata" src="' + escapeHtml(img) + '"></video>' : '<a href="' + escapeHtml(img) + '" target="_blank" rel="noopener noreferrer"><img class="post-img" src="' + escapeHtml(img) + '" alt="投稿画像" loading="lazy"></a>') : '') +
-            '<div class="post-reactions">' + ["👍","❤️","😂","😮","😢","🎉"].map((emoji) => '<button type="button" class="post-reaction' + (social.mine === emoji ? ' on' : '') + '" data-reaction="' + emoji + '" data-post="' + escapeHtml(post.id) + '" aria-pressed="' + (social.mine === emoji) + '">' + emoji + '<span>' + (social.counts[emoji] || 0) + '</span></button>').join("") + '<button type="button" class="post-comment-toggle" data-comment-toggle="' + escapeHtml(post.id) + '">💬 ' + comments.length + '</button></div>' +
+            '<div class="post-reactions">' + quickEmojis.map(rxChip).join("") +
+            '<button type="button" class="post-reaction post-emoji-more' + (pickerOpen ? ' on' : '') + '" data-emoji-toggle="' + escapeHtml(post.id) + '" aria-expanded="' + pickerOpen + '" aria-label="ほかの絵文字">＋</button>' +
+            '<button type="button" class="post-comment-toggle" data-comment-toggle="' + escapeHtml(post.id) + '">💬 ' + comments.length + '</button></div>' +
+            (pickerOpen ? '<div class="post-emoji-picker">' + POST_REACTIONS_ALL.map((emoji) => '<button type="button" class="post-emoji-pick' + (social.mine === emoji ? ' on' : '') + '" data-reaction="' + emoji + '" data-post="' + escapeHtml(post.id) + '">' + emoji + '</button>').join("") + '</div>' : "") +
             (feat.commentOpen.has(post.id) ? '<div class="post-comments">' + visibleComments.map((comment) => '<div class="post-comment">' + miniAvatar(feat.commentProfiles.get(comment.author_id)) + '<div><button class="post-name" type="button" data-comment-author="' + escapeHtml(comment.author_id) + '">' + escapeHtml(profileDisplayName(feat.commentProfiles.get(comment.author_id))) + '</button> <span class="post-time">' + escapeHtml(formatDateTime(comment.created_at)) + '</span><div>' + escapeHtml(comment.body) + '</div></div>' + (comment.author_id === state.user.id ? '<button type="button" class="post-comment-delete" data-comment-delete="' + escapeHtml(comment.id) + '" aria-label="コメントを削除">×</button>' : '') + '</div>').join("") + (comments.length > 3 ? '<div class="meta">新しいコメント3件を表示しています</div>' : '') + '<div class="post-comment-compose"><textarea rows="2" maxlength="500" data-comment-input="' + escapeHtml(post.id) + '" placeholder="コメントを入力（500文字まで）"></textarea><button type="button" class="button-secondary" data-comment-post="' + escapeHtml(post.id) + '">送信</button></div></div>' : '') +
             '<div class="post-actions">' + (post.visibility !== "private" ? '<button type="button" data-postshare="' + escapeHtml(post.id) + '">🔗 共有</button>' : '') + (own ? '<button type="button" data-postdel="' + escapeHtml(post.id) + '">削除</button>' : (feat.isAdmin ? '<button type="button" data-postadmin="' + escapeHtml(post.id) + '">管理者として削除</button>' : '')) + '</div></article>';
     }).join("");
@@ -215,10 +227,13 @@ async function onFeedClick(event){
             const client = requireClient();
             const result = current === emoji ? await client.from("post_reactions").delete().eq("post_id",postId).eq("user_id",state.user.id) : await client.from("post_reactions").upsert({post_id:postId,user_id:state.user.id,reaction:emoji},{onConflict:"post_id,user_id"});
             if(result.error) throw result.error;
+            feat.postEmojiPicker.delete(postId);
             await loadPostSocialState(feat.posts); renderPosts();
         }catch(error){ showToast(featError(error)); reaction.disabled = false; }
         return;
     }
+    const emojiToggle = event.target.closest("[data-emoji-toggle]");
+    if(emojiToggle){ const id = emojiToggle.dataset.emojiToggle; feat.postEmojiPicker.has(id) ? feat.postEmojiPicker.delete(id) : feat.postEmojiPicker.add(id); renderPosts(); return; }
     const commentToggle = event.target.closest("[data-comment-toggle]");
     if(commentToggle){ const id = commentToggle.dataset.commentToggle; feat.commentOpen.has(id) ? feat.commentOpen.delete(id) : feat.commentOpen.add(id); renderPosts(); return; }
     const commentSubmit = event.target.closest("[data-comment-post]");

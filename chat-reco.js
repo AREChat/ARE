@@ -72,20 +72,27 @@ function rcPick(list){
     const all = rcShuffle(src, plan.seed), picked = rcSt.count > 0 ? all.slice(0, rcSt.count) : all;
     return { list:picked, title:kind === "follow" ? "⭐ おすすめ：未フォローの人（" + picked.length + "人）" : "⭐ おすすめ：未チャットの人（" + picked.length + "人）" };
 }
+// 統計チップは、チャットタブ・その他タブと同じく「1つのボタンで切り替え」形式にする
+let rcStatCycleItems = [], rcStatCycleIdx = 0;
 function rcStatsHtml(){
     if(!state.recommendedMode || !rcSt.plan || !rcSt.peers.length) return "";
     const g = rcGroups(rcSt.peers), c = (typeof qkCounts !== "undefined" && qkCounts) || null;
-    const chip = (n, label, fl) => fl
-        ? '<button type="button" class="fl-chip" data-keep="1" data-fl="' + fl + '"><b>' + n + '</b> ' + label + '</button>'
-        : '<span class="fl-chip"><b>' + n + '</b> ' + label + '</span>';
-    const fw = chip(c ? c.followers : "–", "フォロワー", "followers");
-    const fg = chip(c ? c.following : "–", "フォロー中", "following");
-    const nf = chip(g.notFollowed.length, "未フォロー");
-    const rg = chip(g.reg, "登録済み"), ur = chip(g.unreg.length, "未登録");
+    const fw = {n: c ? c.followers : "–", label: "フォロワー", fl: "followers"};
+    const fg = {n: c ? c.following : "–", label: "フォロー中", fl: "following"};
+    const nf = {n: g.notFollowed.length, label: "未フォロー"};
+    const rg = {n: g.reg, label: "登録済み"}, ur = {n: g.unreg.length, label: "未登録"};
     const v = rcSt.plan.stats;
-    // 「非表示」ボタンと同じ並び（1つのflexコンテナ）に置き、入る分だけ1行・入りきらない分だけ自然に2行目へ折り返す
-    // （.section-heading .fl-counts に display:contents を当てて、非表示ボタンと同じ並びのチップとして扱う）
-    return v === 0 ? (ur + rg) : (v === 1 ? (fg + nf + fw) : (ur + rg + fg + nf + fw));
+    rcStatCycleItems = v === 0 ? [ur, rg] : v === 1 ? [fg, nf, fw] : [ur, rg, fg, nf, fw];
+    if(rcStatCycleIdx >= rcStatCycleItems.length) rcStatCycleIdx = 0;
+    const cur = rcStatCycleItems[rcStatCycleIdx];
+    return '<button type="button" class="fl-chip" data-keep="1" data-rc-stat-cyc="1"><b>' + cur.n + '</b> ' + cur.label + ' 🔁</button>';
+}
+/** 統計チップが押されたとき：フォロー中／フォロワーなら一覧を開き、どれでも次の表示へ進める */
+function rcStatCycleClick(){
+    const item = rcStatCycleItems[rcStatCycleIdx];
+    rcStatCycleIdx = rcStatCycleItems.length ? (rcStatCycleIdx + 1) % rcStatCycleItems.length : 0;
+    if(item && item.fl) runTool(() => openFollowList(item.fl));
+    if(typeof qkPaintFollowCounts === "function") qkPaintFollowCounts();
 }
 /** チャット一覧が読み込まれて「登録済み」が変わったときだけ、表示を更新する（選び直しはしない） */
 function rcOnRooms(){
