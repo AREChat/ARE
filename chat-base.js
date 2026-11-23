@@ -523,7 +523,7 @@ function bindEvents(){
         const hdrEl = () => document.querySelector(".chat-header");
         const clearProxies = () => { document.querySelectorAll(".chat-header>.hdr-tool").forEach((x) => x.remove()); };
         const openHdr = () => { const h = hdrEl(), d = document.getElementById("hdrMoreBtn"); if(h){ h.classList.add("hdr-open"); if(d){ d.setAttribute("aria-expanded","true"); d.classList.add("hdr-pulse"); setTimeout(() => d.classList.remove("hdr-pulse"),1600); } window.scrollTo(0,0); } };
-        const liveTools = () => { const t = tools(); return t ? Array.from(t.children).filter((n) => n.classList && n.classList.contains("tool-button") && !n.hidden) : []; };
+        const liveTools = () => { const t = tools(); return t ? Array.from(t.children).filter((n) => n.classList && n.classList.contains("tool-button") && !n.hidden && !n.classList.contains("tool-merged")) : []; };
         // いちど に 見せられる 数（スクロールなしで おさまる分。さいごの1つは「⋯ そのほか」に あてる）
         const capacity = () => { const avail = Math.min(window.innerHeight * 0.52,Math.max(160,composerEl.getBoundingClientRect().top - 60)); const rows = Math.max(1,Math.floor((avail - 56 + 8) / 82)); return rows * 3; };
         const syncOverflow = () => {

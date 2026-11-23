@@ -19,7 +19,7 @@
 <title>ARE | チャット</title>
 <!-- 読み込みを速くする：データ置き場（Supabase）への接続の準備を、ページの読み込みと同時に始める -->
 <link rel="preconnect" href="https://kzrrnuzzvwijujhlbtln.supabase.co" crossorigin>
-<link rel="stylesheet" href="./chat.css?v=666a5c76e1">
+<link rel="stylesheet" href="./chat.css?v=2466db39c3">
 </head>
 <body>
 <div class="app" id="app">
@@ -112,11 +112,11 @@
         <section class="composer">
             <div class="typing-line" id="typingLine" aria-live="polite"></div>
             <div class="composer-tools">
-                <button class="tool-button" id="photoButton" data-feature="camera" type="button">📷 写真</button>
+                <button class="tool-button tool-merged" id="photoButton" data-feature="camera" type="button" hidden aria-hidden="true" tabindex="-1">📷 写真</button>
                 <input class="file-input" id="imageInput" type="file" accept="image/*" multiple>
-                <label class="tool-button" for="fileInput" title="写真・動画・PDF・Wordなどを まぜて、いくつでも まとめて選べます">📎 ファイルを選択（写真・動画もまぜてOK）</label>
+                <label class="tool-button" for="fileInput" title="写真・動画・PDF・Wordなどを まぜて、いくつでも まとめて選べます">📎 ファイルを選択（写真・動画もOK）</label>
                 <input class="file-input" id="fileInput" type="file" multiple accept="image/*,video/*,.bmp,.tif,.tiff,.avif,.ico,.mkv,.avi,.m4v,.3gp,.wmv,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.odt,.ods,.odp,.rtf,.epub,.pages,.numbers,.key,.txt,.log,.ini,.cfg,.conf,.toml,.yaml,.yml,.srt,.vtt,.lrc,.tex,.rst,.sql,.diff,.patch,.jsonl,.md,.markdown,.json,.csv,.tsv,.ics,.vcf,.py,.mjs,.ts,.jsx,.tsx,.css,.scss,.java,.kt,.c,.h,.cpp,.hpp,.cs,.go,.rs,.rb,.php,.swift,.lua,.dart,.gd,.pl,.r,.scala,.glb,.gltf,.stl,.obj,.tmx,.ldtk,.ttf,.otf,.woff,.woff2,.zip,.7z,.rar,.tar,.gz,.tgz,.bz2,.xz,.mp3,.m4a,.aac,.wav,.flac,.ogg,.opus,.mid,.midi,.weba,.html,.htm">
-                <label class="tool-button" for="videoInput">🎬 動画を選択</label>
+                <label class="tool-button tool-merged" for="videoInput" hidden aria-hidden="true">🎬 動画を選択</label>
                 <input class="file-input" id="videoInput" type="file" accept="video/*" multiple>
                 <button class="tool-button" id="emojiButton" data-feature="stamps" type="button">😊 絵文字・スタンプ</button>
                 <button class="tool-button" id="voiceButton" data-feature="voice" data-needs-room type="button" disabled>🎤 音声</button>
@@ -135,7 +135,7 @@
                 <label>送信日時 <input type="datetime-local" id="scheduleAt"></label>
                 <button class="button" id="scheduleSubmit" type="button">この日時に予約（文章）</button>
                 <button class="button-secondary" id="scheduleClose" type="button">閉じる</button>
-                <div class="meta">予約できる文章は <b>4,000文字まで</b>です（ふつうの送信と同じ）。写真・動画・ファイルも予約できます：この日時を決めたまま、上の「📷 写真」「📎 ファイルを選択」「🎬 動画を選択」で選ぶと、すぐアップロードだけ行われ、この日時になったら送信されます。</div>
+                <div class="meta">予約できる文章は <b>4,000文字まで</b>です（ふつうの送信と同じ）。写真・動画・ファイルも予約できます：この日時を決めたまま、上の「📎 ファイルを選択」で選ぶと、すぐアップロードだけ行われ、この日時になったら送信されます。</div>
                 <div id="scheduleList" class="schedule-list"></div>
             </div>
             <div class="composer-bottom">
@@ -170,7 +170,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=a3d0571b9b"></script>
+<script defer src="./chat.bundle.js?v=1a8217bda2"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

@@ -981,3 +981,6 @@ body.sel-mode .message-row{cursor:pointer;-webkit-user-select:none;user-select:n
 .chat-header .hdr-dots.hdr-pulse{animation:hdrPulse .5s ease-in-out 3}
 @keyframes hdrPulse{0%,100%{box-shadow:0 0 0 0 rgba(122,162,255,.0)}50%{box-shadow:0 0 0 6px rgba(122,162,255,.55)}}
 @media(min-width:701px){.chat-header>.hdr-tool{display:none!important}}
+
+/* 「📷 写真」「🎬 動画を選択」は「📎 ファイルを選択」に まとめた（写真・動画も そこで選べる。部品は ほかの機能が使うので 残してある） */
+.tool-merged{display:none!important}
