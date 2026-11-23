@@ -170,7 +170,7 @@ let qkCounts = null;
 
 function qkPaintFollowCounts(){
     document.querySelectorAll("[data-flcount]").forEach((box) => {
-        if(box.closest(".pane-users") && typeof rcStatsHtml === "function"){ const h = rcStatsHtml(); if(h){ box.innerHTML = h; return; } }
+        if(box.closest(".pane-users") && typeof rcPaintStats === "function"){ if(rcPaintStats(box)) return; }
         const c = qkCounts;
         box.innerHTML = '<button type="button" class="fl-chip" data-keep="1" data-fl="followers"><b>' + (c ? c.followers : "–") + '</b> フォロワー</button>' +
             '<button type="button" class="fl-chip" data-keep="1" data-fl="following"><b>' + (c ? c.following : "–") + '</b> フォロー中</button>';
@@ -293,9 +293,9 @@ function initQuick(){
     document.addEventListener("click", (e) => { const b = e.target.closest("[data-fl]"); if(b) runTool(() => openFollowList(b.dataset.fl)); });
     const users = document.querySelector(".pane-users");
     if(users && !users.querySelector("[data-flcount]")){
-        const bar2 = document.createElement("div"); bar2.className = "fl-counts"; bar2.setAttribute("data-flcount", "1");
-        // 「非表示」ボタンと同じ行に並べる（下にはみ出させない）
-        const heading = users.querySelector(".section-heading");
+        const bar2 = document.createElement("div"); bar2.className = "fl-counts fl-row"; bar2.setAttribute("data-flcount", "1");
+        // 「非表示」行（1行目）の下に、フォロー関連チップの行（2行目）として追加する（最大2行に収める）
+        const heading = document.getElementById("usersStatsHeading");
         if(heading) heading.appendChild(bar2); else users.insertBefore(bar2, users.children[1] || null);
     }
     registerTool("fl", qkFlAction);

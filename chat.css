@@ -554,10 +554,10 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .mo-chip.on{background:#5b73ff;border-color:#5b73ff;color:#fff}
 .mo-chip:hover{border-color:#5b73ff}
 .fl-counts{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
-.fl-break{flex-basis:100%;width:0;height:0}
+.fl-row{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;min-width:0}
 .section-heading .fl-counts{margin:0}
-.pane-users .section-heading{flex-wrap:nowrap;align-items:flex-start;margin:4px 0 8px}
-.pane-users .section-heading>.button-secondary,.pane-chats .section-heading>.button-secondary{padding:5px 10px;font-size:12px;min-height:0}
+#usersStatsHeading{margin:4px 0 8px}
+.pane-users .section-heading .button-secondary,.pane-chats .section-heading>.button-secondary{padding:5px 10px;font-size:12px;min-height:0}
 .pane-chats .section-heading{margin:4px 0 8px}
 .pane-users>.fl-counts{margin:0 0 8px}
 .fl-chip{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:999px;padding:4px 9px;font-size:11px;cursor:pointer;white-space:nowrap}

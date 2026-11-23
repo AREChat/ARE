@@ -81,7 +81,9 @@
             <p class="security-banner pane-me" id="securityBanner" hidden></p>
             <label class="me-toggle pane-me"><input type="checkbox" id="readReceiptToggle" checked> 既読を相手に表示する<small>オフにすると、あなたが読んでも相手には「既読」と表示されません。</small></label>
             <div class="pane pane-users">
-            <div class="section-heading" style="justify-content:flex-start"><button class="button-secondary" id="toggleHiddenUsers" data-feature="follow" type="button">非表示（0）</button></div>
+            <div class="section-heading" id="usersStatsHeading" style="flex-direction:column;align-items:stretch;gap:5px">
+                <div class="fl-row" id="flRow1"><button class="button-secondary" id="toggleHiddenUsers" data-feature="follow" type="button">非表示（0）</button></div>
+            </div>
             <div class="user-list" id="recommendedUsers"><div class="empty-list">上の検索バーに名前を入力すると、ユーザーが表示されます。</div></div>
             </div>
             <div class="pane pane-chats">
@@ -170,7 +172,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=597baf01cb"></script>
+<script defer src="./chat.bundle.js?v=4d6b26bb4b"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>
