@@ -1,27 +1,37 @@
 "use strict";
 // ===== 広告（2027年1月1日から、1時間ごとに 15秒の物語紹介映像）=====
 // ・映像は ads/ に 100本（AD001.mp4〜AD100.mp4）。一覧は ads/manifest.json。収入はなし。
-// ・500ポイントで30日間 広告なし（AREShop の上に出る）。管理者は広告なし。
+// ・500ポイントで30日間 広告なし（AREShop の上に出る）。管理者と家庭は ずっと広告なし。社員・友人は1時間ごと、その他は10分ごと。広告は はじまって10秒でスキップできる。
 // ・見つからない映像／広告なし か わからないとき（サーバー未準備など）は、広告を出さずに静かに飛ばす。
 const AD = {
     START: Date.parse("2027-01-01T00:00:00+09:00"),
     HOUR: 3600000,
-    free: null, until: null, price: 500, days: 30,
+    free: null, admin: false, exempt: false, interval: 60, until: null, price: 500, days: 30, SKIP_MS: 10000,
     list: null, busy: false, confirm: false, bad: {}
 };
+// 管理者は、どんな時も 広告を出さない（サーバーの返事・ポイントの情報・画面の管理者の印、どれか1つでも「管理者」なら出さない）
+function adIsAdmin(){
+    try{ if(AD.admin) return true; }catch(_e){}
+    try{ if(typeof pt !== "undefined" && pt && pt.acc && pt.acc.admin) return true; }catch(_e){}
+    try{ if(typeof feat !== "undefined" && feat && feat.isAdmin === true) return true; }catch(_e){}
+    return false;
+}
 function adNow(){ return typeof window.__adNow === "function" ? window.__adNow() : Date.now(); }
 function adUid(){ return (state && state.user && state.user.id) || "x"; }
 function adKey(){ return "are_ad_v1_" + adUid(); }
 function adLoad(){ try{ return JSON.parse(localStorage.getItem(adKey()) || "{}") || {}; }catch(_e){ return {}; } }
 function adSave(o){ try{ localStorage.setItem(adKey(), JSON.stringify(o)); }catch(_e){} }
-function adHourIndex(now){ return Math.floor((now - AD.START) / AD.HOUR); }
+// 広告の間隔：社員・友人は60分、その他は10分（サーバーが返す interval_min。わからなければ60分）。管理者・家庭は広告なし
+function adSlotMs(){ return Math.max(1, AD.interval || 60) * 60000; }
+function adHourIndex(now){ return AD.START + Math.floor((now - AD.START) / adSlotMs()) * adSlotMs(); }   // いまの枠のはじまり（ミリ秒）
 
 async function adStatusLoad(){
     try{
         const r = await requireClient().rpc("ad_free_status");
         if(r.error) throw r.error;
         const d = r.data || {};
-        AD.free = !!d.free; AD.until = d.until || null;
+        AD.admin = !!d.admin; AD.exempt = !!d.exempt || AD.admin; AD.free = !!d.free || AD.exempt; AD.until = d.until || null;
+        const iv = Number(d.interval_min); AD.interval = (iv >= 1 && iv <= 1440) ? iv : 60;
         if(d.price) AD.price = d.price;
         if(d.days) AD.days = d.days;
     }catch(_e){ AD.free = null; }
@@ -104,7 +114,7 @@ function adNext(list, st){
     const a = adPick(list, st); st.next = a ? a.id : null; return a;
 }
 async function adPrefetch(){
-    if(AD.free !== false || AD.busy || !adsUrl() || adNow() < AD.START - 2 * 86400000) return;
+    if(AD.free !== false || adIsAdmin() || AD.busy || !adsUrl() || adNow() < AD.START - 2 * 86400000) return;
     try{
         const list = await adManifest(); const st = adLoad();
         const ad = adNext(list, st); adSave(st);
@@ -118,9 +128,9 @@ function adComposerBusy(){
 }
 
 function adDue(){
-    if(AD.free !== false || AD.busy || document.hidden) return false;
+    if(AD.free !== false || adIsAdmin() || AD.busy || document.hidden) return false;
     const now = adNow(); if(now < AD.START) return false;
-    return adHourIndex(now) > (adLoad().hour === undefined ? -1 : adLoad().hour);
+    const at = adLoad().at; return at === undefined || adHourIndex(now) > at;
 }
 
 async function adCheck(){
@@ -134,12 +144,12 @@ async function adCheck(){
             let ok = false, src = null;
             try{ src = await adSource(ad); ok = await adPlay(ad, src.url); }catch(_e){ ok = false; }
             finally{ if(src && src.revoke){ try{ URL.revokeObjectURL(src.url); }catch(_e){} } }
-            if(ok){ st.hour = hour; st.next = null; adSave(st); adPrefetch(); return; }
+            if(ok){ st.at = hour; st.next = null; adSave(st); adPrefetch(); return; }
             AD.bad[ad.id] = true; st.next = null; adSave(st);
         }
-        st.hour = hour; adSave(st);          // 3本とも だめなら、この1時間は あきらめる（くり返さない）
+        st.at = hour; adSave(st);          // 3本とも だめなら、この1時間は あきらめる（くり返さない）
     }catch(_e){
-        const st = adLoad(); st.hour = adHourIndex(adNow()); adSave(st);
+        const st = adLoad(); st.at = adHourIndex(adNow()); adSave(st);
     }finally{ AD.busy = false; }
 }
 
@@ -158,16 +168,16 @@ function adPlay(ad, srcUrl){
         const cnt = document.createElement("div"); cnt.setAttribute("aria-live", "off"); cnt.textContent = "あと " + 15 + " 秒";
         const row = document.createElement("div"); row.style.cssText = "display:flex;gap:8px;flex-wrap:wrap;justify-content:center";
         const mk = (t, cls) => { const b = document.createElement("button"); b.type = "button"; b.className = cls || "button-secondary"; b.textContent = t; return b; };
-        const snd = mk("🔊 音を出す"); const close = mk("閉じる", "button"); const buy = mk("🚫 " + AD.price + "ポイントで" + AD.days + "日間 広告なし");
+        const snd = mk("🔊 音を出す"); const close = mk("スキップ ▶", "button"); const buy = mk("🚫 " + AD.price + "ポイントで" + AD.days + "日間 広告なし");
         close.hidden = true; buy.hidden = true;
         row.append(snd, close, buy);
         ov.append(tag, v, cap, cnt, row);
         let started = false, done = false, hard = null, boot = null;
         const finish = (ok) => { if(done) return; done = true; clearTimeout(hard); clearTimeout(boot); try{ v.pause(); v.removeAttribute("src"); v.load(); }catch(_e){} ov.remove(); resolve(ok); };
-        const allow = () => { close.hidden = false; buy.hidden = false; cnt.textContent = "広告は ここまで。ありがとうございました"; };
+        const allow = () => { close.hidden = false; buy.hidden = false; cnt.textContent = "スキップできます（広告はあと少しで終わります）"; };
         v.addEventListener("playing", () => {
             if(started) return; started = true; clearTimeout(boot);
-            hard = setTimeout(allow, 20000);               // 万一 終わりの合図が来なくても、20秒で閉じられる
+            hard = setTimeout(allow, AD.SKIP_MS);          // 広告がはじまって 10秒たったら、スキップできる
         });
         v.addEventListener("timeupdate", () => { const left = Math.max(0, Math.ceil((v.duration && isFinite(v.duration) ? v.duration : 15) - v.currentTime)); if(!close.hidden) return; cnt.textContent = "あと " + left + " 秒"; });
         v.addEventListener("ended", allow);
@@ -185,10 +195,11 @@ function adPlay(ad, srcUrl){
 // ---------- AREShop の「広告なし」カード ----------
 function adFreeCardHtml(pts){
     if(AD.free === null) return "";
+    if(AD.exempt) return '<div class="admin-card"><b>🚫 広告なし</b><div class="meta">✅ あなたのアカウントには、ずっと広告が出ません（ポイントは いりません）。</div></div>';
     const untilTxt = AD.until ? new Date(AD.until).toLocaleDateString("ja-JP", {year:"numeric", month:"long", day:"numeric"}) : "";
     let state1;
     if(AD.until && new Date(AD.until) > new Date(adNow())) state1 = '<div class="meta">✅ 広告なし：' + escapeHtml(untilTxt) + ' まで</div>';
-    else state1 = '<div class="meta">広告は 2027年1月1日から 1時間ごとに 15秒の物語紹介映像が出ます。いま買っても、1月1日から ' + AD.days + '日間 広告が出ません。</div>';
+    else state1 = '<div class="meta">広告は 2027年1月1日から ' + (AD.interval >= 60 ? (AD.interval / 60) + '時間' : AD.interval + '分') + 'ごとに 15秒の物語紹介映像が出ます。いま買っても、1月1日から ' + AD.days + '日間 広告が出ません。</div>';
     if(adNow() >= AD.START && AD.until && new Date(AD.until) > new Date(adNow())) state1 = '<div class="meta">✅ 広告なし：' + escapeHtml(untilTxt) + ' まで（買い足すと、その後ろに ' + AD.days + '日 のびます）</div>';
     const lack = pts < AD.price;
     let btn;
