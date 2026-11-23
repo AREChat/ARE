@@ -6,7 +6,7 @@
 const AD = {
     START: Date.parse("2027-01-01T00:00:00+09:00"),
     HOUR: 3600000,
-    free: null, admin: false, exempt: false, interval: 60, until: null, price: 500, days: 30, SKIP_MS: 10000,
+    introDone: false, introTries: 0, free: null, admin: false, exempt: false, interval: 60, until: null, price: 500, days: 30, SKIP_MS: 10000,
     list: null, busy: false, confirm: false, bad: {}
 };
 // 管理者は、どんな時も 広告を出さない（サーバーの返事・ポイントの情報・画面の管理者の印、どれか1つでも「管理者」なら出さない）
@@ -154,12 +154,12 @@ async function adCheck(){
 }
 
 // 再生が はじまったら true（映像が見つからない／読めない時は false）
-function adPlay(ad, srcUrl){
+function adPlay(ad, srcUrl, test){
     return new Promise((resolve) => {
         const ov = document.createElement("div");
         ov.id = "adOverlay"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "広告");
         ov.style.cssText = "position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:12px;color:#fff;font-size:14px";
-        const tag = document.createElement("div"); tag.textContent = "広告 ・ 物語紹介"; tag.style.cssText = "opacity:.8";
+        const tag = document.createElement("div"); tag.textContent = test === "intro" ? "広告 ・ 物語紹介（お試し表示 ・ 今回だけ）" : test ? "広告 ・ 物語紹介（テスト表示）" : "広告 ・ 物語紹介"; tag.style.cssText = "opacity:.8";
         const v = document.createElement("video");
         v.muted = true; v.playsInline = true; v.autoplay = true; v.preload = "auto";
         v.setAttribute("controlsList", "nodownload noremoteplayback"); v.disablePictureInPicture = true;
@@ -174,7 +174,7 @@ function adPlay(ad, srcUrl){
         ov.append(tag, v, cap, cnt, row);
         let started = false, done = false, hard = null, boot = null;
         const finish = (ok) => { if(done) return; done = true; clearTimeout(hard); clearTimeout(boot); try{ v.pause(); v.removeAttribute("src"); v.load(); }catch(_e){} ov.remove(); resolve(ok); };
-        const allow = () => { close.hidden = false; buy.hidden = false; cnt.textContent = "スキップできます（広告はあと少しで終わります）"; };
+        const allow = () => { close.hidden = false; buy.hidden = !!test; cnt.textContent = "スキップできます（広告はあと少しで終わります）"; };
         v.addEventListener("playing", () => {
             if(started) return; started = true; clearTimeout(boot);
             hard = setTimeout(allow, AD.SKIP_MS);          // 広告がはじまって 10秒たったら、スキップできる
@@ -195,7 +195,7 @@ function adPlay(ad, srcUrl){
 // ---------- AREShop の「広告なし」カード ----------
 function adFreeCardHtml(pts){
     if(AD.free === null) return "";
-    if(AD.exempt) return '<div class="admin-card"><b>🚫 広告なし</b><div class="meta">✅ あなたのアカウントには、ずっと広告が出ません（ポイントは いりません）。</div></div>';
+    if(AD.exempt) return '<div class="admin-card"><b>🚫 広告なし</b><div class="meta">✅ あなたのアカウントには、ずっと広告が出ません（ポイントは いりません）。</div>' + (adIsAdmin() ? '<div class="row"><button type="button" class="button-secondary" data-t="pt:adtest">▶ テストの広告を1回だけ出す（管理者用）</button></div>' : '') + '</div>';
     const untilTxt = AD.until ? new Date(AD.until).toLocaleDateString("ja-JP", {year:"numeric", month:"long", day:"numeric"}) : "";
     let state1;
     if(AD.until && new Date(AD.until) > new Date(adNow())) state1 = '<div class="meta">✅ 広告なし：' + escapeHtml(untilTxt) + ' まで</div>';
@@ -207,7 +207,48 @@ function adFreeCardHtml(pts){
     else btn = '<button type="button" class="button' + (lack ? " button-secondary" : "") + '" data-t="pt:adask"' + (lack ? " disabled" : "") + '>' + AD.price + '円 で ' + AD.days + '日間 広告なし</button>' + (lack ? '<span class="meta">あと ' + (AD.price - pts) + '円</span>' : "");
     return '<div class="admin-card"><b>🚫 広告なし（' + AD.days + '日間）</b>' + state1 + '<div class="row" style="justify-content:space-between;align-items:center"><span><b>' + AD.price + '</b> 円</span><span>' + btn + '</span></div></div>';
 }
+// ===== お試し表示：2027年より前に、全員（管理者・家庭の人も）に 1回だけ 広告を流す =====
+// ・「見た」は アカウントごとに保存し、端末をまたいで引きつぐ（chat-prefsync.js の are_ad_intro_v1_）
+// ・流れたときだけ「見た」にする（映像が取れなかった時は、あとで もう一度。1回の起動で最大3回まで）
+function adIntroKey(){ return "are_ad_intro_v1_" + adUid(); }
+function adIntroSeen(){ try{ return localStorage.getItem(adIntroKey()) === "1"; }catch(_e){ return true; } }   // 保存できない端末では くり返しを避けるため 出さない
+async function adIntroCheck(){
+    if(AD.introDone || AD.busy || document.hidden || adNow() >= AD.START || AD.introTries >= 3) return;
+    if(adIntroSeen()){ AD.introDone = true; return; }
+    if(adComposerBusy() || document.getElementById("adOverlay")) return;
+    AD.busy = true; AD.introTries++;
+    let src = null;
+    try{
+        const list = (await adManifest()).filter((a) => !AD.bad[a.id]);
+        if(!list.length) return;
+        const ad = list[Math.floor(Math.random() * list.length)];
+        showToast("広告のお試し表示を準備しています…（はじめては30秒ほどかかります）");
+        src = await adSource(ad);
+        if(await adPlay(ad, src.url, "intro")){ try{ localStorage.setItem(adIntroKey(), "1"); }catch(_e){} AD.introDone = true; }
+        else AD.bad[ad.id] = true;
+    }catch(_e){ /* あとで もう一度 */ }
+    finally{ if(src && src.revoke){ try{ URL.revokeObjectURL(src.url); }catch(_e){} } AD.busy = false; }
+}
+
+// 管理者の確認用：日付・間隔・「広告なし」に関係なく、ドライブの映像を 1本だけ流す（順番や次の予定は変えない）
+async function adTestOnce(){
+    if(!adIsAdmin()){ showToast("このボタンは管理者だけが使えます"); return; }
+    if(AD.busy || document.getElementById("adOverlay")) return;
+    AD.busy = true;
+    let src = null;
+    try{
+        const list = await adManifest();
+        if(!list.length){ showToast("広告の映像が見つかりません（ドライブの「広告」フォルダを確かめてください）"); return; }
+        const ad = list[Math.floor(Math.random() * list.length)];
+        showToast("広告を読み込んでいます…（はじめては30秒ほどかかります）");
+        src = await adSource(ad);
+        const ok = await adPlay(ad, src.url, "test");
+        if(!ok) showToast("この映像は流せませんでした（" + ad.id + "）。もう一度ためしてください");
+    }catch(_e){ showToast("テストの広告を出せませんでした。しばらくしてから もう一度ためしてください"); }
+    finally{ if(src && src.revoke){ try{ URL.revokeObjectURL(src.url); }catch(_e){} } AD.busy = false; }
+}
 async function adFreeAction(action){
+    if(action === "adtest"){ await adTestOnce(); return; }
     if(action === "adask"){ AD.confirm = true; ptShopPaint(); return; }
     if(action === "adcancel"){ AD.confirm = false; ptShopPaint(); return; }
     if(action === "adbuy"){
@@ -219,9 +260,13 @@ async function adFreeAction(action){
 }
 
 function initAds(){
-    adStatusLoad().then(() => { adCheck(); adPrefetch(); });
-    feat.timers.push(setInterval(adCheck, 30000));
+    setTimeout(adIntroCheck, 3000);
+    adStatusLoad().then(() => {
+        adCheck(); adPrefetch();
+        try{ if(/[?&]adtest=1(&|$)/.test(location.search) && adIsAdmin()){ history.replaceState(null, "", location.pathname + location.hash); setTimeout(adTestOnce, 1200); } }catch(_e){}
+    });
+    feat.timers.push(setInterval(() => { adCheck(); adIntroCheck(); }, 30000));
     feat.timers.push(setInterval(adStatusLoad, 30 * 60000));
-    document.addEventListener("visibilitychange", () => { if(!document.hidden) adCheck(); });
-    window.AREAds = {check: adCheck, status: () => ({free: AD.free, until: AD.until})};
+    document.addEventListener("visibilitychange", () => { if(!document.hidden){ adCheck(); adIntroCheck(); } });
+    window.AREAds = {check: adCheck, test: adTestOnce, intro: adIntroCheck, status: () => ({free: AD.free, until: AD.until})};
 }

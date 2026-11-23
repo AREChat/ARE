@@ -194,7 +194,7 @@ async function onPointsAction(action, node){
             pt.confirm = null; showToast("交換しました 🎉"); await ptRefresh(); await ptShopLoad(); return;
         }
         if(action === "view"){ await ptView(node.dataset.id); return; }
-        if(/^ad(ask|cancel|buy)$/.test(action)){ await adFreeAction(action); return; }
+        if(/^ad(ask|cancel|buy|test)$/.test(action)){ await adFreeAction(action); return; }
     }catch(error){
         console.error("[ARE points]", error);
         if(/not_enough_points|already_owned/.test(String(error && error.message))) await ptRefresh();

@@ -10,7 +10,7 @@
 // ・お試し（ゲスト）は、ログアウトで消えるので、同期しません。
 const PS = {
     uid:null, on:false, meta:{}, last:{}, dirty:new Set(), chunks:{}, timer:null, busy:false, applying:false, maxT:0, pulling:false,
-    PREFIX:["are_hidden_rooms_","are_avatar_","are_drafts_","are_folders_","are_phrases_","are_mystamps_","are_myai_","are_sites_","are_nick_","are_quick_v1_","are_ann_seen_","are_tips_seen_","are_tips_off_","are_export_last_"],
+    PREFIX:["are_hidden_rooms_","are_avatar_","are_drafts_","are_folders_","are_phrases_","are_mystamps_","are_myai_","are_sites_","are_nick_","are_quick_v1_","are_ann_seen_","are_tips_seen_","are_tips_off_","are_export_last_","are_ad_intro_v1_"],
     GLOBAL:["are_theme","are_lang","are_eco","are_autotheme","are_mood_theme","are_weather_pref","are_weather_place","are_transit_pref","are_smart","are_qs_auto","are_bj_coins","tq_suggest_name","are_emoji_freq_v1","are_manual_status"],
     CHUNK:14000, MAX:800000, DEBOUNCE:2000, POLL:60000
 };
