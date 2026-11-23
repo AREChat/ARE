@@ -38,14 +38,41 @@ async function loadFollow(uid){
     const box = document.getElementById("pmFollow");
     if(!box || uid === state.user.id) return;
     try{
-        const counts = await followCounts(uid);
-        const mine = await requireClient().from("follows").select("followee_id").eq("follower_id",state.user.id).eq("followee_id",uid).maybeSingle();
+        const client = requireClient();
+        const [counts,mine,theirs] = await Promise.all([
+            followCounts(uid),
+            client.from("follows").select("followee_id").eq("follower_id",state.user.id).eq("followee_id",uid).maybeSingle(),
+            client.from("follows").select("approved_at").eq("follower_id",uid).eq("followee_id",state.user.id).maybeSingle()]);
         if(document.getElementById("pmFollow") !== box) return;
         const following = !!mine.data;
-        box.innerHTML = '<div class="meta">フォロワー ' + counts.followers + ' ・ フォロー中 ' + counts.following + '</div>' +
+        const pendingFromThem = !!(theirs.data && !theirs.data.approved_at);
+        let html = '<div class="meta">フォロワー ' + counts.followers + ' ・ フォロー中 ' + counts.following + '</div>' +
             '<button type="button" class="' + (following ? 'button-secondary' : 'button') + '" data-pm="follow" data-uid="' + escapeHtml(uid) + '" data-following="' + (following ? '1' : '0') + '" style="margin-top:6px">' + (following ? 'フォロー中（解除する）' : 'フォローする') + '</button>';
+        if(pendingFromThem){
+            html += '<div class="meta" style="margin-top:8px">この方がフォローを申請しています。承認すると、すぐにメッセージを送り合えるようになります。</div>' +
+                '<div class="row"><button type="button" class="button" data-pm="approvefollow" data-uid="' + escapeHtml(uid) + '">承認する</button>' +
+                '<button type="button" class="button-secondary" data-pm="declinefollow" data-uid="' + escapeHtml(uid) + '">見送る</button></div>';
+        }
+        box.innerHTML = html;
     }catch(error){
         if(document.getElementById("pmFollow") === box) box.innerHTML = '<div class="meta">' + escapeHtml(featError(error)) + '</div>';
+    }
+}
+
+async function respondFollowRequest(button,approve){
+    const uid = button.dataset.uid;
+    const row = button.closest(".row") || button;
+    const buttons = row.querySelectorAll ? row.querySelectorAll("button") : [button];
+    buttons.forEach((b) => { b.disabled = true; });
+    try{
+        const client = requireClient();
+        const result = await client.rpc(approve ? "approve_follow_v1" : "decline_follow_v1",{p_follower:uid});
+        if(result.error) throw result.error;
+        showToast(approve ? "フォローを承認しました。" : "フォローを見送りました。");
+        await loadFollow(uid);
+    }catch(error){
+        buttons.forEach((b) => { b.disabled = false; });
+        showToast(featError(error));
     }
 }
 

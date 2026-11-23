@@ -301,6 +301,15 @@ function getErrorMessage(error){
     if(/segment_blocked/.test(message)){
         return "この方とは、いまは連絡できません。管理者の承認が必要です。";
     }
+    if(/contact_required/.test(message)){
+        return "この相手とはまだつながっていません。プロフィールの「フォローする」を押すと、お試しでメッセージを送れるようになります。";
+    }
+    if(/approval_required/.test(message)){
+        return "相手が先にあなたをフォローしています。プロフィールで「承認する」を押すと、すぐにメッセージを送れるようになります。";
+    }
+    if(/trial_exhausted/.test(message)){
+        return "お試しで送れる件数を使い切りました。相手にフォローを承認してもらうか、フォローし返してもらうと、制限なく送れるようになります。";
+    }
     if(/guest_limit/.test(message)){
         return "お試しアカウントは、管理者以外の人には5件までしかメッセージを送れません。登録すると制限なく使えます。";
     }
@@ -719,6 +728,12 @@ async function openOrCreateDirectChat(partnerId){
     }catch(error){
         console.error("Open direct chat error:",error);
         if(/segment_blocked/.test(String(error?.message || "")) && typeof segRequestContact === "function"){ setStatus("","info"); segRequestContact(partnerId); return; }
+        if(/contact_required|approval_required|trial_exhausted/.test(String(error?.message || ""))){
+            setStatus("","info");
+            showToast(getErrorMessage(error));
+            try{ const p = await getProfile(partnerId); if(p) openProfileView(p); }catch(_e){ /* プロフィールが開けなくても、トーストの説明は見えている */ }
+            return;
+        }
         setStatus(getErrorMessage(error),"error");
     }
 }

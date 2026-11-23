@@ -117,6 +117,8 @@ async function onSheetClick(event){
     if(button.dataset.pm === "close") closeSheet();
     else if(button.dataset.pm === "save") await saveProfile(button);
     else if(button.dataset.pm === "follow") await toggleFollow(button);
+    else if(button.dataset.pm === "approvefollow") await respondFollowRequest(button,true);
+    else if(button.dataset.pm === "declinefollow") await respondFollowRequest(button,false);
 }
 
 async function onSheetChange(event){
