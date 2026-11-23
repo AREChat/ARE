@@ -55,17 +55,19 @@ function initPosts(){
     el.postMore.addEventListener("click",() => loadPosts(false));
     el.postSubmit.addEventListener("click",submitPost);
     el.postFeed.addEventListener("click",onFeedClick);
+    // 「📷写真」「🎬動画・PDF」を1つの「📎ファイル」ボタンにまとめ、選んだ種類で自動に振り分ける
     el.postImage.addEventListener("change",() => {
-        feat.postImageFile = el.postImage.files[0] || null;
-        if(feat.postImageFile){ feat.postVideoFile = null; el.postVideo.value = ""; }
-        el.postImageName.textContent = feat.postImageFile ? feat.postImageFile.name : "";
-    });
-    el.postVideo.addEventListener("change",() => {
-        const file = el.postVideo.files[0] || null;
-        if(file && !String(file.type).startsWith("video/") && !isPostPdfFile(file)){ showToast("動画またはPDFのファイルを選択してください。"); el.postVideo.value = ""; return; }
-        feat.postVideoFile = file;
-        if(file){ feat.postImageFile = null; el.postImage.value = ""; }
-        el.postImageName.textContent = file ? (isPostPdfFile(file) ? "📄 " : "🎬 ") + file.name + "（" + formatAttachmentSize(file.size) + "）" : "";
+        const file = el.postImage.files[0] || null;
+        if(!file){ feat.postImageFile = null; feat.postVideoFile = null; el.postImageName.textContent = ""; return; }
+        if(String(file.type).startsWith("image/")){
+            feat.postImageFile = file; feat.postVideoFile = null; el.postVideo.value = "";
+            el.postImageName.textContent = file.name;
+        }else if(String(file.type).startsWith("video/") || isPostPdfFile(file)){
+            feat.postVideoFile = file; feat.postImageFile = null;
+            el.postImageName.textContent = (isPostPdfFile(file) ? "📄 " : "🎬 ") + file.name + "（" + formatAttachmentSize(file.size) + "）";
+        }else{
+            showToast("写真・動画・PDFのファイルを選択してください。"); el.postImage.value = ""; feat.postImageFile = null; feat.postVideoFile = null; el.postImageName.textContent = "";
+        }
     });
     registerTool("pvlink",onPostVideoLinkAction);
 }

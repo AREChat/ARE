@@ -30,7 +30,15 @@ function hdrPlace(){
             slot.appendChild(inp); if(wrap) wrap.classList.add("hdr-moved"); hdrSt.more = true;
         }
     }
-    if(hdrSt.help && hdrSt.more){ clearInterval(hdrSt.timer); hdrSt.timer = 0; }
+    // 「すべて／★お気に入り／🕘最近…」の切替ボタンも、検索欄のとなりへ移す
+    if(!hdrSt.moreChips){
+        const chips = document.getElementById("moChips"), slot = document.querySelector(".ba-more");
+        if(chips && slot){
+            const wrap = chips.closest(".more-search");
+            slot.appendChild(chips); if(wrap) wrap.classList.add("hdr-moved"); hdrSt.moreChips = true;
+        }
+    }
+    if(hdrSt.help && hdrSt.more && hdrSt.moreChips){ clearInterval(hdrSt.timer); hdrSt.timer = 0; }
     else if(++hdrSt.tries > 60){ clearInterval(hdrSt.timer); hdrSt.timer = 0; }   // 30秒たっても無ければ あきらめる（今までの場所のまま 使える）
 }
 
@@ -116,5 +124,5 @@ function initHdr(){
         window.addEventListener("are-install-ready", () => { if(typeof feat !== "undefined" && feat.push && !feat.push.installEvent) feat.push.installEvent = window.__areInstallEvent; });
     }
     hdrPlace();
-    if(!(hdrSt.help && hdrSt.more)) hdrSt.timer = setInterval(hdrPlace, 500);
+    if(!(hdrSt.help && hdrSt.more && hdrSt.moreChips)) hdrSt.timer = setInterval(hdrPlace, 500);
 }
