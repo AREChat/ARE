@@ -1,11 +1,13 @@
 "use strict";
 // ===== 絵文字リアクション =====
 
-const REACTION_EMOJIS = ["👍","❤️","😂","😮","😢","🙏","🎉","👀"];
+// 既定5種類。「＋」を押すと全種類（約100種・虫はなし／POST_REACTIONS_ALLと共有）から選べる
+const REACTION_EMOJIS = ["👍","❤️","😂","😮","😢"];
 
 feat.reactions = new Map();
 feat.reactPicker = null;
 feat.reactRoom = null;
+feat.reactFullPicker = new Set();
 
 function initReact(){
     if(!window.AREFeatures.ok("msgmenu")) throw new Error("メッセージ操作メニューが起動していません。");
@@ -56,13 +58,20 @@ function paintReactions(){
             });
         }
         if(feat.reactPicker === id){
-            parts.push('<span class="rx-picker">' + REACTION_EMOJIS.map((emoji) => '<button type="button" class="rx-pick" data-rx-emoji="' + escapeHtml(emoji) + '" data-mid="' + escapeHtml(id) + '">' + escapeHtml(emoji) + '</button>').join("") + '</span>');
+            const full = feat.reactFullPicker.has(id);
+            const list = full ? (typeof POST_REACTIONS_ALL !== "undefined" ? POST_REACTIONS_ALL : REACTION_EMOJIS) : REACTION_EMOJIS;
+            parts.push('<span class="rx-picker' + (full ? ' rx-picker-full' : '') + '">' + list.map((emoji) => '<button type="button" class="rx-pick" data-rx-emoji="' + escapeHtml(emoji) + '" data-mid="' + escapeHtml(id) + '">' + escapeHtml(emoji) + '</button>').join("") +
+                (full ? '' : '<button type="button" class="rx-pick rx-more" data-rx-more="' + escapeHtml(id) + '">＋</button>') + '</span>');
         }
         holder.innerHTML = parts.join("");
     });
 }
 
+function onReactMoreClick(id){ feat.reactFullPicker.has(id) ? feat.reactFullPicker.delete(id) : feat.reactFullPicker.add(id); paintReactions(); }
+
 async function onReactClick(event){
+    const more = event.target.closest("[data-rx-more]");
+    if(more){ onReactMoreClick(more.dataset.rxMore); return; }
     const button = event.target.closest("[data-rx-emoji]");
     if(!button) return;
     button.disabled = true;
@@ -70,6 +79,7 @@ async function onReactClick(event){
         const result = await requireClient().rpc("toggle_reaction",{p_message_id:button.dataset.mid,p_emoji:button.dataset.rxEmoji});
         if(result.error) throw result.error;
         feat.reactPicker = null;
+        feat.reactFullPicker.delete(button.dataset.mid);
         if(feat.reactRoom) await loadReactions(feat.reactRoom);
     }catch(error){ button.disabled = false; showToast(featError(error)); }
 }
