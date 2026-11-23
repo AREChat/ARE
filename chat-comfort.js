@@ -364,8 +364,13 @@ function cfPaintChips(){
     let chips = document.getElementById("cfChips");
     const need = F.list.length > 0 || F.pins.length > 0 || hasGroup;
     if(!need){ if(chips) chips.remove(); return; }
-    if(!chips){ chips = document.createElement("div"); chips.id = "cfChips"; chips.className = "cf-chips"; el.roomList.insertAdjacentElement("beforebegin", chips);
-        chips.addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if(!b) return; cf.folders.filter = b.dataset.f; fdSave(); cfPaintRooms(); }); }
+    if(!chips){
+        chips = document.createElement("div"); chips.id = "cfChips"; chips.className = "cf-chips";
+        // 「グループ作成」「友達追加」と同じ行に並べる（下にはみ出させない）
+        const heading = document.querySelector(".pane-chats .section-heading");
+        if(heading) heading.appendChild(chips); else el.roomList.insertAdjacentElement("beforebegin", chips);
+        chips.addEventListener("click", (e) => { const b = e.target.closest("[data-f]"); if(!b) return; cf.folders.filter = b.dataset.f; fdSave(); cfPaintRooms(); });
+    }
     const opts = [["all", "すべて"]];
     if(F.pins.length) opts.push(["pin", "📌 固定"]);
     if(hasGroup) opts.push(["group", "👥 グループのみ"]);
