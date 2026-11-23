@@ -38,6 +38,7 @@ function showVideoLinkStep(failNote){
     vl.reason = cur.reason || "size";
     const why = vl.reason === "long" ? "5分をこえているため"
         : vl.reason === "upload" ? "容量がいっぱいで、アップロードできなかったため"
+        : vl.reason === "drive" ? "通信量をへらすため、ドライブに置くことにしたものの、自動で置けなかったため"
         : "50MBをこえているため";
     openSheet(toolHead(vlIcon(cur) + " " + W + "をリンクで送る" + (total > 1 ? "（" + nth + " / " + total + " 本目）" : ""), escapeHtml(vl.name) + (vl.size ? "（" + formatAttachmentSize(vl.size) + "）" : "") + " は、" + why + "そのままでは送れません。") +
         (failNote ? '<div class="meta" style="color:#ffb4a8">' + escapeHtml(failNote) + '</div>' : "") +
@@ -323,6 +324,18 @@ async function runDriveQueue(){
             }catch(error){
                 if(dq.cancel) break;
                 console.error("[ARE drive upload]", error);
+                // 「通信量をへらすため」ドライブに回しただけの小さいファイルは、置けなかったら これまでどおり Supabase にそのまま送る
+                if(cur.reason === "drive"){
+                    let okLen = true;
+                    if(kind === "video"){ try{ okLen = (await getVideoDuration(file)) <= MAX_VIDEO_SECONDS; }catch(_e){ okLen = false; } }
+                    if(okLen && file.size <= (kind === "video" ? MAX_VIDEO_BYTES : MAX_FILE_BYTES) && typeof uploadAndSend === "function"){
+                        closeSheet();
+                        showToast("ドライブに置けなかったので、そのまま送ります。");
+                        await uploadAndSend(file, kind, file.size, "", cur.when || null);
+                        vl.index++;
+                        continue;
+                    }
+                }
                 // この1本は自動で置けなかった → リンクを貼る画面に切りかえる（送ったら、つづきの動画へ）
                 // ※再開用の記録は消さない。もう一度同じファイルを選べば、途中から続きを送れる。
                 dq.running = false;
@@ -332,7 +345,9 @@ async function runDriveQueue(){
             const sizeText = "（" + formatAttachmentSize(file.size) + "）";
             const text = [vlIcon(cur) + " " + vlWord(cur) + "のリンク", String(file.name || vlWord(cur)).slice(0, 100) + sizeText, link, "※" + retention + "日たつと自動で消えます。"].join("\n");
             closeSheet();
-            await sendMessagePayload(buildTextPayload(text), {keepInput:true});
+            // 予約送信パネルで日時が選ばれていたら、リンクのメッセージも その日時に予約する
+            if(cur.when && typeof scheduleAttachmentPayload === "function") await scheduleAttachmentPayload(buildTextPayload(text), cur.when);
+            else await sendMessagePayload(buildTextPayload(text), {keepInput:true});
             vl.index++;
         }
     }finally{

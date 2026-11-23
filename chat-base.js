@@ -20,6 +20,12 @@ const MAX_FILE_BYTES = 50 * 1024 * 1024;   // Supabase Free プランは1ファ�
 
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
+// Supabase の「ダウンロード通信量（Cached Egress）」を へらすため、動画と大きいファイルは、Googleドライブ（GAS）に置いて リンクで送る。
+// （GAS の URL が apikey.js に入っているときだけ。うまく置けなかったときは、これまでどおり Supabase に送る）
+const DRIVE_VIDEO_BYTES = 3 * 1024 * 1024;     // 動画は 3MB をこえたら ドライブへ
+const DRIVE_FILE_BYTES = 10 * 1024 * 1024;     // 写真・動画いがいのファイルは 10MB をこえたら ドライブへ
+function driveFirstOn(){ try{ return typeof driveUploadUrl === "function" && !!driveUploadUrl(); }catch(_e){ return false; } }
+
 const MAX_VIDEOS_AT_ONCE = 5;   // 動画をまとめて選べる本数（1本ずつ順番に送る）
 
 function formatAttachmentSize(bytes){
@@ -1011,7 +1017,9 @@ function renderMessageContent(content){
     }
 
     if(item.type === "video"){
-        return '<div class="bubble"><div class="attachment"><video controls preload="metadata"' + dataPath + ' src="' + safeUrl + '"></video><a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer"' + dataPath + '>' + safeName + '</a>' + size + '</div></div>';
+        // 画面を開くたびに動画を先読みすると、Supabase の通信量（Cached Egress）が増えるので、押して再生するまで読みこまない（3MB以下の小さい動画だけ、最初の絵を出す）
+        const vPre = Number(item.size) > 0 && Number(item.size) <= 3 * 1024 * 1024 ? "metadata" : "none";
+        return '<div class="bubble"><div class="attachment"><video controls preload="' + vPre + '"' + dataPath + ' src="' + safeUrl + '"></video><a href="' + safeUrl + '" target="_blank" rel="noopener noreferrer"' + dataPath + '>' + safeName + '</a>' + size + '</div></div>';
     }
 
     return '<div class="bubble"><div class="attachment"><a class="file-card" href="' + safeUrl + '" target="_blank" rel="noopener noreferrer" download="' + safeName + '"' + dataPath + '><span class="file-icon">📄</span><span><span class="file-name">' + safeName + '</span>' + size + '</span></a></div></div>';
@@ -1238,23 +1246,27 @@ async function handleFiles(fileList,kind){
         }
         if(kind === "video"){
             if(file.size > MAX_VIDEO_BYTES){
-                tooBigVideos.push({file, reason:"size"});
+                tooBigVideos.push({file, reason:"size", when:scheduleWhen});
+                continue;
+            }
+            if(driveFirstOn() && file.size > DRIVE_VIDEO_BYTES){   // 通信量をへらすため、ドライブへ（長い動画も ここで受けられる）
+                tooBigVideos.push({file, reason:"drive", when:scheduleWhen});
                 continue;
             }
 
             try{
                 const duration = await getVideoDuration(file);
                 if(duration > MAX_VIDEO_SECONDS){
-                    tooBigVideos.push({file, reason:"long"});
+                    tooBigVideos.push({file, reason:"long", when:scheduleWhen});
                     continue;
                 }
             }catch(error){
                 showToast(file.name + " の動画時間を確認できませんでした。");
                 continue;
             }
-        }else if(uploadFile.size > MAX_FILE_BYTES){
-            // 50MBをこえるファイルも、動画と同じように ドライブに置いて リンクで送る
-            if(typeof openVideoLinkSheet === "function") tooBigVideos.push({file:uploadFile, reason:"size", kind:"file"});
+        }else if(uploadFile.size > MAX_FILE_BYTES || (kind === "file" && driveFirstOn() && uploadFile.size > DRIVE_FILE_BYTES)){
+            // 50MBをこえるファイル（と、通信量をへらすため 10MBをこえるファイル）も、動画と同じように ドライブに置いて リンクで送る
+            if(typeof openVideoLinkSheet === "function") tooBigVideos.push({file:uploadFile, reason:uploadFile.size > MAX_FILE_BYTES ? "size" : "drive", kind:"file", when:scheduleWhen});
             else showToast(file.name + " は" + formatAttachmentSize(MAX_FILE_BYTES) + "を超えているため送信できません。");
             continue;
         }
