@@ -452,8 +452,8 @@ main.qs-drag{outline:3px dashed #5b7cff;outline-offset:-6px}
 .cf-menu{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-weight:700;cursor:pointer}
 .cf-menu:hover,.cf-menu:focus-visible{background:var(--panel2);color:var(--text);outline:1px solid var(--line)}
 .room-item:has(.nf-badge) .cf-marks{right:58px}
-.cf-chips{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 8px}
-.cf-chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:5px 11px;font-size:12px}
+.cf-chips{display:flex;gap:5px;flex-wrap:wrap;margin:0}
+.cf-chip{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:999px;padding:4px 9px;font-size:11px}
 .cf-chip.on{background:var(--accent2);border-color:var(--accent2);color:#fff}
 .cf-jump{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;padding:4px clamp(12px,4vw,48px) 0}
 .cf-jump[hidden],.cf-jump [hidden]{display:none}
@@ -556,10 +556,12 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .fl-counts{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
 .fl-break{flex-basis:100%;width:0;height:0}
 .section-heading .fl-counts{margin:0}
-.pane-users .section-heading{flex-wrap:nowrap;align-items:flex-start}
+.pane-users .section-heading{flex-wrap:nowrap;align-items:flex-start;margin:4px 0 8px}
+.pane-users .section-heading>.button-secondary,.pane-chats .section-heading>.button-secondary{padding:5px 10px;font-size:12px;min-height:0}
+.pane-chats .section-heading{margin:4px 0 8px}
 .pane-users>.fl-counts{margin:0 0 8px}
-.fl-chip{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:999px;padding:6px 14px;font-size:13px;cursor:pointer;white-space:nowrap}
-.fl-chip b{font-size:15px;margin-right:2px}
+.fl-chip{border:1px solid var(--line);background:var(--panel2);color:var(--text);border-radius:999px;padding:4px 9px;font-size:11px;cursor:pointer;white-space:nowrap}
+.fl-chip b{font-size:12.5px;margin-right:1px}
 .fl-chip:hover{border-color:var(--accent,#6aa0ff)}
 .qk-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
 .qk-ico{font-size:20px;width:28px;text-align:center;flex:0 0 28px}
@@ -635,7 +637,7 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .ba-posts .post-visibility-label{font-size:13px}
 .ba-posts .post-visibility-label select{min-height:38px}
 /* ヘッダーの中に置いた select（公開範囲・すべて・ステータス）は、設定画面のものより小さく・1行に収まるように */
-.ba .status-select{max-width:104px;min-height:38px;padding:7px 6px}
+.ba .status-select{max-width:96px;min-height:34px;padding:6px 5px}
 
 /* 対戦パネル（盤を画面の上に固定） */
 .vspin{flex:0 0 auto;max-height:52vh;overflow:hidden;display:flex;flex-direction:column;background:var(--panel);border-bottom:2px solid var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.18);z-index:3}
@@ -860,19 +862,19 @@ button:disabled#delRequestButton,button:disabled#delCancelButton{opacity:.55;cur
 .brand{gap:10px}
 .brand>div:first-child{flex:0 0 auto}
 .brand-title{min-width:0}
-.brand-title .bt{display:none;margin:0;font-size:14px;letter-spacing:normal;white-space:nowrap}
-.brand-title .bt.bt-me{align-items:center;gap:10px;min-width:0}
+.brand-title .bt{display:none;margin:0;font-size:13px;letter-spacing:normal;white-space:nowrap}
+.brand-title .bt.bt-me{align-items:center;gap:8px;min-width:0}
 .brand-title .bt.bt-me .avatar{cursor:pointer}
-.brand-title .bt.bt-me .user-info strong{font-size:14px}
+.brand-title .bt.bt-me .user-info strong{font-size:13px}
 .brand-actions{flex:1 1 auto;min-width:0;display:flex;justify-content:flex-end}
-.brand-actions .ba{display:none;align-items:center;justify-content:flex-end;gap:8px;min-width:0;flex:1 1 auto;flex-wrap:wrap}
-#brandActions .ba-posts,#brandActions .ba-me{flex-wrap:nowrap;gap:6px}
+.brand-actions .ba{display:none;align-items:center;justify-content:flex-end;gap:6px;min-width:0;flex:1 1 auto;flex-wrap:wrap}
+#brandActions .ba-posts,#brandActions .ba-me{flex-wrap:nowrap;gap:5px}
 .sidebar[data-tab="chats"] .ba-chats,.sidebar[data-tab="chats"] .bt-chats,
 .sidebar[data-tab="users"] .ba-users,.sidebar[data-tab="users"] .bt-users,
 .sidebar[data-tab="posts"] .ba-posts,.sidebar[data-tab="posts"] .bt-posts,
 .sidebar[data-tab="more"] .ba-more,.sidebar[data-tab="more"] .bt-more,
 .sidebar[data-tab="me"] .ba-me,.sidebar[data-tab="me"] .bt-me{display:flex}
-.hdr-btn{flex:0 0 auto;white-space:nowrap;padding:7px 11px;font-size:13px;min-height:38px;display:inline-flex;align-items:center;text-decoration:none}
+.hdr-btn{flex:0 0 auto;white-space:nowrap;padding:6px 9px;font-size:12px;min-height:34px;display:inline-flex;align-items:center;text-decoration:none}
 .hdr-label{flex:0 0 auto;white-space:nowrap;font-size:14px;font-weight:700}
 .hdr-icon{flex:0 0 auto;min-width:40px;min-height:38px;padding:0 9px;font-size:18px;line-height:1}
 .hdr-icon[hidden]{display:none}
