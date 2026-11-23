@@ -559,8 +559,11 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .fl-counts{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
 /* 「非表示」ボタンと同じ折り返し（flex-wrap）に参加させ、入る分だけ1行・入りきらない分だけ自然に2行目へ */
 .section-heading .fl-counts{display:contents}
-#usersStatsHeading{margin:4px 0 8px;justify-content:flex-start}
+#usersStatsHeading{margin:4px 0 8px;justify-content:flex-start;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
 .pane-users .section-heading .button-secondary,.pane-chats .section-heading>.button-secondary{padding:4px 8px;font-size:11px;min-height:0}
+#usersStatsHeading .fl-chip{font-size:10px;padding:3px 6px;flex:0 0 auto}
+#usersStatsHeading .fl-chip b{font-size:11px}
+#usersStatsHeading .button-secondary{flex:0 0 auto}
 .pane-chats .section-heading{margin:4px 0 8px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin}
 .pane-chats .section-heading .cf-chips{display:contents}
 .pane-chats .section-heading .cf-chip{flex:0 0 auto;padding:4px 7px;font-size:10.5px}
@@ -644,6 +647,7 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 /* ヘッダーの中に置いた select（公開範囲・すべて・ステータス）は、設定画面のものより小さく・1行に収まるように */
 .ba .status-select{max-width:96px;min-height:34px;padding:6px 5px;font-size:11.5px}
 #myStatus.status-select{max-width:122px}
+#myStatus{display:none} /* ステータス切替は不要のため非表示（内部の値更新は引き続き動作） */
 
 /* 対戦パネル（盤を画面の上に固定） */
 .vspin{flex:0 0 auto;max-height:52vh;overflow:hidden;display:flex;flex-direction:column;background:var(--panel);border-bottom:2px solid var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.18);z-index:3}
