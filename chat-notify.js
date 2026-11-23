@@ -17,6 +17,14 @@ function nfLoad(){
 function nfSave(){ try{ localStorage.setItem(nf.key, JSON.stringify(nf.seen)); }catch(_e){ /* 保存できなくても続ける */ } }
 
 nf.liveNotif = {};   // room_id -> いま出しているブラウザ通知（Notification）。既読になったら閉じる
+/** 画面の上に出ているポップアップが、その部屋のものなら消す（その部屋を読んだとき） */
+function nfDropPop(roomId){
+    if(nf.pop && nf.pop.dataset.room === roomId){ try{ nf.pop.remove(); }catch(_e){} nf.pop = null; clearTimeout(nf.timer); }
+}
+/** ブロック・ミュートした相手のメッセージか（サーバーの通知と同じく、この人たちの新着では知らせない） */
+function nfSilencedSender(senderId){
+    try{ const k = feat.blocks && feat.blocks.get ? feat.blocks.get(senderId) : null; return k === "block" || k === "mute"; }catch(_e){ return false; }
+}
 function nfMarkSeen(roomId, iso){
     if(!roomId) return;
     const now = new Date().toISOString();
@@ -24,6 +32,7 @@ function nfMarkSeen(roomId, iso){
     nfSave();
     if(feat.unread[roomId]){ feat.unread[roomId] = 0; nfPaint(); }
     if(nf.liveNotif[roomId]){ try{ nf.liveNotif[roomId].close(); }catch(_e){} delete nf.liveNotif[roomId]; }
+    nfDropPop(roomId);
     try{ pushCloseRoomNotifications(roomId); }catch(_e){}
 }
 
@@ -52,6 +61,7 @@ function nfApplyRead(roomId, iso){
     if(v <= (nf.seen[roomId] || "")) return false;
     nf.seen[roomId] = v;
     nfSave();
+    nfDropPop(roomId);   // 別の端末で読まれた → 画面の上のポップアップも消す
     if(feat.unread[roomId]){
         // 別の端末で読まれた → この端末に出ている通知（ポップアップ・ブラウザ通知）も片づける
         if(nf.liveNotif[roomId]){ try{ nf.liveNotif[roomId].close(); }catch(_e){} delete nf.liveNotif[roomId]; }
@@ -158,6 +168,7 @@ function nfOpenRoom(roomId){
 }
 
 function nfPopup(room, m){
+    if(m && nfSilencedSender(m.sender_id)) return;   // ブロック・ミュートした相手の新着では、ポップアップも通知も出さない
     const group = Boolean(room.is_group);
     const roomName = group ? (room.name || "グループ") : profileDisplayName(room.partner);
     const who = group ? profileDisplayName(feat.known.get(m.sender_id)) + "（" + roomName + "）" : roomName;
@@ -168,13 +179,18 @@ function nfPopup(room, m){
     const pop = document.createElement("button");
     pop.type = "button"; pop.className = "nf-pop";
     pop.innerHTML = '<strong>💬 ' + escapeHtml(who) + '</strong><span>' + escapeHtml(body) + '</span>';
+    pop.dataset.room = room.id;
     pop.addEventListener("click", () => { pop.remove(); nfOpenRoom(room.id); });
     document.body.appendChild(pop); nf.pop = pop;
     clearTimeout(nf.timer);
     nf.timer = setTimeout(() => { pop.remove(); if(nf.pop === pop) nf.pop = null; }, 6000);
-    if("Notification" in window && Notification.permission === "granted" && document.hidden){
+    // サーバーからの通知（プッシュ）がオンの端末では、そちらが出るので、ここでは出さない（二重に鳴らさない）。
+    // 出すときも、プッシュと同じ tag（room-部屋ID）にして、同じチャットの通知は 1 つにまとまるようにする
+    let pushOn = false;
+    try{ pushOn = typeof pushState === "function" && pushState() === "on"; }catch(_e){ pushOn = false; }
+    if(!pushOn && "Notification" in window && Notification.permission === "granted" && document.hidden){
         try{
-            const n = new Notification("ARE：" + who, {body, tag:room.id});
+            const n = new Notification("ARE：" + who, {body, tag:"room-" + room.id});
             n.onclick = () => { window.focus(); nfOpenRoom(room.id); n.close(); };
             nf.liveNotif[room.id] = n;
         }catch(_e){ /* 通知できない端末 */ }
