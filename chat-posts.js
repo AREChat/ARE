@@ -1,6 +1,6 @@
 "use strict";
 
-feat.posts = []; feat.postProfiles = new Map(); feat.postImageFile = null; feat.postVideoFile = null; feat.postsLoadedAt = 0; feat.postReactions = new Map(); feat.postComments = new Map(); feat.commentProfiles = new Map(); feat.commentOpen = new Set(); feat.postEmojiPicker = new Set();
+feat.posts = []; feat.postProfiles = new Map(); feat.postImageFile = null; feat.postVideoFile = null; feat.postsLoadedAt = 0; feat.postReactions = new Map(); feat.postComments = new Map(); feat.commentProfiles = new Map(); feat.commentOpen = new Set(); feat.postEmojiPicker = new Set(); feat.postSelect = new Set();
 
 // 投稿リアクション：ふだん出す4種類＋「＋」で全種類（虫は入れない）
 const POST_REACTIONS_DEFAULT = ["👍","❤️","😂","😢"];
@@ -60,9 +60,15 @@ async function loadPostSocialState(posts){
 
 feat.signed = new Map();
 
+function postBulkBarHtml(){
+    if(!feat.isAdmin || !feat.postSelect.size) return "";
+    return '<div class="post-bulkbar" id="postBulkBar"><span class="meta">' + feat.postSelect.size + '件を選択中</span>' +
+        '<button type="button" class="button-secondary" data-postbulk-clear="1">選択を解除</button>' +
+        '<button type="button" class="button" data-postbulk-admin="1">選択した投稿を管理者として削除</button></div>';
+}
 function renderPosts(){
     if(!feat.posts.length){ el.postFeed.innerHTML = '<div class="empty-list">まだ投稿がありません。最初の投稿をしてみましょう。</div>'; return; }
-    el.postFeed.innerHTML = feat.posts.map((post) => {
+    el.postFeed.innerHTML = postBulkBarHtml() + feat.posts.map((post) => {
         const author = feat.postProfiles.get(post.author_id) || {};
         const own = post.author_id === state.user.id;
         const img = post.image_path ? safeHttpUrl(feat.signed.get(post.image_path) || "") : "";
@@ -84,7 +90,7 @@ function renderPosts(){
             '<button type="button" class="post-comment-toggle" data-comment-toggle="' + escapeHtml(post.id) + '">💬 ' + comments.length + '</button></div>' +
             (pickerOpen ? '<div class="post-emoji-picker">' + POST_REACTIONS_ALL.map((emoji) => '<button type="button" class="post-emoji-pick' + (social.mine === emoji ? ' on' : '') + '" data-reaction="' + emoji + '" data-post="' + escapeHtml(post.id) + '">' + emoji + '</button>').join("") + '</div>' : "") +
             (feat.commentOpen.has(post.id) ? '<div class="post-comments">' + visibleComments.map((comment) => '<div class="post-comment">' + miniAvatar(feat.commentProfiles.get(comment.author_id)) + '<div><button class="post-name" type="button" data-comment-author="' + escapeHtml(comment.author_id) + '">' + escapeHtml(profileDisplayName(feat.commentProfiles.get(comment.author_id))) + '</button> <span class="post-time">' + escapeHtml(formatDateTime(comment.created_at)) + '</span><div>' + escapeHtml(comment.body) + '</div></div>' + (comment.author_id === state.user.id ? '<button type="button" class="post-comment-delete" data-comment-delete="' + escapeHtml(comment.id) + '" aria-label="コメントを削除">×</button>' : '') + '</div>').join("") + (comments.length > 3 ? '<div class="meta">新しいコメント3件を表示しています</div>' : '') + '<div class="post-comment-compose"><textarea rows="2" maxlength="500" data-comment-input="' + escapeHtml(post.id) + '" placeholder="コメントを入力（500文字まで）"></textarea><button type="button" class="button-secondary" data-comment-post="' + escapeHtml(post.id) + '">送信</button></div></div>' : '') +
-            '<div class="post-actions">' + (post.visibility !== "private" ? '<button type="button" data-postshare="' + escapeHtml(post.id) + '">🔗 共有</button>' : '') + (own ? '<button type="button" data-postdel="' + escapeHtml(post.id) + '">削除</button>' : (feat.isAdmin ? '<button type="button" data-postadmin="' + escapeHtml(post.id) + '">管理者として削除</button>' : '')) + '</div></article>';
+            '<div class="post-actions">' + (post.visibility !== "private" ? '<button type="button" data-postshare="' + escapeHtml(post.id) + '">🔗 共有</button>' : '') + (own ? '<button type="button" data-postdel="' + escapeHtml(post.id) + '">削除</button>' : (feat.isAdmin ? '<label class="post-select"><input type="checkbox" data-post-select="' + escapeHtml(post.id) + '"' + (feat.postSelect.has(post.id) ? " checked" : "") + '> 選択</label><button type="button" data-postadmin="' + escapeHtml(post.id) + '">管理者として削除</button>' : '')) + '</div></article>';
     }).join("");
 }
 
@@ -252,6 +258,35 @@ async function onFeedClick(event){
         catch(error){ showToast(featError(error)); }
         return;
     }
+    const select = event.target.closest("[data-post-select]");
+    if(select){
+        const id = select.dataset.postSelect;
+        if(select.checked) feat.postSelect.add(id); else feat.postSelect.delete(id);
+        renderPosts();
+        return;
+    }
+    const bulkClear = event.target.closest("[data-postbulk-clear]");
+    if(bulkClear){ feat.postSelect.clear(); renderPosts(); return; }
+    const bulkAdmin = event.target.closest("[data-postbulk-admin]");
+    if(bulkAdmin){
+        const ids = Array.from(feat.postSelect);
+        if(!ids.length) return;
+        const reason = window.prompt("選択した" + ids.length + "件の投稿を管理者として削除します。理由を入力してください（記録されます）。","");
+        if(reason === null) return;
+        bulkAdmin.disabled = true;
+        let ok = 0, fail = 0;
+        for(const id of ids){
+            try{
+                const result = await requireClient().rpc("admin_delete_post",{p_post_id:id,p_reason:reason});
+                if(result.error) throw result.error;
+                ok++;
+            }catch(error){ fail++; }
+        }
+        feat.postSelect.clear();
+        await loadPosts(true);
+        showToast(fail ? (ok + "件削除しました（" + fail + "件は失敗）") : (ok + "件削除しました"));
+        return;
+    }
     const del = event.target.closest("[data-postdel]");
     const adm = event.target.closest("[data-postadmin]");
     try{
@@ -266,6 +301,7 @@ async function onFeedClick(event){
             if(reason === null) return;
             const result = await requireClient().rpc("admin_delete_post",{p_post_id:adm.dataset.postadmin,p_reason:reason});
             if(result.error) throw result.error;
+            feat.postSelect.delete(adm.dataset.postadmin);
             await loadPosts(true);
         }
     }catch(error){ showToast(featError(error)); }
