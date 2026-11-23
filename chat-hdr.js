@@ -1,7 +1,7 @@
 "use strict";
 // ===== 上のバー（ARE のロゴの右がわ）：タブごとのボタン ＋「アプリとして追加」📲 =====
 // ・ログアウトは「マイページ」だけに出します（ふだんは ほとんど使わないため）。
-// ・チャット：📖 操作方法はこちら／更新／📲 アプリ追加　　ユーザー：検索欄／更新　　投稿：更新　　その他：🔍 機能を検索　　マイページ：ログアウト
+// ・チャット：📖 マニュアル／更新／📲 アプリ追加　　ユーザー：検索欄／更新　　投稿：更新　　その他：🔍 機能を検索　　マイページ：ログアウト
 // ・ボタンの実体は、もとの場所から ここへ「移した」だけです。押したときの動きは 今までと同じです。
 //   （もとの場所に 作られるボタン〈操作方法・機能を検索〉は、作られたあとで ここへ移します）
 // ・📲 は、Android の Chrome／パソコンの Chrome・Edge ではワンクリックでインストール。
@@ -18,7 +18,7 @@ function hdrPlace(){
     if(!hdrSt.help){
         const a = document.getElementById("segHelpLink"), slot = document.querySelector(".ba-chats");
         if(a && slot){
-            a.className = "button-secondary hdr-btn hdr-help"; a.innerHTML = '<span class="hdr-long">📖 操作方法はこちら</span><span class="hdr-short">📖 操作方法</span>'; a.title = "操作方法はこちら（使い方ガイドを開く）";
+            a.className = "button-secondary hdr-btn hdr-help"; a.textContent = "📖 マニュアル"; a.title = "マニュアル（使い方ガイドを開く）";
             slot.insertAdjacentElement("afterbegin", a); hdrSt.help = true;
         }
     }
