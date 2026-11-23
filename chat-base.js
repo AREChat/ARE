@@ -584,7 +584,7 @@ function renderRecommendations(){
     });
     if(typeof rcPaintCount === "function") rcPaintCount();
     if(typeof absPaintBar === "function") absPaintBar();
-    el.toggleHiddenUsers.textContent = state.showHidden ? "非表示を隠す" : "非表示（" + state.hiddenIds.size + "）";
+    el.toggleHiddenUsers.textContent = state.showHidden ? "🙈 隠す" : "🙈（" + state.hiddenIds.size + "）";
 
     if(!list.length){
         el.recommendedUsers.innerHTML = '<div class="empty-list">' + (el.userSearch.value.trim()

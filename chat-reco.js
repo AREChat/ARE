@@ -83,20 +83,9 @@ function rcStatsHtml(){
     const nf = chip(g.notFollowed.length, "未フォロー");
     const rg = chip(g.reg, "登録済み"), ur = chip(g.unreg.length, "未登録");
     const v = rcSt.plan.stats;
-    // 「非表示」ボタンと同じ行に並ぶグループ（未登録・登録済み）と、次の行に並ぶグループ（フォロー中・未フォロー・フォロワー）に分ける。
-    // どのパターンでも最大2行に収まるよう、呼び出し側（rcPaintStats）で別々の行に描画する
-    return { group1:v === 1 ? "" : (ur + rg), group2:v === 0 ? "" : (fg + nf + fw) };
-}
-/** ユーザー一覧の「非表示」行に統計チップを描く：1行目＝非表示＋未登録/登録済み、2行目＝フォロー中/未フォロー/フォロワー（最大2行） */
-function rcPaintStats(row2box){
-    const row1 = document.getElementById("flRow1");
-    if(!row1) return false;
-    const r = rcStatsHtml();
-    if(!r) return false;
-    row1.querySelectorAll(".fl-chip").forEach((n) => n.remove());
-    if(r.group1) row1.insertAdjacentHTML("beforeend", r.group1);
-    if(row2box) row2box.innerHTML = r.group2 || "";
-    return true;
+    // 「非表示」ボタンと同じ並び（1つのflexコンテナ）に置き、入る分だけ1行・入りきらない分だけ自然に2行目へ折り返す
+    // （.section-heading .fl-counts に display:contents を当てて、非表示ボタンと同じ並びのチップとして扱う）
+    return v === 0 ? (ur + rg) : (v === 1 ? (fg + nf + fw) : (ur + rg + fg + nf + fw));
 }
 /** チャット一覧が読み込まれて「登録済み」が変わったときだけ、表示を更新する（選び直しはしない） */
 function rcOnRooms(){

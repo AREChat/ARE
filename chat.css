@@ -554,8 +554,8 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .mo-chip.on{background:#5b73ff;border-color:#5b73ff;color:#fff}
 .mo-chip:hover{border-color:#5b73ff}
 .fl-counts{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
-.fl-row{display:flex;align-items:center;gap:5px;flex-wrap:nowrap;min-width:0}
-.section-heading .fl-counts{margin:0}
+/* 「非表示」ボタンと同じ折り返し（flex-wrap）に参加させ、入る分だけ1行・入りきらない分だけ自然に2行目へ */
+.section-heading .fl-counts{display:contents}
 #usersStatsHeading{margin:4px 0 8px}
 .pane-users .section-heading .button-secondary,.pane-chats .section-heading>.button-secondary{padding:5px 10px;font-size:12px;min-height:0}
 .pane-chats .section-heading{margin:4px 0 8px}
