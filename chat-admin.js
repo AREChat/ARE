@@ -1,5 +1,11 @@
 "use strict";
 
+// 管理者が削除したあと、Supabase のストレージに残った添付ファイルを すぐ消す（Supabase の削除トリガー ＋ Edge Function purge-storage）。
+// ・待たない／失敗しても何も起きない（5分ごとの自動掃除が やり直す）。メッセージの管理者削除（admin-api）は 自分でこれを行う。
+function purgeStorageSoon(){
+    try{ const p = requireClient().functions.invoke("purge-storage",{body:{action:"drain"}}); if(p && p.catch) p.catch(() => {}); }catch(_e){}
+}
+
 function attachmentText(content){
     const item = parseMessageContent(content);
     if(item.type === "text") return escapeHtml(item.text || "");
@@ -256,6 +262,7 @@ async function onAdminClick(event){
         try{
             const result = await requireClient().rpc("admin_decide_delete_request",{p_request_id:target.dataset.id,p_approve:approve,p_note:note});
             if(result.error) throw result.error;
+            if(approve) purgeStorageSoon();
             showToast(approve ? "削除しました。" : "却下しました。");
             refreshAdminBadge(); renderAdmin();
         }catch(error){ target.disabled = false; showToast(featError(error)); }
@@ -281,6 +288,7 @@ async function runOrphanRoomDelete(){
     try{
         const r = await requireClient().rpc("admin_delete_orphan_room",{p_room_id:id});
         if(r.error) throw r.error;
+        purgeStorageSoon();
         feat.orphanRoom = null; closeSheet();
         state.rooms = state.rooms.filter((x) => x.id !== id); if(state.allRooms) state.allRooms = state.allRooms.filter((x) => x.id !== id);
         if(state.currentRoom && state.currentRoom.id === id){ try{ el.app.classList.remove("chat-open"); }catch(_e){} state.currentRoom = null; }
@@ -491,6 +499,7 @@ async function runBulkDelete(button){
         }catch(error){ bad.push(u.name + "：" + (error?.message || featError(error))); }
     }
     feat.bulkList = null; closeSheet();
+    if(ok) purgeStorageSoon();
     showToast(bad.length ? ok + "人を削除しました。削除できなかった人：" + bad.join(" / ") : ok + "人のアカウントを削除しました。");
     renderAdmin(); refreshAdminBadge();
 }
@@ -544,6 +553,7 @@ async function runGroupDelete(button){
     try{
         const r = await requireClient().rpc("admin_delete_group_v1",{p_room_id:t.id, p_reason:reason || null});
         if(r.error) throw r.error;
+        purgeStorageSoon();
         feat.delGroupTarget = null; closeSheet();
         showToast(t.name + " を削除しました。");
         renderAdmin();
@@ -599,6 +609,7 @@ async function onDelSheet(event){
             setTimeout(() => URL.revokeObjectURL(url),60000);
         }
         await window.ARESystem.callAuthenticatedFunction("admin-delete-user",{requestId:t.id,userId:t.uid,confirmName:t.name,reason:(t.reason && t.reason.length >= 5) ? t.reason : "利用者本人の申請による削除"});
+        purgeStorageSoon();
         closeSheet(); feat.delTarget = null;
         showToast(t.name + " さんのアカウントを完全に削除しました。");
         renderAdmin(); refreshAdminBadge();

@@ -27,18 +27,18 @@ function renderStorageAdmin(report){
     const rows = report.rows || [];
     const totalBytes = rows.reduce((sum,row) => sum + Number(row.total_bytes || 0),0);
     const orphanBytes = rows.reduce((sum,row) => sum + Number(row.orphan_bytes || 0),0);
-    openSheet(toolHead("🗄️ Storage使用量と整理","参照されていない画像だけを確認し、24時間以上経過したものを整理します。") +
-        '<div class="storage-admin-summary"><b>使用量</b><span>' + escapeHtml(formatAttachmentSize(totalBytes)) + '</span><b>整理できる画像</b><span>' + escapeHtml(formatAttachmentSize(orphanBytes)) + '</span></div>' +
-        '<div class="storage-admin-list">' + rows.map((row) => '<div class="storage-admin-row"><b>' + escapeHtml(row.bucket_id) + '</b><span>' + escapeHtml(formatAttachmentSize(row.total_bytes)) + '</span><small>画像 ' + Number(row.object_count || 0) + '件 / 整理候補 ' + Number(row.orphan_count || 0) + '件</small></div>').join("") + '</div>' +
-        '<div id="storageAdminStatus" class="meta"></div><div class="row"><button type="button" class="button-secondary" id="storageAdminRefresh">更新</button><button type="button" class="button" id="storageAdminClean"' + (orphanBytes ? "" : " disabled") + '>不要画像を整理</button></div>' + toolClose());
+    openSheet(toolHead("🗄️ Storage使用量と整理","どの投稿・ストーリー・メッセージからも使われていないファイルだけを確認し、24時間以上経過したものを整理します。") +
+        '<div class="storage-admin-summary"><b>使用量</b><span>' + escapeHtml(formatAttachmentSize(totalBytes)) + '</span><b>整理できるファイル</b><span>' + escapeHtml(formatAttachmentSize(orphanBytes)) + '</span></div>' +
+        '<div class="storage-admin-list">' + rows.map((row) => '<div class="storage-admin-row"><b>' + escapeHtml(row.bucket_id) + '</b><span>' + escapeHtml(formatAttachmentSize(row.total_bytes)) + '</span><small>ファイル ' + Number(row.object_count || 0) + '件 / 整理候補 ' + Number(row.orphan_count || 0) + '件</small></div>').join("") + '</div>' +
+        '<div id="storageAdminStatus" class="meta"></div><div class="row"><button type="button" class="button-secondary" id="storageAdminRefresh">更新</button><button type="button" class="button" id="storageAdminClean"' + (orphanBytes ? "" : " disabled") + '>不要ファイルを整理</button></div>' + toolClose());
     document.getElementById("storageAdminRefresh").addEventListener("click",openStorageAdmin);
     document.getElementById("storageAdminClean").addEventListener("click",storageAdminClean);
 }
 
 async function storageAdminClean(event){
-    if(!confirm("24時間以上どの投稿・ストーリーからも参照されていない画像を削除します。続けますか？")) return;
+    if(!confirm("24時間以上どの投稿・ストーリー・メッセージからも使われていないファイル（管理者が消したメッセージの添付が残っていたものなど）を、Supabase のストレージから完全に削除します。元に戻せません。続けますか？")) return;
     const button = event.currentTarget, status = document.getElementById("storageAdminStatus"); button.disabled = true;
     if(status) status.textContent = "整理しています…";
-    try{ const result = await storageAdminRequest("clean-orphans"); showToast(Number(result.deleted || 0) + "件の不要画像を整理しました。"); await openStorageAdmin(); }
+    try{ const result = await storageAdminRequest("clean-orphans"); showToast(Number(result.deleted || 0) + "件の不要ファイルを整理しました。"); await openStorageAdmin(); }
     catch(error){ if(status) status.textContent = featError(error); button.disabled = false; }
 }
