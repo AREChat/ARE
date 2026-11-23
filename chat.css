@@ -628,7 +628,9 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 .auto-reply-title{display:flex;justify-content:space-between;gap:8px}
 .auto-reply-title span{font-size:11px;color:var(--muted)}
 .auto-reply-response{white-space:pre-wrap;overflow-wrap:anywhere}
-@media(max-width:560px){.post-tools{align-items:flex-start}.post-visibility-label{width:100%;justify-content:space-between}.p3d-colors{grid-template-columns:1fr}}
+@media(max-width:560px){.post-tools{align-items:flex-start}.post-tools .post-visibility-label{width:100%;justify-content:space-between}.p3d-colors{grid-template-columns:1fr}}
+.ba-posts .post-visibility-label{font-size:13px}
+.ba-posts .post-visibility-label select{min-height:38px}
 
 /* 対戦パネル（盤を画面の上に固定） */
 .vspin{flex:0 0 auto;max-height:52vh;overflow:hidden;display:flex;flex-direction:column;background:var(--panel);border-bottom:2px solid var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.18);z-index:3}
@@ -852,9 +854,17 @@ button:disabled#delRequestButton,button:disabled#delCancelButton{opacity:.55;cur
 /* ===== 上のバー：タブごとのボタン（ログアウトは マイページだけ）／キーボード中の入力欄 ===== */
 .brand{gap:10px}
 .brand>div:first-child{flex:0 0 auto}
+.brand-title{min-width:0}
+.brand-title .bt{display:none;margin:0}
+.brand-title .bt.bt-me{align-items:center;gap:10px;min-width:0}
+.brand-title .bt.bt-me .avatar{cursor:pointer}
 .brand-actions{flex:1 1 auto;min-width:0;display:flex;justify-content:flex-end}
 .brand-actions .ba{display:none;align-items:center;justify-content:flex-end;gap:8px;min-width:0;flex:1 1 auto;flex-wrap:wrap}
-.sidebar[data-tab="chats"] .ba-chats,.sidebar[data-tab="users"] .ba-users,.sidebar[data-tab="posts"] .ba-posts,.sidebar[data-tab="more"] .ba-more,.sidebar[data-tab="me"] .ba-me{display:flex}
+.sidebar[data-tab="chats"] .ba-chats,.sidebar[data-tab="chats"] .bt-chats,
+.sidebar[data-tab="users"] .ba-users,.sidebar[data-tab="users"] .bt-users,
+.sidebar[data-tab="posts"] .ba-posts,.sidebar[data-tab="posts"] .bt-posts,
+.sidebar[data-tab="more"] .ba-more,.sidebar[data-tab="more"] .bt-more,
+.sidebar[data-tab="me"] .ba-me,.sidebar[data-tab="me"] .bt-me{display:flex}
 .hdr-btn{flex:0 0 auto;white-space:nowrap;padding:7px 11px;font-size:13px;min-height:38px;display:inline-flex;align-items:center;text-decoration:none}
 .hdr-label{flex:0 0 auto;white-space:nowrap;font-size:14px;font-weight:700}
 .hdr-icon{flex:0 0 auto;min-width:40px;min-height:38px;padding:0 9px;font-size:18px;line-height:1}
