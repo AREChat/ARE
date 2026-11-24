@@ -116,7 +116,7 @@
     function savedPlace() { try { return JSON.parse(localStorage.getItem("are_weather_place")) || null; } catch (_e) { return null; } }
     function renderWeather() {
         title.textContent = "☀️ 天気予報";
-        body.innerHTML = '<div class="eb-row"><select class="eb-in" id="wPref" aria-label="都道府県">' + PREF_NAMES.map((n, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + n + '</option>').join("") + '</select></div><div class="eb-note">都道府県を選ぶと、県庁所在地の天気を表示します（1時間ごとに自動更新）。</div><div class="eb-row"><input class="eb-in" id="wCity" placeholder="地名で検索（例：大阪、札幌）" maxlength="40"><button class="eb-btn" id="wSearch" type="button">検索</button><button class="eb-btn sec" id="wGeo" type="button">📍 現在地</button></div><div id="wChoices" class="eb-row"></div><div id="wResult"></div><div class="eb-note">天気データ：Open-Meteo（無料サービス）。現在地は、押したときだけブラウザの許可を得て使います。</div>';
+        body.innerHTML = '<div class="eb-row"><select class="eb-in" id="wPref" aria-label="都道府県">' + PREF_NAMES.map((n, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + n + '</option>').join("") + '</select></div><div class="eb-note">都道府県を選ぶと、県庁所在地の天気を表示します（30分ごとに自動更新。今日の絵は、1日のうち いちばん荒れた天気です）。</div><div class="eb-row"><input class="eb-in" id="wCity" placeholder="地名で検索（例：大阪、札幌）" maxlength="40"><button class="eb-btn" id="wSearch" type="button">検索</button><button class="eb-btn sec" id="wGeo" type="button">📍 現在地</button></div><div id="wChoices" class="eb-row"></div><div id="wResult"></div><div class="eb-note">天気データ：Open-Meteo（無料サービス）。現在地は、押したときだけブラウザの許可を得て使います。</div>';
         const sp = savedPlace();
         let prefCode = ""; try { prefCode = localStorage.getItem("are_weather_pref") || ""; } catch (_e) { /* 続行 */ }
         if (!prefCode && !sp) prefCode = "13";
