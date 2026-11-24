@@ -988,7 +988,7 @@ function renderMessageContent(content){
     if(item.type === "text"){
         const escaped = escapeHtml(item.text || "");
         const html = (window.AREText && typeof window.AREText.format === "function") ? window.AREText.format(escaped,item) : escaped;
-        return '<div class="bubble' + (item.stamp ? ' stamp' : '') + '">' + html + '</div>';
+        return '<div class="bubble' + (item.stamp ? ' stamp' : '') + '" data-i18n-skip>' + html + '</div>';
     }
     if(item.type === "poll"){
         return '<div class="bubble">📊 <b>アンケート</b><br>' + escapeHtml(item.question || "") + '<br><button type="button" class="button-secondary" data-openpoll="' + escapeHtml(item.pollId || "") + '">回答・結果を見る</button></div>';

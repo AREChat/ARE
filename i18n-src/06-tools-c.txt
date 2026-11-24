@@ -1,0 +1,192 @@
+# ===== ツールの画面（3）：チャットの整理〜CSV =====
+フォルダ分け・固定・並び替え（この端末だけに保存） || Folders, pinning and reordering (saved on this device only) || 文件夹分类·置顶·重新排序（仅保存在本设备） || 폴더 분류·고정·순서 변경(이 기기에만 저장)
+並び順 || Sort order || 排序方式 || 정렬 순서
+日時順 || By date || 按时间 || 날짜순
+名前順 || By name || 按名称 || 이름순
+登録順 || By creation || 按创建顺序 || 등록순
+お気に入り順 || By favorites || 按收藏 || 즐겨찾기순
+✔ 未読・通知が来たチャットを一番上に || ✔ Put chats with unread messages or notifications at the top || ✔ 将有未读消息·通知的聊天置顶 || ✔ 읽지 않음·알림이 온 채팅을 맨 위로
+日時順＝最後のメッセージが新しい順／登録順＝チャットを作った順／お気に入り順＝⭐をつけたチャットを上に。📌固定は、いつも一番上です。 || By date = newest last message first / By creation = order the chats were created / By favorites = chats with ⭐ on top. 📌 Pinned chats are always at the top. || 按时间＝最后一条消息最新的在前／按创建顺序＝聊天创建的先后／按收藏＝加了⭐的聊天排在前面。📌置顶的聊天始终排在最上面。 || 날짜순＝마지막 메시지가 최신인 순／등록순＝채팅을 만든 순／즐겨찾기순＝⭐를 붙인 채팅을 위로. 📌 고정은 항상 맨 위입니다.
+フォルダ（最大8個。チャット一覧の「⋯」で振り分けます） || Folders (up to 8. Sort chats into them with "⋯" in the chat list) || 文件夹（最多8个。在聊天列表中通过“⋯”进行分类） || 폴더(최대 8개. 채팅 목록의 '⋯'에서 분류합니다)
+新しいフォルダ名（例：仕事） || New folder name (e.g. Work) || 新文件夹名称（例：工作） || 새 폴더 이름(예: 업무)
+押すと入力欄に入ります（まだ送りません）。「送る」で、そのまま送信します。 || Tap to put it in the text box (it is not sent yet). Press "Send" to send it as is. || 点击后会放入输入框（尚不发送）。点击“发送”则直接发送。 || 누르면 입력란에 들어갑니다(아직 보내지 않습니다). '보내기'를 누르면 그대로 전송합니다.
+了解です || Understood || 明白了 || 알겠습니다
+ありがとうございます || Thank you || 谢谢 || 감사합니다
+少し待ってください || Please wait a moment || 请稍等 || 잠시만 기다려 주세요
+あとで連絡します || I'll contact you later || 我稍后联系您 || 나중에 연락할게요
+お疲れさまです || Thanks for your hard work || 辛苦了 || 수고하셨습니다
+今どこ？ || Where are you now? || 你现在在哪？ || 지금 어디야?
+新しい定型文（60文字まで・最大20個） || New phrase (up to 60 characters · up to 20) || 新常用语（最多60字·最多20个） || 새 정형문(60자까지·최대 20개)
+初期に戻す || Reset to defaults || 恢复初始设置 || 초기화
+すぐ送る || Send now || 立即发送 || 바로 보내기
+例：いま電車なので、あとで返信します || e.g. I'm on the train now, so I'll reply later || 例：我现在在电车上，稍后回复 || 예: 지금 전철이라서 나중에 답장할게요
+この端末だけに保存されます || Saved on this device only || 仅保存在本设备 || 이 기기에만 저장됩니다
+文字の大きさ || Text size || 字号 || 글자 크기
+大 || Large || 大 || 크게
+特大 || Extra large || 特大 || 아주 크게
+最大 || Maximum || 最大 || 최대
+高コントラスト（文字と背景をはっきり） || High contrast (clear text and background) || 高对比度（文字与背景更分明） || 고대비(글자와 배경을 뚜렷하게)
+読み上げの速さ（メッセージの「🔊」で使います） || Read-aloud speed (used with "🔊" on messages) || 朗读速度（用于消息上的“🔊”） || 읽어 주는 속도(메시지의 '🔊'에서 사용)
+ゆっくり || Slow || 慢速 || 느리게
+はやい || Fast || 快速 || 빠르게
+試し聞き || Preview || 试听 || 미리 듣기
+見本： || Sample: || 示例： || 견본:
+こんにちは！ ARE です。 || Hello! This is ARE. || 你好！这里是 ARE。 || 안녕하세요! ARE입니다.
+広告 ・ 物語紹介（お試し表示 ・ 今回だけ） || Ad · Story introduction (trial display · this time only) || 广告·故事介绍（试播·仅此一次） || 광고·이야기 소개(체험 표시·이번만)
+星影の主からの挑戦状 || A challenge from the Lord of Starlight || 来自星影之主的挑战书 || 별그림자의 주인이 보낸 도전장
+あと {n} 秒 || {n} s left || 还剩 {n} 秒 || 앞으로 {n}초
+最後まで見ると +1000ポイント（スキップは +100ポイント。途中で閉じると 0 ポイント） || Watch to the end for +1000 points (skip = +100 points; closing partway = 0 points) || 看到最后可得 +1000 积分（跳过得 +100 积分；中途关闭得 0 积分） || 끝까지 보면 +1000포인트(건너뛰기는 +100포인트, 도중에 닫으면 0포인트)
+音を出す || Turn sound on || 开启声音 || 소리 내기
+スキップ ▶（+100ポイント） || Skip ▶ (+100 points) || 跳过 ▶（+100积分） || 건너뛰기 ▶(+100포인트)
+500ポイントで30日間 広告なし || No ads for 30 days with 500 points || 500积分免广告30天 || 500포인트로 30일간 광고 없음
+広告 || Ad || 广告 || 광고
+最後まで見てくれて ありがとう！ +1000ポイント || Thanks for watching to the end! +1000 points || 感谢您看到最后！+1000积分 || 끝까지 봐 줘서 고마워요! +1000포인트
+スキップできます（広告はあと少しで終わります） || You can skip (the ad ends soon) || 可以跳过（广告即将结束） || 건너뛸 수 있어요(광고가 곧 끝납니다)
+押すと、このチャットに大きめの画像として送ります（最大12個。この端末に保存） || Tap to send it to this chat as a larger image (up to 12 · saved on this device) || 点击后会作为较大的图片发送到此聊天（最多12个·保存在本设备） || 누르면 이 채팅에 큰 이미지로 보냅니다(최대 12개·이 기기에 저장)
+まだありません。下の「写真からつくる」で追加します。 || None yet. Add one with "Make from photo" below. || 还没有。请通过下方的“用照片制作”添加。 || 아직 없습니다. 아래의 '사진으로 만들기'로 추가합니다.
+写真からつくる || Make from photo || 用照片制作 || 사진으로 만들기
+写真や画像の中の文字を、テキストにします（端末の中で処理します） || Turns the text in photos and images into plain text (processed inside your device). || 把照片和图片中的文字转换成文本（在设备内处理）。 || 사진이나 이미지 속 글자를 텍스트로 바꿉니다(기기 안에서 처리합니다).
+画像を選ぶ・撮影する || Choose or take an image || 选择·拍摄图片 || 이미지 선택·촬영
+・初回は読み取り用の部品（数MB）を読み込むため、時間がかかります。 || • The first time takes a while because it loads the reading component (a few MB). || ·首次使用需要加载识别组件（数MB），会花一些时间。 || ·처음에는 읽기용 부품(수 MB)을 불러오느라 시간이 걸립니다.
+・チャットの画像は、画像の📝ボタンからも読み取れます。 || • Images in chats can also be read with the 📝 button on the image. || ·聊天中的图片也可以通过图片上的📝按钮识别。 || ·채팅의 이미지는 이미지의 📝 버튼으로도 읽을 수 있습니다.
+・手書きや斜めの写真は、うまく読めないことがあります。 || • Handwriting and tilted photos may not be read well. || ·手写体和倾斜的照片可能无法很好地识别。 || ·손글씨나 비스듬한 사진은 잘 읽히지 않을 수 있습니다.
+※スマホでの利用をおすすめします（パソコンの内蔵カメラでは読み取りにくいです）。相手のプロフィールQR（プロフィール → 🔗 プロフィールを共有）を映してください || * We recommend using a phone (built-in PC cameras have a hard time reading it). Show the other person's profile QR (Profile → 🔗 Share profile). || ※建议使用手机（电脑内置摄像头较难识别）。请对准对方的资料二维码（资料 → 🔗 分享资料）。 || ※스마트폰에서 이용하는 것을 권장합니다(PC 내장 카메라로는 읽기 어렵습니다). 상대의 프로필 QR(프로필 → 🔗 프로필 공유)을 비춰 주세요.
+カメラを使えませんでした。「画像から読み取る」を使ってください。 || Could not use the camera. Please use "Read from image". || 无法使用摄像头，请使用“从图片读取”。 || 카메라를 사용할 수 없었습니다. '이미지에서 읽기'를 사용해 주세요.
+画像から読み取る || Read from image || 从图片读取 || 이미지에서 읽기
+1日1つ。気分もいっしょに記録できます（自分だけが見られます） || One entry a day. You can record your mood too (only you can see it). || 每天一篇，也可以同时记录心情（仅自己可见）。 || 하루에 하나. 기분도 함께 기록할 수 있습니다(나만 볼 수 있습니다).
+気分{n} || Mood {n} || 心情{n} || 기분{n}
+日記をさがす || Search diary || 搜索日记 || 일기 찾기
+毎日の習慣をチェック。連続日数が増えます（自分だけが見られます） || Check off daily habits. Your streak grows (only you can see it). || 每天打卡习惯，连续天数会不断增加（仅自己可见）。 || 매일의 습관을 체크합니다. 연속 일수가 늘어납니다(나만 볼 수 있습니다).
+収入と支出を記録して、月ごとに集計します（自分だけが見られます） || Record income and expenses and total them by month (only you can see it). || 记录收入和支出，并按月汇总（仅自己可见）。 || 수입과 지출을 기록해 월별로 집계합니다(나만 볼 수 있습니다).
+{n}円 || {n} yen || {n}日元 || {n}엔
+収入 || Income || 收入 || 수입
+支出 || Expenses || 支出 || 지출
+収支 || Balance || 收支 || 수지
+食費 || Food || 餐饮 || 식비
+日用品 || Daily goods || 日用品 || 생필품
+交通 || Transport || 交通 || 교통
+趣味 || Hobbies || 爱好 || 취미
+交際 || Socializing || 社交 || 교제비
+住まい || Housing || 住房 || 주거
+通信 || Communication || 通讯 || 통신
+この月の記録はありません。 || There are no records for this month. || 这个月没有记录。 || 이 달의 기록이 없습니다.
+この月をCSVで保存 || Save this month as CSV || 将本月保存为 CSV || 이 달을 CSV로 저장
+前の月 || Previous month || 上个月 || 이전 달
+次の月 || Next month || 下个月 || 다음 달
+金額（円） || Amount (yen) || 金额（日元） || 금액(엔)
+ここから はじめましょう ▾ || Start here ▾ || 从这里开始吧 ▾ || 여기서 시작해요 ▾
+予定表 || Schedule || 日程表 || 일정표
+時間割 || Timetable || 时间表 || 시간표
+まとめ || Summary || 汇总 || 요약
+まず、予定を入れましょう || First, add your schedule || 先添加日程吧 || 먼저 일정을 넣어 보세요
+Excel・Word・PDF・テキストなどの ファイルを 選ぶか、表を はりつけると、時刻・待ち時間・金額を 自動で読み取ります。ひな形から 作ることも できます。 || Choose an Excel, Word, PDF or text file, or paste a table, and times, waiting times and amounts are read automatically. You can also start from a template. || 选择 Excel·Word·PDF·文本等文件，或粘贴表格，即可自动读取时间·等待时间·金额。也可以从模板开始创建。 || Excel·Word·PDF·텍스트 등의 파일을 고르거나 표를 붙여넣으면 시각·대기 시간·금액을 자동으로 읽어 들입니다. 서식 견본에서 만들 수도 있습니다.
+ファイル・表から取り込む || Import from a file or table || 从文件·表格导入 || 파일·표에서 불러오기
+ひな形から作る（テーマパーク・旅行・仕事…） || Make from a template (theme park, travel, work…) || 从模板创建（主题乐园·旅行·工作…） || 서식 견본으로 만들기(테마파크·여행·업무…)
+＋ 1件ずつ入れる || + Add one at a time || ＋ 逐条添加 || ＋ 하나씩 넣기
+アラームの設定 || Alarm settings || 闹钟设置 || 알람 설정
+書き出し || Export || 导出 || 내보내기
+カウントダウンとポモドーロ（作業と休憩をくり返す集中法） || Countdown and Pomodoro (a focus method that repeats work and breaks) || 倒计时与番茄钟（重复“工作与休息”的专注方法） || 카운트다운과 포모도로(작업과 휴식을 반복하는 집중법)
+停止中 || Stopped || 已停止 || 정지 중
+カウントダウン || Countdown || 倒计时 || 카운트다운
+ポモドーロ || Pomodoro || 番茄钟 || 포모도로
+作業 || Work || 工作 || 작업
+休憩 || Break || 休息 || 휴식
+長休憩 || Long break || 长休息 || 긴 휴식
+ポモドーロを始める || Start Pomodoro || 开始番茄钟 || 포모도로 시작
+・終わると音・振動・通知（許可しているとき）でお知らせします。 || • When it ends, you are notified with sound, vibration and a notification (if allowed). || ·结束时会通过声音·震动·通知（已允许时）提醒您。 || ·끝나면 소리·진동·알림(허용한 경우)으로 알려 드립니다.
+・ブラウザを完全に閉じると鳴りません。 || • It will not ring if you close the browser completely. || ·完全关闭浏览器后不会响铃。 || ·브라우저를 완전히 닫으면 울리지 않습니다.
+通知を許可する || Allow notifications || 允许通知 || 알림 허용
+名前（任意） || Name (optional) || 名称（可选） || 이름(선택)
+計算・単位の換算・為替の目安 || Calculation, unit conversion and exchange rate estimates || 计算·单位换算·汇率参考 || 계산·단위 환산·환율 참고
+電卓 || Calculator || 计算器 || 계산기
+単位換算 || Unit conversion || 单位换算 || 단위 환산
+為替の目安 || Exchange rate estimate || 汇率参考 || 환율 참고
+結果をコピー || Copy result || 复制结果 || 결과 복사
+入力欄に入れる || Put into the text box || 放入输入框 || 입력란에 넣기
+例：1280×3+500 || e.g. 1280×3+500 || 例：1280×3+500 || 예: 1280×3+500
+ファイルをまとめて ZIP にしたり、ZIP をほどいたり。ぜんぶ この端末の中で処理します（サーバーには送りません） || Bundle files into a ZIP or unpack a ZIP. Everything is processed inside this device (nothing is sent to the server). || 把文件打包成 ZIP，或解压 ZIP。全部在此设备内处理（不会发送到服务器）。 || 파일을 ZIP으로 묶거나 ZIP을 풉니다. 모두 이 기기 안에서 처리합니다(서버로는 보내지 않습니다).
+圧縮（ZIPにする） || Compress (make a ZIP) || 压缩（生成ZIP） || 압축(ZIP으로 만들기)
+解凍（ZIPをほどく） || Extract (unpack a ZIP) || 解压（解开ZIP） || 압축 해제(ZIP 풀기)
+ファイルを選ぶ || Choose files || 选择文件 || 파일 선택
+フォルダを選ぶ || Choose a folder || 选择文件夹 || 폴더 선택
+ファイルを選ぶと ここに並びます。 || Files you choose will be listed here. || 选择的文件会列在这里。 || 파일을 고르면 여기에 나열됩니다.
+ZIPの名前 || ZIP name || ZIP 名称 || ZIP 이름
+パスワード || Password || 密码 || 비밀번호
+つけない || None || 不设置 || 설정 안 함
+つける：AES-256（強い・おすすめ） || Set: AES-256 (strong · recommended) || 设置：AES-256（强·推荐） || 설정: AES-256(강함·추천)
+つける：ZipCrypto（Windows標準でも開ける・弱い） || Set: ZipCrypto (opens with Windows built-in tools · weak) || 设置：ZipCrypto（Windows 自带工具也能打开·强度弱） || 설정: ZipCrypto(Windows 기본 기능으로도 열림·약함)
+ぜんぶはずす || Remove all || 全部移除 || 모두 빼기
+ZIPにして保存 || Save as ZIP || 保存为 ZIP || ZIP으로 저장
+画像を小さく・サイズ変更・形式変換（まとめて） || Shrink, resize and convert images (in bulk) || 批量压缩·调整尺寸·转换格式 || 이미지를 작게·크기 변경·형식 변환(한꺼번에)
+画像を選ぶ（いくつでも） || Choose images (any number) || 选择图片（数量不限） || 이미지 선택(몇 개든)
+画像を選ぶと ここに並びます。 || Images you choose will be listed here. || 选择的图片会列在这里。 || 이미지를 고르면 여기에 나열됩니다.
+長いほうの辺 || Longer side || 较长的边 || 긴 쪽 변
+そのまま || As is || 保持不变 || 그대로
+1920px（おすすめ） || 1920px (recommended) || 1920px（推荐） || 1920px(추천)
+形式 || Format || 格式 || 형식
+画質 {n}% || Quality {n}% || 画质 {n}% || 화질 {n}%
+変換する || Convert || 转换 || 변환하기
+画像を選ぶと ここに並びます（上から順にPDFのページになります）。 || Images you choose will be listed here (they become PDF pages from top to bottom). || 选择的图片会列在这里（从上到下依次成为PDF的页面）。 || 이미지를 고르면 여기에 나열됩니다(위에서부터 순서대로 PDF 페이지가 됩니다).
+ページの大きさ || Page size || 页面大小 || 페이지 크기
+A4（画像の向きに合わせる） || A4 (match the image orientation) || A4（与图片方向一致） || A4(이미지 방향에 맞춤)
+A4 たて || A4 portrait || A4 纵向 || A4 세로
+A4 よこ || A4 landscape || A4 横向 || A4 가로
+画像の大きさに合わせる || Match the image size || 与图片大小一致 || 이미지 크기에 맞춤
+PDFにして保存 || Save as PDF || 保存为 PDF || PDF로 저장
+結合・ページ抜き出し・1ページずつに分ける・回転 || Merge, extract pages, split into single pages, rotate || 合并·提取页面·拆成单页·旋转 || 병합·페이지 추출·한 페이지씩 나누기·회전
+結合 || Merge || 合并 || 병합
+ページを抜き出す || Extract pages || 提取页面 || 페이지 추출
+1ページずつに分ける || Split into single pages || 拆成单页 || 한 페이지씩 나누기
+回転 || Rotate || 旋转 || 회전
+PDFを選ぶ（いくつでも） || Choose PDFs (any number) || 选择PDF（数量不限） || PDF 선택(몇 개든)
+PDFを選んでください。 || Please choose a PDF. || 请选择PDF。 || PDF를 선택해 주세요.
+結合して保存 || Merge and save || 合并并保存 || 병합해서 저장
+投稿・送信の前に、位置情報や撮影情報を取りのぞく || Remove location and shooting data before posting or sending || 发布·发送前，去除位置信息和拍摄信息 || 게시·전송 전에 위치 정보와 촬영 정보를 제거합니다
+写真を選ぶ（いくつでも） || Choose photos (any number) || 选择照片（数量不限） || 사진 선택(몇 장이든)
+写真を選ぶと、位置情報などが入っているか 調べます。 || When you choose photos, it checks whether they contain location data and more. || 选择照片后，会检查其中是否包含位置信息等。 || 사진을 고르면 위치 정보 등이 들어 있는지 조사합니다.
+SNSやチャットに写真を載せる前に。画像を作り直して、位置情報・撮影日時・カメラ機種などを取りのぞきます（画質はほぼ変わりません。向きは正しくなおします）。 || Use this before putting photos on social media or in chats. The image is rebuilt, removing location, shooting date/time, camera model and more (quality barely changes; the orientation is corrected). || 在把照片发到社交媒体或聊天之前使用。会重新生成图片，去除位置信息·拍摄时间·相机型号等（画质几乎不变，方向会被校正）。 || SNS나 채팅에 사진을 올리기 전에 사용하세요. 이미지를 다시 만들어 위치 정보·촬영 일시·카메라 기종 등을 제거합니다(화질은 거의 변하지 않으며 방향은 바르게 고칩니다).
+情報を消して保存 || Remove data and save || 清除信息并保存 || 정보를 지우고 저장
+同じアカウントの別の端末へ、ファイルを渡す || Pass files to another device on the same account || 向同一账号的另一台设备传递文件 || 같은 계정의 다른 기기로 파일 전달하기
+ここに入れたファイルは、同じアカウントの別の端末から ダウンロードできます（Googleドライブに保管します。大きさの上限はありません）。 || Files you put here can be downloaded from another device on the same account (stored in Google Drive; there is no size limit). || 放在这里的文件，可以从同一账号的另一台设备下载（保存在 Google 云端硬盘，没有大小限制）。 || 여기에 넣은 파일은 같은 계정의 다른 기기에서 다운로드할 수 있습니다(Google 드라이브에 보관하며 크기 제한은 없습니다).
+ファイルを送る（いくつでも） || Send files (any number) || 发送文件（数量不限） || 파일 보내기(몇 개든)
+まだ ファイルはありません。 || There are no files yet. || 还没有文件。 || 아직 파일이 없습니다.
+ファイルを選ぶ（いくつでも） || Choose files (any number) || 选择文件（数量不限） || 파일 선택(몇 개든)
+ファイルを選ぶと、指紋（ハッシュ値）を計算します。配布元が公開している値と合えば、こわれていない・すりかわっていない ことが確かめられます。 || When you choose a file, its fingerprint (hash value) is calculated. If it matches the value published by the source, you can confirm it is not corrupted or swapped. || 选择文件后，会计算其指纹（哈希值）。如果与发布方公布的值一致，就能确认文件没有损坏、也没有被替换。 || 파일을 고르면 지문(해시값)을 계산합니다. 배포처가 공개한 값과 맞으면 손상되지 않았고 바뀌지 않았음을 확인할 수 있습니다.
+照合したい値（配布元のハッシュを貼る） || Value to check against (paste the source's hash) || 要核对的值（粘贴发布方的哈希值） || 대조할 값(배포처의 해시를 붙여넣기)
+※MD5には対応していません（安全でないため）。 || * MD5 is not supported (because it is not secure). || ※不支持 MD5（因为不安全）。 || ※MD5는 지원하지 않습니다(안전하지 않기 때문).
+例：e3b0c442… || e.g. e3b0c442… || 例：e3b0c442… || 예: e3b0c442…
+新しい名前の形（\{name\}＝もとの名前 \{n\}＝連番 \{date\}＝今日の日付） || New name format (\{name\} = original name, \{n\} = number, \{date\} = today's date) || 新名称格式（\{name\}＝原名称 \{n\}＝序号 \{date\}＝今天的日期） || 새 이름 형식(\{name\}＝원래 이름 \{n\}＝연번 \{date\}＝오늘 날짜)
+さがす文字 || Text to find || 要查找的文字 || 찾을 글자
+おきかえ || Replace with || 替换为 || 바꿀 글자
+連番の開始 || Number start || 序号起始 || 연번 시작
+桁数 || Digits || 位数 || 자릿수
+大文字小文字 || Letter case || 大小写 || 대소문자
+小文字に || To lowercase || 转为小写 || 소문자로
+大文字に || To uppercase || 转为大写 || 대문자로
+ファイルを選ぶと、変更後の名前を ここで確認できます。 || When you choose files, you can check the new names here. || 选择文件后，可以在这里确认修改后的名称。 || 파일을 고르면 변경 후의 이름을 여기서 확인할 수 있습니다.
+名前を変えてZIPで保存 || Rename and save as ZIP || 重命名并保存为ZIP || 이름을 바꿔 ZIP으로 저장
+※ブラウザの安全のため、もとのファイルは変わりません。新しい名前の ZIP ができます。 || * For browser safety, the original files are not changed. A ZIP with the new names is created. || ※出于浏览器安全考虑，原文件不会改变，会生成带有新名称的 ZIP。 || ※브라우저 안전을 위해 원래 파일은 바뀌지 않습니다. 새 이름의 ZIP이 만들어집니다.
+例：旅行_\{n\} || e.g. trip_\{n\} || 例：旅行_\{n\} || 예: 여행_\{n\}
+Shift_JIS などの文字化けを UTF-8 にしてなおす || Fix garbled Shift_JIS and similar text by converting it to UTF-8 || 将 Shift_JIS 等造成的乱码转为 UTF-8 修复 || Shift_JIS 등의 깨진 글자를 UTF-8로 고칩니다
+テキストファイルを選ぶ || Choose a text file || 选择文本文件 || 텍스트 파일 선택
+もとの文字コード || Original encoding || 原始编码 || 원래 문자 코드
+自動で判定 || Auto-detect || 自动判定 || 자동 판정
+Shift_JIS（Windows日本語） || Shift_JIS (Windows Japanese) || Shift_JIS（Windows 日语） || Shift_JIS(Windows 일본어)
+西欧（Windows-1252） || Western European (Windows-1252) || 西欧语（Windows-1252） || 서유럽(Windows-1252)
+改行 || Line break || 换行 || 줄바꿈
+LF（Mac・Linux） || LF (Mac / Linux) || LF（Mac·Linux） || LF(Mac·Linux)
+BOM付きで保存（Excelで開く用） || Save with BOM (for opening in Excel) || 带 BOM 保存（用于在 Excel 中打开） || BOM 포함으로 저장(Excel에서 열기용)
+ファイルを選ぶと、文字化けをなおして UTF-8 にします。ためしに別の文字コードを選ぶと、読めるようになることがあります。 || When you choose a file, garbled text is fixed and converted to UTF-8. Trying a different encoding may make it readable. || 选择文件后，会修复乱码并转为 UTF-8。尝试选择其他编码，有时就能正常显示。 || 파일을 고르면 깨진 글자를 고쳐 UTF-8로 만듭니다. 다른 문자 코드를 선택해 보면 읽을 수 있게 되기도 합니다.
+UTF-8で保存 || Save as UTF-8 || 以 UTF-8 保存 || UTF-8로 저장
+CSVを表で見る／JSON・TSV・Excel用に変換 || View CSV as a table / convert for JSON, TSV or Excel || 以表格查看 CSV／转换为 JSON·TSV·Excel 用格式 || CSV를 표로 보기／JSON·TSV·Excel용으로 변환
+CSVを選ぶ || Choose a CSV || 选择 CSV || CSV 선택
+区切り || Delimiter || 分隔符 || 구분자
+自動 || Auto || 自动 || 자동
+カンマ || Comma || 逗号 || 쉼표
+タブ || Tab || 制表符 || 탭
+セミコロン || Semicolon || 分号 || 세미콜론
+1行目は見出し || First row is a header || 第一行为表头 || 첫 줄은 제목
+JSONで保存 || Save as JSON || 保存为 JSON || JSON으로 저장
+TSVで保存 || Save as TSV || 保存为 TSV || TSV로 저장
+Excel用CSV(BOM付き) || CSV for Excel (with BOM) || Excel 用 CSV（带BOM） || Excel용 CSV(BOM 포함)
+動画の好きな場面を、画像で保存 || Save any scene of a video as an image || 把视频中喜欢的画面保存为图片 || 동영상의 원하는 장면을 이미지로 저장

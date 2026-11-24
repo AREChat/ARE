@@ -87,7 +87,7 @@ function initPoints(){
     }catch(_e){}
     // 送信エラーが「スパム凍結」だったら、すぐ凍結画面にする
     const st = document.getElementById("status");
-    if(st) new MutationObserver(() => { if(/スパムの疑い/.test(st.textContent || "")) ptRefresh(); }).observe(st, {childList:true, characterData:true, subtree:true});
+    if(st) new MutationObserver(() => { if(/スパムの疑い|spam was suspected|垃圾信息|스팸/i.test(st.textContent || "")) ptRefresh(); }).observe(st, {childList:true, characterData:true, subtree:true});
     ptStart();
 }
 async function ptStart(){

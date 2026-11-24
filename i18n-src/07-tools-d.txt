@@ -1,0 +1,56 @@
+# ===== ツールの画面（4）：動画〜設定、ゲーム入口 =====
+動画を選ぶ || Choose a video || 选择视频 || 동영상 선택
+動画を選んで、止めたい場面を決めて保存します。スライダーや「1コマ」ボタンで細かく動かせます。 || Choose a video, pick the scene to stop on, and save it. Use the slider or the "1 frame" buttons to move in small steps. || 选择视频，确定想停下的画面并保存。可用滑块或“1帧”按钮精细调整。 || 동영상을 골라 멈추고 싶은 장면을 정해 저장합니다. 슬라이더나 '1프레임' 버튼으로 세밀하게 움직일 수 있습니다.
+送れない大きさのファイルを分けて送る／もとに戻す || Split a file that is too big to send and send it in parts / join it back together || 把太大无法发送的文件拆分后发送／还原 || 보낼 수 없는 크기의 파일을 나눠서 보내기／원래대로 되돌리기
+分割する || Split || 拆分 || 분할하기
+もとに戻す（結合） || Restore (join) || 还原（合并） || 원래대로(결합)
+分割するファイルを選ぶ || Choose a file to split || 选择要拆分的文件 || 분할할 파일 선택
+送れないほど大きいファイルを、小さく分けて送れます。受け取った側は「もとに戻す」で合体できます。 || A file too large to send can be split into small parts and sent. The receiver can join them with "Restore". || 太大无法发送的文件可以拆成小块发送。接收方通过“还原”即可合并。 || 보낼 수 없을 만큼 큰 파일을 작게 나눠 보낼 수 있습니다. 받은 쪽은 '원래대로'로 합칠 수 있습니다.
+1つの大きさ || Size of each part || 每块大小 || 한 개의 크기
+25MB（メールの目安） || 25MB (typical email limit) || 25MB（邮件附件的参考大小） || 25MB(메일 첨부 기준)
+分割してZIPで保存 || Split and save as ZIP || 拆分并保存为ZIP || 분할해서 ZIP으로 저장
+ストーリー重視の3D・RPG。前日譚から後日談まで52話。スマホ・タブレットは横向き推奨 || A story-focused 3D RPG. 52 episodes from the prequel to the aftermath. Landscape orientation recommended on phones and tablets. || 重视剧情的3D RPG。从前传到后日谈共52话。手机·平板建议横屏。 || 스토리 중심의 3D RPG. 전일담부터 후일담까지 52화. 스마트폰·태블릿은 가로 방향 권장
+セーブはこの端末のブラウザに保存されます。ゲーム内からRPG『ARE QUEST』やドリームフロンティアにも行けます。 || Saves are stored in this device's browser. From inside the game you can also go to the RPG "ARE QUEST" and Dream Frontier. || 存档保存在本设备的浏览器中。在游戏内也可以前往RPG《ARE QUEST》和梦想前线。 || 세이브는 이 기기의 브라우저에 저장됩니다. 게임 안에서 RPG 'ARE QUEST'나 드림 프런티어로도 갈 수 있습니다.
+ゲームをひらく || Open the game || 打开游戏 || 게임 열기
+3Dの盤面で遊ぶカードバトル（土台版） || A card battle played on a 3D board (base version) || 在3D棋盘上进行的卡牌对战（基础版） || 3D 판에서 즐기는 카드 배틀(기본 버전)
+デッキを組んでCPUと対戦。セーブはこの端末のブラウザに保存されます。アカウント・ポイントは不要です。 || Build a deck and fight the CPU. Saves are stored in this device's browser. No account or points needed. || 组建卡组与CPU对战。存档保存在本设备的浏览器中。无需账号和积分。 || 덱을 짜서 CPU와 대전합니다. 세이브는 이 기기의 브라우저에 저장됩니다. 계정·포인트는 필요 없습니다.
+GAME5 推理ゲーム || GAME5 Mystery game || GAME5 推理游戏 || GAME5 추리 게임
+会話と証言を集めて、升目（マス目）パズルで事件を解く、全10章のオリジナル推理ゲーム || An original 10-chapter mystery game where you collect conversations and testimony and solve the case with a grid puzzle. || 收集对话与证词，用方格谜题解决案件的全10章原创推理游戏。 || 대화와 증언을 모아 칸 퍼즐로 사건을 푸는 전 10장의 오리지널 추리 게임
+ブラウザで すぐ あそべます（ダウンロード不要）。パソコンでは、Windows版（exe）も ページから入手できます（スマホは ブラウザ版のみ）。 || Play right away in your browser (no download needed). On a PC, you can also get the Windows version (exe) from the page (phones: browser version only). || 可直接在浏览器中游玩（无需下载）。电脑上也可以从页面获取 Windows 版（exe）（手机仅限浏览器版）。 || 브라우저에서 바로 즐길 수 있습니다(다운로드 불필요). PC에서는 Windows 버전(exe)도 페이지에서 받을 수 있습니다(스마트폰은 브라우저 버전만).
+ブラウザで あそぶ || Play in browser || 在浏览器中游玩 || 브라우저에서 즐기기
+案内ページ（Windows版） || Info page (Windows version) || 介绍页面（Windows 版） || 안내 페이지(Windows 버전)
+電波がなくても あそべる、暇つぶしの豪華ミニゲーム || Lavish mini-games to pass the time, playable even without a signal || 没有网络也能玩的豪华打发时间小游戏 || 전파가 없어도 즐길 수 있는 시간 때우기용 호화 미니게임
+ルーレットで選ばれる5つのミニゲーム（ダッシュ・お城づくり・ダンジョン・ビート・コイン集め）。コインと図鑑はぜんぶ共通。通信が回復するとジャックポット！ アカウント・ポイントは不要です。 || 5 mini-games chosen by roulette (Dash, Castle Building, Dungeon, Beat, Coin Collecting). Coins and the collection book are shared by all of them. When your connection comes back, it's a jackpot! No account or points needed. || 由轮盘选出的5个小游戏（冲刺·建城堡·地下城·节奏·收集金币）。金币和图鉴全部通用。网络恢复后还有大奖！无需账号和积分。 || 룰렛으로 뽑히는 5개의 미니게임(대시·성 쌓기·던전·비트·코인 모으기). 코인과 도감은 모두 공통입니다. 통신이 회복되면 잭팟! 계정·포인트는 필요 없습니다.
+あそぶ || Play || 开始游玩 || 플레이
+3〜2の技・縛り（3枚縛りも）・革命・階級・カード交換。ルールは自由に変えられます || Tricks from 3 to 2, locks (including 3-card locks), revolution, ranks and card exchange. You can freely change the rules. || 3～2的牌型·锁牌（含3张锁牌）·革命·阶级·换牌。规则可以自由更改。 || 3~2의 기술·묶기(3장 묶기도)·혁명·계급·카드 교환. 규칙은 자유롭게 바꿀 수 있습니다.
+CPUと3〜6人で対戦。大富豪／富豪／平民／貧民／大貧民と、ラウンドごとのカード交換つき。アカウント・ポイントは不要です。 || Play with 3 to 6 players against the CPU. Includes Grand Millionaire / Millionaire / Commoner / Poor / Grand Pauper ranks and card exchange each round. No account or points needed. || 与CPU共3～6人对战。设有大富豪／富豪／平民／贫民／大贫民阶级，每轮都会换牌。无需账号和积分。 || CPU와 3~6명이 대전합니다. 대부호／부호／평민／빈민／대빈민과 라운드마다 카드 교환이 있습니다. 계정·포인트는 필요 없습니다.
+3Dのテーマパーク。18のライド・アトラクションをめぐってスタンプを集めよう || A 3D theme park. Tour 18 rides and attractions and collect stamps. || 3D主题乐园。游玩18个游乐设施，集齐印章吧。 || 3D 테마파크. 18개의 놀이기구·어트랙션을 돌며 스탬프를 모아 보세요.
+アカウント・ポイントは不要です。セーブはこの端末のブラウザに保存されます。スマホ・タブレットは横向き推奨。 || No account or points needed. Saves are stored in this device's browser. Landscape orientation recommended on phones and tablets. || 无需账号和积分。存档保存在本设备的浏览器中。手机·平板建议横屏。 || 계정·포인트는 필요 없습니다. 세이브는 이 기기의 브라우저에 저장됩니다. 스마트폰·태블릿은 가로 방향 권장.
+パークにはいる || Enter the park || 进入乐园 || 파크에 입장
+プログラミング学習サイト。用語集・クイズ・物語・天気や電車の情報など || A programming study site: glossary, quizzes, stories, weather and train info and more. || 编程学习网站。术语表·测验·故事·天气和电车信息等。 || 프로그래밍 학습 사이트. 용어집·퀴즈·이야기·날씨와 전철 정보 등
+ARE とは別のサイトです。新しいタブで開きます。学習サイトからも、ARE とゲーム（game1〜game6）へ移れます。 || This is a separate site from ARE. It opens in a new tab. From the study site you can also go to ARE and the games (game1–game6). || 这是与 ARE 不同的独立网站，将在新标签页打开。从学习网站也可以前往 ARE 和游戏（game1～game6）。 || ARE와는 별도의 사이트입니다. 새 탭에서 열립니다. 학습 사이트에서도 ARE와 게임(game1~game6)으로 이동할 수 있습니다.
+学習サイトをひらく || Open the study site || 打开学习网站 || 학습 사이트 열기
+他の人に画面を見られないための鍵です（この端末だけの設定） || A lock to keep other people from seeing your screen (this device only) || 防止他人看到屏幕的锁（仅对本设备有效） || 다른 사람이 화면을 보지 못하게 하는 잠금입니다(이 기기에서만 적용)
+アプリロック：オフ || App lock: Off || 应用锁：关 || 앱 잠금: 꺼짐
+アプリロック：オン || App lock: On || 应用锁：开 || 앱 잠금: 켜짐
+PIN（数字4〜8けた） || PIN (4 to 8 digits) || PIN（4～8位数字） || PIN(숫자 4~8자리)
+もう一度 || Once more || 再输入一次 || 한 번 더
+ロックを設定 || Set lock || 设置锁定 || 잠금 설정
+放置したとき || When left idle || 闲置时 || 방치했을 때
+画面をぼかす（操作がない時間） || Blur the screen (idle time) || 模糊屏幕（无操作的时间） || 화면 흐리게(조작 없는 시간)
+しない || Never || 不启用 || 안 함
+自動でログアウト（操作がない時間） || Log out automatically (idle time) || 自动退出登录（无操作的时间） || 자동 로그아웃(조작 없는 시간)
+・PIN は忘れても復旧できません（ログアウトして入り直せば解除されます）。 || • A forgotten PIN cannot be recovered (logging out and back in clears it). || ·忘记 PIN 无法找回（退出登录后重新登录即可解除）。 || ·PIN을 잊어버리면 복구할 수 없습니다(로그아웃했다가 다시 들어오면 해제됩니다).
+・開発者ツールなどを使う人までは防げません。 || • It cannot stop people who use developer tools and the like. || ·无法防住使用开发者工具等的人。 || ·개발자 도구 등을 쓰는 사람까지는 막을 수 없습니다.
+管理者からのお知らせです || Announcements from the administrator || 来自管理员的公告 || 관리자의 공지입니다
+お知らせはありません。 || There are no announcements. || 没有公告。 || 공지가 없습니다.
+気分テーマ || Mood theme || 心情主题 || 기분 테마
+省データ・省電力モード || Data & power saver mode || 省流量·省电模式 || 데이터·전력 절약 모드
+アニメーションを止め、動画・音声を再生するまで読み込まないようにします。 || Stops animations and doesn't load videos or audio until you play them. || 停止动画，在播放之前不加载视频和音频。 || 애니메이션을 멈추고, 동영상·음성은 재생할 때까지 불러오지 않습니다.
+日本語 / English / 中文 / 한국어 に対応しています。チャットで やりとりした 文章そのものは 翻訳されません（🌐 翻訳ボタンで 1 通ずつ翻訳できます）。 || Supports 日本語 / English / 中文 / 한국어. The text of your chat messages themselves is not translated (you can translate them one at a time with the 🌐 Translate button). || 支持 日本語 / English / 中文 / 한국어。聊天中的消息本身不会被翻译（可用 🌐 翻译按钮逐条翻译）。 || 日本語 / English / 中文 / 한국어를 지원합니다. 채팅으로 주고받은 문장 자체는 번역되지 않습니다(🌐 번역 버튼으로 한 통씩 번역할 수 있습니다).
+アプリ化ボタンをチャットの上のバーに表示 || Show the "Install as app" button in the bar above the chat || 在聊天上方的栏中显示“安装为应用”按钮 || 앱 설치 버튼을 채팅 위쪽 바에 표시
+オフにしても「その他」からはいつでもアプリ化できます。 || Even if you turn this off, you can always install the app from "More". || 即使关闭，也可以随时在“更多”中安装为应用。 || 꺼도 '더보기'에서 언제든 앱으로 설치할 수 있습니다.
+スパムの疑いで一時停止中です。 || Paused because spam was suspected. || 因涉嫌垃圾信息而被暂时停止。 || 스팸 의심으로 일시 정지 중입니다.
+スパムの疑いで一時停止中 || Paused for suspected spam || 因涉嫌垃圾信息而暂停中 || 스팸 의심으로 일시 정지 중
+メッセージを入力...（Enterで送信、Shift+Enterか ↵ ボタンで改行） || Type a message... (Enter to send, Shift+Enter or the ↵ button for a new line) || 输入消息...（Enter 发送，Shift+Enter 或 ↵ 按钮换行） || 메시지를 입력하세요...(Enter로 전송, Shift+Enter 또는 ↵ 버튼으로 줄바꿈)
+ARE QUEST 2・3 || ARE QUEST 2 & 3 || ARE QUEST 2・3 || ARE QUEST 2 & 3

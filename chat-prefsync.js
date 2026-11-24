@@ -156,11 +156,7 @@ function psOnChanged(names){
         if(names.some((n) => n === "are_theme" || n === "are_autotheme" || n === "are_mood_theme") && typeof applyTheme === "function") applyTheme(prefGet("are_theme", "standard"));
         if(names.indexOf("are_eco") >= 0 && typeof applyEco === "function") applyEco(prefGet("are_eco", "0") === "1");
         if(names.indexOf("are_hidden_rooms") >= 0 && typeof hrLoad === "function"){ hrLoad(); if(typeof hrPaint === "function") hrPaint(); }
-        if(names.indexOf("are_lang") >= 0){
-            const k = "are_ps_lang_reload";
-            let last = 0; try{ last = Number(sessionStorage.getItem(k) || 0); }catch(_e){}
-            if(Date.now() - last > 30000){ try{ sessionStorage.setItem(k, String(Date.now())); }catch(_e){} location.reload(); }
-        }
+        if(names.indexOf("are_lang") >= 0 && typeof applyLanguage === "function") applyLanguage(prefGet("are_lang", "ja"));
     }catch(_e){ /* 反映に失敗しても、保存は済んでいる */ }
 }
 

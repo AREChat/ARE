@@ -1,0 +1,144 @@
+# ===== ツールの画面（1）：チャット画面の残り〜ブラックジャックまで =====
+気分テーマ・省データモード・English || Mood theme, data saver mode and English || 心情主题·省流量模式·English || 기분 테마·데이터 절약 모드·English
+ポイント || Points || 积分 || 포인트
+円 || yen || 日元 || 엔
+履歴 || History || 历史记录 || 기록
+お試し期間：全機能OK・あと{n}日 || Trial period: all features available · {n} days left || 试用期：全部功能可用·还剩 {n} 天 || 체험 기간: 모든 기능 이용 가능·앞으로 {n}일
+ログインボーナス +{n}円（{d}日連続） || Login bonus +{n} yen ({d} day streak) || 登录奖励 +{n}日元（连续{d}天） || 로그인 보너스 +{n}엔({d}일 연속)
+チャットを読み込んでいます... || Loading chats... || 正在加载聊天... || 채팅을 불러오는 중...
+管理者に送れるメッセージは、あと{n}通です || You can send {n} more message(s) to the administrator || 您还可以向管理员发送 {n} 条消息 || 관리자에게 보낼 수 있는 메시지가 {n}개 남았습니다
+「修正依頼」の部屋は、いま準備中です。少し待ってから、もう一度お試しください。 || The "Fix requests" room is being prepared. Please wait a moment and try again. || “修改请求”房间正在准备中，请稍等片刻后再试。 || '수정 요청' 방은 지금 준비 중입니다. 잠시 기다린 후 다시 시도해 주세요.
+ストーリー || Stories || 故事 || 스토리
+24時間公開した後、7日間アーカイブに残ります。画像と本文は端末にも自動保存します。 || After being public for 24 hours, they stay in the archive for 7 days. Images and text are also saved to your device automatically. || 公开24小时后，将在存档中保留7天。图片和正文也会自动保存到设备。 || 24시간 공개한 뒤 7일간 보관함에 남습니다. 이미지와 본문은 기기에도 자동 저장됩니다.
+いまのストーリー || Current stories || 当前的故事 || 지금의 스토리
+アーカイブ || Archive || 存档 || 보관함
+＋ ストーリーを投稿 || + Post a story || ＋ 发布故事 || ＋ 스토리 올리기
+表示できるストーリーはありません。ユーザーをフォローするか、自分で投稿してみましょう。 || There are no stories to show. Follow a user or post one yourself. || 没有可显示的故事。关注用户，或自己发布一个吧。 || 표시할 스토리가 없습니다. 사용자를 팔로우하거나 직접 올려 보세요.
+言葉や曜日・時間帯に応じて、設定した文章をそのまま返します。【動く条件】相手があなたに送った文字のメッセージに、1対1のチャットで返します（グループ、写真・スタンプ、自分で送ったメッセージには動きません）。自分で試すときは、別のアカウントから送ってください。「含む」は文の一部に言葉があれば反応します。 || Replies with the text you set, depending on words, weekdays and time of day. [When it runs] It replies in a 1-on-1 chat to text messages that the other person sent you (it does not run in groups, for photos/stamps, or for messages you sent yourself). To test it yourself, send from another account. "Contains" reacts if the word appears anywhere in the message. || 根据关键词、星期和时间段，原样回复您设定的文字。【触发条件】在一对一聊天中，对对方发给您的文字消息进行回复（群聊、照片·贴纸以及您自己发送的消息不会触发）。想自己测试时，请用另一个账号发送。“包含”表示消息中含有该词即会响应。 || 말이나 요일·시간대에 따라 설정한 문장을 그대로 답장합니다. 【작동 조건】상대가 나에게 보낸 글자 메시지에 1:1 채팅에서 답장합니다(그룹, 사진·스티커, 내가 보낸 메시지에는 작동하지 않습니다). 직접 시험해 볼 때는 다른 계정으로 보내 주세요. '포함'은 문장의 일부에 그 말이 있으면 반응합니다.
+＋ ルールを追加 || + Add a rule || ＋ 添加规则 || ＋ 규칙 추가
+自動応答ルールはまだありません。 || There are no auto-reply rules yet. || 还没有自动回复规则。 || 자동 응답 규칙이 아직 없습니다.
+最大20件まで設定できます。キーワードの返信間隔を「毎回」にすると、該当するメッセージごとに固定文を返信します。 || You can set up to 20. If you set a keyword's reply interval to "Every time", it replies with the fixed text for each matching message. || 最多可设置20条。将关键词的回复间隔设为“每次”，则每条匹配的消息都会回复固定文字。 || 최대 20개까지 설정할 수 있습니다. 키워드의 답장 간격을 '매번'으로 하면 해당하는 메시지마다 고정 문장으로 답장합니다.
+広告のお試し表示を準備しています…（はじめては30秒ほどかかります） || Preparing the ad preview… (the first time takes about 30 seconds) || 正在准备广告试播…（首次约需30秒） || 광고 체험 표시를 준비하는 중…(처음에는 30초 정도 걸립니다)
+どのチャットのアルバムを見ますか？ || Which chat's album would you like to see? || 要查看哪个聊天的相册？ || 어느 채팅의 앨범을 볼까요?
+画像は端末の中で加工します。送信するまで外には出ません。 || Images are edited inside your device. They don't leave it until you send. || 图片在设备内处理，发送之前不会传到外部。 || 이미지는 기기 안에서 가공합니다. 보내기 전에는 밖으로 나가지 않습니다.
+画像を選ぶ || Choose an image || 选择图片 || 이미지 선택
+写真を撮る || Take a photo || 拍照 || 사진 찍기
+Hugging Faceの無料公開モデルを使います。入力した文章はHugging Faceへ送られ、生成したファイルはこの端末へ直接保存します。AREやSupabaseには保存しません。 || This uses free public models on Hugging Face. The text you enter is sent to Hugging Face, and the generated file is saved directly to this device. It is not stored in ARE or Supabase. || 使用 Hugging Face 的免费公开模型。您输入的文字会发送到 Hugging Face，生成的文件直接保存到此设备，不会保存到 ARE 或 Supabase。 || Hugging Face의 무료 공개 모델을 사용합니다. 입력한 문장은 Hugging Face로 전송되고, 생성된 파일은 이 기기에 직접 저장됩니다. ARE나 Supabase에는 저장되지 않습니다.
+生成するもの || What to generate || 生成内容 || 생성할 것
+画像 || Image || 图片 || 이미지
+短い動画 || Short video || 短视频 || 짧은 동영상
+画像の品質 || Image quality || 图片质量 || 이미지 품질
+標準（4-step） || Standard (4-step) || 标准（4-step） || 표준(4-step)
+高速（2-step） || Fast (2-step) || 快速（2-step） || 고속(2-step)
+高品質（8-step） || High quality (8-step) || 高质量（8-step） || 고품질(8-step)
+最速（1-step） || Fastest (1-step) || 最快（1-step） || 최고속(1-step)
+作りたい画像・動画の説明 || Describe the image or video you want || 想生成的图片·视频的描述 || 만들고 싶은 이미지·동영상 설명
+動画の画風 || Video style || 视频画风 || 동영상 화풍
+アニメ風（ToonYou） || Anime style (ToonYou) || 动画风（ToonYou） || 애니메이션풍(ToonYou)
+写実風（epiCRealism） || Realistic style (epiCRealism) || 写实风（epiCRealism） || 사실풍(epiCRealism)
+カメラの動き || Camera movement || 镜头运动 || 카메라 움직임
+標準 || Standard || 标准 || 표준
+ズームイン || Zoom in || 放大 || 줌 인
+ズームアウト || Zoom out || 缩小 || 줌 아웃
+上に傾ける || Tilt up || 向上倾斜 || 위로 기울이기
+下に傾ける || Tilt down || 向下倾斜 || 아래로 기울이기
+左にパン || Pan left || 向左平移 || 왼쪽으로 패닝
+右にパン || Pan right || 向右平移 || 오른쪽으로 패닝
+Hugging Faceのアクセストークン（任意） || Hugging Face access token (optional) || Hugging Face 访问令牌（可选） || Hugging Face 액세스 토큰(선택)
+無料アカウントは1日5 GPU分が目安で、画像・動画など全ZeroGPU利用の合計です。トークンなしでも試せますが、匿名利用は共有枠で上限が小さく、混雑しやすくなります。利用量と順番待ちはHugging Face側で決まります。 || A free account gets roughly 5 GPU minutes a day, counted across all ZeroGPU use such as images and videos. You can try it without a token, but anonymous use shares a small quota and gets crowded easily. Usage and queue position are decided on the Hugging Face side. || 免费账号每天约有5个 GPU 分钟，为图片、视频等所有 ZeroGPU 使用的合计。不使用令牌也能尝试，但匿名使用共享额度较小，容易拥挤。使用量和排队顺序由 Hugging Face 一方决定。 || 무료 계정은 하루 5 GPU분 정도가 기준이며, 이미지·동영상 등 모든 ZeroGPU 사용의 합계입니다. 토큰 없이도 시험해 볼 수 있지만, 익명 이용은 공유 한도가 작고 혼잡해지기 쉽습니다. 이용량과 대기 순서는 Hugging Face 쪽에서 정해집니다.
+無料トークンの作成 || Create a free token || 创建免费令牌 || 무료 토큰 만들기
+無料枠の説明 || About the free allowance || 免费额度说明 || 무료 한도 설명
+接続確認 || Check connection || 检查连接 || 연결 확인
+生成して端末に保存 || Generate and save to device || 生成并保存到设备 || 생성해서 기기에 저장
+まだ接続していません。接続確認はGPUを使わず、生成を押すと無料枠を消費します。 || Not connected yet. Checking the connection does not use the GPU; pressing Generate uses up your free allowance. || 尚未连接。检查连接不会使用 GPU，点击“生成”会消耗免费额度。 || 아직 연결하지 않았습니다. 연결 확인은 GPU를 사용하지 않으며, 생성을 누르면 무료 한도가 소모됩니다.
+hf_...（この画面を閉じると破棄） || hf_... (discarded when you close this screen) || hf_...（关闭此页面后将被丢弃） || hf_...(이 화면을 닫으면 폐기됩니다)
+リンクをコピー || Copy link || 复制链接 || 링크 복사
+自動では送られません。「現在地を取得」を押したときだけ位置を調べ、小数点以下4桁（約10m）に丸めます。チャットを開いていなくても使えます。 || Nothing is sent automatically. Your location is checked only when you press "Get current location", and it is rounded to 4 decimal places (about 10 m). You can use this even if no chat is open. || 不会自动发送。只有在点击“获取当前位置”时才会查询位置，并四舍五入到小数点后4位（约10米）。即使没有打开聊天也可以使用。 || 자동으로는 전송되지 않습니다. '현재 위치 가져오기'를 눌렀을 때만 위치를 조사하며, 소수점 아래 4자리(약 10m)로 반올림합니다. 채팅을 열지 않아도 사용할 수 있습니다.
+「現在地を取得」を押すと、ブラウザが許可を求めます。 || When you press "Get current location", your browser will ask for permission. || 点击“获取当前位置”后，浏览器会请求授权。 || '현재 위치 가져오기'를 누르면 브라우저가 허용을 요청합니다.
+現在地を取得 || Get current location || 获取当前位置 || 현재 위치 가져오기
+地図で開く || Open in map || 在地图中打开 || 지도로 열기
+座標をコピー || Copy coordinates || 复制坐标 || 좌표 복사
+ひとこと（60文字まで・任意） || A short note (up to 60 characters, optional) || 附言（最多60字·可选） || 한마디(60자까지·선택)
+送り先 || Send to || 发送给 || 보낼 곳
+（送らない） || (Don't send) || （不发送） || (보내지 않음)
+このチャットに送信 || Send to this chat || 发送到此聊天 || 이 채팅에 보내기
+例：駅の東口にいます || e.g. I'm at the east exit of the station || 例：我在车站东口 || 예: 역 동쪽 출구에 있어요
+ワークスペース || Workspace || 工作空间 || 워크스페이스
+チームで使う仕事用の画面です。メンバーだけが見られます。 || A work screen for teams. Only members can see it. || 团队使用的工作页面，仅成员可见。 || 팀에서 쓰는 업무용 화면입니다. 멤버만 볼 수 있습니다.
+出勤だけ使う（個人） || Use attendance only (personal) || 只使用出勤功能（个人） || 출근만 사용(개인)
+個人の出勤管理 || Personal attendance || 个人出勤管理 || 개인 출근 관리
+まだワークスペースがありません。下で作成してください。 || There is no workspace yet. Create one below. || 还没有工作空间，请在下方创建。 || 아직 워크스페이스가 없습니다. 아래에서 만들어 주세요.
+新しいワークスペース名 || New workspace name || 新工作空间名称 || 새 워크스페이스 이름
+作成 || Create || 创建 || 만들기
+例：営業チーム || e.g. Sales team || 例：销售团队 || 예: 영업팀
+自分のカレンダーの予定とすき間から、会議などに使える時間をルールで計算します。 || Calculates times that can be used for meetings from your own calendar events and gaps, using rules. || 根据自己日历中的日程和空隙，按规则计算可用于会议等的时间。 || 내 캘린더의 일정과 빈틈에서 회의 등에 쓸 수 있는 시간을 규칙으로 계산합니다.
+必要な時間（分） || Time needed (minutes) || 所需时间（分钟） || 필요한 시간(분)
+何時から（例 9） || From what hour (e.g. 9) || 几点开始（例 9） || 몇 시부터(예 9)
+何時まで（例 18） || Until what hour (e.g. 18) || 到几点（例 18） || 몇 시까지(예 18)
+提案する || Suggest || 提出建议 || 제안하기
+体重・睡眠・歩数・気分を記録します。自分だけが見られます（管理者を含め他の人には見えません）。 || Record weight, sleep, steps and mood. Only you can see it (not even the administrator or anyone else). || 记录体重·睡眠·步数·心情。仅自己可见（包括管理员在内的其他人都看不到）。 || 체중·수면·걸음 수·기분을 기록합니다. 나만 볼 수 있습니다(관리자를 포함해 다른 사람에게는 보이지 않습니다).
+体重 7日平均(kg) || Weight 7-day avg (kg) || 体重 7日平均(kg) || 체중 7일 평균(kg)
+睡眠 7日平均(h) || Sleep 7-day avg (h) || 睡眠 7日平均(h) || 수면 7일 평균(h)
+歩数 7日平均 || Steps 7-day avg || 步数 7日平均 || 걸음 수 7일 평균
+歩数（14日） || Steps (14 days) || 步数（14天） || 걸음 수(14일)
+睡眠（14日・時間） || Sleep (14 days, hours) || 睡眠（14天·小时） || 수면(14일·시간)
+記録する（入れた項目だけ保存） || Record (saves only the fields you filled in) || 记录（仅保存已填写的项目） || 기록하기(입력한 항목만 저장)
+気分 || Mood || 心情 || 기분
+（記録しない） || (Don't record) || （不记录） || (기록하지 않음)
+最近の記録 || Recent records || 最近的记录 || 최근 기록
+まだ記録がありません。 || There are no records yet. || 还没有记录。 || 아직 기록이 없습니다.
+CSVで保存 || Save as CSV || 保存为 CSV || CSV로 저장
+この記録は健康の目安づくり用です。体調に不安があるときは医療機関に相談してください。 || These records are only a rough guide for your health. If you are worried about your condition, please consult a medical institution. || 此记录仅用于了解健康的大致情况。如果对身体状况感到不安，请咨询医疗机构。 || 이 기록은 건강의 기준을 잡기 위한 것입니다. 몸 상태가 걱정될 때는 의료기관과 상담해 주세요.
+体重 kg || Weight kg || 体重 kg || 체중 kg
+睡眠 時間 || Sleep hours || 睡眠 小时 || 수면 시간
+歩数 || Steps || 步数 || 걸음 수
+メモ（任意） || Memo (optional) || 备注（可选） || 메모(선택)
+目的地を決めて、メッセージを預けます。着いたら「到着しました」を押すと送信されます。 || Set a destination and leave a message. When you arrive, press "I've arrived" to send it. || 设定目的地并预存消息。到达后点击“已到达”即可发送。 || 목적지를 정해 메시지를 맡겨 둡니다. 도착해서 '도착했습니다'를 누르면 전송됩니다.
+新しく預ける || Leave a new one || 新增预存 || 새로 맡기기
+先にチャットを開いてから、この画面を開いてください。 || Please open a chat first, then open this screen. || 请先打开聊天，再打开此页面。 || 먼저 채팅을 연 다음 이 화면을 열어 주세요.
+目的地の名前 || Destination name || 目的地名称 || 목적지 이름
+送るメッセージ（500文字まで） || Message to send (up to 500 characters) || 要发送的消息（最多500字） || 보낼 메시지(500자까지)
+地名で探す || Search by place name || 按地名搜索 || 지명으로 찾기
+探す || Search || 搜索 || 찾기
+目的地の座標（緯度,経度） || Destination coordinates (latitude, longitude) || 目的地坐标（纬度,经度） || 목적지 좌표(위도,경도)
+いまの場所を目的地にする || Use my current location as the destination || 将当前位置设为目的地 || 지금 있는 곳을 목적지로 하기
+到着とみなす範囲 || Range counted as arrived || 视为到达的范围 || 도착으로 보는 범위
+100m以内 || Within 100 m || 100米以内 || 100m 이내
+150m以内 || Within 150 m || 150米以内 || 150m 이내
+300m以内 || Within 300 m || 300米以内 || 300m 이내
+1km以内 || Within 1 km || 1公里以内 || 1km 이내
+預ける || Leave it || 预存 || 맡기기
+近づいたらお知らせ：オフ || Notify when nearby: Off || 接近时通知：关 || 가까워지면 알림: 꺼짐
+近づいたらお知らせ：オン || Notify when nearby: On || 接近时通知：开 || 가까워지면 알림: 켜짐
+オンにすると、ARE を開いている間、目的地の近くに来たときに画面にお知らせが出ます（押すと送信）。位置情報はこの端末の中だけで調べます。 || When on, while ARE is open, a notice appears on screen when you get near the destination (press it to send). Your location is checked only inside this device. || 开启后，在打开 ARE 期间，接近目的地时屏幕上会出现提示（点击即可发送）。位置信息仅在此设备内部查询。 || 켜면 ARE를 열어 둔 동안 목적지 근처에 오면 화면에 알림이 표시됩니다(누르면 전송). 위치 정보는 이 기기 안에서만 조사합니다.
+預けているメッセージ || Messages you left || 已预存的消息 || 맡겨 둔 메시지
+預けているメッセージはありません。 || You have no messages left. || 没有已预存的消息。 || 맡겨 둔 메시지가 없습니다.
+例：駅の改札 || e.g. Station ticket gate || 例：车站检票口 || 예: 역 개찰구
+例：東京駅 || e.g. Tokyo Station || 例：东京站 || 예: 도쿄역
+気分・時間帯でテーマを変える || Change the theme by mood and time of day || 按心情·时间段切换主题 || 기분·시간대에 따라 테마 바꾸기
+朝・昼・夕方・夜で自動的にテーマが変わります。気分を表す言葉を書くと、その言葉に合うテーマに切り替わります。この端末だけの設定です。 || The theme changes automatically in the morning, noon, evening and night. If you write a word that expresses your mood, it switches to a matching theme. This setting applies to this device only. || 主题会按早晨、白天、傍晚、夜晚自动切换。写下表达心情的词语，会切换到与之匹配的主题。此设置仅对本设备有效。 || 아침·낮·저녁·밤에 따라 테마가 자동으로 바뀝니다. 기분을 나타내는 말을 쓰면 그 말에 맞는 테마로 바뀝니다. 이 기기에서만 적용되는 설정입니다.
+自動で切り替える || Switch automatically || 自动切换 || 자동으로 전환
+いまの時間帯：{p} → {theme} || Current time of day: {p} → {theme} || 当前时间段：{p} → {theme} || 현재 시간대: {p} → {theme}
+いまの気分を一言（例：嬉しい／疲れた／のんびり） || Your mood in a word (e.g. happy / tired / relaxed) || 用一个词说说现在的心情（例：开心／累了／悠闲） || 지금 기분을 한마디로(예: 기뻐요／피곤해／느긋해)
+この気分にする || Set this mood || 设为此心情 || 이 기분으로 하기
+時間帯と言葉の設定（mood-theme.json） || Time-of-day and word settings (mood-theme.json) || 时间段与词语设置（mood-theme.json） || 시간대와 말 설정(mood-theme.json)
+朝：5〜11時 → {theme} || Morning: 5–11 → {theme} || 早晨：5～11点 → {theme} || 아침: 5~11시 → {theme}
+昼：11〜17時 → {theme} || Noon: 11–17 → {theme} || 白天：11～17点 → {theme} || 낮: 11~17시 → {theme}
+夕方：17〜21時 → {theme} || Evening: 17–21 → {theme} || 傍晚：17～21点 → {theme} || 저녁: 17~21시 → {theme}
+夜：21〜5時 → {theme} || Night: 21–5 → {theme} || 夜晚：21～5点 → {theme} || 밤: 21~5시 → {theme}
+さくらの気分：{list} || Sakura mood: {list} || 樱花心情：{list} || 벚꽃 기분: {list}
+森の気分：{list} || Forest mood: {list} || 森林心情：{list} || 숲 기분: {list}
+夕焼けの気分：{list} || Sunset mood: {list} || 晚霞心情：{list} || 노을 기분: {list}
+標準（ダーク）：{list} || Standard (dark): {list} || 标准（深色）：{list} || 표준(다크): {list}
+ライト：{list} || Light: {list} || 浅色：{list} || 라이트: {list}
+さくらの気分 || Sakura mood || 樱花心情 || 벚꽃 기분
+森の気分 || Forest mood || 森林心情 || 숲 기분
+夕焼けの気分 || Sunset mood || 晚霞心情 || 노을 기분
+標準（ダーク） || Standard (dark) || 标准（深色） || 표준(다크)
+ライト || Light || 浅色 || 라이트
+言葉を足したいときは、mood-theme.json を書き換えて上書きアップロードします。 || To add words, edit mood-theme.json and upload it over the old one. || 想添加词语时，请修改 mood-theme.json 并覆盖上传。 || 말을 추가하고 싶을 때는 mood-theme.json을 수정해서 덮어쓰기로 업로드합니다.
+先にチャットを開いてください。 || Please open a chat first. || 请先打开聊天。 || 먼저 채팅을 열어 주세요.
+ディーラー（CPU）と対戦。コインはこの端末だけの遊び用です。 || Play against the dealer (CPU). Coins are just for play on this device only. || 与庄家（CPU）对战。金币仅供本设备娱乐使用。 || 딜러(CPU)와 대결합니다. 코인은 이 기기에서만 쓰는 놀이용입니다.
+持ち点： || Balance: || 持有点数： || 보유 점수:
+コイン || Coins || 金币 || 코인
+かけるコイン || Coins to bet || 下注金币 || 거는 코인

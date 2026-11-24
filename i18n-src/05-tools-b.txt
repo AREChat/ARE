@@ -1,0 +1,144 @@
+# ===== ツールの画面（2）：メモ〜セキュリティ =====
+メモ || Notes || 备忘录 || 메모
+ゴミ箱 || Trash || 回收站 || 휴지통
+メモを入力... || Type a note... || 输入备忘... || 메모를 입력하세요...
+メモはまだありません。「メモを入力...」から追加できます。 || There are no notes yet. You can add one from "Type a note...". || 还没有备忘。可以通过“输入备忘...”添加。 || 메모가 아직 없습니다. '메모를 입력하세요...'에서 추가할 수 있습니다.
+このメモは自分だけが見られます。管理者を含め、他の人には表示されません。 || Only you can see these notes. They are not shown to anyone else, including the administrator. || 此备忘仅自己可见，包括管理员在内的其他人都看不到。 || 이 메모는 나만 볼 수 있습니다. 관리자를 포함해 다른 사람에게는 표시되지 않습니다.
+メモを検索... || Search notes... || 搜索备忘... || 메모 검색...
+配る || Deal || 发牌 || 나눠 주기
+CO2の記録 || CO2 log || CO2 记录 || CO2 기록
+移動・食事・電気から、CO2の目安を計算して記録します。自分だけが見られます。 || Calculates and records an estimate of CO2 from travel, meals and electricity. Only you can see it. || 根据出行·饮食·用电，计算并记录CO2的大致排放量。仅自己可见。 || 이동·식사·전기에서 CO2의 기준량을 계산해 기록합니다. 나만 볼 수 있습니다.
+今日 (kg) || Today (kg) || 今天 (kg) || 오늘 (kg)
+7日間 (kg) || 7 days (kg) || 7天 (kg) || 7일간 (kg)
+今月 (kg) || This month (kg) || 本月 (kg) || 이번 달 (kg)
+今月の分は、スギ約 {n} 本が1か月で吸収する量に相当します（1本あたり年間約8.8kgの目安）。 || This month's amount equals what about {n} cedar tree(s) absorb in a month (a guide of about 8.8 kg per tree per year). || 本月的排放量相当于约 {n} 棵杉树一个月的吸收量（按每棵每年约8.8kg估算）。 || 이번 달 분량은 삼나무 약 {n}그루가 한 달 동안 흡수하는 양에 해당합니다(한 그루당 연간 약 8.8kg 기준).
+徒歩 || Walking || 步行 || 도보
+自転車 || Bicycle || 自行车 || 자전거
+バス || Bus || 公交车 || 버스
+電車 || Train || 电车 || 전철
+自家用車 || Private car || 私家车 || 자가용
+飛行機（国内） || Airplane (domestic) || 飞机（国内） || 비행기(국내)
+牛肉 || Beef || 牛肉 || 소고기
+鶏肉 || Chicken || 鸡肉 || 닭고기
+野菜 || Vegetables || 蔬菜 || 채소
+電気 || Electricity || 电力 || 전기
+そのほか（kgで直接入力） || Other (enter kg directly) || 其他（直接输入kg） || 기타(kg으로 직접 입력)
+CO2の目安：{n} kg || Estimated CO2: {n} kg || CO2 估算：{n} kg || CO2 기준량: {n} kg
+計算に使っている係数（目安） || Coefficients used in the calculation (approximate) || 计算所用系数（参考值） || 계산에 쓰는 계수(기준)
+徒歩：0 || Walking: 0 || 步行：0 || 도보: 0
+自転車：0 || Bicycle: 0 || 自行车：0 || 자전거: 0
+バス：約57g/人km || Bus: about 57 g/person·km || 公交车：约57g/人·km || 버스: 약 57g/인·km
+電車：約18g/人km || Train: about 18 g/person·km || 电车：约18g/人·km || 전철: 약 18g/인·km
+自家用車：約130g/km || Private car: about 130 g/km || 私家车：约130g/km || 자가용: 약 130g/km
+飛行機（国内）：約100g/人km || Airplane (domestic): about 100 g/person·km || 飞机（国内）：约100g/人·km || 비행기(국내): 약 100g/인·km
+牛肉：約2.7kg/100g || Beef: about 2.7 kg/100 g || 牛肉：约2.7kg/100g || 소고기: 약 2.7kg/100g
+鶏肉：約0.7kg/100g || Chicken: about 0.7 kg/100 g || 鸡肉：约0.7kg/100g || 닭고기: 약 0.7kg/100g
+野菜：約0.1kg/100g || Vegetables: about 0.1 kg/100 g || 蔬菜：约0.1kg/100g || 채소: 약 0.1kg/100g
+電気：約0.45kg/kWh || Electricity: about 0.45 kg/kWh || 电力：约0.45kg/kWh || 전기: 약 0.45kg/kWh
+そのほか（kgで直接入力）：入力値そのまま || Other (enter kg directly): the entered value as is || 其他（直接输入kg）：按输入值计算 || 기타(kg으로 직접 입력): 입력값 그대로
+直近14日の記録 || Records from the last 14 days || 最近14天的记录 || 최근 14일 기록
+種類 || Type || 种类 || 종류
+量 || Amount || 数量 || 양
+自分だけのキャラクターを作って画像として送れます。 || Create your own character and send it as an image. || 可以创建专属于自己的角色，并作为图片发送。 || 나만의 캐릭터를 만들어 이미지로 보낼 수 있습니다.
+髪型 || Hairstyle || 发型 || 헤어스타일
+短め || Short || 短发 || 짧게
+ロング || Long || 长发 || 롱
+ボブ || Bob || 波波头 || 단발
+つるつる || Bald || 光头 || 민머리
+ツンツン || Spiky || 刺猬头 || 뾰족뾰족
+髪の色 || Hair color || 发色 || 머리 색
+肌の色 || Skin color || 肤色 || 피부 색
+目 || Eyes || 眼睛 || 눈
+ふつう || Normal || 普通 || 보통
+おおきい || Large || 大眼睛 || 큰 눈
+やさしい || Gentle || 温柔 || 온화한
+アクセサリー || Accessory || 配饰 || 액세서리
+めがね || Glasses || 眼镜 || 안경
+リボン || Ribbon || 蝴蝶结 || 리본
+ニット帽 || Knit cap || 针织帽 || 니트 모자
+ヘッドホン || Headphones || 耳机 || 헤드폰
+ねこ耳 || Cat ears || 猫耳 || 고양이 귀
+服の色 || Clothes color || 衣服颜色 || 옷 색
+背景の色 || Background color || 背景颜色 || 배경 색
+チャットに画像で送る || Send to chat as an image || 以图片形式发送到聊天 || 채팅에 이미지로 보내기
+画像を保存 || Save image || 保存图片 || 이미지 저장
+アバターのプレビュー || Avatar preview || 头像预览 || 아바타 미리보기
+色{n} || Color {n} || 颜色{n} || 색{n}
+見た目の設定だけを保存します。動きの同期や追加通信はありません。 || Only the appearance settings are saved. There is no motion syncing or extra communication. || 仅保存外观设置，没有动作同步或额外通信。 || 겉모습 설정만 저장합니다. 움직임 동기화나 추가 통신은 없습니다.
+形 || Shape || 形状 || 모양
+丸い || Round || 圆形 || 둥근
+少し角ばった || Slightly angular || 略带棱角 || 약간 각진
+肌 || Skin || 皮肤 || 피부
+髪 || Hair || 头发 || 머리카락
+服 || Clothes || 衣服 || 옷
+背景 || Background || 背景 || 배경
+あなた専用のAIです。外部のAIは使わず、この端末の中だけで動きます。覚えた内容はこの端末にだけ保存されます。 || Your own personal AI. It does not use any external AI and runs only inside this device. What it learns is saved only on this device. || 这是您专属的AI。不使用外部AI，仅在此设备内运行。学到的内容只保存在本设备。 || 나만을 위한 AI입니다. 외부 AI는 쓰지 않고 이 기기 안에서만 작동합니다. 기억한 내용은 이 기기에만 저장됩니다.
+名前を変える || Rename || 更改名字 || 이름 바꾸기
+こんにちは！私はAREbotです。あなた専用のAIです。質問してみてください。知らないことは、教えてもらえれば覚えます（「質問＝答え」の形で送ってもOK）。 || Hello! I'm AREbot, your own personal AI. Feel free to ask me something. If there's something I don't know, teach me and I'll remember it (you can also send it in the form "question = answer"). || 你好！我是 AREbot，您专属的AI。请随便问我问题。不知道的事情，您教我我就会记住（也可以用“问题＝答案”的形式发送）。 || 안녕하세요! 저는 AREbot입니다. 당신만을 위한 AI예요. 질문해 보세요. 모르는 것은 가르쳐 주시면 기억할게요('질문＝답' 형태로 보내도 괜찮아요).
+送る || Send || 发送 || 보내기
+覚えていること（{n}件） || What I remember ({n}) || 已记住的内容（{n}条） || 기억하고 있는 것({n}건)
+まだありません。 || None yet. || 目前还没有。 || 아직 없습니다.
+会話から学ぶ || Learn from conversations || 从对话中学习 || 대화에서 배우기
+あなたの過去のチャットから「相手がこう言ったら、自分はこう返した」を集めます（{n}組を記憶中）。この端末の中だけで処理します。 || Collects "when they said this, I replied like this" from your past chats ({n} pair(s) remembered). Processed only inside this device. || 从您过去的聊天中收集“对方这样说，自己这样回”（已记住{n}组）。仅在此设备内处理。 || 내 과거 채팅에서 '상대가 이렇게 말하면 나는 이렇게 답했다'를 모읍니다({n}쌍 기억 중). 이 기기 안에서만 처리합니다.
+返信候補に使う：オン || Use for reply suggestions: On || 用于回复建议：开 || 답장 후보에 사용: 켜짐
+返信候補に使う：オフ || Use for reply suggestions: Off || 用于回复建议：关 || 답장 후보에 사용: 꺼짐
+書き出し／読み込み || Export / import || 导出／导入 || 내보내기／불러오기
+書き出す || Export || 导出 || 내보내기
+読み込む（追加） || Import (add) || 导入（追加） || 불러오기(추가)
+AIの名前 || AI name || AI 名称 || AI 이름
+質問、または「質問＝答え」で教える || Ask a question, or teach with "question = answer" || 提问，或用“问题＝答案”来教它 || 질문하거나 '질문＝답'으로 가르쳐 주세요
+分析するチャットを、先に開いてください。 || Please open the chat you want to analyze first. || 请先打开要分析的聊天。 || 분석할 채팅을 먼저 열어 주세요.
+公開終了から7日間はサーバーに保管し、その後は端末の保存領域に残します。端末保存が確認できると、サーバー上の画像と投稿は自動削除されます。 || For 7 days after publishing ends, they are kept on the server, and after that they remain in your device's storage. Once the device copy is confirmed, the images and posts on the server are deleted automatically. || 公开结束后的7天内保存在服务器，之后保留在设备的存储空间中。确认设备已保存后，服务器上的图片和动态会被自动删除。 || 공개 종료 후 7일간은 서버에 보관하고, 그 뒤에는 기기의 저장 공간에 남깁니다. 기기 저장이 확인되면 서버의 이미지와 게시물은 자동 삭제됩니다.
+全 {n} 件 || {n} in total || 共 {n} 条 || 총 {n}건
+アーカイブはまだありません。ストーリーは公開終了後7日間ここに残り、その後は端末に保存されます。 || There is no archive yet. Stories stay here for 7 days after they stop being public and are then saved on your device. || 还没有存档。故事在公开结束后会在这里保留7天，之后保存到设备上。 || 보관함이 아직 없습니다. 스토리는 공개 종료 후 7일간 여기에 남고, 그 뒤에는 기기에 저장됩니다.
+プロフィール共有 || Share profile || 分享资料 || 프로필 공유
+このQRコードを相手のスマホで読み取ると、あなたのプロフィールが開きます（相手もログインが必要です）。 || When the other person scans this QR code with their phone, your profile opens (they also need to be logged in). || 对方用手机扫描此二维码，就会打开您的资料（对方也需要登录）。 || 상대가 이 QR 코드를 스마트폰으로 읽으면 내 프로필이 열립니다(상대도 로그인해야 합니다).
+QR画像を保存 || Save QR image || 保存二维码图片 || QR 이미지 저장
+プロフィールのQRコード || Profile QR code || 资料二维码 || 프로필 QR 코드
+遊ぶとスコアが記録され、ランキングに載ります。 || Your score is recorded when you play and appears in the rankings. || 游玩后分数会被记录，并出现在排行榜中。 || 플레이하면 점수가 기록되어 랭킹에 오릅니다.
+じゃんけん || Rock-paper-scissors || 猜拳 || 가위바위보
+何連勝できるか（負けたら終了） || How many wins in a row can you get (it ends when you lose) || 能连胜几次（输了就结束） || 몇 연승할 수 있을까(지면 종료)
+数当て || Guess the number || 猜数字 || 숫자 맞히기
+1〜100の数字を少ない回数で当てる || Guess a number from 1 to 100 in as few tries as possible. || 用尽量少的次数猜出1～100的数字。 || 1~100의 숫자를 적은 횟수로 맞힙니다.
+三目並べ || Tic-tac-toe || 井字棋 || 틱택토
+CPUと対戦。勝ち3点・引き分け1点（合計で競う） || Play against the CPU. Win = 3 points, draw = 1 point (compete on the total). || 与CPU对战。胜3分·平局1分（比拼总分）。 || CPU와 대결합니다. 승리 3점·무승부 1점(합계로 경쟁)
+神経衰弱 || Memory match || 翻牌配对 || 신경쇠약(카드 짝 맞추기)
+少ない手数でペアを全部そろえる || Match all the pairs in as few moves as possible. || 用尽量少的步数配齐所有的对子。 || 적은 횟수로 짝을 모두 맞춥니다.
+絵文字クイズ || Emoji quiz || 表情符号问答 || 이모지 퀴즈
+10問。正解数がスコア || 10 questions. Your score is the number of correct answers. || 10道题，答对的数量即为分数。 || 10문제. 정답 수가 점수입니다.
+しりとり || Shiritori (word chain) || 接龙 || 끝말잇기
+CPUと何往復できるか || How many rounds can you go with the CPU || 能和CPU来回接几轮 || CPU와 몇 번 주고받을 수 있을까
+絵文字しりとり || Emoji shiritori || 表情符号接龙 || 이모지 끝말잇기
+CPUの絵文字を読み取って、しりとりでつなぐ（友だちとの絵しりとりは「対戦ゲーム」） || Read the CPU's emoji and chain with shiritori (picture shiritori with friends is under "Versus games"). || 读取CPU的表情符号，进行接龙（和朋友玩的画图接龙在“对战游戏”中）。 || CPU의 이모지를 읽고 끝말잇기로 이어 갑니다(친구와 하는 그림 끝말잇기는 '대전 게임').
+ランキング || Rankings || 排行榜 || 랭킹
+成績・実績 || Stats & achievements || 成绩·成就 || 성적·업적
+あなただけが見られます（管理者を含め、他の人には表示されません）。 || Only you can see this (it is not shown to anyone else, including the administrator). || 仅您自己可见（包括管理员在内的其他人都看不到）。 || 나만 볼 수 있습니다(관리자를 포함해 다른 사람에게는 표시되지 않습니다).
+カレンダー || Calendar || 日历 || 캘린더
+タスク || Tasks || 任务 || 할 일
+アプリを閉じていても、新着をお知らせします（無料） || Notifies you of new messages even when the app is closed (free) || 即使关闭应用，也会通知您新消息（免费） || 앱을 닫아도 새 소식을 알려 줍니다(무료)
+状態：⛔ ブラウザでブロック中 || Status: ⛔ Blocked by the browser || 状态：⛔ 被浏览器屏蔽 || 상태: ⛔ 브라우저에서 차단 중
+通知をオンにする || Turn on notifications || 开启通知 || 알림 켜기
+通知に本文を表示する（オフだと「新しいメッセージ」とだけ表示） || Show message text in notifications (if off, only "New message" is shown) || 在通知中显示正文（关闭后只显示“新消息”） || 알림에 본문 표시(끄면 '새 메시지'만 표시)
+おやすみ時間 || Quiet hours || 免打扰时间 || 방해 금지 시간
+この時間はプッシュ通知を送らない || No push notifications during this time || 此时间段不发送推送通知 || 이 시간에는 푸시 알림을 보내지 않음
+開始 || Start || 开始 || 시작
+時 || h || 时 || 시
+分 || min || 分 || 분
+終了 || End || 结束 || 종료
+決定ずみ：{a}〜{b}（いまはオフです） || Set: {a}–{b} (currently off) || 已设置：{a}～{b}（当前为关闭） || 설정됨: {a}~{b}(지금은 꺼져 있습니다)
+決定ずみ：{a}〜{b}（いまは おやすみ中です） || Set: {a}–{b} (quiet hours are on now) || 已设置：{a}～{b}（当前处于免打扰中） || 설정됨: {a}~{b}(지금은 방해 금지 중입니다)
+決定 || Set || 确定 || 결정
+端末のタイムゾーン：{tz} || Device time zone: {tz} || 设备时区：{tz} || 기기 시간대: {tz}
+ホーム画面に追加 || Add to home screen || 添加到主屏幕 || 홈 화면에 추가
+ブラウザのメニュー（⋮）から「アプリをインストール」または「ホーム画面に追加」を選べます。 || From the browser menu (⋮) you can choose "Install app" or "Add to Home screen". || 可以从浏览器菜单（⋮）中选择“安装应用”或“添加到主屏幕”。 || 브라우저 메뉴(⋮)에서 '앱 설치' 또는 '홈 화면에 추가'를 선택할 수 있습니다.
+ミュート中のチャット || Muted chats || 已静音的聊天 || 음소거 중인 채팅
+ありません（チャット画面の 🔔 で切り替えます） || None (switch with 🔔 on the chat screen) || 没有（在聊天页面用 🔔 切换） || 없습니다(채팅 화면의 🔔로 전환합니다)
+開始の時 || Start hour || 开始的时 || 시작 시
+開始の分 || Start minute || 开始的分 || 시작 분
+終了の時 || End hour || 结束的时 || 종료 시
+終了の分 || End minute || 结束的分 || 종료 분
+認証アプリの6桁コードで管理者機能を保護します。コードは端末外へ送信しません。 || Admin features are protected with the 6-digit code from an authenticator app. The code is never sent outside your device. || 用验证应用的6位数代码保护管理员功能。代码不会发送到设备之外。 || 인증 앱의 6자리 코드로 관리자 기능을 보호합니다. 코드는 기기 밖으로 전송되지 않습니다.
+管理者アカウントでログインしてください。 || Please log in with an administrator account. || 请使用管理员账号登录。 || 관리자 계정으로 로그인해 주세요.
+認証コード || Authentication code || 验证码 || 인증 코드
+認証アプリを登録 || Register authenticator app || 注册验证应用 || 인증 앱 등록
+6桁のコード || 6-digit code || 6位数代码 || 6자리 코드

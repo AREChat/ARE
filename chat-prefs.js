@@ -45,14 +45,14 @@ function openPrefs(){
     openSheet(toolHead("⚙️ 表示設定・言語", "この端末だけに保存されます。") +
         '<label>気分テーマ<select class="status-select" data-t="pf:theme">' + Object.keys(THEMES).map((k) => '<option value="' + k + '"' + (k === theme ? " selected" : "") + '>' + THEMES[k].label + '</option>').join("") + '</select></label>' +
         '<label><input type="checkbox" data-t="pf:eco"' + (eco ? " checked" : "") + '> 省データ・省電力モード<small class="meta" style="display:block">アニメーションを止め、動画・音声を再生するまで読み込まないようにします。</small></label>' +
-        '<label>言語 / Language<select class="status-select" data-t="pf:lang"><option value="ja"' + (lang === "ja" ? " selected" : "") + '>日本語</option><option value="en"' + (lang === "en" ? " selected" : "") + '>English（一部のみ / partial）</option></select></label>' +
-        '<div class="meta">English は、メニューやボタンなど主な画面部品が対象です。チャットの内容・エラーメッセージ・管理者パネルは日本語のままです。</div>' +
+        '<label>言語 / Language / 语言 / 언어<select class="status-select" data-t="pf:lang">' + [["ja","日本語"],["en","English"],["zh","中文（简体）"],["ko","한국어"]].map((p) => '<option value="' + p[0] + '"' + (lang === p[0] ? " selected" : "") + '>' + p[1] + '</option>').join("") + '</select></label>' +
+        '<div class="meta">日本語 / English / 中文 / 한국어 に対応しています。チャットで やりとりした 文章そのものは 翻訳されません（🌐 翻訳ボタンで 1 通ずつ翻訳できます）。</div>' +
         '<label><input type="checkbox" data-t="pf:install"' + (showInstall ? " checked" : "") + '> 📲 アプリ化ボタンをチャットの上のバーに表示<small class="meta" style="display:block">オフにしても「その他」からはいつでもアプリ化できます。</small></label>' + toolClose());
 }
 
 function onPrefsAction(action, node){
     if(action === "theme"){ prefSet("are_theme", node.value); applyTheme(node.value); }
     else if(action === "eco"){ prefSet("are_eco", node.checked ? "1" : "0"); applyEco(node.checked); }
-    else if(action === "lang"){ prefSet("are_lang", node.value); if(typeof applyLanguage === "function") applyLanguage(node.value); else showToast("この機能は未実装です。"); }
+    else if(action === "lang"){ prefSet("are_lang", node.value); if(typeof applyLanguage === "function") applyLanguage(node.value); }
     else if(action === "install"){ prefSet("are_show_install", node.checked ? "1" : "0"); if(typeof hdrInstallPaint === "function") hdrInstallPaint(); }
 }

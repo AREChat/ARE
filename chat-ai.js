@@ -163,7 +163,7 @@ function toggleDictation(){
     const button = $("dictateButton");
     if(feat.ai.recording && feat.ai.rec){ feat.ai.rec.stop(); return; }
     const rec = new Recognition();
-    rec.lang = prefGet("are_lang", "ja") === "en" ? "en-US" : "ja-JP";
+    rec.lang = ({ja:"ja-JP", en:"en-US", zh:"zh-CN", ko:"ko-KR"})[prefGet("are_lang", "ja")] || "ja-JP";
     rec.interimResults = true; rec.continuous = false;
     const base = el.messageInput.value;
     let finalText = "";
@@ -195,11 +195,11 @@ async function translateMessage(item){
     }
     openSheet(toolHead("🌐 翻訳") + '<div class="meta">原文</div><div class="admin-card">' + escapeHtml(text) + '</div><div id="trOut" class="empty-list">翻訳しています...（初回は言語データの準備に時間がかかることがあります）</div>' + toolClose());
     try{
-        let source = /[぀-ヿ一-鿿]/.test(text) ? "ja" : "en";
+        let source = /[぀-ヿ]/.test(text) ? "ja" : /[가-힣]/.test(text) ? "ko" : /[一-鿿]/.test(text) ? "zh" : "en";
         if("LanguageDetector" in self){
             try{ const det = await self.LanguageDetector.create(); const res = await det.detect(text); if(res && res[0] && res[0].confidence > 0.5) source = res[0].detectedLanguage; }catch(_e){}
         }
-        const wanted = prefGet("are_lang", "ja") === "en" ? "en" : "ja";
+        const wanted = ({ja:"ja", en:"en", zh:"zh", ko:"ko"})[prefGet("are_lang", "ja")] || "ja";
         const target = source === wanted ? (wanted === "ja" ? "en" : "ja") : wanted;
         const avail = await self.Translator.availability({sourceLanguage:source, targetLanguage:target});
         if(avail === "unavailable"){ if($("trOut")) $("trOut").textContent = "この言語の組み合わせ（" + source + " → " + target + "）は翻訳できません。"; return; }

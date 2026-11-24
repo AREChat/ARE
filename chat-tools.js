@@ -72,7 +72,7 @@ const TOOL_LIST = [
     ["study124", "📚", "学習サイト（LearnLab124）", "プログラミング学習サイト（用語集・クイズ・物語）を別のタブで開きます。ARE とは別のサイトです", "openStudy124"],
     ["lock", "🔒", "ロック・自動ログアウト", "PIN・放置したら画面ぼかし/ログアウト", "openLock"],
     ["announce", "📢", "お知らせ", "管理者からのお知らせ", "openAnnouncements"],
-    ["prefs", "⚙️", "表示設定・言語", "気分テーマ・省データモード・English", "openPrefs"]
+    ["prefs", "⚙️", "表示設定・言語", "気分テーマ・省データモード・言語（日本語 / English / 中文 / 한국어）", "openPrefs"]
 ];
 
 const toolHandlers = {};

@@ -1,0 +1,198 @@
+# ===== 入口の画面：index / login / register / recovery / 404 / virus / 共通の警告 =====
+ARE 起動画面 || ARE Launch Screen || ARE 启动画面 || ARE 시작 화면
+ARE｜友達と話せる無料チャットとゲーム｜やりすぎヒーロー伝説＆ドリームストーリー || ARE | Free chat with friends and games | Over-the-Top Hero Legend & Dream Story || ARE｜可与朋友聊天的免费聊天与游戏｜过度英雄传说＆梦想故事 || ARE｜친구와 대화할 수 있는 무료 채팅과 게임｜너무한 히어로 전설 & 드림 스토리
+やりすぎヒーロー伝説＆ドリームストーリー || Over-the-Top Hero Legend & Dream Story || 过度英雄传说＆梦想故事 || 너무한 히어로 전설 & 드림 스토리
+ログイン画面へ移動しています… || Going to the login screen… || 正在前往登录页面… || 로그인 화면으로 이동하는 중…
+ログイン｜ARE チャット｜やりすぎヒーロー伝説＆ドリームストーリー || Log in | ARE Chat | Over-the-Top Hero Legend & Dream Story || 登录｜ARE 聊天｜过度英雄传说＆梦想故事 || 로그인｜ARE 채팅｜너무한 히어로 전설 & 드림 스토리
+新規登録｜ARE チャット｜やりすぎヒーロー伝説＆ドリームストーリー || Sign up | ARE Chat | Over-the-Top Hero Legend & Dream Story || 注册｜ARE 聊天｜过度英雄传说＆梦想故事 || 회원가입｜ARE 채팅｜너무한 히어로 전설 & 드림 스토리
+ARE | アカウント復旧 || ARE | Account recovery || ARE | 账号恢复 || ARE | 계정 복구
+ページが みつかりません｜ARE || Page not found | ARE || 找不到页面｜ARE || 페이지를 찾을 수 없습니다｜ARE
+ARE | 警告 || ARE | Warning || ARE | 警告 || ARE | 경고
+
+# --- ログイン ---
+ログイン || Log in || 登录 || 로그인
+ログインして会話を始めましょう。 || Log in to start chatting. || 登录后开始聊天吧。 || 로그인해서 대화를 시작해 보세요.
+おかえりなさい || Welcome back || 欢迎回来 || 어서 오세요
+おはようございます || Good morning || 早上好 || 좋은 아침입니다
+こんばんは || Good evening || 晚上好 || 안녕하세요(저녁)
+ログインID || Login ID || 登录ID || 로그인 ID
+ログインID：登録したときに決めたIDです（表示名とは別です）。 || Login ID: the ID you chose when you signed up (it is different from your display name). || 登录ID：注册时设定的ID（与显示名称不同）。 || 로그인 ID: 가입할 때 정한 ID입니다(표시 이름과는 다릅니다).
+パスワード || Password || 密码 || 비밀번호
+パスワード：登録したときに決めたパスワードです（復旧コードではありません）。右の目のボタンで、入力内容を表示して確認できます。 || Password: the password you chose when you signed up (not your recovery code). Use the eye button on the right to show what you typed. || 密码：注册时设定的密码（不是恢复码）。点击右侧的眼睛按钮可以显示输入的内容。 || 비밀번호: 가입할 때 정한 비밀번호입니다(복구 코드가 아닙니다). 오른쪽 눈 모양 버튼으로 입력한 내용을 표시해 확인할 수 있습니다.
+新規登録 || Sign up || 注册 || 회원가입
+アカウント復旧 || Account recovery || 账号恢复 || 계정 복구
+ログインしています... || Logging in... || 正在登录... || 로그인하는 중...
+ログインに失敗しました。 || Login failed. || 登录失败。 || 로그인에 실패했습니다.
+ログインしてください。 || Please log in. || 请先登录。 || 로그인해 주세요.
+ログインIDを入力してください。 || Please enter your login ID. || 请输入登录ID。 || 로그인 ID를 입력해 주세요.
+ログインIDとパスワードを入力してください。 || Please enter your login ID and password. || 请输入登录ID和密码。 || 로그인 ID와 비밀번호를 입력해 주세요.
+ログイン結果からユーザー情報を取得できませんでした。 || Could not get your user information from the login result. || 无法从登录结果中获取用户信息。 || 로그인 결과에서 사용자 정보를 가져오지 못했습니다.
+保存済みのログイン状態を確認できませんでした。再度ログインしてください。 || Could not check your saved login. Please log in again. || 无法确认已保存的登录状态，请重新登录。 || 저장된 로그인 상태를 확인하지 못했습니다. 다시 로그인해 주세요.
+ふだん使っている端末の ロック（PIN）や ログインを 3回以上 まちがえないようにしてください。 || Please do not enter the wrong PIN or password 3 or more times on the device you normally use. || 请不要在常用设备上将锁屏（PIN）或登录连续输错3次以上。 || 평소 사용하는 기기의 잠금(PIN)이나 로그인을 3회 이상 틀리지 않도록 해 주세요.
+🛡 3回まちがえたら、アカンです || 🛡 Get it wrong 3 times and it's a no-go || 🛡 输错3次就不行了 || 🛡 3번 틀리면 안 돼요
+✨ 登録しないでお試しではじめる（無料体験） || ✨ Try it without signing up (free trial) || ✨ 不注册，直接试用（免费体验） || ✨ 가입하지 않고 체험으로 시작하기(무료 체험)
+お試しは、登録もパスワードも要りません。チャットアプリを体験できます。ログアウトすると、このお試しには戻れません。 || The trial needs no sign-up and no password. You can try the chat app. Once you log out, you cannot return to this trial. || 试用无需注册，也不需要密码，可以体验聊天应用。退出登录后将无法回到本次试用。 || 체험은 가입도 비밀번호도 필요 없습니다. 채팅 앱을 체험할 수 있습니다. 로그아웃하면 이 체험으로 돌아갈 수 없습니다.
+お試しをはじめる前に || Before you start the trial || 开始试用之前 || 체험을 시작하기 전에
+お試しでは、名前が自動で「ゲスト＋数字」になります。はじめたら、チャット画面で自分の名前を確かめて、管理者に伝えてください。 || In the trial, your name is set automatically to "Guest + a number". Once you start, check your name on the chat screen and tell the administrator. || 试用时，名字会自动变成“Guest＋数字”。开始后，请在聊天页面确认自己的名字，并告诉管理员。 || 체험에서는 이름이 자동으로 '게스트＋숫자'가 됩니다. 시작한 뒤 채팅 화면에서 내 이름을 확인하고 관리자에게 알려 주세요.
+① 管理者に、自分の名前を伝えてください。 || ① Tell the administrator your name. || ① 请把自己的名字告诉管理员。 || ① 관리자에게 내 이름을 알려 주세요.
+② ログアウトに注意してください。 || ② Be careful about logging out. || ② 请注意不要随意退出登录。 || ② 로그아웃에 주의해 주세요.
+ログアウトすると、このお試しアカウントは削除されます（送ったメッセージも消えます）。もう一度「お試し」を押すと、新しいアカウント（別の名前）が作られます。 || If you log out, this trial account will be deleted (the messages you sent will disappear too). If you press "Trial" again, a new account (with a different name) will be created. || 退出登录后，本试用账号将被删除（已发送的消息也会消失）。再次点击“试用”，会创建新的账号（不同的名字）。 || 로그아웃하면 이 체험 계정이 삭제됩니다(보낸 메시지도 사라집니다). 다시 '체험'을 누르면 새 계정(다른 이름)이 만들어집니다.
+はじめる || Start || 开始 || 시작하기
+やめる || Cancel || 取消 || 그만두기
+お試しを用意しています... || Preparing your trial... || 正在准备试用... || 체험을 준비하고 있습니다...
+お試しの開始に失敗しました。もう一度お試しください。 || Could not start the trial. Please try again. || 试用启动失败，请重试。 || 체험을 시작하지 못했습니다. 다시 시도해 주세요.
+お試しの開始に失敗しました。時間をおいてもう一度お試しください。 || Could not start the trial. Please wait a moment and try again. || 试用启动失败，请稍后再试。 || 체험을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.
+お試しを始められませんでした。時間をおいてもう一度お試しください。 || Could not start the trial. Please wait a moment and try again. || 无法开始试用，请稍后再试。 || 체험을 시작할 수 없었습니다. 잠시 후 다시 시도해 주세요.
+お試しの機能を読み込めませんでした。ページを再読み込みしてください。 || Could not load the trial feature. Please reload the page. || 无法加载试用功能，请刷新页面。 || 체험 기능을 불러오지 못했습니다. 페이지를 새로고침해 주세요.
+system.js の読み込み、またはログイン機能の初期化に失敗しました。 || Failed to load system.js or to start the login feature. || system.js 加载失败，或登录功能初始化失败。 || system.js를 불러오지 못했거나 로그인 기능 초기화에 실패했습니다.
+
+# --- ログイン画面のゲーム入口 ---
+🃏⭐ GAME4 ARE CARD ＋ 星紡ぎの旅人（カードバトルとRPG・ログインなし・無料） || 🃏⭐ GAME4 ARE CARD + Star-Weaver Traveler (card battle & RPG · no login · free) || 🃏⭐ GAME4 ARE CARD ＋ 织星旅人（卡牌对战与RPG·无需登录·免费） || 🃏⭐ GAME4 ARE CARD ＋ 별을 잇는 나그네(카드 배틀과 RPG·로그인 없음·무료)
+🎡 ドリームフロンティア（ログインなし・無料） || 🎡 Dream Frontier (no login · free) || 🎡 梦想前线（无需登录·免费） || 🎡 드림 프런티어(로그인 없음·무료)
+🎮 RPGだけ あそぶ（ログインなし・ずっと無料） || 🎮 Play just the RPG (no login · always free) || 🎮 只玩RPG（无需登录·永久免费） || 🎮 RPG만 하기(로그인 없음·계속 무료)
+🎰 OFFLINE PARADISE（電波がなくても あそべるミニゲーム・無料） || 🎰 OFFLINE PARADISE (mini-games you can play without a signal · free) || 🎰 OFFLINE PARADISE（没有网络也能玩的小游戏·免费） || 🎰 OFFLINE PARADISE(전파가 없어도 즐기는 미니게임·무료)
+🏁 GAME8 アクション＆レース（3Dグラフィック・ログインなし・無料） || 🏁 GAME8 Action & Race (3D graphics · no login · free) || 🏁 GAME8 动作＆竞速（3D画面·无需登录·免费） || 🏁 GAME8 액션 & 레이스(3D 그래픽·로그인 없음·무료)
+👑 大富豪（本格ルール・全部入り） || 👑 Daifugo (full rules · everything included) || 👑 大富豪（正式规则·功能齐全） || 👑 대부호(본격 규칙·올인원)
+📖🌙 ARE QUEST 2 ・ 3（AREを入手せよ／月影のあしあと・ログインなし・無料） || 📖🌙 ARE QUEST 2 · 3 (Get ARE / Footprints in the Moonlight · no login · free) || 📖🌙 ARE QUEST 2 · 3（获得ARE／月影的足迹·无需登录·免费） || 📖🌙 ARE QUEST 2 · 3(ARE를 손에 넣어라／달그림자의 발자취·로그인 없음·무료)
+📚 学習サイト LearnLab124（プログラミング学習・別のサイト） || 📚 Study site LearnLab124 (programming lessons · a separate site) || 📚 学习网站 LearnLab124（编程学习·独立网站） || 📚 학습 사이트 LearnLab124(프로그래밍 학습·별도 사이트)
+🔎🧱 GAME5 推理ゲーム（表・裏）＋ ブロックパズル（落ちものゲーム・ブラウザで あそべます） || 🔎🧱 GAME5 Mystery game (front & back) + Block puzzle (falling blocks · plays in your browser) || 🔎🧱 GAME5 推理游戏（表·里）＋ 方块拼图（消除类游戏·可在浏览器中游玩） || 🔎🧱 GAME5 추리 게임(앞·뒤) ＋ 블록 퍼즐(떨어지는 블록 게임·브라우저에서 즐길 수 있어요)
+RPG『ARE QUEST』『ARE QUEST 2』とテーマパーク『ドリームフロンティア』は、アカウントなし・ポイントなしで遊べます。主人公の名前は「主人公」のままでも、自分で決めてもOKです。 || The RPGs "ARE QUEST" and "ARE QUEST 2" and the theme park "Dream Frontier" can be played with no account and no points. You can keep the hero's name as "Hero" or choose your own. || RPG《ARE QUEST》《ARE QUEST 2》和主题乐园《梦想前线》无需账号、无需积分即可游玩。主人公的名字可以保持“主人公”，也可以自己决定。 || RPG 'ARE QUEST', 'ARE QUEST 2'와 테마파크 '드림 프런티어'는 계정 없이, 포인트 없이 즐길 수 있습니다. 주인공 이름은 '주인공' 그대로 두어도, 직접 정해도 괜찮습니다.
+ぜんぶ消す || Delete all || 全部删除 || 모두 지우기
+記録する || Record || 记录 || 기록하기
+記録を見る || View records || 查看记录 || 기록 보기
+記録 || Records || 记录 || 기록
+記録は ありません。 || There are no records. || 没有记录。 || 기록이 없습니다.
+記録を ぜんぶ 消しますか？ || Delete all records? || 要删除全部记录吗？ || 기록을 모두 지울까요?
+消しました。 || Deleted. || 已删除。 || 지웠습니다.
+オン || On || 开 || 켜짐
+オフ || Off || 关 || 꺼짐
+オン（カメラ許可あり） || On (camera permission granted) || 开（已允许使用摄像头） || 켜짐(카메라 허용됨)
+オン。ただし このブラウザは カメラ許可が まだ ないので、許可するまで 撮りません。 || On. However, this browser does not have camera permission yet, so nothing will be taken until you allow it. || 开。但此浏览器尚未获得摄像头权限，在允许之前不会拍摄。 || 켜짐. 다만 이 브라우저는 아직 카메라 허용이 없어서, 허용할 때까지 촬영하지 않습니다.
+🏅 実績・称号を見る || 🏅 View achievements & titles || 🏅 查看成就与称号 || 🏅 업적·칭호 보기
+ゲームをさがす || Find games || 查找游戏 || 게임 찾기
+ゲームを さがす（れい：カード） || Find games (e.g. cards) || 查找游戏（例：卡牌） || 게임 찾기(예: 카드)
+みつかりませんでした。 || Nothing found. || 没有找到。 || 찾지 못했습니다.
+を おきにいり || Add to favorites || 加入收藏 || 즐겨찾기에 추가
+から はずす || Remove from favorites || 取消收藏 || 즐겨찾기에서 빼기
+に する || Make it || 设为 || (으)로 하기
+
+# --- 新規登録 ---
+アカウントを作成 || Create account || 创建账号 || 계정 만들기
+表示名 || Display name || 显示名称 || 표시 이름
+パスワード（確認） || Password (confirm) || 密码（确认） || 비밀번호(확인)
+表示名・ログインID・パスワードだけで登録できます。電話番号やメールアドレスは必要ありません。 || You can sign up with just a display name, login ID and password. No phone number or email address is needed. || 只需显示名称、登录ID和密码即可注册，无需手机号或电子邮箱。 || 표시 이름, 로그인 ID, 비밀번호만으로 가입할 수 있습니다. 전화번호나 이메일 주소는 필요 없습니다.
+8文字以上で入力してください。 || Enter at least 8 characters. || 请输入8个字符以上。 || 8자 이상으로 입력해 주세요.
+ログイン画面に戻る || Back to login || 返回登录页面 || 로그인 화면으로 돌아가기
+ログイン画面へ || To the login screen || 前往登录页面 || 로그인 화면으로
+ログイン画面へ もどる || Back to the login screen || 返回登录页面 || 로그인 화면으로 돌아가기
+復旧コードを保存してください || Please save your recovery code || 请保存恢复码 || 복구 코드를 저장해 주세요
+このコードはアカウント復旧に必要です。安全な場所に保存してください。画面を閉じると再表示できない場合があります。 || This code is needed to recover your account. Save it somewhere safe. It may not be shown again once you close this screen. || 此代码是恢复账号所必需的，请保存在安全的地方。关闭此页面后可能无法再次显示。 || 이 코드는 계정 복구에 필요합니다. 안전한 곳에 저장해 주세요. 화면을 닫으면 다시 볼 수 없을 수 있습니다.
+コピー || Copy || 复制 || 복사
+復旧コード || Recovery code || 恢复码 || 복구 코드
+アカウントを作成しています... || Creating your account... || 正在创建账号... || 계정을 만드는 중...
+コピーする復旧コードがありません。 || There is no recovery code to copy. || 没有可复制的恢复码。 || 복사할 복구 코드가 없습니다.
+パスワードが一致しません。入力内容を確認してください。 || The passwords do not match. Please check what you entered. || 两次输入的密码不一致，请检查输入内容。 || 비밀번호가 일치하지 않습니다. 입력한 내용을 확인해 주세요.
+パスワードは8文字以上で入力してください。 || Enter a password of at least 8 characters. || 密码请输入8个字符以上。 || 비밀번호는 8자 이상으로 입력해 주세요.
+自動コピーできませんでした。コードを選択して手動でコピーしてください。 || Could not copy automatically. Please select the code and copy it by hand. || 无法自动复制，请选中代码后手动复制。 || 자동으로 복사하지 못했습니다. 코드를 선택해서 직접 복사해 주세요.
+登録が完了しました。復旧コードを安全な場所に保存してください。 || Sign-up complete. Please save your recovery code somewhere safe. || 注册完成。请将恢复码保存在安全的地方。 || 가입이 완료되었습니다. 복구 코드를 안전한 곳에 저장해 주세요.
+登録に失敗しました。入力内容を確認してください。 || Sign-up failed. Please check what you entered. || 注册失败，请检查输入内容。 || 가입에 실패했습니다. 입력한 내용을 확인해 주세요.
+表示名とログインIDを入力してください。 || Please enter a display name and a login ID. || 请输入显示名称和登录ID。 || 표시 이름과 로그인 ID를 입력해 주세요.
+復旧コードをコピーしました。 || Recovery code copied. || 已复制恢复码。 || 복구 코드를 복사했습니다.
+system.js の読み込み、または登録機能の初期化に失敗しました。 || Failed to load system.js or to start the sign-up feature. || system.js 加载失败，或注册功能初始化失败。 || system.js를 불러오지 못했거나 가입 기능 초기화에 실패했습니다.
+
+# --- パスワードの強さ ---
+パスワードを表示 || Show password || 显示密码 || 비밀번호 표시
+パスワードを隠す || Hide password || 隐藏密码 || 비밀번호 숨기기
+8文字以上 || At least 8 characters || 至少8个字符 || 8자 이상
+小文字（a〜z）を1文字以上 || At least 1 lowercase letter (a–z) || 至少1个小写字母（a–z） || 소문자(a–z) 1자 이상
+大文字（A〜Z）を1文字以上 || At least 1 uppercase letter (A–Z) || 至少1个大写字母（A–Z） || 대문자(A–Z) 1자 이상
+数字か記号を1文字以上 || At least 1 number or symbol || 至少1个数字或符号 || 숫자나 기호 1자 이상
+パスワードは8文字以上にしてください。 || Make the password at least 8 characters. || 密码请设置为8个字符以上。 || 비밀번호는 8자 이상으로 해 주세요.
+パスワードは72文字以内にしてください。 || Keep the password within 72 characters. || 密码请控制在72个字符以内。 || 비밀번호는 72자 이내로 해 주세요.
+パスワードに小文字（a〜z）を1文字以上含めてください。 || Include at least 1 lowercase letter (a–z) in the password. || 密码中请至少包含1个小写字母（a–z）。 || 비밀번호에 소문자(a–z)를 1자 이상 포함해 주세요.
+パスワードに大文字（A〜Z）を1文字以上含めてください。 || Include at least 1 uppercase letter (A–Z) in the password. || 密码中请至少包含1个大写字母（A–Z）。 || 비밀번호에 대문자(A–Z)를 1자 이상 포함해 주세요.
+パスワードに数字または記号を1文字以上含めてください。 || Include at least 1 number or symbol in the password. || 密码中请至少包含1个数字或符号。 || 비밀번호에 숫자 또는 기호를 1자 이상 포함해 주세요.
+つくり方の例：好きな言葉を2つ続けて1文字を大文字にし、最後に数字と記号を足す（例：Nekobus24!）。この例そのものは使わず、自分だけの言葉で作ってください。パスワードは紙に控えるか、パスワード管理アプリに保存すると忘れにくくなります。 || Example: join two words you like, capitalize one letter, and add a number and a symbol at the end (e.g. Nekobus24!). Do not use this example itself – make one from your own words. Writing the password on paper or saving it in a password manager makes it harder to forget. || 创建示例：把两个喜欢的词连在一起，将其中一个字母大写，最后加上数字和符号（例：Nekobus24!）。请不要直接使用这个例子，用自己的词来设置。把密码记在纸上或保存到密码管理应用中，就不容易忘记。 || 만드는 방법 예: 좋아하는 단어 두 개를 이어서 한 글자를 대문자로 하고, 마지막에 숫자와 기호를 더합니다(예: Nekobus24!). 이 예시 자체는 쓰지 말고 자신만의 단어로 만들어 주세요. 비밀번호는 종이에 적어 두거나 비밀번호 관리 앱에 저장하면 잊어버리기 어렵습니다.
+
+# --- アカウント復旧 ---
+アカウント復旧 || Account recovery || 账号恢复 || 계정 복구
+パスワードを再設定 || Reset your password || 重设密码 || 비밀번호 재설정
+登録時のログインIDと復旧コードを入力してください。 || Enter the login ID and recovery code you used when you signed up. || 请输入注册时的登录ID和恢复码。 || 가입할 때의 로그인 ID와 복구 코드를 입력해 주세요.
+新しいパスワード || New password || 新密码 || 새 비밀번호
+新しいパスワード（確認） || New password (confirm) || 新密码（确认） || 새 비밀번호(확인)
+復旧処理が完了しました || Recovery complete || 恢复处理已完成 || 복구 처리가 완료되었습니다
+新しいパスワードでログインしてください。 || Please log in with your new password. || 请使用新密码登录。 || 새 비밀번호로 로그인해 주세요.
+アカウントを復旧しています... || Recovering your account... || 正在恢复账号... || 계정을 복구하는 중...
+アカウント復旧に失敗しました。ログインIDと復旧コードを確認してください。 || Account recovery failed. Please check your login ID and recovery code. || 账号恢复失败，请检查登录ID和恢复码。 || 계정 복구에 실패했습니다. 로그인 ID와 복구 코드를 확인해 주세요.
+ログインIDと復旧コードを入力してください。 || Please enter your login ID and recovery code. || 请输入登录ID和恢复码。 || 로그인 ID와 복구 코드를 입력해 주세요.
+ログインID、復旧コード、新しいパスワードを入力してください。 || Please enter your login ID, recovery code and new password. || 请输入登录ID、恢复码和新密码。 || 로그인 ID, 복구 코드, 새 비밀번호를 입력해 주세요.
+新しいパスワードが一致しません。入力内容を確認してください。 || The new passwords do not match. Please check what you entered. || 两次输入的新密码不一致，请检查输入内容。 || 새 비밀번호가 일치하지 않습니다. 입력한 내용을 확인해 주세요.
+新しいパスワードは8文字以上で入力してください。 || Enter a new password of at least 8 characters. || 新密码请输入8个字符以上。 || 새 비밀번호는 8자 이상으로 입력해 주세요.
+復旧処理が完了しました。新しいパスワードでログインしてください。 || Recovery complete. Please log in with your new password. || 恢复处理已完成，请使用新密码登录。 || 복구 처리가 완료되었습니다. 새 비밀번호로 로그인해 주세요.
+system.js の読み込み、またはアカウント復旧機能の初期化に失敗しました。 || Failed to load system.js or to start the account recovery feature. || system.js 加载失败，或账号恢复功能初始化失败。 || system.js를 불러오지 못했거나 계정 복구 기능 초기화에 실패했습니다.
+
+# --- 404 ---
+🔍 ページが みつかりません || 🔍 Page not found || 🔍 找不到页面 || 🔍 페이지를 찾을 수 없습니다
+アドレスが ちがうか、ページが うつった かもしれません。 || The address may be wrong, or the page may have moved. || 地址可能有误，或页面已经移动。 || 주소가 틀렸거나 페이지가 옮겨졌을 수 있습니다.
+
+# --- ウイルス画面（おしおき） ---
+ARE セキュリティ警告 || ARE Security Warning || ARE 安全警告 || ARE 보안 경고
+お使いの端末は ウイルスに感染しました！ || Your device has been infected with a virus! || 您的设备已感染病毒！ || 사용 중인 기기가 바이러스에 감염되었습니다!
+不適切な発言をくりかえした あなたの端末から<br><b>「おしおきウイルス」</b>が 見つかりました。 || The "Punishment Virus" was found on your device, which kept making inappropriate remarks. || 在多次发表不当言论的您的设备上，发现了<b>“惩罚病毒”</b>。 || 부적절한 발언을 반복한 당신의 기기에서 <b>'벌칙 바이러스'</b>가 발견되었습니다.
+スキャン済みファイル || Files scanned || 已扫描文件 || 검사한 파일
+感染したファイル || Infected files || 已感染文件 || 감염된 파일
+このまま 画面を閉じようとしても、ウイルスは消えません。 || Even if you try to close the screen, the virus will not go away. || 就算直接关闭页面，病毒也不会消失。 || 이대로 화면을 닫아도 바이러스는 사라지지 않습니다.
+反省して あやまるまで、ほかの操作は できません。 || You can't do anything else until you reflect and apologize. || 在您反省并道歉之前，无法进行其他操作。 || 반성하고 사과할 때까지 다른 조작은 할 수 없습니다.
+ごめんなさい、申しません || I'm sorry, I won't say it again || 对不起，我不会再说了 || 죄송합니다, 다시는 말하지 않겠습니다
+※これは ARE 運営の「おしおき演出」です。実際のウイルスには感染していません。 || * This is a "punishment effect" by the ARE team. Your device is not actually infected with any virus. || ※这是 ARE 运营团队的“惩罚特效”，并未感染真正的病毒。 || ※이것은 ARE 운영진의 '벌칙 연출'입니다. 실제 바이러스에는 감염되지 않았습니다.
+アカウントは 消えました。 || Your account has been deleted. || 账号已被删除。 || 계정이 삭제되었습니다.
+…さようなら。 || …Goodbye. || …再见。 || …안녕히 가세요.
+ログアウト || Log out || 退出登录 || 로그아웃
+不正な操作を 検知しました。 || Unauthorized activity was detected. || 检测到非法操作。 || 부정한 조작이 감지되었습니다.
+管理者が 解除するまで、メッセージは 送れません。 || You can't send messages until the administrator lifts this. || 在管理员解除之前，无法发送消息。 || 관리자가 해제할 때까지 메시지를 보낼 수 없습니다.
+もう一度確認する || Check again || 再确认一次 || 다시 확인하기
+確認しています… || Checking… || 正在确认… || 확인하는 중…
+まだ保護モードです。管理者が解除するまでお待ちください。 || Protected mode is still on. Please wait until the administrator lifts it. || 仍处于保护模式，请等待管理员解除。 || 아직 보호 모드입니다. 관리자가 해제할 때까지 기다려 주세요.
+解除されたら「もう一度確認する」を 押してください。 || Once it is lifted, press "Check again". || 解除后，请点击“再确认一次”。 || 해제되면 '다시 확인하기'를 눌러 주세요.
+（区分「その他」の保護モードです。管理者が解除するまで、この画面になります。アカウントは消えません） || (This is the protected mode for the "Other" group. This screen stays until the administrator lifts it. Your account will not be deleted.) || （这是“其他”类别的保护模式。在管理员解除之前，将一直停留在此页面。账号不会被删除。） || ('기타' 구분의 보호 모드입니다. 관리자가 해제할 때까지 이 화면이 유지됩니다. 계정은 삭제되지 않습니다.)
+（管理者プレビュー：ボタンを押してもアカウントは消えません） || (Admin preview: pressing the button will not delete the account) || （管理员预览：点击按钮也不会删除账号） || (관리자 미리보기: 버튼을 눌러도 계정은 삭제되지 않습니다)
+（警告の演出です。これで{n}回目です。アカウントは消えません。5回目から1分間の凍結（回数がふえるたびに2倍）、100回でアカウントが削除されます） || (This is a warning effect. This is time #{n}. Your account will not be deleted. From the 5th time you are frozen for 1 minute (doubling each additional time), and at 100 times the account is deleted.) || （这是警告特效，这是第{n}次。账号不会被删除。从第5次起冻结1分钟（每多一次时间翻倍），达到100次将删除账号。） || (경고 연출입니다. 이번이 {n}번째입니다. 계정은 삭제되지 않습니다. 5번째부터 1분간 동결되며(횟수가 늘 때마다 2배), 100번이면 계정이 삭제됩니다.)
+C:\おしおき\うざい.exe を検出 || Detected C:\Punishment\annoying.exe || 检测到 C:\惩罚\烦人.exe || C:\벌칙\짜증.exe 감지됨
+メモリ領域 0x7F3A を書きかえ中… || Overwriting memory region 0x7F3A… || 正在改写内存区域 0x7F3A… || 메모리 영역 0x7F3A를 덮어쓰는 중…
+「ごめんなさい」が見つかりません || "I'm sorry" not found || 找不到“对不起” || '죄송합니다'를 찾을 수 없습니다
+きょうの反省ポイント: 0 || Today's reflection points: 0 || 今天的反省点数：0 || 오늘의 반성 포인트: 0
+ARE警察が あなたを みています || The ARE police are watching you || ARE警察正在盯着您 || ARE 경찰이 당신을 지켜보고 있습니다
+言葉づかい.dll が こわれています || manners.dll is broken || 措辞.dll 已损坏 || 말투.dll이 망가졌습니다
+やさしさ.dat が みつかりません || kindness.dat not found || 找不到 善意.dat || 다정함.dat를 찾을 수 없습니다
+感染を ひろげています… || Spreading the infection… || 正在扩散感染… || 감염을 퍼뜨리는 중…
+反省しています… || Reflecting… || 正在反省… || 반성하는 중…
+あやまっています… || Apologizing… || 正在道歉… || 사과하는 중…
+ウイルスが残っています。反省して あやまるまで 閉じられません。 || The virus is still here. You can't close this until you reflect and apologize. || 病毒仍然残留。在您反省并道歉之前，无法关闭。 || 바이러스가 남아 있습니다. 반성하고 사과할 때까지 닫을 수 없습니다.
+うまくいきませんでした。もういちど押してください。 || That didn't work. Please press it again. || 没有成功，请再点一次。 || 잘되지 않았습니다. 다시 한 번 눌러 주세요.
+つながりません。通信を 確認して ページを 開きなおしてください。 || Can't connect. Check your connection and reopen the page. || 无法连接。请检查网络并重新打开页面。 || 연결되지 않습니다. 통신 상태를 확인하고 페이지를 다시 열어 주세요.
+画面を もどします。どこかを タップしてください。 || Restoring the screen. Tap anywhere. || 正在恢复画面，请点击任意位置。 || 화면을 되돌립니다. 아무 곳이나 탭해 주세요.
+どこかを タップすると 全画面になります。 || Tap anywhere to go full screen. || 点击任意位置即可全屏。 || 아무 곳이나 탭하면 전체 화면이 됩니다.
+「保護モード」 || "Protected mode" || “保护模式” || '보호 모드'
+「おしおきウイルス」 || "Punishment Virus" || “惩罚病毒” || '벌칙 바이러스'
+
+# --- 共通の警告・保護 ---
+閉じる || Close || 关闭 || 닫기
+この機能は未実装です。 || This feature is not available yet. || 此功能尚未实现。 || 이 기능은 아직 구현되지 않았습니다.
+この機能は未実装です（または読み込みに失敗しました）。 || This feature is not available yet (or failed to load). || 此功能尚未实现（或加载失败）。 || 이 기능은 아직 구현되지 않았습니다(또는 불러오지 못했습니다).
+この操作でエラーが起きました。時間をおいて、もう一度お試しください。 || An error occurred. Please wait a moment and try again. || 此操作出错了，请稍后再试。 || 이 작업에서 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.
+「{name}」は現在ご利用いただけません（未実装、またはサーバー側でエラーが起きています）。 || "{name}" is currently unavailable (not implemented yet, or a server-side error occurred). || “{name}”目前无法使用（尚未实现，或服务器端出现错误）。 || '{name}'은(는) 현재 이용할 수 없습니다(미구현이거나 서버 쪽에서 오류가 발생했습니다).
+一部の機能は、未実装、または起動に失敗したため使えません：{list}。ほかの機能は使えます。 || Some features are unavailable because they are not implemented or failed to start: {list}. Other features still work. || 部分功能因尚未实现或启动失败而无法使用：{list}。其他功能仍可使用。 || 일부 기능은 미구현이거나 시작에 실패해서 사용할 수 없습니다: {list}. 다른 기능은 사용할 수 있습니다.
+この機能 || This feature || 此功能 || 이 기능
+この操作は無効になっています。 || This action is disabled. || 此操作已被禁用。 || 이 작업은 사용할 수 없게 되어 있습니다.
+画像・ファイルの貼り付けは、チャット画面でだけ使えます。 || Pasting images and files only works on the chat screen. || 粘贴图片和文件只能在聊天页面使用。 || 이미지·파일 붙여넣기는 채팅 화면에서만 사용할 수 있습니다.
+開発者ツールを閉じてください。閉じると元の画面に戻ります。 || Please close the developer tools. When you close them, the screen returns to normal. || 请关闭开发者工具，关闭后将回到原来的页面。 || 개발자 도구를 닫아 주세요. 닫으면 원래 화면으로 돌아옵니다.
+止まって！ || Stop! || 停下！ || 멈춰요!
+%cだれかに「ここにコードを貼って」と言われても、貼らないでください。アカウントやデータを盗まれるおそれがあります。 || %cIf anyone tells you to "paste code here", do not paste it. Your account and data could be stolen. || %c如果有人让您“把代码贴在这里”，请不要照做，否则账号和数据可能被盗。 || %c누군가 '여기에 코드를 붙여 넣어'라고 해도 붙여 넣지 마세요. 계정과 데이터를 도둑맞을 수 있습니다.
+
+# --- 通信・サーバーのエラー（共通） ---
+サーバーに つながりませんでした。Wi-Fi などの通信をたしかめて、もう一度お試しください（会社・学校のネットは、制限で つながらないことがあります。別の回線もためしてください）。 || Could not connect to the server. Check your Wi-Fi or other connection and try again (company or school networks may block the connection. Try another network too). || 无法连接到服务器。请检查Wi-Fi等网络后重试（公司或学校的网络可能因限制而无法连接，也请试试其他网络）。 || 서버에 연결하지 못했습니다. Wi-Fi 등 통신 상태를 확인하고 다시 시도해 주세요(회사·학교 네트워크는 제한으로 연결되지 않을 수 있습니다. 다른 회선도 시도해 보세요).
+サーバーからの返事がありません。ネットの調子が悪いかもしれません。少し待って、もう一度お試しください。 || No reply from the server. Your connection may be unstable. Please wait a moment and try again. || 服务器没有响应，可能是网络状况不佳。请稍等片刻后重试。 || 서버에서 응답이 없습니다. 네트워크 상태가 좋지 않을 수 있습니다. 잠시 기다린 후 다시 시도해 주세요.
+予期しないエラーが発生しました。 || An unexpected error occurred. || 发生了意外错误。 || 예기치 않은 오류가 발생했습니다.
+ログアウトしますか？ || Log out? || 要退出登录吗？ || 로그아웃할까요?
+ログアウトすると、このお試しアカウントは削除されます。 || If you log out, this trial account will be deleted. || 退出登录后，此试用账号将被删除。 || 로그아웃하면 이 체험 계정이 삭제됩니다.
+送ったメッセージもすべて消えて、元にはもどせません。 || All the messages you sent will also disappear and cannot be restored. || 已发送的消息也会全部消失，且无法恢复。 || 보낸 메시지도 모두 사라지며 되돌릴 수 없습니다.

@@ -1,0 +1,175 @@
+# ===== チャット画面の基本（上のタブ・サイド・入力欄・メニュー） =====
+ARE | チャット || ARE | Chat || ARE | 聊天 || ARE | 채팅
+チャット || Chats || 聊天 || 채팅
+ユーザー || Users || 用户 || 사용자
+投稿 || Posts || 动态 || 게시물
+その他 || More || 更多 || 더보기
+マイページ || My page || 我的主页 || 마이페이지
+ログイン中 || Logged in || 已登录 || 로그인 중
+マニュアル || Manual || 使用手册 || 매뉴얼
+全体公開 || Public || 公开 || 전체 공개
+フォロワーのみ || Followers only || 仅关注者 || 팔로워만
+自分のみ || Only me || 仅自己 || 나만
+フォロー中 || Following || 关注中 || 팔로잉
+すべて || All || 全部 || 전체
+ステータスメッセージ未設定 || No status message || 未设置状态消息 || 상태 메시지 미설정
+フォロワー || Followers || 关注者 || 팔로워
+自分専用メモ（Keep） || My notes (Keep) || 我的笔记（Keep） || 나만의 메모(Keep)
+プロフィールを編集 || Edit profile || 编辑个人资料 || 프로필 편집
+プロフィールを共有（QR） || Share my profile (QR) || 分享我的资料（二维码） || 프로필 공유(QR)
+ポイントを読み込み中… || Loading points… || 正在加载积分… || 포인트를 불러오는 중…
+★よく使うサイト || ★ Favorite sites || ★常用网站 || ★자주 쓰는 사이트
+アカウントの削除 || Delete account || 删除账号 || 계정 삭제
+削除を申請すると、管理者の承認後にアカウントとデータが完全に削除されます（元に戻せません）。 || If you request deletion, your account and data will be permanently deleted after the administrator approves (this cannot be undone). || 提交删除申请后，经管理员批准，账号和数据将被永久删除（无法恢复）。 || 삭제를 신청하면 관리자의 승인 후 계정과 데이터가 완전히 삭제됩니다(되돌릴 수 없습니다).
+アカウント削除を申請 || Request account deletion || 申请删除账号 || 계정 삭제 신청
+申請を取り消す || Cancel request || 撤销申请 || 신청 취소
+会話履歴の保存（ZIP形式） || Save chat history (ZIP) || 保存聊天记录（ZIP格式） || 대화 기록 저장(ZIP 형식)
+緊急ボタン || Emergency button || 紧急按钮 || 긴급 버튼
+困ったとき、管理者とチャットで直接やりとりできます（電話はできません） || When you're in trouble, you can chat directly with the administrator (phone calls are not available). || 遇到困难时，可以直接与管理员聊天（不支持电话）。 || 곤란할 때 관리자와 채팅으로 직접 대화할 수 있습니다(전화는 불가).
+BINGOゲーム || BINGO game || BINGO游戏 || 빙고 게임
+みんなで遊べるビンゴ大会（新しいタブで開きます） || A bingo tournament everyone can join (opens in a new tab) || 大家一起玩的宾果大赛（在新标签页打开） || 모두 함께 즐기는 빙고 대회(새 탭에서 열립니다)
+ポイントと交換（動画・物語・パック） || Exchange for points (videos, stories, packs) || 用积分兑换（视频·故事·礼包） || 포인트로 교환(영상·이야기·팩)
+フォロー・フォロワー || Following & followers || 关注与关注者 || 팔로잉·팔로워
+一覧を見る・チャットを始める・フォロー解除 || View the list, start a chat, unfollow || 查看列表·开始聊天·取消关注 || 목록 보기·채팅 시작·팔로우 해제
+操作方法 || How to use || 操作方法 || 사용 방법
+使い方ガイド（スマホ・パソコン共通） || User guide (phone and PC) || 使用指南（手机·电脑通用） || 사용 가이드(스마트폰·PC 공통)
+アプリ化 || Install as app || 安装为应用 || 앱으로 설치
+ホーム画面・デスクトップに追加（手順つき） || Add to your home screen or desktop (with steps) || 添加到主屏幕·桌面（附步骤） || 홈 화면·바탕화면에 추가(순서 안내 포함)
+AIチャットボット || AI chatbot || AI聊天机器人 || AI 챗봇
+よくある質問に自動で答えます || Automatically answers common questions || 自动回答常见问题 || 자주 묻는 질문에 자동으로 답해요
+天気予報 || Weather forecast || 天气预报 || 날씨 예보
+地名で検索・7日間の予報 || Search by place name · 7-day forecast || 按地名搜索·7天预报 || 지명으로 검색·7일 예보
+交通情報 || Transit info || 交通信息 || 교통 정보
+乗換案内・運行状況 || Route search & service status || 换乘指南·运行状况 || 환승 안내·운행 상황
+ツール || Tools || 工具 || 도구
+この分類の機能はありません。 || There are no features in this category. || 此分类下没有功能。 || 이 분류에는 기능이 없습니다.
+ファイル || File || 文件 || 파일
+予約 || Schedule || 预约 || 예약
+予約中 || Scheduled || 预约中 || 예약 중
+管理者パネル || Admin panel || 管理员面板 || 관리자 패널
+既読を相手に表示する || Show read receipts to others || 向对方显示已读 || 읽음 표시를 상대에게 보이기
+オフにすると、あなたが読んでも相手には「既読」と表示されません。 || If turned off, the other person will not see "Read" even when you read their message. || 关闭后，即使您已阅读，对方也不会看到“已读”。 || 끄면 내가 읽어도 상대에게는 '읽음'이 표시되지 않습니다.
+非表示のチャット（{n}） || Hidden chats ({n}) || 隐藏的聊天（{n}） || 숨긴 채팅({n})
+上の検索バーに名前を入力すると、ユーザーが表示されます。 || Type a name in the search bar above to show users. || 在上方搜索栏输入名字，即可显示用户。 || 위 검색창에 이름을 입력하면 사용자가 표시됩니다.
+グループ作成 || New group || 创建群组 || 그룹 만들기
+友達追加 || Add friend || 添加好友 || 친구 추가
+すれ違いタウン || Passing Town || 擦肩小镇 || 스쳐가는 마을
+近くにいた人と、自動ですれ違い || Automatically pass by people who were nearby || 与附近的人自动擦肩而过 || 근처에 있던 사람과 자동으로 스쳐 지나가요
+主人公 || Protagonist || 主人公 || 주인공
+AREへようこそ || Welcome to ARE || 欢迎来到ARE || ARE에 오신 것을 환영합니다
+チャット相手を選択してください || Please choose who to chat with || 请选择聊天对象 || 채팅 상대를 선택해 주세요
+削除 || Delete || 删除 || 삭제
+一括削除 || Delete in bulk || 批量删除 || 일괄 삭제
+チャットの準備ができました。ユーザーを選択してください。 || The chat is ready. Please choose a user. || 聊天已准备就绪，请选择用户。 || 채팅 준비가 끝났습니다. 사용자를 선택해 주세요.
+会話を始めよう || Start a conversation || 开始聊天吧 || 대화를 시작해 보세요
+おすすめユーザーを選択するか、既存のチャットを開いてください。 || Choose a recommended user or open an existing chat. || 请选择推荐用户，或打开已有的聊天。 || 추천 사용자를 선택하거나 기존 채팅을 열어 주세요.
+最初のメッセージを送ろう || Send the first message || 发送第一条消息吧 || 첫 메시지를 보내 보세요
+メッセージやファイルを送信すると、ここに表示されます。 || Messages and files you send will appear here. || 发送的消息和文件会显示在这里。 || 메시지나 파일을 보내면 여기에 표시됩니다.
+日付 || Date || 日期 || 날짜
+最新へ || To latest || 回到最新 || 최신으로
+写真 || Photo || 照片 || 사진
+ファイルを選択 || Choose file || 选择文件 || 파일 선택
+動画を選択 || Choose video || 选择视频 || 동영상 선택
+画像を選択 || Choose image || 选择图片 || 이미지 선택
+絵文字・スタンプ || Emoji & stamps || 表情·贴纸 || 이모지·스티커
+音声 || Voice || 语音 || 음성
+録音を取消 || Cancel recording || 取消录音 || 녹음 취소
+消える || Disappear || 阅后即焚 || 사라짐
+対戦 || Versus || 对战 || 대전
+要約して || Summarize || 总结一下 || 요약해 줘
+位置情報 || Location || 位置信息 || 위치 정보
+音声入力 || Voice input || 语音输入 || 음성 입력
+予約送信 || Scheduled send || 定时发送 || 예약 전송
+貼り付け || Paste || 粘贴 || 붙여넣기
+画面を撮る || Capture screen || 截取屏幕 || 화면 캡처
+連絡先 || Contact || 联系人 || 연락처
+送信日時 || Send time || 发送时间 || 전송 일시
+この日時に予約（文章） || Schedule for this time (text) || 在此时间预约发送（文字） || 이 일시에 예약(글)
+この日時に予約 || Schedule for this time || 在此时间预约 || 이 일시에 예약
+予約できる文章は || Text you can schedule is up to || 可预约的文字最多 || 예약할 수 있는 글은
+4,000文字まで || 4,000 characters || 4,000字 || 4,000자까지
+です（ふつうの送信と同じ）。写真・動画・ファイルも予約できます：この日時を決めたまま、上の「📎 ファイルを選択」で選ぶと、すぐアップロードだけ行われ、この日時になったら送信されます。 || (same as a normal send). Photos, videos and files can also be scheduled: keep this date and time set and pick one with "📎 Choose file" above. It is uploaded right away and sent when this time arrives. || （与普通发送相同）。照片、视频和文件也可以预约：保持此日期时间不变，用上方的“📎 选择文件”选好文件后，会立即上传，到达此时间时发送。 || (일반 전송과 같습니다). 사진·동영상·파일도 예약할 수 있습니다: 이 일시를 정한 채로 위의 '📎 파일 선택'으로 고르면 바로 업로드만 이루어지고, 이 일시가 되면 전송됩니다.
+絵文字（入力欄に入れる） || Emoji (insert into the text box) || 表情（放入输入框） || 이모지(입력란에 넣기)
+スタンプ（すぐ送る） || Stamps (send right away) || 贴纸（立即发送） || 스티커(바로 보내기)
+文字 || Text || 文字 || 글자
+閲覧・承認の操作はすべて監査ログに記録されます || All viewing and approval actions are recorded in the audit log. || 所有查看和审批操作都会记录在审计日志中。 || 열람·승인 조작은 모두 감사 로그에 기록됩니다.
+会話一覧 || Conversations || 会话列表 || 대화 목록
+削除申請 || Deletion requests || 删除申请 || 삭제 신청
+通報 || Reports || 举报 || 신고
+NG制裁 || NG penalties || NG处罚 || NG 제재
+利用状況 || Usage || 使用情况 || 이용 현황
+お知らせ || Announcements || 通知公告 || 공지
+ショップ管理 || Shop management || 商店管理 || 상점 관리
+ユーザー管理 || User management || 用户管理 || 사용자 관리
+アカウント削除 || Account deletion || 账号删除 || 계정 삭제
+セキュリティ || Security || 安全 || 보안
+バックアップ || Backup || 备份 || 백업
+お試し中：管理者以外へは あと {n} 件 || Trial: {n} more message(s) to anyone but the administrator || 试用中：除管理员外还可发送 {n} 条 || 체험 중: 관리자 이외에는 앞으로 {n}건
+登録する || Sign up || 注册 || 가입하기
+操作がないため、画面を隠しています。タップで戻る || The screen is hidden because there was no activity. Tap to return. || 因长时间无操作，屏幕已隐藏。点击即可返回。 || 조작이 없어 화면을 가렸습니다. 탭하면 돌아옵니다.
+メインメニュー || Main menu || 主菜单 || 메인 메뉴
+アプリ化（ホーム画面・デスクトップに追加） || Install as app (add to home screen or desktop) || 安装为应用（添加到主屏幕·桌面） || 앱으로 설치(홈 화면·바탕화면에 추가)
+マニュアル（使い方ガイドを開く） || Manual (open the user guide) || 使用手册（打开使用指南） || 매뉴얼(사용 가이드 열기)
+ページを強制的に最新版に更新します（パソコンのShift+Ctrl+Rと同じ） || Force the page to refresh to the latest version (same as Shift+Ctrl+R on a PC) || 强制将页面更新到最新版本（与电脑上的 Shift+Ctrl+R 相同） || 페이지를 강제로 최신 버전으로 새로고침합니다(PC의 Shift+Ctrl+R과 같음)
+ページを強制的に最新版に更新 || Force refresh to the latest version || 强制更新到最新版本 || 최신 버전으로 강제 새로고침
+ユーザー名を検索 || Search users || 搜索用户名 || 사용자 이름 검색
+ユーザー名を検索... || Search users... || 搜索用户名... || 사용자 이름 검색...
+投稿の公開範囲 || Post visibility || 动态可见范围 || 게시물 공개 범위
+表示する投稿 || Posts to show || 显示的动态 || 표시할 게시물
+機能を検索 || Search features || 搜索功能 || 기능 검색
+「その他」の機能を名前で探す（例：家計 / ゲーム / てんき） || Find "More" features by name (e.g. budget / games / weather) || 按名称查找“更多”中的功能（例：家计 / 游戏 / 天气） || '더보기'의 기능을 이름으로 찾기(예: 가계부 / 게임 / 날씨)
+機能を検索（その他） || Search features (More) || 搜索功能（更多） || 기능 검색(더보기)
+分類で絞る || Filter by category || 按分类筛选 || 분류로 좁히기
+ステータス || Status || 状态 || 상태
+よく使う機能 || Frequently used || 常用功能 || 자주 쓰는 기능
+メニュー（ショートカットの編集） || Menu (edit shortcuts) || 菜单（编辑快捷方式） || 메뉴(바로가기 편집)
+メニュー || Menu || 菜单 || 메뉴
+学習アプリ || Study app || 学习应用 || 학습 앱
+行動予定表 || Itinerary || 行动日程表 || 행동 일정표
+RPGゲーム || RPG games || RPG游戏 || RPG 게임
+お気に入りに入れる || Add to favorites || 加入收藏 || 즐겨찾기에 넣기
+お気に入りからはずす || Remove from favorites || 从收藏中移除 || 즐겨찾기에서 빼기
+非表示にした人の一覧 || List of hidden people || 已隐藏的人员列表 || 숨긴 사람 목록
+整理メニュー || Organize menu || 整理菜单 || 정리 메뉴
+そのほかのボタン（画面サイズ・検索・名前変更など） || More buttons (screen size, search, rename, etc.) || 其他按钮（屏幕大小·搜索·改名等） || 기타 버튼(화면 크기·검색·이름 변경 등)
+そのほかのボタンを出す・かくす || Show or hide more buttons || 显示·隐藏其他按钮 || 기타 버튼 보이기·숨기기
+画面の見やすさ || Screen readability || 屏幕易读性 || 화면 보기 편의
+メッセージ検索 || Search messages || 消息搜索 || 메시지 검색
+ブロック・ミュート || Block & mute || 屏蔽·静音 || 차단·음소거
+削除ずみユーザーのチャットを消す（管理者のみ） || Remove chats with deleted users (admin only) || 清除已删除用户的聊天（仅管理员） || 삭제된 사용자의 채팅 지우기(관리자 전용)
+このチャットを削除（管理者のみ） || Delete this chat (admin only) || 删除此聊天（仅管理员） || 이 채팅 삭제(관리자 전용)
+複数のメッセージを選んで、まとめて管理者として削除します || Select multiple messages and delete them together as the administrator || 选择多条消息，以管理员身份一并删除 || 여러 메시지를 골라 관리자로서 한꺼번에 삭제합니다
+メッセージを一括選択 || Select messages in bulk || 批量选择消息 || 메시지 일괄 선택
+このチャットでの名前を変更 || Change your name in this chat || 更改在此聊天中的名字 || 이 채팅에서의 이름 변경
+対戦パネル || Versus panel || 对战面板 || 대전 패널
+いちばん上へ || To the top || 回到顶部 || 맨 위로
+写真・動画・PDF・Wordなどを まぜて、いくつでも まとめて選べます || You can pick any number of photos, videos, PDFs, Word files and more at once. || 可以一次选择任意数量的照片、视频、PDF、Word 等文件。 || 사진·동영상·PDF·Word 등을 섞어서 여러 개를 한꺼번에 고를 수 있습니다.
+返信をやめる || Cancel reply || 取消回复 || 답장 취소
+絵文字を検索 || Search emoji || 搜索表情 || 이모지 검색
+よく使う || Frequently used || 常用 || 자주 쓰는
+スマイリー・人 || Smileys & people || 笑脸·人物 || 스마일리·사람
+どうぶつ・しぜん || Animals & nature || 动物·自然 || 동물·자연
+たべもの・のみもの || Food & drink || 食物·饮品 || 음식·음료
+スポーツ・あそび || Sports & play || 运动·游戏 || 스포츠·놀이
+たびもの・のりもの || Travel & vehicles || 旅行·交通工具 || 여행·탈것
+もの・どうぐ || Objects & tools || 物品·工具 || 물건·도구
+きごう || Symbols || 符号 || 기호
+はた || Flags || 旗帜 || 깃발
+改行（送信しません） || New line (does not send) || 换行（不发送） || 줄바꿈(전송하지 않음)
+自分専用メモ || My notes || 我的笔记 || 나만의 메모
+ロック中 || Locked || 已锁定 || 잠김
+メッセージを入力... || Type a message... || 输入消息... || 메시지를 입력하세요...
+メッセージを入力...（Enterで送信、Shift+Enterで改行） || Type a message... (Enter to send, Shift+Enter for a new line) || 输入消息...（Enter 发送，Shift+Enter 换行） || 메시지를 입력하세요...(Enter로 전송, Shift+Enter로 줄바꿈)
+いまどうしてる？（500文字まで） || What's up? (max 500 characters) || 在做什么？（最多500字） || 지금 뭐 하고 있어요? (500자까지)
+🔎 ユーザー名を検索 || 🔎 Search users || 🔎 搜索用户名 || 🔎 사용자 이름 검색
+はじめて開く画面の案内です || A guide to this screen, shown the first time you open it || 首次打开此页面的指引 || 처음 여는 화면의 안내입니다
+人をタップすると、プロフィールを見たり、チャットを始めたりできます。 || Tap a person to view their profile or start a chat. || 点击某个人，即可查看资料或开始聊天。 || 사람을 탭하면 프로필을 보거나 채팅을 시작할 수 있습니다.
+上の検索ボックスで、名前をさがせます。 || You can search by name in the search box above. || 可以在上方的搜索框中按名字查找。 || 위 검색창에서 이름을 찾을 수 있습니다.
+「非表示のチャット」ボタンから、隠したチャットを元に戻せます。 || You can restore hidden chats with the "Hidden chats" button. || 通过“隐藏的聊天”按钮，可以恢复已隐藏的聊天。 || '숨긴 채팅' 버튼에서 숨긴 채팅을 되돌릴 수 있습니다.
+わかった || Got it || 知道了 || 알겠어요
+案内を今後ぜんぶ出さない || Don't show any more guides || 以后不再显示任何指引 || 앞으로 안내를 모두 표시하지 않기
+ARE を「アプリ化」しましょう || Let's install ARE as an app || 把 ARE 安装为应用吧 || ARE를 '앱으로 설치'해 보세요
+ホーム画面（パソコンはデスクトップ）にアイコンができて、アプリのように すぐ開けます。通知も受け取れます。 || An icon appears on your home screen (desktop on a PC) so you can open it right away like an app. You can also receive notifications. || 主屏幕（电脑为桌面）上会出现图标，像应用一样可以立即打开，还能接收通知。 || 홈 화면(PC는 바탕화면)에 아이콘이 생겨서 앱처럼 바로 열 수 있습니다. 알림도 받을 수 있어요.
+アプリ化する || Install as app || 安装为应用 || 앱으로 설치하기
+「アプリ化する」を押すと、先へ進めます。 || Press "Install as app" to continue. || 点击“安装为应用”即可继续。 || '앱으로 설치하기'를 누르면 다음으로 넘어갈 수 있습니다.
+アプリ化のお願い || A request to install as an app || 请安装为应用 || 앱으로 설치 부탁드려요

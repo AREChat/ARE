@@ -134,6 +134,8 @@ function otherHookFetch(){
 
 function initOther(){
     otherHookFetch();
+    // 言語を切りかえたら、残り回数の案内も その言語で 書きなおす
+    try{ if(window.AREI18N) AREI18N.onChange(() => { try{ otherPaintLimit(); }catch(_e){} }); }catch(_e){}
     // 起動直後：前回の答え（キャッシュ）でも ウイルスフラグが立っていれば、すぐに出す
     try{ if(otherActive()) otherAfterFlags(); }catch(_e){}
 }

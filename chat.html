@@ -1,8 +1,8 @@
 
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" data-i18n-nopicker>
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8"><script src="./i18n.js"></script>
 <link rel="icon" type="image/png" href="./icon-192.png">
 <link rel="manifest" href="./manifest.webmanifest">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
@@ -147,7 +147,7 @@
         </section>
     </main>
 </div>
-<section class="admin-panel" id="adminPanel" hidden aria-label="管理者パネル">
+<section class="admin-panel" id="adminPanel" hidden aria-label="管理者パネル" data-i18n-skip>
     <header><b>🛡️ 管理者パネル</b><span class="admin-note">閲覧・承認の操作はすべて監査ログに記録されます</span>
         <button class="button-secondary" data-admin-view="rooms" type="button">会話一覧</button>
         <button class="button-secondary" data-admin-view="requests" type="button">削除申請</button>
@@ -170,7 +170,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=693fa032df"></script>
+<script defer src="./chat.bundle.js?v=77544cffe8"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

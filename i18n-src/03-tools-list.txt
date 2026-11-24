@@ -1,0 +1,137 @@
+# ===== 「その他」のツール一覧（名前と説明） =====
+修正依頼を送る || Send a fix request || 发送修改请求 || 수정 요청 보내기
+直してほしいところ・こうしてほしいことを、みんなで見られる「修正依頼」の部屋に送ります || Send what you'd like fixed or changed to the "Fix requests" room that everyone can see. || 把希望修改或改进的地方发送到大家都能看到的“修改请求”房间。 || 고쳤으면 하는 점·이렇게 해 줬으면 하는 점을 모두가 볼 수 있는 '수정 요청' 방에 보냅니다.
+近くにいた人と、自動ですれ違い。かけらパズル・かざし合い（位置はざっくりの区画だけ・いつでもオフ） || Automatically pass by people who were nearby. Piece puzzles & hold-up exchanges (only a rough area is used for location · can be turned off any time). || 与附近的人自动擦肩而过。碎片拼图·互相挥手（位置仅为大致区域·随时可关闭）。 || 근처에 있던 사람과 자동으로 스쳐 지나갑니다. 조각 퍼즐·서로 대기(위치는 대략적인 구역만·언제든 끌 수 있음).
+ストーリー（24時間） || Stories (24 h) || 故事（24小时） || 스토리(24시간)
+フォロー中の人と自分の、24時間で消える投稿 || Posts from people you follow and yourself that disappear after 24 hours. || 关注的人和自己发布的、24小时后消失的动态。 || 팔로우 중인 사람과 내가 올린, 24시간 뒤 사라지는 게시물입니다.
+自動応答 || Auto-reply || 自动回复 || 자동 응답
+言葉や曜日・時間帯に応じた固定メッセージを返信 || Reply with fixed messages depending on words, weekdays and time of day. || 根据关键词、星期和时间段回复固定消息。 || 말이나 요일·시간대에 따라 정해 둔 메시지로 답장합니다.
+アルバム || Album || 相册 || 앨범
+チャットの写真を一覧で見る（チャットを選べます） || See the photos in a chat as a list (you can choose the chat). || 以列表查看聊天中的照片（可选择聊天）。 || 채팅의 사진을 목록으로 봅니다(채팅을 고를 수 있어요).
+画像編集 || Photo editor || 图片编辑 || 이미지 편집
+回転・切り抜き・明るさ・文字入れをして送信 || Rotate, crop, adjust brightness, add text, then send. || 旋转·裁剪·调整亮度·添加文字后发送。 || 회전·자르기·밝기·글자 넣기를 한 뒤 보냅니다.
+AI画像・動画生成 || AI image & video generation || AI 图片·视频生成 || AI 이미지·동영상 생성
+無料枠で生成して端末にダウンロード（回数・混雑の制限あり） || Generate within the free allowance and download to your device (limits on count and congestion apply). || 在免费额度内生成并下载到设备（有次数和拥挤限制）。 || 무료 한도 내에서 생성해 기기에 다운로드합니다(횟수·혼잡 제한 있음).
+位置情報を送る || Send my location || 发送位置信息 || 위치 정보 보내기
+いまいる場所を、いまのチャットに送信 || Send where you are now to the current chat. || 把当前所在位置发送到当前聊天。 || 지금 있는 장소를 현재 채팅에 보냅니다.
+ワークスペース（仕事） || Workspace (work) || 工作空间（工作） || 워크스페이스(업무)
+出勤・経費・会議室・プロジェクト・文書・共同メモ・レポート || Attendance, expenses, meeting rooms, projects, documents, shared notes, reports. || 出勤·报销·会议室·项目·文档·共享笔记·报告。 || 출근·경비·회의실·프로젝트·문서·공동 메모·리포트
+予定の空き時間を提案 || Suggest free time slots || 推荐日程空闲时间 || 일정의 빈 시간 제안
+予定のすき間から会議に使える時間を計算 || Calculates times available for a meeting from the gaps in your schedule. || 根据日程的空隙计算可用于会议的时间。 || 일정의 빈틈에서 회의에 쓸 수 있는 시간을 계산합니다.
+ヘルス記録 || Health log || 健康记录 || 헬스 기록
+体重・睡眠・歩数・気分を記録（自分だけ） || Record weight, sleep, steps and mood (only you can see it). || 记录体重·睡眠·步数·心情（仅自己可见）。 || 체중·수면·걸음 수·기분을 기록합니다(나만 볼 수 있어요).
+場所で送るメッセージ || Location-triggered messages || 按地点发送的消息 || 장소로 보내는 메시지
+目的地で「到着しました」を押すと送信 || Press "I've arrived" at your destination to send. || 到达目的地后点击“已到达”即可发送。 || 목적지에서 '도착했습니다'를 누르면 전송됩니다.
+気分・時間帯でテーマ || Theme by mood & time of day || 按心情·时间段切换主题 || 기분·시간대별 테마
+朝昼夕夜や気分の言葉で、画面の色が変わる || The screen colors change with morning/noon/evening/night or mood words. || 随早晨、白天、傍晚、夜晚或心情词语，屏幕颜色会改变。 || 아침·낮·저녁·밤이나 기분 말에 따라 화면 색이 바뀝니다.
+カードゲーム（手札かくし） || Card games (hidden hands) || 卡牌游戏（隐藏手牌） || 카드 게임(패 숨김)
+ババ抜き・大富豪・インディアンポーカー・ダウト || Old Maid, Daifugo, Indian Poker, Cheat (Doubt) || 抽鬼牌·大富豪·印第安扑克·质疑 || 도둑잡기·대부호·인디언 포커·다우트
+ブラックジャック || Blackjack || 二十一点 || 블랙잭
+ディーラー(CPU)と1人で対戦。コインは端末だけ || Play alone against the dealer (CPU). Coins stay on your device only. || 一个人对战庄家（CPU）。金币只保存在本设备。 || 딜러(CPU)와 혼자 대결합니다. 코인은 기기에만 저장됩니다.
+自分だけが見られるメモ・チェックリスト || Notes and checklists only you can see. || 仅自己可见的笔记和清单。 || 나만 볼 수 있는 메모·체크리스트입니다.
+CO2トラッカー || CO2 tracker || CO2 追踪器 || CO2 트래커
+移動・食事・電気のCO2をかんたん記録 || Easily record CO2 from travel, meals and electricity. || 轻松记录出行·饮食·用电产生的CO2。 || 이동·식사·전기의 CO2를 간단히 기록합니다.
+アバター || Avatar || 头像形象 || 아바타
+自分のキャラを作って画像として送る || Create your own character and send it as an image. || 创建自己的角色，并作为图片发送。 || 나만의 캐릭터를 만들어 이미지로 보냅니다.
+3Dプロフィールカード || 3D profile card || 3D 资料卡 || 3D 프로필 카드
+Three.jsのキャラクターを自分用に設定します || Set up your own Three.js character. || 设置属于自己的 Three.js 角色。 || Three.js 캐릭터를 나에게 맞게 설정합니다.
+教えると覚える・自分の返し方を学ぶ（APIキー不要・無料） || Teach it and it remembers · learns how you reply (no API key needed · free). || 教它就会记住·学习您的回复方式（无需 API 密钥·免费）。 || 가르치면 기억하고, 내 답장 방식을 배웁니다(API 키 불필요·무료).
+会話の分析 || Conversation analysis || 对话分析 || 대화 분석
+要約・キーワード・感情・分類（端末内だけで処理） || Summary, keywords, emotion and classification (processed on your device only). || 摘要·关键词·情感·分类（仅在设备内处理）。 || 요약·키워드·감정·분류(기기 안에서만 처리)
+ストーリーのアーカイブ || Story archive || 故事存档 || 스토리 보관함
+24時間をすぎたストーリーの保存先 || Where stories are kept after 24 hours. || 超过24小时的故事的保存位置。 || 24시간이 지난 스토리의 보관 장소입니다.
+プロフィール共有・QR || Share profile / QR || 分享资料·二维码 || 프로필 공유·QR
+自分のQRコードとリンクを表示 || Show your QR code and link. || 显示自己的二维码和链接。 || 내 QR 코드와 링크를 표시합니다.
+ゲーム || Games || 游戏 || 게임
+6種類のミニゲーム・ランキング・実績 || 6 kinds of mini-games, rankings and achievements. || 6种小游戏·排行榜·成就。 || 6종류의 미니게임·랭킹·업적
+タスク・カレンダー || Tasks & calendar || 任务·日历 || 할 일·캘린더
+自分だけが見られる予定表 || A schedule only you can see. || 仅自己可见的日程表。 || 나만 볼 수 있는 일정표입니다.
+通知・ホーム画面 || Notifications & home screen || 通知·主屏幕 || 알림·홈 화면
+閉じていても届く通知・チャットごとのミュート・ホーム画面に追加 || Notifications that arrive even when closed · mute per chat · add to home screen. || 关闭后也能收到的通知·按聊天静音·添加到主屏幕。 || 닫아도 오는 알림·채팅별 음소거·홈 화면에 추가
+管理者のTOTP認証 || Administrator TOTP authentication || 管理员 TOTP 验证 || 관리자 TOTP 인증
+管理者用の認証アプリを登録・確認します || Register and check the authenticator app for administrators. || 注册并确认管理员用的验证应用。 || 관리자용 인증 앱을 등록·확인합니다.
+Storage使用量と整理 || Storage usage & cleanup || 存储用量与整理 || 스토리지 사용량과 정리
+容量と参照されていない画像を確認します || Check the capacity and images that are no longer referenced. || 查看容量以及不再被引用的图片。 || 용량과 참조되지 않는 이미지를 확인합니다.
+スター付きメッセージ || Starred messages || 已加星标的消息 || 별표 메시지
+あとで見返したいメッセージの一覧 || A list of messages you want to look back on later. || 想稍后回看的消息列表。 || 나중에 다시 보고 싶은 메시지 목록입니다.
+チャットの整理 || Organize chats || 整理聊天 || 채팅 정리
+フォルダ分け・固定・並び替え || Folders, pinning and reordering. || 文件夹分类·置顶·重新排序。 || 폴더 분류·고정·순서 변경
+定型文 || Canned phrases || 常用语 || 정형문
+よく使う文を登録して、ワンタップで入力 || Save phrases you use often and insert them with one tap. || 保存常用语句，一键输入。 || 자주 쓰는 문장을 등록해 한 번의 탭으로 입력합니다.
+見やすさ・読み上げ || Readability & read-aloud || 易读性·朗读 || 보기 편의·읽어 주기
+文字サイズ・高コントラスト・読み上げの速さ || Text size, high contrast and read-aloud speed. || 字号·高对比度·朗读速度。 || 글자 크기·고대비·읽어 주는 속도
+お絵かき || Drawing || 涂鸦 || 그림 그리기
+手書きの絵を画像にして、チャットに送る || Turn a hand-drawn picture into an image and send it in the chat. || 把手绘的画变成图片，发送到聊天中。 || 손으로 그린 그림을 이미지로 만들어 채팅에 보냅니다.
+自作スタンプ || My stamps || 自制贴纸 || 내 스티커
+自分の画像から作って、ワンタップで送る || Make stamps from your own images and send them with one tap. || 用自己的图片制作，一键发送。 || 내 이미지로 만들어 한 번의 탭으로 보냅니다.
+割り勘計算 || Split the bill || AA制计算 || 더치페이 계산
+合計と人数から計算して、チャットに貼る || Calculate from the total and number of people, then paste it in the chat. || 根据总额和人数计算，并贴到聊天中。 || 합계와 인원수로 계산해서 채팅에 붙여넣습니다.
+日程調整ボード || Scheduling board || 日程协调板 || 일정 조율 보드
+候補日に ○△× で投票して決める || Vote on candidate dates with ○△× to decide. || 对候选日期用 ○△× 投票来决定。 || 후보 날짜에 ○△×로 투표해서 정합니다.
+ライブ位置共有 || Live location sharing || 实时位置共享 || 실시간 위치 공유
+一定時間だけ、お互いの位置を地図で見る || See each other's location on a map for a set time only. || 在一段时间内，在地图上互相查看位置。 || 일정 시간 동안만 서로의 위치를 지도로 봅니다.
+文字を読み取る || Read text (OCR) || 识别文字 || 글자 읽기(OCR)
+画像の中の文字をテキストにする || Turn the text in an image into plain text. || 把图片中的文字转换成文本。 || 이미지 속 글자를 텍스트로 바꿉니다.
+QRで友だち追加（スマホ限定） || Add friends by QR (phones only) || 扫二维码添加好友（仅限手机） || QR로 친구 추가(스마트폰 전용)
+スマホ限定：カメラでQRを読み取ってチャットを始める（パソコンのカメラは読み取りにくいです） || Phones only: scan a QR code with the camera to start a chat (PC cameras have a hard time reading it). || 仅限手机：用摄像头扫描二维码开始聊天（电脑摄像头较难识别）。 || 스마트폰 전용: 카메라로 QR을 읽어 채팅을 시작합니다(PC 카메라는 읽기 어렵습니다).
+日記 || Diary || 日记 || 일기
+気分つきで1日1つ。検索もできる || One entry a day with your mood. Searchable too. || 每天一篇，附带心情，也可以搜索。 || 기분과 함께 하루에 하나. 검색도 가능합니다.
+習慣トラッカー || Habit tracker || 习惯追踪 || 습관 트래커
+毎日の習慣をチェック。連続日数がわかる || Check off daily habits and see your streak. || 每天打卡习惯，可以看到连续天数。 || 매일의 습관을 체크하고 연속 일수를 확인합니다.
+家計簿 || Household budget || 家庭账本 || 가계부
+収入と支出を記録して月ごとに集計 || Record income and expenses and total them by month. || 记录收入和支出，并按月汇总。 || 수입과 지출을 기록해 월별로 집계합니다.
+待ち時間もボタンで記録・アラーム・10種類で書き出し || Record waiting times with a button · alarms · export in 10 formats. || 等待时间也能用按钮记录·闹钟·可导出10种格式。 || 대기 시간도 버튼으로 기록·알람·10종류로 내보내기
+タイマー || Timer || 计时器 || 타이머
+カウントダウン・ポモドーロ || Countdown & Pomodoro || 倒计时·番茄钟 || 카운트다운·포모도로
+電卓・換算 || Calculator & converter || 计算器·换算 || 계산기·환산
+計算・単位換算・為替の目安 || Calculation, unit conversion and exchange rate estimates. || 计算·单位换算·汇率参考。 || 계산·단위 환산·환율 참고
+ZIP 圧縮・解凍 || ZIP compress / extract || ZIP 压缩·解压 || ZIP 압축·해제
+ファイルをZIPにまとめる／ZIPをほどく（端末の中だけで処理） || Bundle files into a ZIP / unpack a ZIP (processed on your device only). || 将文件打包成ZIP／解压ZIP（仅在设备内处理）。 || 파일을 ZIP으로 묶기／ZIP 풀기(기기 안에서만 처리)
+画像まとめて変換 || Batch image conversion || 批量转换图片 || 이미지 일괄 변환
+小さく・サイズ変更・形式変換をまとめて || Shrink, resize and convert formats in bulk. || 批量压缩·调整尺寸·转换格式。 || 작게·크기 변경·형식 변환을 한꺼번에
+画像→PDF || Images → PDF || 图片→PDF || 이미지→PDF
+写真やスキャンを1つのPDFにまとめる || Combine photos and scans into one PDF. || 把照片和扫描件合并成一个PDF。 || 사진이나 스캔을 하나의 PDF로 묶습니다.
+PDFを操作 || PDF tools || PDF 操作 || PDF 다루기
+結合・ページ抜き出し・分割・回転 || Merge, extract pages, split and rotate. || 合并·提取页面·拆分·旋转。 || 병합·페이지 추출·분할·회전
+写真の位置情報を消す || Remove location data from photos || 删除照片的位置信息 || 사진의 위치 정보 지우기
+送る前に位置情報・撮影情報を取りのぞく || Remove location and shooting data before you send. || 发送前去除位置信息和拍摄信息。 || 보내기 전에 위치 정보·촬영 정보를 제거합니다.
+ファイル転送（スマホ↔PC） || File transfer (phone ↔ PC) || 文件传输（手机↔电脑） || 파일 전송(스마트폰↔PC)
+スマホで入れて、パソコンで受け取る（本人だけ・7日で消える） || Put it in on your phone and receive it on your PC (only you · deleted after 7 days). || 在手机上放入，在电脑上接收（仅本人·7天后删除）。 || 스마트폰에서 넣고 PC에서 받습니다(본인만·7일 뒤 삭제).
+ファイル照合（ハッシュ） || File check (hash) || 文件校验（哈希） || 파일 대조(해시)
+ダウンロードしたファイルが本物か確かめる || Check whether a downloaded file is genuine. || 确认下载的文件是否为正版。 || 다운로드한 파일이 진짜인지 확인합니다.
+ファイル名まとめて変更 || Batch rename files || 批量重命名文件 || 파일 이름 일괄 변경
+連番・置きかえ・大文字小文字（ZIPで保存） || Numbering, replacing, upper/lower case (saved as ZIP). || 序号·替换·大小写（以ZIP保存）。 || 연번·바꾸기·대소문자(ZIP으로 저장)
+文字化けなおし・改行変換 || Fix garbled text & convert line breaks || 修复乱码·转换换行 || 글자 깨짐 고치기·줄바꿈 변환
+Shift_JIS などを UTF-8 になおす || Convert Shift_JIS and others to UTF-8. || 把 Shift_JIS 等转换为 UTF-8。 || Shift_JIS 등을 UTF-8로 고칩니다.
+CSV変換・表示 || CSV convert & view || CSV 转换·查看 || CSV 변환·보기
+表で見る／JSON・TSV・Excel用に変換 || View as a table / convert for JSON, TSV or Excel. || 以表格查看／转换为 JSON·TSV·Excel 用格式。 || 표로 보기／JSON·TSV·Excel용으로 변환
+動画から静止画 || Still image from video || 从视频截取静态图 || 동영상에서 정지 이미지
+動画の好きな場面を画像で保存 || Save any scene of a video as an image. || 把视频中喜欢的画面保存为图片。 || 동영상의 원하는 장면을 이미지로 저장합니다.
+大きいファイルの分割・結合 || Split & join large files || 大文件的拆分·合并 || 큰 파일 분할·결합
+送れない大きさのファイルを分けて送る || Split a file that is too big to send and send it in parts. || 把太大无法发送的文件拆分后分批发送。 || 보낼 수 없는 크기의 파일을 나눠서 보냅니다.
+買い物リスト || Shopping list || 购物清单 || 쇼핑 목록
+このチャットのみんなで共有 || Shared with everyone in this chat. || 与此聊天中的所有人共享。 || 이 채팅의 모두와 공유합니다.
+じゃんけん・ルーレット・あみだ || Rock-paper-scissors, roulette, Amida || 猜拳·轮盘·画鬼脚 || 가위바위보·룰렛·사다리타기
+決めごとをみんなで || Decide things together. || 大家一起做决定。 || 정할 일을 다 같이.
+ARE 〜そういうときは、AREだ！〜 || ARE ~That's What ARE Is For!~ || ARE ～这种时候，就用ARE！～ || ARE ~그럴 때는 ARE지!~
+ゲーム一覧をひらく（RPG・カード・推理・ミニゲームなど）。2D・王道ふうRPGもここから（お試し期間のあとは ぼうけんパックで解放） || Open the game list (RPG, cards, mystery, mini-games and more). The classic-style 2D RPG starts here too (unlocked with the Adventure Pack after the trial period). || 打开游戏列表（RPG·卡牌·推理·小游戏等）。2D王道风格RPG也从这里开始（试用期结束后用冒险包解锁）。 || 게임 목록을 엽니다(RPG·카드·추리·미니게임 등). 2D 왕도풍 RPG도 여기서 시작합니다(체험 기간 이후에는 모험 팩으로 해제).
+ARE QUEST 2・3 || ARE QUEST 2 & 3 || ARE QUEST 2・3 || ARE QUEST 2 & 3
+ストーリー重視の3D・RPG。AREを入手せよ／月影のあしあと（ARE QUEST 3）まで、ここから遊べます（お試し期間のあとは ぼうけんパックで解放） || A story-focused 3D RPG. Play from "Get ARE" through "Footprints in the Moonlight" (ARE QUEST 3) right here (unlocked with the Adventure Pack after the trial period). || 重视剧情的3D RPG。从“获得ARE”到“月影的足迹”（ARE QUEST 3），都可以在这里游玩（试用期结束后用冒险包解锁）。 || 스토리 중심의 3D RPG. 'ARE를 손에 넣어라'부터 '달그림자의 발자취'(ARE QUEST 3)까지 여기서 즐길 수 있습니다(체험 기간 이후에는 모험 팩으로 해제).
+ARE CARD 〜そういうときは、AREだ！〜 || ARE CARD ~That's What ARE Is For!~ || ARE CARD ～这种时候，就用ARE！～ || ARE CARD ~그럴 때는 ARE지!~
+3Dの盤面で遊ぶカードバトル（土台版）。デッキを組んでCPUと対戦（お試し期間のあとは ぼうけんパックで解放） || A card battle played on a 3D board (base version). Build a deck and fight the CPU (unlocked with the Adventure Pack after the trial period). || 在3D棋盘上进行的卡牌对战（基础版）。组建卡组与CPU对战（试用期结束后用冒险包解锁）。 || 3D 판에서 즐기는 카드 배틀(기본 버전). 덱을 짜서 CPU와 대전합니다(체험 기간 이후에는 모험 팩으로 해제).
+GAME5 推理ゲーム（表・裏） || GAME5 Mystery game (front & back) || GAME5 推理游戏（表·里） || GAME5 추리 게임(앞·뒤)
+表＝会話と証言から推理する全10章／裏＝表に○×をつける推理ゲーム2。ブラウザですぐ あそべます（Windows版もあり） || Front = 10 chapters of deduction from conversations and testimony / Back = Mystery Game 2, where you mark ○× on the front. Play right in your browser (a Windows version is available too). || 表＝根据对话和证词推理的全10章／里＝对表打○×的推理游戏2。可直接在浏览器中游玩（也有 Windows 版）。 || 앞＝대화와 증언으로 추리하는 전 10장／뒤＝앞면에 ○×를 매기는 추리 게임 2. 브라우저에서 바로 즐길 수 있습니다(Windows 버전도 있음).
+OFFLINE PARADISE || OFFLINE PARADISE || OFFLINE PARADISE || OFFLINE PARADISE
+電波がなくても あそべる、ルーレットで選ばれる5つのミニゲーム（コイン・図鑑つき） || 5 mini-games chosen by roulette that you can play even without a signal (with coins and a collection book). || 没有网络也能玩，由轮盘选出的5个小游戏（含金币·图鉴）。 || 전파가 없어도 즐길 수 있는, 룰렛으로 뽑히는 5개의 미니게임(코인·도감 포함)
+大富豪（本格ルール） || Daifugo (full rules) || 大富豪（正式规则） || 대부호(본격 규칙)
+3〜2の技・縛り・革命・階級・カード交換。ルールは自由に変えられます || Tricks from 3 to 2, locks, revolution, ranks and card exchange. You can freely change the rules. || 3～2的牌型·锁牌·革命·阶级·换牌。规则可以自由更改。 || 3~2의 기술·묶기·혁명·계급·카드 교환. 규칙은 자유롭게 바꿀 수 있습니다.
+ドリームフロンティア || Dream Frontier || 梦想前线 || 드림 프런티어
+3Dのテーマパーク。ライドを回ってスタンプを集めよう（お試し期間のあとは ぼうけんパックで解放） || A 3D theme park. Ride the attractions and collect stamps (unlocked with the Adventure Pack after the trial period). || 3D主题乐园。游玩各个游乐设施，集齐印章吧（试用期结束后用冒险包解锁）。 || 3D 테마파크. 놀이기구를 타고 스탬프를 모아 보세요(체험 기간 이후에는 모험 팩으로 해제).
+学習サイト（LearnLab124） || Study site (LearnLab124) || 学习网站（LearnLab124） || 학습 사이트(LearnLab124)
+プログラミング学習サイト（用語集・クイズ・物語）を別のタブで開きます。ARE とは別のサイトです || Opens the programming study site (glossary, quizzes, stories) in another tab. It is a separate site from ARE. || 在新标签页打开编程学习网站（术语表·测验·故事）。这是与 ARE 不同的独立网站。 || 프로그래밍 학습 사이트(용어집·퀴즈·이야기)를 다른 탭에서 엽니다. ARE와는 별도의 사이트입니다.
+ロック・自動ログアウト || Lock & auto logout || 锁定·自动退出登录 || 잠금·자동 로그아웃
+PIN・放置したら画面ぼかし/ログアウト || PIN · blur the screen or log out when left idle. || PIN·闲置时模糊屏幕／退出登录。 || PIN·방치하면 화면 흐림/로그아웃
+お知らせ || Announcements || 公告 || 공지
+管理者からのお知らせ || Announcements from the administrator. || 来自管理员的公告。 || 관리자의 공지입니다.
+表示設定・言語 || Display & language || 显示设置·语言 || 표시 설정·언어
+気分テーマ・省データモード・言語（日本語 / English / 中文 / 한국어） || Mood theme, data saver mode and language (日本語 / English / 中文 / 한국어). || 心情主题·省流量模式·语言（日本語 / English / 中文 / 한국어）。 || 기분 테마·데이터 절약 모드·언어(日本語 / English / 中文 / 한국어)
