@@ -85,10 +85,23 @@
         $("botForm").addEventListener("submit", (ev) => { ev.preventDefault(); const i = $("botInput"); ask(i.value); i.value = ""; });
     }
 
-    // ---------- 都道府県ごとの天気・運行（Supabase が1時間ごとに集めた結果を表示。取れないときは公式サイトへのリンク）----------
+    // ---------- 都道府県ごとの天気・運行（Googleドライブ側の GAS が集めた結果を表示。取れないときは公式サイトへのリンク）----------
     const PREF_NAMES = ["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
     const jmaLink = (code) => (["01", "46", "47"].indexOf(code) >= 0 ? "https://www.jma.go.jp/bosai/forecast/" : "https://www.jma.go.jp/bosai/forecast/#area_type=offices&area_code=" + code + "0000");
     async function cacheRow(kind, key) {
+        // ① Googleドライブ側の GAS（ファイル保存と同じ）から取る。Supabase は使わない
+        const base = String((window.ARE_CONFIG || {}).adsUrl || "").trim();
+        if (base) {
+            try {
+                const ctl = typeof AbortController === "function" ? new AbortController() : null;
+                const tm = ctl ? setTimeout(() => ctl.abort(), 15000) : 0;
+                const r = await fetch(base + "?action=info&kind=" + encodeURIComponent(kind) + "&key=" + encodeURIComponent(key), ctl ? { signal: ctl.signal } : undefined);
+                if (tm) clearTimeout(tm);
+                const j = await r.json();
+                if (j && j.ok && j.payload) return j;
+            } catch (_e) { /* ② へ */ }
+        }
+        // ② GAS が（まだ）古い・つながらないときだけ、Supabase に残っている前回のコピーを使う
         if (typeof requireClient !== "function") throw new Error("no client");
         const r = await requireClient().from("info_cache").select("payload,ok,source_url,updated_at").eq("kind", kind).eq("key", key).maybeSingle();
         if (r.error || !r.data) throw new Error("no row");
@@ -155,7 +168,7 @@
     // ---------- 交通情報（JR東日本は自動取得。取れないとき・他の地域は公式サイトへのリンク）----------
     function renderTransit() {
         title.textContent = "🚆 交通情報";
-        body.innerHTML = '<div class="eb-note">都道府県を選ぶと運行状況を表示します（東京都は都営交通を1時間ごとに自動更新。全国どこでも、選んだ地域のJR各社などの公式サイトへすぐ移動できます）。</div>' +
+        body.innerHTML = '<div class="eb-note">都道府県を選ぶと運行状況を表示します（東京都は都営交通を数分おきに自動更新。全国どこでも、選んだ地域のJR各社などの公式サイトへすぐ移動できます）。</div>' +
             '<div class="eb-row"><select class="eb-in" id="tPref" aria-label="都道府県">' + PREF_NAMES.map((n, i) => '<option value="' + String(i + 1).padStart(2, "0") + '">' + n + '</option>').join("") + '</select></div><div id="tResult"></div>' +
             '<hr style="border:0;border-top:1px solid #2c3a63;margin:12px 0"><div class="eb-note">乗換案内（外部サービスを新しいタブで開きます）</div>' +
             '<div class="eb-row"><input class="eb-in" id="tFrom" placeholder="出発駅・場所" maxlength="40"><input class="eb-in" id="tTo" placeholder="到着駅・場所" maxlength="40"></div>' +
@@ -199,7 +212,7 @@
                 if (Date.now() - new Date(row.updated_at).getTime() > 6 * 3600 * 1000) throw new Error("stale");
                 out.innerHTML = '<div class="eb-day" style="text-align:left;margin:8px 0"><b>都営交通の運行状況</b><ul style="margin:6px 0 0 18px;padding:0">' +
                     row.payload.lines.map((l) => '<li><b>' + esc(l.name) + '</b>：' + esc(l.text) + '</li>').join("") + '</ul>' +
-                    '<div class="eb-note">更新 ' + hhmm(row.updated_at) + '（1時間ごとに自動更新）<br>出典：' + esc(row.payload.credit || "東京都交通局（公共交通オープンデータセンター）") + '</div></div>' +
+                    '<div class="eb-note">更新 ' + hhmm(row.updated_at) + '（数分おきに自動更新）<br>出典：' + esc(row.payload.credit || "東京都交通局（公共交通オープンデータセンター）") + '</div></div>' +
                     '<div class="eb-note">JR・私鉄・東京メトロはこのアプリ内では表示できません。下のボタンで公式サイトを確認してください。</div>' + yahoo;
             } catch (_e) {
                 out.innerHTML = failBox("都営交通の運行状況を取得できませんでした。", "https://www.kotsu.metro.tokyo.jp/subway/schedule/", "東京都交通局の運行情報を開く") + yahoo;
