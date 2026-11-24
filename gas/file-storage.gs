@@ -10,7 +10,7 @@
  *   2) チャットが、その口へ ファイルを直接アップロード（進み具合は チャット側で表示）
  *   3) finish ：「リンクを知っている全員が見られる」に設定 → 見るためのリンクと番号（id）を返す
  *   ほかに（これまでと同じ）
- *   ・30日アーカイブ：Supabase に残った古いファイルを、ドライブへ移す（合言葉 ARCHIVE_TOKEN が要ります）
+ *   ・30日アーカイブ：Supabase に残った古いファイルを、ドライブへ移す（合言葉 ARCHIVE_TOKEN が要ります。写真は share:true で公開リンクにして移せます）
  *   ・広告の映像：ドライブの「広告」フォルダの AD001.mp4〜 を、チャットに渡す（?action=list／?action=part）
  *   ・天気・運行情報：都道府県ごとの天気と都営交通の運行状況を、ここで集めて チャットに渡す（?action=info）。Supabase は使いません
  *   ・いざというとき用：keepAlive（Supabase を眠らせない。週1回のトリガーに設定して使う。ふだんは何もしません）
@@ -22,10 +22,10 @@ var CONFIG = {
   // ファイル保存フォルダ（https://drive.google.com/drive/folders/ のあとの文字）
   FOLDER_ID: '1W60advMCNRxEWyhTeyX-MP5yO1-wniZX',
   // 1つあたりの上限（バイト）
-  MAX_BYTES: 1000 * 1024 * 1024 * 1024,
+  MAX_BYTES: 10000 * 1024 * 1024 * 1024,
   // 1人が1日にあずけられる上限（いたずらで ドライブがいっぱいになるのを防ぐ）
-  DAILY_MAX_FILES: 1000,
-  DAILY_MAX_BYTES: 100 * 1024 * 1024 * 1024,
+  DAILY_MAX_FILES: 10000,
+  DAILY_MAX_BYTES: 1000 * 1024 * 1024 * 1024,
   // ログイン確認に使う Supabase（公開してよい値だけ）
   SUPABASE_URL: 'https://kzrrnuzzvwijujhlbtln.supabase.co',
   SUPABASE_PUBLISHABLE_KEY: 'sb_publishable_lO7m63Or44b-CIRWfYMcjA_z_WuONpi',
@@ -60,6 +60,7 @@ function doGet(e) {
     if (a.action === 'list') return json_(adsList_());
     if (a.action === 'part') return json_(adsPart_(String(a.id || ''), parseInt(a.i, 10)));
     if (a.action === 'info') return json_(infoGet_(String(a.kind || ''), String(a.key || '')));
+    if (a.action === 'ping') return json_({ ok: true, version: '2026-11-24-media', features: ['info', 'archive-share'] });   // どの版が動いているかの確認用
   } catch (err) {
     return json_({ ok: false, error: String(err).slice(0, 200) });
   }
@@ -131,13 +132,20 @@ function archive_(body) {
   if (!/^https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/sign\//.test(url)) return { ok: false, error: 'bad url' };
   var name = cleanName_(body.name);
   var sub = monthFolder_(/^\d{4}-\d{2}$/.test(String(body.month || '')) ? String(body.month) : 'unknown');
+  // share:true のときは「リンクを知っている全員が見られる」にします（写真をチャットや投稿に そのまま出すため。ドライブへ移した写真用）
+  var share = body.share === true;
   // 同じ名前がすでにあれば、保存しなおさない（やり直しで二重にならないように）
   var same = sub.getFilesByName(name);
-  if (same.hasNext()) return { ok: true, id: same.next().getId(), name: name, duplicate: true };
+  if (same.hasNext()) {
+    var old = same.next();
+    if (share) old.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    return { ok: true, id: old.getId(), name: name, size: old.getSize(), duplicate: true, shared: share };
+  }
   var res = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
   if (res.getResponseCode() !== 200) return { ok: false, error: 'fetch ' + res.getResponseCode() };
   var file = sub.createFile(res.getBlob().setName(name));
-  return { ok: true, id: file.getId(), name: name, size: file.getSize() };
+  if (share) file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+  return { ok: true, id: file.getId(), name: name, size: file.getSize(), shared: share };
 }
 
 // ===== 自動削除はしません（古い設定で「毎日 cleanup」を動かしていても、何も消しません）=====
