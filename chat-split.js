@@ -41,7 +41,7 @@ function openSplit(){
         if(id === state.user.id) return "あなた";
         // 自分だけにつけた名前は、チャットに貼ると相手に伝わってしまうので使わない（本来の名前か、チャット内の名前）
         const p = feat.known.get(id) || (room.partner && room.partner.id === id ? room.partner : {id});
-        return (typeof nickRoomName === "function" && nickRoomName(room.id, id)) || p.display_name || p.displayName || "ユーザー";
+        return (typeof nickRoomName === "function" && nickRoomName(room.id, id)) || adminAliasFor(p) || p.display_name || p.displayName || "ユーザー";
     });
     openSheet(toolHead("💴 割り勘", "合計と人数から、ひとりぶんを計算してチャットに貼ります") +
         '<label for="spTotal">合計金額（円）</label><input type="number" id="spTotal" data-live="1" data-t="split:calc" inputmode="numeric" min="1" max="9999999" placeholder="例：12800">' +

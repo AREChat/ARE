@@ -125,7 +125,7 @@ function nickMembers(room){
     const ids = (room.memberIds && room.memberIds.length ? room.memberIds : [state.user.id, room.partnerId].filter(Boolean));
     return ids.map((id) => {
         const p = id === state.user.id ? state.profile : (feat.known.get(id) || (room.partner && room.partner.id === id ? room.partner : {id}));
-        const real = (p && (p.display_name || p.displayName)) || "ユーザー";
+        const real = adminAliasFor(p) || (p && (p.display_name || p.displayName)) || "ユーザー";
         const can = !room.is_group || id === state.user.id || room.created_by === state.user.id;
         return {id, real, can, nick:nickRoomName(room.id, id), me:id === state.user.id};
     });
@@ -166,7 +166,7 @@ async function onNickAction(action, node){
 
 function nickProfileExtras(profile){
     if(!profile || !profile.id || profile.id === state.user.id) return;
-    const real = profile.display_name || profile.displayName || "ユーザー";
+    const real = adminAliasFor(profile) || profile.display_name || profile.displayName || "ユーザー";
     const box = document.createElement("div");
     box.className = "nk-box";
     box.innerHTML = '<label for="nkPriv">自分だけに表示する名前（相手には見えません）</label>' +

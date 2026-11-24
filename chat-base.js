@@ -351,8 +351,16 @@ async function getProfile(userId){
     return result.data;
 }
 
+// 管理者の名前：ふだんは「主人公」。「社員」の区分の人にだけ「坂井さん」と見せる（サーバーが my_ui_flags で、その人にだけ材料を渡します）
+function adminAliasFor(profile){
+    try{
+        const al = segSt && segSt.flags && segSt.flags.admin_alias;
+        if(al && al.name && Array.isArray(al.ids) && profile && profile.id && al.ids.indexOf(profile.id) >= 0) return String(al.name);
+    }catch(_e){ /* 区分の読み込み前 */ }
+    return "";
+}
 function profileDisplayName(profile){
-    return profile?.display_name || profile?.displayName || profile?.username || profile?.login_id || "ユーザー";
+    return adminAliasFor(profile) || profile?.display_name || profile?.displayName || profile?.username || profile?.login_id || "ユーザー";
 }
 
 function setAvatar(target, profile){

@@ -33,7 +33,7 @@ async function segLoadFlags(){
         const r = await requireClient().rpc("my_ui_flags");
         if(!r.error && r.data && typeof r.data === "object"){
             segSt.flags = r.data;
-            try{ localStorage.setItem(segCacheKey(), JSON.stringify({ show_users:r.data.show_users, show_posts:r.data.show_posts, request_room:r.data.request_room, is_admin:r.data.is_admin, restricted:r.data.restricted, quick:r.data.quick })); }catch(_e){}
+            try{ localStorage.setItem(segCacheKey(), JSON.stringify({ show_users:r.data.show_users, show_posts:r.data.show_posts, request_room:r.data.request_room, is_admin:r.data.is_admin, restricted:r.data.restricted, quick:r.data.quick, admin_alias:r.data.admin_alias || null })); }catch(_e){}
             return;
         }
     }catch(_e){ /* SQL 未実行・通信失敗 */ }
@@ -288,5 +288,7 @@ function initSegments(){
         try{ if(typeof qkPaintBar === "function") qkPaintBar(); }catch(_e){ /* ショートカットの描き直し */ }
         if(typeof loadRecommendations === "function") loadRecommendations();     // おすすめ（同じグループの人）を出す
         if(typeof renderRooms === "function" && state.rooms && state.rooms.length) try{ renderRooms(); }catch(_e){}
+        // 管理者の名前（社員にだけ「坂井さん」）が はじめて分かったときは、開いている会話の名前も描き直す
+        if(segSt.flags && segSt.flags.admin_alias && state.currentRoom && typeof renderMessages === "function") try{ renderMessages(false); }catch(_e){}
     });
 }

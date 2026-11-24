@@ -35,10 +35,10 @@ function wkDateTime(iso){ const d = new Date(iso); return (d.getMonth() + 1) + "
 function wkYen(n){ return Number(n || 0).toLocaleString("ja-JP") + "円"; }
 function wkName(id){
     const m = feat.wk.members.find((x) => x.user_id === id);
-    return id === state.user.id ? "あなた" : (m ? (m.display_name || "名前なし") : "（退会済み）");
+    return id === state.user.id ? "あなた" : (m ? (adminAliasFor({id:m.user_id}) || m.display_name || "名前なし") : "（退会済み）");
 }
 function wkMemberOptions(sel, withNone){
-    return (withNone ? '<option value="">（未定）</option>' : "") + feat.wk.members.map((m) => '<option value="' + escapeHtml(m.user_id) + '"' + (m.user_id === sel ? " selected" : "") + '>' + escapeHtml(m.display_name || "名前なし") + '</option>').join("");
+    return (withNone ? '<option value="">（未定）</option>' : "") + feat.wk.members.map((m) => '<option value="' + escapeHtml(m.user_id) + '"' + (m.user_id === sel ? " selected" : "") + '>' + escapeHtml(adminAliasFor({id:m.user_id}) || m.display_name || "名前なし") + '</option>').join("");
 }
 function wkCsv(rows, name){
     const text = "﻿" + rows.map((r) => r.map((c) => '"' + String(c ?? "").replace(/"/g, '""') + '"').join(",")).join("\r\n");
@@ -214,7 +214,7 @@ async function wkNotesHtml(){
 // ---------- メンバー ----------
 function wkMembersHtml(){
     const w = feat.wk;
-    return '<h4 style="margin:6px 0">👥 メンバー（' + w.members.length + '人）</h4>' + w.members.map((m) => '<div class="admin-card">' + escapeHtml(m.display_name || "名前なし") + (m.user_id === state.user.id ? "（あなた）" : "") + ' <span class="chip">' + (m.role === "admin" ? "管理者" : "メンバー") + '</span>' +
+    return '<h4 style="margin:6px 0">👥 メンバー（' + w.members.length + '人）</h4>' + w.members.map((m) => '<div class="admin-card">' + escapeHtml(adminAliasFor({id:m.user_id}) || m.display_name || "名前なし") + (m.user_id === state.user.id ? "（あなた）" : "") + ' <span class="chip">' + (m.role === "admin" ? "管理者" : "メンバー") + '</span>' +
         (w.isAdmin && m.user_id !== state.user.id ? '<div class="row"><button type="button" class="button-secondary" data-t="wk:role" data-id="' + escapeHtml(m.user_id) + '" data-r="' + (m.role === "admin" ? "member" : "admin") + '">' + (m.role === "admin" ? "管理者を外す" : "管理者にする") + '</button><button type="button" class="button-danger" data-t="wk:kick" data-id="' + escapeHtml(m.user_id) + '">外す</button></div>' : "") + '</div>').join("") +
         (w.isAdmin ? '<hr class="sep"><label>メンバーを追加</label>' + pickList(w.members.map((m) => m.user_id)) + '<div class="row"><button type="button" class="button" data-t="wk:addmem">選んだ人を追加</button></div>' : "") +
         '<hr class="sep"><div class="row"><button type="button" class="button-danger" data-t="wk:leavews">このワークスペースを抜ける</button></div>';

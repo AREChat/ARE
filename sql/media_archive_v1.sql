@@ -92,9 +92,9 @@ grant execute on function private.media_archive_apply_v1(text, text, text) to se
 -- Edge Function（サービスキー）が private スキーマの関数を直接呼べないため、public に「入り口」だけ作る（中身は上の2つ）
 create or replace function public.media_archive_targets_v1()
 returns table(bucket text, object_path text, kind text, ref_id text, owner_name text, created_at timestamptz, file_name text, mime_type text, size_bytes bigint)
-language sql stable security invoker set search_path to '' as $$ select * from private.media_archive_targets_v1() $$;
+language sql stable security definer set search_path to '' as $$ select * from private.media_archive_targets_v1() $$;
 create or replace function public.media_archive_apply_v1(p_bucket text, p_path text, p_drive text)
-returns jsonb language sql security invoker set search_path to '' as $$ select private.media_archive_apply_v1(p_bucket, p_path, p_drive) $$;
+returns jsonb language sql security definer set search_path to '' as $$ select private.media_archive_apply_v1(p_bucket, p_path, p_drive) $$;
 revoke all on function public.media_archive_targets_v1() from public, anon, authenticated;
 revoke all on function public.media_archive_apply_v1(text, text, text) from public, anon, authenticated;
 grant execute on function public.media_archive_targets_v1() to service_role;

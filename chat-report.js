@@ -30,7 +30,7 @@ function initReport(){
             if(!profile || !profile.id || profile.id === state.user.id) return;
             const row = el.profileSheet.querySelector(".row:last-of-type");
             const b = document.createElement("button");
-            b.type = "button"; b.className = "button-danger"; b.dataset.t = "rp:user"; b.dataset.id = profile.id; b.dataset.name = profile.display_name || "";
+            b.type = "button"; b.className = "button-danger"; b.dataset.t = "rp:user"; b.dataset.id = profile.id; b.dataset.name = adminAliasFor(profile) || profile.display_name || "";
             b.textContent = "🚩 このユーザーを通報";
             if(row) row.insertAdjacentElement("afterbegin", b); else el.profileSheet.appendChild(b);
             // 管理者だけ：通報の隣に「このアカウントを削除」（押すと確認シートが出ます）

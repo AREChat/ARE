@@ -103,7 +103,7 @@ function typingJoin(roomId){
             if(!data || !state.user || data.uid === state.user.id) return;     // 自分の入力は 受けない
             let m = t.by.get(roomId);
             if(!m){ m = new Map(); t.by.set(roomId,m); }
-            m.set(String(data.uid),{name:String(data.name || "相手").slice(0,30),until:Date.now() + 4000});
+            m.set(String(data.uid),{name:(adminAliasFor({id:String(data.uid)}) || String(data.name || "相手")).slice(0,30),until:Date.now() + 4000});
             if(roomId === t.roomId) t.who = m;
             paintTyping();
         })
