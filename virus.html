@@ -13,7 +13,9 @@
 </head>
 <body>
 <main id="vx" aria-live="assertive">
+  <canvas id="vxRain" class="vx-rain" aria-hidden="true"></canvas>
   <div class="vx-flash" aria-hidden="true"></div>
+  <div class="vx-stripe t" aria-hidden="true"></div><div class="vx-stripe b" aria-hidden="true"></div>
   <header class="vx-head"><span class="vx-tri">⚠</span> ARE セキュリティ警告 <span class="vx-tri">⚠</span></header>
   <section class="vx-body">
     <h1>お使いの端末は ウイルスに感染しました！</h1>
@@ -26,6 +28,7 @@
     </div>
     <p class="vx-warn">このまま 画面を閉じようとしても、ウイルスは消えません。<br>反省して あやまるまで、ほかの操作は できません。</p>
     <button type="button" id="vxSorry" class="vx-btn" disabled>ごめんなさい、申しません</button>
+    <button type="button" id="vxOut" class="vx-btn vx-btn2" hidden>ログアウト</button>
     <p id="vxMsg" class="vx-msg" role="status"></p>
     <p class="vx-fine">※これは ARE 運営の「おしおき演出」です。実際のウイルスには感染していません。<span id="vxPrev"></span></p>
   </section>

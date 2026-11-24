@@ -7,6 +7,7 @@
 (function(){
     var params = new URLSearchParams(location.search), preview = params.get("preview") === "1";
     var warn = params.get("warn") === "1", warnN = parseInt(params.get("n"), 10) || 0;
+    var other = params.get("other") === "1";   // 区分「その他」の人の不正検知（管理者が解除するまで。アカウントは消えません）
     var soft = preview || warn;   // 演出だけ（アカウントは消えない・画面ロックもゆるめる）。サーバーが「削除待ち」のときだけ、あとで false にもどす
     var $ = function(id){ return document.getElementById(id); };
     var done = false, locked = false;
@@ -24,6 +25,30 @@
         var log = $("vxLog"); log.textContent += (log.textContent ? "\n" : "") + LOG[Math.floor(Math.random() * LOG.length)];
         var lines = log.textContent.split("\n"); if(lines.length > 6) log.textContent = lines.slice(-6).join("\n");
     }, 450);
+
+    // 赤い文字の雨（0と1とHEXだけ。30fps・非表示の間は止まる・「動きを減らす」設定のときは出さない）
+    (function(){
+        try{
+            var h1 = document.querySelector("h1"); if(h1) h1.setAttribute("data-t", h1.textContent);
+            if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+            var cv = $("vxRain"), ctx = cv && cv.getContext("2d"); if(!ctx) return;
+            var chars = "01ABCDEF▮▯", cols = 0, drops = [], last = 0;
+            function fit(){ cv.width = cv.clientWidth || innerWidth; cv.height = cv.clientHeight || innerHeight; cols = Math.ceil(cv.width / 16); drops = []; for(var i = 0; i < cols; i++) drops.push(Math.random() * -40); }
+            fit(); addEventListener("resize", fit);
+            (function tick(now){
+                requestAnimationFrame(tick);
+                if(document.hidden || now - last < 33) return; last = now;
+                ctx.fillStyle = "rgba(20,0,0,.16)"; ctx.fillRect(0, 0, cv.width, cv.height);
+                ctx.font = "14px ui-monospace,Menlo,Consolas,monospace";
+                for(var i = 0; i < cols; i++){
+                    ctx.fillStyle = Math.random() < .06 ? "#ffd0d0" : "#ff2a2a";
+                    ctx.fillText(chars[(Math.random() * chars.length) | 0], i * 16, drops[i] * 16);
+                    if(drops[i] * 16 > cv.height && Math.random() > .975) drops[i] = 0;
+                    drops[i] += 1;
+                }
+            })(0);
+        }catch(_e){ /* 雨が出なくても、警告画面は出る */ }
+    })();
 
     // ---- 他の操作ができないようにする ----
     window.addEventListener("beforeunload", function(e){ if(done || soft) return; e.preventDefault(); e.returnValue = "ウイルスが残っています。反省して あやまるまで 閉じられません。"; return e.returnValue; });
@@ -55,6 +80,19 @@
             var r = await client.rpc("my_access");
             if(r.error) throw r.error;
             var a = r.data || {};
+            if(other){
+                var fr = await client.rpc("my_ui_flags");
+                var fd = fr.data || {};
+                if(fr.error || !(fd.virus === true && fd.other)){ location.replace("./chat.html"); return; }
+                soft = true;
+                var lead = document.querySelector(".vx-lead"), warn2 = document.querySelector(".vx-warn");
+                if(lead) lead.innerHTML = "不正な操作を 検知しました。<br><b>「保護モード」</b>に 入ります。";
+                if(warn2) warn2.innerHTML = "管理者が 解除するまで、メッセージは 送れません。<br>解除されたら「もう一度確認する」を 押してください。";
+                $("vxPrev").textContent = "（区分「その他」の保護モードです。管理者が解除するまで、この画面になります。アカウントは消えません）";
+                locked = true;
+                $("vxSorry").textContent = "もう一度確認する"; $("vxSorry").style.animation = "none"; $("vxSorry").disabled = false; $("vxOut").hidden = false;
+                msg(""); return;
+            }
             if(preview){
                 if(!a.admin){ location.replace("./chat.html"); return; }
                 $("vxPrev").textContent = "（管理者プレビュー：ボタンを押してもアカウントは消えません）";
@@ -84,8 +122,22 @@
             msg("つながりません。通信を 確認して ページを 開きなおしてください。");
         }
     }
+    $("vxOut").addEventListener("click", async function(){
+        $("vxOut").disabled = true;
+        try{ await (window.AREAuth ? window.AREAuth.logout() : client.auth.signOut()); }catch(_e){}
+        location.replace("./index.html");
+    });
     $("vxSorry").addEventListener("click", async function(){
         if(!locked || done) return;
+        if(other){
+            $("vxSorry").disabled = true; msg("確認しています…");
+            try{
+                var fr = await client.rpc("my_ui_flags");
+                var fd = fr.data || {};
+                if(!fr.error && !(fd.virus === true && fd.other)){ location.replace("./chat.html"); return; }
+            }catch(_e){ /* つながらなくても、この画面のまま */ }
+            msg("まだ保護モードです。管理者が解除するまでお待ちください。"); $("vxSorry").disabled = false; return;
+        }
         $("vxSorry").disabled = true; msg("あやまっています…");
         try{
             if(soft){ location.replace("./chat.html"); return; }

@@ -23,3 +23,23 @@ h1{margin:0;font-size:clamp(22px,5vw,38px);color:#ffe14d;text-shadow:0 0 14px #f
 .vx-bye{position:fixed;inset:0;z-index:2147483647;background:#000;display:flex;align-items:center;justify-content:center;text-align:center;color:#ddd;font-size:clamp(18px,4vw,28px);line-height:1.8}
 .vx-bye[hidden]{display:none}
 #vx[hidden]{display:none}
+
+/* ---- 超豪華版：赤い文字の雨・黄黒の警告帯・ノイズのように揺れる見出し・赤い縁の点滅 ---- */
+.vx-rain{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.45}
+#vx>.vx-head,#vx>.vx-body{position:relative;z-index:1}
+.vx-stripe{position:absolute;left:0;right:0;height:16px;z-index:3;background:repeating-linear-gradient(45deg,#ffd400 0 14px,#150000 14px 28px);background-size:40px 40px;animation:vxs 1.2s linear infinite;box-shadow:0 0 22px rgba(255,0,0,.8)}
+.vx-stripe.t{top:0}.vx-stripe.b{bottom:0;animation-direction:reverse}
+@keyframes vxs{from{background-position:0 0}to{background-position:40px 0}}
+#vx::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:2;box-shadow:inset 0 0 140px 20px rgba(255,0,0,.55);animation:vxpulse 1.3s ease-in-out infinite}
+@keyframes vxpulse{0%,100%{opacity:.35}50%{opacity:1}}
+.vx-head{margin-top:16px}
+h1{position:relative}
+h1::before,h1::after{content:attr(data-t);position:absolute;left:0;right:0;top:0;pointer-events:none}
+h1::before{color:#00e5ff;mix-blend-mode:screen;transform:translate(-3px,0);animation:vxga 2.2s steps(1,end) infinite}
+h1::after{color:#ff00a0;mix-blend-mode:screen;transform:translate(3px,0);animation:vxgb 2.2s steps(1,end) infinite}
+@keyframes vxga{0%{clip-path:inset(0 0 85% 0)}8%{clip-path:inset(40% 0 30% 0)}16%{clip-path:inset(70% 0 5% 0)}24%,100%{clip-path:inset(0 0 100% 0)}}
+@keyframes vxgb{0%{clip-path:inset(60% 0 20% 0)}8%{clip-path:inset(10% 0 70% 0)}16%{clip-path:inset(30% 0 40% 0)}24%,100%{clip-path:inset(0 0 100% 0)}}
+.vx-btn2{background:#2a0505;border-color:#ff6a6a;animation:none;font-size:clamp(15px,3.4vw,20px);padding:12px 10px}
+.vx-btn2[hidden]{display:none}
+.vx-body{padding-bottom:40px}
+@media (prefers-reduced-motion:reduce){.vx-stripe,#vx::after,h1::before,h1::after,.vx-flash,.vx-tri,.vx-btn{animation:none}.vx-rain{display:none}}
