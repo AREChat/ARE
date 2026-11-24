@@ -1144,6 +1144,8 @@ async function sendMessagePayload(payload,options){
         const result = await sendRpcContent(state.currentRoom.id,content);
 
         if(result.error) throw result.error;
+        // サーバーがNGワードで取り消したとき（メッセージIDが空）：すぐ状態を確認して、ウイルス画面などに移る
+        if(!result.data && typeof ptRefresh === "function") ptRefresh();
 
         if(payload.type === "text" && !(options && options.keepInput)){
             el.messageInput.value = "";

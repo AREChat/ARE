@@ -12,6 +12,7 @@
  *   ほかに（これまでと同じ）
  *   ・30日アーカイブ：Supabase に残った古いファイルを、ドライブへ移す（合言葉 ARCHIVE_TOKEN が要ります）
  *   ・広告の映像：ドライブの「広告」フォルダの AD001.mp4〜 を、チャットに渡す（?action=list／?action=part）
+ *   ・いざというとき用：keepAlive（Supabase を眠らせない。週1回のトリガーに設定して使う。ふだんは何もしません）
  *
  * 使い方：このコード全部を、いまの「ファイル保存」プロジェクトに貼り直して保存 → 「デプロイ」→「デプロイを管理」→ えんぴつ →
  *         バージョン「新バージョン」→「デプロイ」。（こうすると URL が変わりません。「動画保存」のプロジェクトは もう使いません）
@@ -183,6 +184,23 @@ function adsPart_(id, i) {
   var start = i * ADS_PART_BYTES;
   if (start >= bytes.length) throw new Error('bad part');
   return { ok: true, i: i, b64: Utilities.base64Encode(bytes.slice(start, Math.min(bytes.length, start + ADS_PART_BYTES))) };
+}
+
+// ===== いざというとき用：Supabase を眠らせない（週1回の軽い呼び出し）=====
+// ・毎日チャットが使われているあいだは、設定しなくてOKです（ふだんは何もしません）。
+// ・使われない日が続きそうなとき：GAS の左のメニュー「トリガー」→「トリガーを追加」→
+//   実行する関数＝keepAlive ／ イベントのソース＝時間主導型 ／ 週ベースのタイマー（毎週 月曜 など）→ 保存。
+// ・呼び先は Supabase の関数 keepalive_v1（時刻を返すだけ。テーブルには さわりません）。
+function keepAlive() {
+  var res = UrlFetchApp.fetch(CONFIG.SUPABASE_URL + '/rest/v1/rpc/keepalive_v1', {
+    method: 'post',
+    contentType: 'application/json',
+    payload: '{}',
+    headers: { apikey: CONFIG.SUPABASE_PUBLISHABLE_KEY },
+    muteHttpExceptions: true
+  });
+  console.log('keepAlive: ' + res.getResponseCode() + ' ' + String(res.getContentText()).slice(0, 80));
+  return res.getResponseCode();
 }
 
 // ===== 道具 =====
