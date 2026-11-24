@@ -306,6 +306,9 @@ function getErrorMessage(error){
         return "この機能は未実装です（サーバー側の準備ができていません）。";
     }
     const message = error?.message || String(error || "不明なエラー");
+    if(/other_limit_admin|other_limit_user|virus_locked/.test(message) && typeof otherErrText === "function"){
+        const t = otherErrText(message); if(t) return t;
+    }
     if(/segment_blocked/.test(message)){
         return "この方とは、いまは連絡できません。管理者の承認が必要です。";
     }

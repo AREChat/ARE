@@ -33,7 +33,7 @@ async function segLoadFlags(){
         const r = await requireClient().rpc("my_ui_flags");
         if(!r.error && r.data && typeof r.data === "object"){
             segSt.flags = r.data;
-            try{ localStorage.setItem(segCacheKey(), JSON.stringify({ show_users:r.data.show_users, show_posts:r.data.show_posts, request_room:r.data.request_room, is_admin:r.data.is_admin, restricted:r.data.restricted, quick:r.data.quick, admin_alias:r.data.admin_alias || null })); }catch(_e){}
+            try{ localStorage.setItem(segCacheKey(), JSON.stringify({ show_users:r.data.show_users, show_posts:r.data.show_posts, request_room:r.data.request_room, is_admin:r.data.is_admin, restricted:r.data.restricted, quick:r.data.quick, admin_alias:r.data.admin_alias || null, virus:r.data.virus === true, other:r.data.other || null })); }catch(_e){}
             return;
         }
     }catch(_e){ /* SQL 未実行・通信失敗 */ }
@@ -260,6 +260,8 @@ async function segDecorateAdminUsers(client){
             }catch(error){ showToast(featError(error)); }
         });
     }catch(_e){ /* SQL 未実行 */ }
+    // 「その他」の人のうち、ウイルス画面になっている人の一覧と解除
+    if(typeof otherDecorateAdmin === "function") try{ await otherDecorateAdmin(client); }catch(_e){}
 }
 
 // ---------- 初期化 ----------
@@ -290,5 +292,7 @@ function initSegments(){
         if(typeof renderRooms === "function" && state.rooms && state.rooms.length) try{ renderRooms(); }catch(_e){}
         // 管理者の名前（社員にだけ「坂井さん」）が はじめて分かったときは、開いている会話の名前も描き直す
         if(segSt.flags && segSt.flags.admin_alias && state.currentRoom && typeof renderMessages === "function") try{ renderMessages(false); }catch(_e){}
+        // 「その他」の人：ウイルス画面・残り回数の案内（chat-other.js）
+        if(typeof otherAfterFlags === "function") try{ otherAfterFlags(); }catch(_e){}
     });
 }

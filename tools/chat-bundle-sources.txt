@@ -32,6 +32,7 @@ chat-mention.js
 qr.js
 chat-tools.js
 chat-segments.js
+chat-other.js
 chat-hdr.js
 chat-hiderooms.js
 chat-firsttips.js

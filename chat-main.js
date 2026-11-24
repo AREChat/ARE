@@ -238,6 +238,7 @@ const FEATURES = [
     ["sharefile","ファイル共有",initShareFile],
     ["hiderooms","チャットの非表示（消さずに隠す）",initHideRooms],
     ["segments","ユーザー区分・友達追加・操作方法ボタン",initSegments],
+    ["other","「その他」の厳重対策・ウイルス画面",initOther],
     ["hdr","上のバー（タブごとのボタン・アプリ追加）",initHdr],
     ["firsttips","はじめて開く画面の案内ポップアップ",initFirstTips],
     ["adminusers","管理者：ユーザータブでグループ一覧",initAdminUsersBar],
