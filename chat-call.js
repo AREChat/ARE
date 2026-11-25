@@ -48,9 +48,19 @@ function telBeep(freq, at, dur, vol){
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.02); g.gain.setValueAtTime(vol, t + dur - 0.04); g.gain.linearRampToValueAtTime(0, t + dur);
     o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + dur + 0.02);
 }
+/** 管理者の着信音は、平日（月〜金）の日本時間 7:00〜20:00（20:00 ちょうどは鳴る）は、消す。ほかの人・休日・夜は、ふつうに鳴る（祝日は、平日として数えます） */
+function telNow(){ return typeof window.__telNow === "function" ? Number(window.__telNow()) : Date.now(); }
+function telQuiet(){
+    let admin = false;
+    try{ admin = (typeof adIsAdmin === "function" && adIsAdmin()) || !!(typeof feat !== "undefined" && feat.isAdmin); }catch(_e){}
+    if(!admin) return false;
+    const j = new Date(telNow() + 9 * 3600000), day = j.getUTCDay(), h = j.getUTCHours();
+    return day >= 1 && day <= 5 && h >= 7 && h < 20;
+}
 /** "in"＝着信音（にぎやか） ／ "out"＝かけているときの呼び出し音（静か） */
 function telToneStart(kind){
     telToneStop();
+    if(kind === "in" && telQuiet()){ tel.toneMuted = true; return; }   // 見た目の着信は出すが、音と振動は出さない
     telUnlockAudio();
     const cycle = () => {
         if(kind === "in"){
@@ -61,7 +71,7 @@ function telToneStart(kind){
     cycle();
     tel.tone = setInterval(cycle, kind === "in" ? 2600 : 3500);
 }
-function telToneStop(){ if(tel.tone){ clearInterval(tel.tone); tel.tone = null; } try{ if(navigator.vibrate) navigator.vibrate(0); }catch(_e){} }
+function telToneStop(){ tel.toneMuted = false; if(tel.tone){ clearInterval(tel.tone); tel.tone = null; } try{ if(navigator.vibrate) navigator.vibrate(0); }catch(_e){} }
 
 // ===== 画面（着信・通話中）=====
 function telCss(){
@@ -253,7 +263,7 @@ function telIncoming(room, m, d){
     const u = tel.ui, inc = {id:m.id, room, key:tel.keyOf.get(room.id), m, d, kind:d.kind === "video" ? "video" : "audio", t0:Date.now() - (m.age || 0)};
     tel.incoming = inc;
     u.inName.textContent = telNameOf(room);
-    u.inKind.textContent = inc.kind === "video" ? "ビデオ通話の着信です" : "音声通話の着信です";
+    u.inKind.textContent = (inc.kind === "video" ? "ビデオ通話の着信です" : "音声通話の着信です") + (telQuiet() ? "（平日 7:00〜20:00 は、着信音を消しています）" : "");
     telPaintAvatar(u.inAv, room);
     u.inVideo.hidden = inc.kind !== "video";
     u.inAudio.textContent = inc.kind === "video" ? "🎤 音声だけで出る" : "🎤 出る";
@@ -262,7 +272,7 @@ function telIncoming(room, m, d){
     inc.timer = setTimeout(() => { if(tel.incoming === inc) telStopIncoming("不在着信"); }, Math.max(1000, TEL_RING_MS - (m.age || 0)));
     try{
         if(document.hidden && "Notification" in window && Notification.permission === "granted"){
-            const n = new Notification("📞 着信：" + telNameOf(room), {body:inc.kind === "video" ? "ビデオ通話" : "音声通話", tag:"are-call", requireInteraction:true});
+            const n = new Notification("📞 着信：" + telNameOf(room), {body:inc.kind === "video" ? "ビデオ通話" : "音声通話", tag:"are-call", requireInteraction:true, silent:telQuiet()});
             n.onclick = () => { try{ window.focus(); }catch(_e){} n.close(); };
             inc.note = n;
         }
@@ -529,6 +539,6 @@ function initCall(){
             try{ navigator.sendBeacon(telUrl(), JSON.stringify({action:"call", op:"send", key:call.key, type:call.answered ? "hangup" : "cancel", from:tel.dev, id:call.id, data:null})); }catch(_e){}
         }
     });
-    window.AREtel = {state:tel, start:telStart, end:telEnd, accept:telAccept, decline:telDecline, tick:() => telSchedule(10)};
+    window.AREtel = {state:tel, quiet:telQuiet, start:telStart, end:telEnd, accept:telAccept, decline:telDecline, tick:() => telSchedule(10)};
     telSchedule(2500);
 }
