@@ -25,7 +25,7 @@ const OK_PHRASES = [
 // 「虫は 出さない」と 書いてある 注意書き（同じ行に これがあれば 例外）
 const NOTE_RE = /(一切|ぜったい|絶対|なし|入れな|出ない|出さな|出ません|禁止|NG|BAD|block|除外|使わな|無し|含まな|入って いな|入っていな|いない|ありません|ゼロ|無い)/;
 // 注意書き／禁止語リストそのもの（中に 虫の言葉が 並ぶのが 仕事のファイル）
-const SKIP_FILE = /(check-words\.js|check-bugs\.js|game6[\\/]js[\\/](pools|plan)\.js|[\\/]docs[\\/]|DEVLOG|story_bible|README|PROGRESS_NOTES|prompts?[\\/])/i;
+const SKIP_FILE = /(check-words\.js|check-bugs\.js|game6[\\/]js[\\/](pools|plan)\.js|wc-banned\.js|[\\/]docs[\\/]|DEVLOG|story_bible|README|PROGRESS_NOTES|prompts?[\\/])/i;
 const SKIP_DIR = new Set(["node_modules", ".git", "vendor", "lazy", "bgm", "bgm_src", "wasm"]);
 const EXT = /\.(js|mjs|json|html|css|md|txt|svg|cpp|h)$/i;
 const SKIP_NAME = /(three(\.min|\.module)?|\.bundle|precache|\.min)\b|chat\.bundle|game\.bundle|monsters\.json$/i;
