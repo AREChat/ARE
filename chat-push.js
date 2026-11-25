@@ -83,20 +83,95 @@ async function pushEnable(){
 
 // 初期値はオン：自分でオフにしていない人は、最初の操作（タップ）で自動的にオンにする
 // （ブラウザの決まりで、通知の許可は画面を触ったときにしか聞けません）
-let pushAutoTried = false;
+let pushAutoTried = 0;
 async function pushAutoOn(){
-    if(pushAutoTried || !state.user || feat.push.sub) return;
+    if(pushAutoTried >= 3 || !state.user || feat.push.sub) return;
     try{ if(localStorage.getItem("are_push_optout_" + state.user.id)) return; }catch(_e){ return; }
     const st = pushState();
     if(st !== "off") return;
-    pushAutoTried = true;
-    try{ await pushEnable(); }catch(_e){ /* 断られたら何もしない */ }
+    pushAutoTried++;
+    try{ await pushEnable(); pushBarPaint(); }catch(_e){ /* 断られたら何もしない（また触ったときに、聞きなおす。3回まで） */ }
 }
 function pushAutoArm(){
     if(!pushSupported() || (typeof Notification !== "undefined" && Notification.permission === "denied")) return;
     if(typeof Notification !== "undefined" && Notification.permission === "granted"){ pushAutoOn(); return; }
-    const once = () => { document.removeEventListener("click", once, true); pushAutoOn(); };
-    document.addEventListener("click", once, true);
+    // ブラウザの決まりで、許可を聞けるのは「画面を触った直後」だけ。聞かれても閉じられたときは、次に触ったときにもう一度聞く（3回まで）
+    const again = () => {
+        if(pushAutoTried >= 3 || feat.push.sub || Notification.permission !== "default"){ document.removeEventListener("click", again, true); return; }
+        pushAutoOn();
+    };
+    document.addEventListener("click", again, true);
+}
+
+// ===== 通知の「いまの状態」を見せる帯と、診断 =====
+function pushBarPaint(){
+    let bar = document.getElementById("pushBar");
+    let st = "on";
+    try{ st = state.user ? pushState() : "on"; }catch(_e){ st = "on"; }
+    let optout = false, hushed = false;
+    try{ optout = !!(state.user && localStorage.getItem("are_push_optout_" + state.user.id)); hushed = Date.now() - Number(localStorage.getItem("are_pushbar_hush") || 0) < 3 * 86400000; }catch(_e){}
+    if(st === "on" || optout || hushed || st === "unsupported"){ if(bar) bar.remove(); return; }
+    const text = {off:"🔔 通知がオフです。オンにすると、閉じていても新着・着信が届きます。", denied:"⛔ 通知がブロックされています。直さないと、新着・着信が届きません。", "need-install":"📲 iPhone / iPad は「ホーム画面に追加」すると通知が届きます。"}[st] || "";
+    const btn = {off:"オンにする", denied:"なおし方", "need-install":"やり方"}[st] || "設定";
+    if(!bar){
+        bar = document.createElement("div"); bar.id = "pushBar"; bar.setAttribute("role", "status");
+        bar.style.cssText = "position:fixed;left:6px;right:6px;z-index:41;background:#2b2440;color:#fff;font-size:12px;line-height:1.35;border:1px solid #8a6bff;border-radius:10px;padding:6px 8px;display:flex;gap:6px;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.35)";
+        bar.innerHTML = '<span id="pushBarText" style="flex:1;min-width:0"></span><button type="button" id="pushBarGo" class="button" style="padding:2px 10px;font-size:12px;min-height:0;flex:none"></button><button type="button" id="pushBarX" class="button-secondary" aria-label="とじる" style="padding:2px 8px;font-size:12px;min-height:0;flex:none">✕</button>';
+        document.body.appendChild(bar);
+        bar.querySelector("#pushBarGo").addEventListener("click", async () => {
+            const cur = pushState();
+            if(cur === "off"){ try{ await pushEnable(); showToast("通知をオンにしました。"); }catch(error){ showToast(featError(error)); openPushSettings(); } pushBarPaint(); }
+            else openPushSettings();
+        });
+        bar.querySelector("#pushBarX").addEventListener("click", () => { try{ localStorage.setItem("are_pushbar_hush", String(Date.now())); }catch(_e){} bar.remove(); });
+    }
+    bar.style.top = (document.getElementById("guestBar") ? 34 : 6) + "px";
+    bar.querySelector("#pushBarText").textContent = text;
+    bar.querySelector("#pushBarGo").textContent = btn;
+}
+
+/** 通知が届くための条件を、ひとつずつ調べる（○なら大丈夫、×ならなおし方つき） */
+async function pushDiagnose(){
+    const out = [];
+    const add = (ok, label, fix) => out.push({ok, label, fix: ok ? "" : (fix || "")});
+    const ios = pushIsIos(), stand = pushIsStandalone();
+    const android = /Android/i.test(navigator.userAgent);
+    if(ios) add(stand, "ホーム画面のアプリとして開いている", "Safari の「共有」ボタン →「ホーム画面に追加」を押し、できたアイコンから開いてください（iPhone の決まりです。iOS 16.4 以上が必要）。");
+    add(pushSupported(), "この端末・ブラウザは、閉じている間の通知に対応している", ios ? "iOS 16.4 以上に更新し、ホーム画面のアプリとして開いてください。" : "Chrome・Edge・Firefox・Safari など、新しいブラウザで開いてください（LINE などのアプリ内ブラウザは非対応です）。");
+    const perm = typeof Notification !== "undefined" ? Notification.permission : "denied";
+    add(perm === "granted", "通知が「許可」されている（いま：" + ({granted:"許可", denied:"ブロック", default:"まだ聞いていない"}[perm] || perm) + "）",
+        perm === "denied" ? (ios ? "「設定」アプリ → 通知 → ARE → 「通知を許可」をオンにしてください。" : android ? "Chrome の ⋮ → 設定 → サイトの設定 → 通知 → このサイトを「許可」にしてください。（アプリの場合は、端末の設定 → アプリ → ARE／Chrome → 通知 をオン）" : "アドレスバーの 🔒（または ⓘ）→ 通知 → 「許可」にしてください。") : "下の「通知をオンにする」を押して、出てきた確認で「許可」を選んでください。");
+    add(!!feat.push.sub, "この端末が、通知の受け取りに登録されている", "「通知をオンにする」を押してください。");
+    let saved = false;
+    try{
+        if(feat.push.sub){
+            const r = await requireClient().from("push_subscriptions").select("endpoint").eq("endpoint", feat.push.sub.endpoint).maybeSingle();
+            saved = !!(r && r.data);
+        }
+    }catch(_e){}
+    add(saved, "サーバーにも、この端末が登録されている", "いったん「通知をオフにする」→「通知をオンにする」で、登録し直してください。");
+    let sw = false;
+    try{ const reg = await navigator.serviceWorker.getRegistration(); sw = !!(reg && reg.active); }catch(_e){}
+    add(sw, "通知を受け取る部品（サービスワーカー）が動いている", "ページを一度「強く再読み込み」（またはアプリを閉じて開き直し）してください。");
+    try{
+        const q = feat.push.quiet;
+        if(q && q.enabled){
+            const now = new Date(), hm = String(now.getHours()).padStart(2, "0") + ":" + String(now.getMinutes()).padStart(2, "0");
+            const inq = q.start > q.end ? (hm >= q.start || hm < q.end) : (hm >= q.start && hm < q.end);
+            add(!inq, "「おやすみ時間」ではない（設定：" + q.start + "〜" + q.end + "）", "いまは「おやすみ時間」のため、通知は送られません。下の設定を変えてください。");
+        }
+    }catch(_e){}
+    return out;
+}
+function pushDiagHtml(list){
+    return '<div class="meta" style="display:grid;gap:4px">' + list.map((x) => '<div>' + (x.ok ? "✅ " : "❌ ") + escapeHtml(x.label) + (x.fix ? '<div style="margin:2px 0 0 22px;opacity:.9">👉 ' + escapeHtml(x.fix) + '</div>' : "") + '</div>').join("") + '</div>';
+}
+async function pushServerTest(){
+    const res = await requireClient().functions.invoke("call-push", {body:{test:true}});
+    if(res.error) throw new Error("サーバーに届きませんでした。通信のようすを見て、もう一度お試しください。");
+    const devs = (res.data && res.data.devices) || [];
+    if(!devs.length) return '<div class="meta">❌ サーバーに、あなたの端末の登録が1つもありません。「通知をオンにする」を押してください。</div>';
+    return '<div class="meta" style="display:grid;gap:4px">' + devs.map((d) => '<div>' + (d.ok ? "✅ " : "❌ ") + escapeHtml(d.kind) + "：" + (d.ok ? "サーバーからは送れました（その端末に、通知が出るはずです）" : (d.removed ? "この端末の登録が切れていたので、登録を消しました。その端末で「通知をオンにする」を押し直してください" : "送れませんでした（エラー " + (d.status || "?") + "）")) + '</div>').join("") + '</div>';
 }
 
 // 着信を「アプリを閉じていても届く」ようにする更新（1台につき1回）。
@@ -225,6 +300,8 @@ function openPushSettings(){
     const muted = Array.from(feat.push.mutes);
     openSheet(toolHead("🔔 通知・ホーム画面", "アプリを閉じていても、新着をお知らせします（無料）") +
         '<div class="meta">状態：' + stText + '</div>' +
+        '<h4 style="margin:10px 0 4px">通知が来ないとき（診断）</h4><div data-push-diag class="meta">調べています…</div>' +
+        '<div class="row"><button type="button" class="button-secondary" data-t="push:servertest">📨 サーバーからテスト送信（登録している全部の端末）</button></div><div data-push-testout></div>' +
         '<div class="row">' + (st === "on"
             ? '<button type="button" data-t="push:off">通知をオフにする</button><button type="button" class="button-secondary" data-t="push:test">テスト通知</button>'
             : '<button type="button" data-t="push:on"' + (st === "unsupported" || st === "denied" ? " disabled" : "") + '>通知をオンにする</button>') + '</div>' +
@@ -238,6 +315,7 @@ function openPushSettings(){
         (muted.length ? muted.map((id) => '<div class="row"><span>🔕 ' + escapeHtml(roomNameById(id)) + '</span><button type="button" class="button-secondary" data-t="push:unmute" data-room="' + escapeHtml(id) + '">再開</button></div>').join("") : '<div class="meta">ありません（チャット画面の 🔔 で切り替えます）</div>') +
         toolClose());
     // 時刻は、「決定」ボタンを押したときに保存する。チェック（オン／オフ）は、押したらすぐ保存する
+    pushDiagnose().then((list) => { const box = el.profileSheet.querySelector("[data-push-diag]"); if(box) box.innerHTML = pushDiagHtml(list); }).catch(() => {});
     const quietNote = () => tpNote(el.profileSheet.querySelector("[data-quiet-note]"), tpValue(el.profileSheet, "quiet-start"), tpValue(el.profileSheet, "quiet-end"), false);
     tpNote(el.profileSheet.querySelector("[data-quiet-note]"), feat.push.quiet.start, feat.push.quiet.end, true, feat.push.quiet.enabled ? "この時間は通知を送りません" : "いまはオフです");
     tpBind(el.profileSheet, ["quiet-start", "quiet-end"], quietNote);
@@ -246,12 +324,18 @@ function openPushSettings(){
 }
 
 async function onPushAction(action, node){
-    if(action === "on"){ await pushEnable(); showToast("通知をオンにしました。"); openPushSettings(); }
+    if(action === "on"){ await pushEnable(); showToast("通知をオンにしました。"); pushBarPaint(); openPushSettings(); }
     else if(action === "off"){ try{ localStorage.setItem("are_push_optout_" + state.user.id, "1"); }catch(_e){} await pushDisable(); showToast("通知をオフにしました。"); openPushSettings(); }
     else if(action === "body"){ await pushSetBody(node.checked); showToast(node.checked ? "本文を表示します。" : "本文を隠します。"); }
     else if(action === "quiet-save"){ await pushSaveQuiet(node); }
     else if(action === "quiet"){ feat.push.quiet.enabled = node.checked; }
     else if(action === "unmute"){ await muteSet(node.dataset.room, false); openPushSettings(); }
+    else if(action === "servertest"){
+        const out = el.profileSheet.querySelector("[data-push-testout]");
+        if(out) out.innerHTML = '<div class="meta">送っています…</div>';
+        const html = await pushServerTest();
+        if(out) out.innerHTML = html;
+    }
     else if(action === "test"){
         const reg = feat.push.reg || await navigator.serviceWorker.ready;
         await reg.showNotification("ARE テスト通知", {body:"このように表示されます。", icon:"icon-192.png", tag:"are-test"});
@@ -277,6 +361,8 @@ function initPush(){
     registerTool("push", onPushAction);
     setTimeout(() => { if(feat.push.ready) pushAutoArm(); else pushRegister().then(pushAutoArm); }, 2500);
     setTimeout(() => { pushBackgroundUpgrade(false).catch(() => {}); }, 4500);
+    setTimeout(() => { pushBarPaint(); }, 6000);
+    setInterval(() => { pushBarPaint(); }, 60000);
     // ヘッダーの 🔔 ボタン
     const head = document.querySelector(".chat-header");
     const anchor = document.getElementById("refreshMessagesButton");
