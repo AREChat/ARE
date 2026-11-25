@@ -13,6 +13,7 @@ const tel = {
     poll:null, pollMs:6000, errs:0, call:null, incoming:null, ac:null, tone:null, ice:null, iceAt:0, ui:null
 };
 const TEL_ON_KEY = "are_tel_on";
+const TEL_EMOJIS = ["👍","❤️","😂","👏","🎉","😮","🙏","😢","🔥","✋"];
 const TEL_RING_MS = 45000, TEL_ICE_FALLBACK = [{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"]}];
 
 function telUrl(){ const c = window.ARE_CONFIG || {}; return String(c.adsUrl || c.videoUploadUrl || "").trim(); }
@@ -84,8 +85,14 @@ function telCss(){
         ".tel-stage video.tel-remote{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000}.tel-stage video[hidden]{display:none}" +
         ".tel-av{width:112px;height:112px;border-radius:50%;background:#1b253a;display:flex;align-items:center;justify-content:center;font-size:44px;overflow:hidden}.tel-av img{width:100%;height:100%;object-fit:cover}" +
         ".tel-pip{position:absolute;right:10px;bottom:10px;width:min(30%,150px);aspect-ratio:3/4;object-fit:cover;border-radius:10px;border:1px solid #2b3851;background:#000;z-index:2}.tel-pip[hidden]{display:none}" +
-        ".tel-bar{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;padding:12px 12px calc(16px + env(safe-area-inset-bottom))}" +
-        ".tel-bar button{width:58px;height:58px;border-radius:50%;border:0;background:#26324a;color:#fff;font-size:22px}.tel-bar button.off{background:#fff;color:#111}.tel-bar button.end{background:#e0443e}.tel-bar button[hidden]{display:none}" +
+        ".tel-bar{display:flex;gap:10px 8px;justify-content:center;flex-wrap:wrap;padding:10px 8px calc(14px + env(safe-area-inset-bottom))}" +
+        ".tel-bar .tb{display:flex;flex-direction:column;align-items:center;gap:3px;width:64px}.tel-bar .tb[hidden]{display:none}.tel-bar .tb small{font-size:10.5px;color:#b6c2da;line-height:1.1;text-align:center}" +
+        ".tel-bar button{width:54px;height:54px;border-radius:50%;border:0;background:#26324a;color:#fff;font-size:22px}.tel-bar button.off{background:#fff;color:#111}.tel-bar button.end{background:#e0443e}.tel-bar button[hidden]{display:none}" +
+        ".tel-stage video.tel-pip.mirror{transform:scaleX(-1)}" +
+        ".tel-emo{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:4;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:94%;padding:8px 10px;border-radius:16px;background:rgba(20,27,45,.96);border:1px solid #3a4a6c}.tel-emo[hidden]{display:none}.tel-emo button{width:44px;height:44px;border-radius:12px;border:0;background:#26324a;font-size:24px}" +
+        ".tel-fly{position:absolute;bottom:70px;z-index:5;font-size:44px;pointer-events:none;animation:telFly 2.4s ease-out forwards}.tel-fly small{display:block;font-size:11px;color:#cfe;text-align:center}" +
+        "@keyframes telFly{0%{opacity:0;transform:translateY(0) scale(.6)}12%{opacity:1;transform:translateY(-20px) scale(1.15)}100%{opacity:0;transform:translateY(-260px) scale(1)}}" +
+        "@media (prefers-reduced-motion:reduce){.tel-fly{animation-duration:.01s;animation-delay:1.6s}}" +
         ".tel-in{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translateX(-50%);z-index:9995;width:min(94vw,380px);background:#141b2d;border:1px solid #7c9cff;border-radius:16px;padding:14px;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.5)}" +
         ".tel-in .row{display:flex;gap:10px;align-items:center}.tel-in .tel-av{width:54px;height:54px;font-size:22px;flex:none}.tel-in .nm{font-weight:700;font-size:17px}.tel-in small{color:#9aa8c2}" +
         ".tel-in .acts{display:flex;gap:8px;margin-top:12px}.tel-in .acts button{flex:1;border:0;border-radius:10px;padding:11px 6px;font-weight:700;color:#fff}.tel-in .ok{background:#2e9e6b}.tel-in .ng{background:#e0443e}" +
@@ -99,8 +106,16 @@ function telBuildUi(){
     ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "通話");
     ov.innerHTML =
         '<div class="tel-top"><b id="telName">通話</b><small id="telSt"></small></div>' +
-        '<div class="tel-stage"><div class="tel-av" id="telAv">📞</div><video class="tel-remote" id="telRemote" autoplay playsinline hidden></video><video class="tel-pip" id="telLocal" autoplay playsinline muted hidden></video></div>' +
-        '<div class="tel-bar"><button type="button" id="telMic" title="マイク（押すとミュート）" aria-label="マイク">🎤</button><button type="button" id="telCam" title="カメラ" aria-label="カメラ">📷</button><button type="button" id="telScr" title="画面共有（パソコンのみ）" aria-label="画面共有" hidden>🖥️</button><button type="button" class="end" id="telEnd" title="切る" aria-label="切る">📵</button></div>';
+        '<div class="tel-stage"><div class="tel-av" id="telAv">📞</div><video class="tel-remote" id="telRemote" autoplay playsinline hidden></video><video class="tel-pip" id="telLocal" autoplay playsinline muted hidden></video><div class="tel-emo" id="telEmoTray" hidden></div></div>' +
+        '<div class="tel-bar">' +
+        '<div class="tb"><button type="button" id="telMic" title="マイク（押すとミュート）" aria-label="ミュート" aria-pressed="false">🎤</button><small>ミュート</small></div>' +
+        '<div class="tb"><button type="button" id="telSpk" title="スピーカー（相手の声を出す／止める）" aria-label="スピーカー" aria-pressed="true">🔊</button><small>スピーカー</small></div>' +
+        '<div class="tb"><button type="button" id="telCam" title="カメラ" aria-label="カメラ">📷</button><small>カメラ</small></div>' +
+        '<div class="tb" id="telFlipBox" hidden><button type="button" id="telFlip" title="内カメラ・外カメラを切りかえる" aria-label="カメラの向きを切りかえる">🔄</button><small id="telFlipTx">外カメラへ</small></div>' +
+        '<div class="tb"><button type="button" id="telEmo" title="絵文字を送る" aria-label="絵文字">😀</button><small>絵文字</small></div>' +
+        '<div class="tb" id="telScrBox" hidden><button type="button" id="telScr" title="画面共有" aria-label="画面共有">🖥️</button><small>画面共有</small></div>' +
+        '<div class="tb"><button type="button" class="end" id="telEnd" title="切る" aria-label="切る">📵</button><small>切る</small></div>' +
+        '</div>';
     document.body.appendChild(ov);
     const inc = document.createElement("div"); inc.className = "tel-in"; inc.id = "telIn"; inc.hidden = true;
     inc.setAttribute("role", "alertdialog"); inc.setAttribute("aria-label", "着信");
@@ -109,17 +124,22 @@ function telBuildUi(){
         '<div class="acts"><button type="button" class="ng" id="telInNo">拒否</button><button type="button" class="ok" id="telInAudio">🎤 音声で出る</button><button type="button" class="ok" id="telInVideo">🎥 ビデオで出る</button></div>';
     document.body.appendChild(inc);
     const $ = (id) => document.getElementById(id);
-    tel.ui = {ov, inc, name:$("telName"), st:$("telSt"), av:$("telAv"), remote:$("telRemote"), local:$("telLocal"), mic:$("telMic"), cam:$("telCam"), scr:$("telScr"), end:$("telEnd"),
+    tel.ui = {ov, inc, name:$("telName"), st:$("telSt"), av:$("telAv"), remote:$("telRemote"), local:$("telLocal"), mic:$("telMic"), cam:$("telCam"), scr:$("telScr"), scrBox:$("telScrBox"), spk:$("telSpk"), flip:$("telFlip"), flipBox:$("telFlipBox"), flipTx:$("telFlipTx"), emo:$("telEmo"), emoTray:$("telEmoTray"), end:$("telEnd"),
         inAv:$("telInAv"), inName:$("telInName"), inKind:$("telInKind"), inNo:$("telInNo"), inAudio:$("telInAudio"), inVideo:$("telInVideo")};
     const u = tel.ui;
     u.end.addEventListener("click", () => telEnd("切りました"));
     u.mic.addEventListener("click", telToggleMic);
     u.cam.addEventListener("click", telToggleCam);
     u.scr.addEventListener("click", telToggleScreen);
+    u.spk.addEventListener("click", telToggleSpeaker);
+    u.flip.addEventListener("click", telFlipCamera);
+    u.emo.addEventListener("click", () => { u.emoTray.hidden = !u.emoTray.hidden; });
+    TEL_EMOJIS.forEach((e) => { const b = document.createElement("button"); b.type = "button"; b.textContent = e; b.setAttribute("aria-label", "絵文字 " + e); b.addEventListener("click", () => { telSendEmoji(e); u.emoTray.hidden = true; }); u.emoTray.appendChild(b); });
     u.inNo.addEventListener("click", () => telDecline());
     u.inAudio.addEventListener("click", () => telAccept(false));
     u.inVideo.addEventListener("click", () => telAccept(true));
-    if(!(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) u.scr.hidden = true; else u.scr.hidden = false;
+    // 画面共有：ブラウザが対応しているときだけボタンを出す（スマホの多くは非対応）
+    u.scrBox.hidden = !(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);
     return u;
 }
 function telPartnerOf(room){ return room && !room.is_group ? room.partner : null; }
@@ -186,13 +206,19 @@ function telMakePc(call, servers){
         let m = null; try{ m = JSON.parse(ev.data); }catch(_e){}
         if(!m) return;
         if(m.t === "bye"){ telEnd("相手が切りました。", {notify:false}); return; }
-        if(m.t === "st"){ call.peerCam = !!m.cam; call.peerScr = !!m.scr; telPaintRemote(); }
+        if(m.t === "st"){ call.peerCam = !!m.cam; call.peerScr = !!m.scr; call.peerMuted = !!m.mic; telPaintRemote(); telPaintPeerMic(); }
+        if(m.t === "em" && TEL_EMOJIS.includes(m.e)) telFlyEmoji(m.e, telNameOf(call.room));
     });
     // 音声と映像の「通り道」を、はじめから2つ作る（あとからカメラや画面共有を足しても、つなぎなおしがいらない）
     return pc;
 }
 function telSendState(call){
-    try{ if(call.dc && call.dc.readyState === "open") call.dc.send(JSON.stringify({t:"st", cam:!!call.camOn, scr:!!call.scrOn})); }catch(_e){}
+    try{ if(call.dc && call.dc.readyState === "open") call.dc.send(JSON.stringify({t:"st", cam:!!call.camOn, scr:!!call.scrOn, mic:!!call.muted})); }catch(_e){}
+}
+function telPaintPeerMic(){
+    const call = tel.call, u = tel.ui; if(!call || !u || !call.startAt) return;
+    const base = u.st.textContent.replace(/ ・ 相手はミュート中$/, "");
+    u.st.textContent = base + (call.peerMuted ? " ・ 相手はミュート中" : "");
 }
 function telPaintRemote(){
     const call = tel.call, u = tel.ui; if(!call || !u) return;
@@ -208,12 +234,18 @@ function telPaintLocal(){
     if(on){ u.local.srcObject = call.scrOn ? call.screenStream : call.camStream; u.local.style.objectFit = call.scrOn ? "contain" : "cover"; }
     u.cam.classList.toggle("off", !call.camOn);
     u.mic.classList.toggle("off", !!call.muted);
+    u.mic.textContent = call.muted ? "🔇" : "🎤"; u.mic.setAttribute("aria-pressed", call.muted ? "true" : "false");
+    u.spk.classList.toggle("off", !!call.spkOff);
+    u.spk.textContent = call.spkOff ? "🔈" : "🔊"; u.spk.setAttribute("aria-pressed", call.spkOff ? "false" : "true");
     u.scr.classList.toggle("off", !call.scrOn);
+    u.local.classList.toggle("mirror", !!(call.camOn && !call.scrOn && call.facing !== "environment"));
+    u.flipBox.hidden = !(call.camOn && !call.scrOn && telCanFlip());
+    u.flipTx.textContent = call.facing === "environment" ? "内カメラへ" : "外カメラへ";
 }
 
 function telNewCall(o){
     return Object.assign({id:o.id || telRand(16), room:null, key:"", role:"caller", kind:"audio", pc:null, dc:null, remote:null, stream:null, camStream:null, screenStream:null,
-        camOn:false, scrOn:false, muted:false, peerCam:false, peerScr:false, answered:false, startAt:0, timer:null, ringTimer:null, dcTimer:null, ended:false}, o);
+        camOn:false, scrOn:false, muted:false, spkOff:false, peerMuted:false, facing:"user", peerCam:false, peerScr:false, answered:false, startAt:0, timer:null, ringTimer:null, dcTimer:null, ended:false}, o);
 }
 async function telSend(type, call, data, withToken){
     const body = {op:"send", key:call.key, type, from:tel.dev, id:call.id, data:data == null ? null : data};
@@ -327,7 +359,8 @@ function telOpenUi(call, status){
     u.name.textContent = telNameOf(call.room);
     telPaintAvatar(u.av, call.room);
     u.av.hidden = false; u.remote.hidden = true; u.remote.srcObject = null; u.local.hidden = true;
-    u.mic.classList.remove("off"); u.cam.classList.remove("off"); u.scr.classList.add("off");
+    u.mic.classList.remove("off"); u.cam.classList.remove("off"); u.scr.classList.add("off"); u.emoTray.hidden = true; u.flipBox.hidden = true; u.remote.muted = false; u.local.classList.remove("mirror");
+    u.mic.textContent = "🎤"; u.spk.textContent = "🔊"; u.spk.classList.remove("off");
     u.ov.hidden = false; telStatus(status);
     try{ document.body.style.overflow = "hidden"; }catch(_e){}
 }
@@ -337,9 +370,9 @@ function telLive(call){
     telStatus("通話中 0:00");
     call.timer = setInterval(() => {
         const s = Math.floor((Date.now() - call.startAt) / 1000);
-        telStatus("通話中 " + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"));
+        telStatus("通話中 " + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0") + (call.peerMuted ? " ・ 相手はミュート中" : ""));
     }, 1000);
-    telSendState(call); telPaintLocal(); telPaintRemote();
+    telSendState(call); telPaintLocal(); telPaintRemote(); telCountCams(call);
 }
 
 // ===== 通話中の操作 =====
@@ -347,6 +380,70 @@ function telToggleMic(){
     const call = tel.call; if(!call || !call.stream) return;
     call.muted = !call.muted;
     call.stream.getAudioTracks().forEach((t) => { t.enabled = !call.muted; });
+    telSendState(call); telPaintLocal();
+}
+function telToggleSpeaker(){
+    const call = tel.call, u = tel.ui; if(!call || !u) return;
+    call.spkOff = !call.spkOff;
+    u.remote.muted = call.spkOff;           // 相手の声を出す／止める
+    if(!call.spkOff) u.remote.play && u.remote.play().catch(() => {});
+    telPaintLocal();
+    showToast(call.spkOff ? "スピーカーを止めました（相手の声が聞こえません）。" : "スピーカーをつけました。");
+}
+let telEmoAt = 0;
+function telSendEmoji(e){
+    const call = tel.call; if(!call || !TEL_EMOJIS.includes(e)) return;
+    const now = Date.now(); if(now - telEmoAt < 300) return; telEmoAt = now;
+    telFlyEmoji(e, "");
+    try{ if(call.dc && call.dc.readyState === "open") call.dc.send(JSON.stringify({t:"em", e})); else showToast("つながってから送れます。"); }catch(_e){}
+}
+function telFlyEmoji(e, who){
+    const u = tel.ui; if(!u) return;
+    const stage = u.ov.querySelector(".tel-stage"); if(!stage) return;
+    const el = document.createElement("div"); el.className = "tel-fly";
+    el.style.left = (15 + Math.random() * 70) + "%";
+    el.textContent = e;
+    if(who){ const sm = document.createElement("small"); sm.textContent = who; el.appendChild(sm); }
+    stage.appendChild(el);
+    setTimeout(() => { try{ el.remove(); }catch(_e){} }, 2600);
+}
+async function telCountCams(call){
+    try{ call.camDevices = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput").length; telPaintLocal(); }catch(_e){}
+}
+function telCanFlip(){ return !!(tel.call && (tel.call.camDevices > 1 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent))); }
+async function telFlipCamera(){
+    const call = tel.call; if(!call || !call.pc || !call.camOn || call.scrOn || call.flipping) return;
+    const sender = telSender(call.pc, "video"); if(!sender) return;
+    call.flipping = true;
+    try{
+        const next = call.facing === "environment" ? "user" : "environment";
+        let s = null;
+        try{
+            s = await navigator.mediaDevices.getUserMedia({audio:false, video:{width:{ideal:1280}, height:{ideal:720}, facingMode:{ideal:next}}});
+        }catch(_e){ s = null; }
+        // パソコンなど facingMode が効かないときは、カメラを順番に切りかえる
+        let vt = s && s.getVideoTracks()[0];
+        const curId = call.camStream && call.camStream.getVideoTracks()[0] && call.camStream.getVideoTracks()[0].getSettings().deviceId;
+        const gotId = vt && vt.getSettings().deviceId;
+        if(!vt || (curId && gotId === curId)){
+            if(s) s.getTracks().forEach((t) => t.stop());
+            const devs = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput");
+            if(devs.length < 2) throw new Error("切りかえられるカメラがありません。");
+            const i = Math.max(0, devs.findIndex((d) => d.deviceId === curId));
+            const nd = devs[(i + 1) % devs.length];
+            s = await navigator.mediaDevices.getUserMedia({audio:false, video:{deviceId:{exact:nd.deviceId}}});
+            vt = s.getVideoTracks()[0];
+        }
+        const old = call.camStream; 
+        await sender.replaceTrack(vt);
+        call.camStream = new MediaStream([vt]);
+        try{ old && old.getVideoTracks().forEach((t) => { if(t !== vt) t.stop(); }); }catch(_e){}   // 声（マイク）は止めない
+        call.facing = next;
+        const fm = vt.getSettings && vt.getSettings().facingMode;
+        if(fm === "environment" || fm === "user") call.facing = fm;
+        showToast(call.facing === "environment" ? "外カメラにしました。" : "内カメラにしました。");
+    }catch(e){ showToast(String(e && e.message || "カメラの向きを切りかえられませんでした。")); }
+    call.flipping = false;
     telPaintLocal();
 }
 async function telToggleCam(){
@@ -361,7 +458,8 @@ async function telToggleCam(){
             const s = await telGetMedia(true);
             s.getAudioTracks().forEach((t) => t.stop());   // 声は、いまのマイクのまま
             const vt = s.getVideoTracks()[0];
-            await sender.replaceTrack(vt); call.camOn = true; call.camStream = new MediaStream([vt]);
+            await sender.replaceTrack(vt); call.camOn = true; call.camStream = new MediaStream([vt]); call.facing = "user";
+            try{ call.camDevices = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput").length; }catch(_e){ call.camDevices = 0; }
         }
     }catch(e){ showToast(String(e && e.message || "カメラを切りかえられませんでした。")); }
     telSendState(call); telPaintLocal();
