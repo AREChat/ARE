@@ -133,6 +133,7 @@ chat-passby-key.js
 chat-passby-town.js
 chat-postshare.js
 chat-schedcontent.js
+chat-usage.js
 chat-main.js
 link-copy.js
 chat-fileopen.js

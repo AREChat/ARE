@@ -72,6 +72,7 @@ const TOOL_LIST = [
     ["study124", "📚", "学習サイト（LearnLab124）", "プログラミング学習サイト（用語集・クイズ・物語）を別のタブで開きます。ARE とは別のサイトです", "openStudy124"],
     ["lock", "🔒", "ロック・自動ログアウト", "PIN・放置したら画面ぼかし/ログアウト", "openLock"],
     ["announce", "📢", "お知らせ", "管理者からのお知らせ", "openAnnouncements"],
+    ["usage", "📊", "利用時間レポート", "ログインして使った時間のランキング（同じグループは名前・ほかは匿名）", "openUsage"],
     ["prefs", "⚙️", "表示設定・言語", "気分テーマ・省データモード・言語（日本語 / English / 中文 / 한국어）", "openPrefs"]
 ];
 
@@ -91,7 +92,7 @@ function initTools(){
     const pane = document.querySelector(".pane-more");
     if(!pane) throw new Error("「その他」タブが見つかりません。");
     pane.insertAdjacentHTML("beforeend", '<div class="section-heading" style="margin-top:10px"><h2>🧩 ツール</h2></div>' +
-        TOOL_LIST.map((t) => '<button type="button" class="admin-card more-item" data-tool="' + t[0] + '" data-feature="' + t[0] + '">' + t[1] + ' ' + t[2] + '<small class="meta">' + t[3] + '</small></button>').join(""));
+        TOOL_LIST.map((t) => '<button type="button" class="admin-card more-item" data-tool="' + t[0] + '" data-feature="' + t[0] + '"' + (t[0] === "usage" ? ' style="display:none"' : "") + '>' + t[1] + ' ' + t[2] + '<small class="meta">' + t[3] + '</small></button>').join(""));
     pane.addEventListener("click", (event) => {
         const button = event.target.closest("[data-tool]");
         if(!button) return;

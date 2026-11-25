@@ -69,7 +69,7 @@ function qkItems(){
         ["shop", "🛍️", "AREShop", "ポイントと交換", "しょっぷ ぽいんと こうかん"],
         ["follow", "👥", "フォロー・フォロワー", "一覧を見る", "ふぉろー ふぉろわー ともだち"]
     ];
-    const tools = (typeof TOOL_LIST !== "undefined" ? TOOL_LIST : []).map((t) => ["tool:" + t[0], t[1], QK_LABEL[t[0]] || t[2], t[3], QK_ALIAS[t[0]] || ""]);
+    const tools = (typeof TOOL_LIST !== "undefined" ? TOOL_LIST : []).filter((t) => t[0] !== "usage" || (typeof uxEntryOk === "function" && uxEntryOk())).map((t) => ["tool:" + t[0], t[1], QK_LABEL[t[0]] || t[2], t[3], QK_ALIAS[t[0]] || ""]);
     return base.concat(tools);
 }
 function qkFind(id){ return qkItems().find((x) => x[0] === id) || null; }
@@ -251,6 +251,7 @@ function qkMoreFilter(){
     const q = inp.value.trim();
     let shown = 0;
     pane.querySelectorAll(".more-item").forEach((item) => {
+        if(item.dataset.tool === "usage" && item.style.display === "none") return;      // 家庭・お試しの人には出さない入口は、数えない
         const key = item.dataset.tool || item.dataset.extra || "";
         const ok = !q || qkMatch(item.textContent + " " + (QK_ALIAS[key] || ""), q);
         item.classList.toggle("qk-hide", !ok); if(ok) shown++;

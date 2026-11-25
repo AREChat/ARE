@@ -1,0 +1,3 @@
+# ===== 利用時間レポート（chat-usage.js。画面の中の文は chat-usage.js の UX_TX に4言語で入れてある。ここは「その他」タブの入口のカードだけ）=====
+利用時間レポート || Usage report || 使用时间报告 || 사용 시간 리포트
+ログインして使った時間のランキング（同じグループは名前・ほかは匿名） || Ranking of time spent logged in (same group by name, others anonymous) || 登录使用时间排行榜（同一分组显示姓名，其他人匿名） || 로그인해서 사용한 시간 순위(같은 그룹은 이름, 다른 그룹은 익명)

@@ -12,7 +12,7 @@ const MO_CATS = [
     ["make", "🎨 つくる", ["story", "album", "imgedit", "draw", "mystamp", "avatar", "profile3d", "aistudio", "archive"]],
     ["play", "🎮 あそぶ", ["games", "cards", "bj", "fun", "rpg", "game2", "game4", "game5", "game7", "daifugo", "dream", "bingo"]],
     ["smart", "🧠 かしこい・学習", ["chatbot", "myai", "ai", "work", "autoreply", "study124"]],
-    ["chat", "💬 チャット・設定", ["phrases", "folders", "stars", "location", "live", "share", "contact", "passby", "push", "comfort", "mood", "prefs", "lock", "announce", "security", "storage", "run:follow"]]
+    ["chat", "💬 チャット・設定", ["phrases", "folders", "stars", "location", "live", "share", "contact", "passby", "push", "comfort", "mood", "prefs", "lock", "announce", "usage", "security", "storage", "run:follow"]]
 ];
 const MO_RECENT_MAX = 8;
 const mo = {cat: "all", favs: [], recent: [], applying: false, timer: 0};
@@ -63,7 +63,7 @@ const moCatOf = (id) => { for(const c of MO_CATS) if(c[2].includes(id)) return c
 function moApply(){
     const pane = document.querySelector(".pane-more"); if(!pane) return;
     mo.applying = true;
-    const items = Array.from(pane.querySelectorAll(":scope > .more-item"));
+    const items = Array.from(pane.querySelectorAll(":scope > .more-item")).filter((it) => !(it.dataset.tool === "usage" && it.style.display === "none"));   // 家庭・お試しの人には出さない入口は、数えない
     const seen = new Set();
     items.forEach((item, i) => {
         const id = moId(item) || ("i" + i); item.dataset.moId = id;

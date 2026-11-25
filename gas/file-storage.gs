@@ -14,6 +14,7 @@
  *   ・広告の映像：ドライブの「広告」フォルダの AD001.mp4〜 を、チャットに渡す（?action=list／?action=part）
  *   ・天気・運行情報：都道府県ごとの天気と都営交通の運行状況を、ここで集めて チャットに渡す（?action=info）。Supabase は使いません
  *   ・通話：着信のよびだしと、つなぎの相談を、ここの「郵便受け」で受けわたす（action=call）。声や映像は ここを通りません（ブラウザどうしが直接つなぐ）。Supabase は ほぼ使いません
+ *   ・利用時間レポート：ログインしてチャットを使っていた時間を ここに記録し、ランキングを返す（action=usage）。管理者と「家庭」の人は記録しない。Supabase は本人確認のときだけ
  *   ・いざというとき用：keepAlive（Supabase を眠らせない。週1回のトリガーに設定して使う。ふだんは何もしません）
  *
  * 使い方：このコード全部を、いまの「ファイル保存」プロジェクトに貼り直して保存 → 「デプロイ」→「デプロイを管理」→ えんぴつ →
@@ -44,6 +45,7 @@ function doPost(e) {
   try {
     var body = JSON.parse((e && e.postData && e.postData.contents) || '{}');
     if (body.action === 'call') return json_(callApi_(body));   // 通話の郵便受け
+    if (body.action === 'usage') return json_(usageApi_(body));   // 利用時間レポート（記録とランキング）
     if (body.action === 'start' || body.action === 'finish') {
       var uid = verifyUser_(body.token);
       return json_(body.action === 'start' ? start_(uid, body) : finish_(uid, body));
@@ -62,7 +64,7 @@ function doGet(e) {
     if (a.action === 'list') return json_(adsList_());
     if (a.action === 'part') return json_(adsPart_(String(a.id || ''), parseInt(a.i, 10)));
     if (a.action === 'info') return json_(infoGet_(String(a.kind || ''), String(a.key || '')));
-    if (a.action === 'ping') return json_({ ok: true, version: '2026-11-25-call', features: ['info', 'archive-share', 'call'] });   // どの版が動いているかの確認用
+    if (a.action === 'ping') return json_({ ok: true, version: '2026-11-25-usage', features: ['info', 'archive-share', 'call', 'usage'] });   // どの版が動いているかの確認用
   } catch (err) {
     return json_({ ok: false, error: String(err).slice(0, 200) });
   }
@@ -359,6 +361,193 @@ function callIce_(body) {
   var servers = [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }];
   if (urls.length && p.getProperty('TURN_USER')) servers.push({ urls: urls, username: p.getProperty('TURN_USER'), credential: p.getProperty('TURN_PASS') || '' });
   return { ok: true, iceServers: servers, turn: urls.length > 0 };
+}
+
+// ===== 利用時間レポート（ログインしてチャットを使っていた時間の記録とランキング）=====
+// ・チャットの画面が、「画面を開いて操作していた時間」を 5分ごとに（と、画面を閉じるとき）ここへ送ります（action=usage, op=add）。
+// ・記録するのは「家庭」以外の人だけ。管理者・「家庭」の人・お試し（ゲスト）の分は、送られてきても 記録しません（op=rank も 何も返しません）。
+//   管理者は「見るだけ」：自分の分は記録されず、ランキングには出ません。
+// ・ランキングの名前：管理者には ぜんぶ本名。ほかの人には、「同じグループ（区分）の人は本名・ほかのグループの人は 匿名（匿名 A7F3 のような番号）」。
+//   ただし区分「その他」は、ほかの人から隔離する決まり（other_privacy_v1）なので、同じ「その他」どうしでも 匿名です。
+//   本名を返してよい人にだけ、この GAS が名前を入れて返します（匿名の人の名前は、チャットの画面に届きません）。
+// ・本人の確認：Supabase の関数 report_identity_v1（sql/report_identity_v1.sql）を、本人のログインで呼びます（表示名・区分・管理者か）。
+//   結果は 20分だけ GAS の一時メモ（CacheService）に控えるので、Supabase への問い合わせは ほとんど増えません。
+// ・保存先：スクリプトのプロパティ（usage:<ユーザー番号>＝1人1つ・直近35日と累計）。トリガーの設定は要りません。自動では消しません。
+// ・ごまかし対策：1回に足せるのは「前回から経った時間＋90秒」まで・1回 30分まで・1日 24時間まで。ほかの日付（きょう・きのう以外）は受けつけません。
+// ・ドライブへの控え：usageBackup() を実行すると、ファイル保存フォルダの月フォルダに CSV を書きます（お好みで 毎日のトリガーに）。
+var USAGE = {
+  PREFIX: 'usage:', KEEP_DAYS: 35, MAX_ADD_SEC: 1800, FIRST_MAX_SEC: 900, SLACK_SEC: 90, DAY_MAX_SEC: 86400,
+  IDENT_TTL_SEC: 1200, MAX_ROWS: 300, MAX_PROP_CHARS: 8000
+};
+var USAGE_SEGS = { home: 1, work: 1, friend: 1, other: 1 };
+
+function usageApi_(body) {
+  var op = String(body.op || '');
+  if (op !== 'add' && op !== 'rank') return { ok: false, message: '不明な操作です。' };
+  var me = usageIdentity_(body.token);
+  if (me.admin) usageForget_(me.uid);                                        // 管理者の分は残さない（あとから管理者になった人の古い記録も、ここで消える）
+  if (me.admin && op === 'add') return { ok: true, recorded: false, admin: true };
+  if (!me.admin && (me.guest || me.seg === 'home')) {                         // 家庭・お試しは、記録もしない・見せもしない
+    usageForget_(me.uid);
+    return { ok: true, recorded: false, hidden: true, reason: me.guest ? 'guest' : 'home' };
+  }
+  return op === 'add' ? usageAdd_(me, body) : usageRank_(me);
+}
+
+// 本人の確認（表示名・区分・管理者か）。トークンの SHA-256 をキーに 20分だけ控える
+function usageIdentity_(token) {
+  if (!token || typeof token !== 'string' || token.length < 20 || token.length > 4000) throw new Error('ログインが確認できません。');
+  var cache = CacheService.getScriptCache();
+  var ck = 'uid:' + usageHex_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, token));
+  var hit = cache.get(ck);
+  if (hit) { try { return JSON.parse(hit); } catch (e) { /* 取りなおす */ } }
+  var res = UrlFetchApp.fetch(CONFIG.SUPABASE_URL + '/rest/v1/rpc/report_identity_v1', {
+    method: 'post', contentType: 'application/json', payload: '{}',
+    headers: { Authorization: 'Bearer ' + token, apikey: CONFIG.SUPABASE_PUBLISHABLE_KEY },
+    muteHttpExceptions: true
+  });
+  var code = res.getResponseCode();
+  if (code === 404) throw new Error('利用時間レポートのサーバー側の準備（report_identity_v1）がまだです。');
+  if (code !== 200) throw new Error('ログインが確認できません。もう一度ログインしてください。');
+  var j;
+  try { j = JSON.parse(res.getContentText()); } catch (e) { throw new Error('ログインが確認できません。'); }
+  if (!j || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(j.uid || ''))) throw new Error('ログインが確認できません。');
+  var me = {
+    uid: String(j.uid).toLowerCase(),
+    name: String(j.name == null ? '' : j.name).replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 30),
+    seg: USAGE_SEGS[j.seg] ? String(j.seg) : 'other',
+    admin: j.admin === true,
+    guest: j.guest === true
+  };
+  cache.put(ck, JSON.stringify(me), USAGE.IDENT_TTL_SEC);
+  return me;
+}
+
+function usageHex_(bytes) {
+  var out = '';
+  for (var i = 0; i < bytes.length; i++) out += ('0' + ((bytes[i] + 256) % 256).toString(16)).slice(-2);
+  return out;
+}
+function usageDay_(ms) { return Utilities.formatDate(new Date(ms), CONFIG.TZ, 'yyyy-MM-dd'); }
+function usageRead_(uid) {
+  var raw = PropertiesService.getScriptProperties().getProperty(USAGE.PREFIX + uid);
+  if (!raw) return null;
+  try { var o = JSON.parse(raw); return o && typeof o === 'object' ? o : null; } catch (e) { return null; }
+}
+function usageForget_(uid) {
+  var p = PropertiesService.getScriptProperties();
+  if (p.getProperty(USAGE.PREFIX + uid) != null) p.deleteProperty(USAGE.PREFIX + uid);
+}
+
+// 時間を足す。body.days = { "2026-11-25": 秒, ... }（きょう・きのうだけ）
+function usageAdd_(me, body) {
+  var now = Date.now(), today = usageDay_(now), yest = usageDay_(now - 24 * 3600 * 1000);
+  var want = [];
+  var days = body.days && typeof body.days === 'object' ? body.days : {};
+  [yest, today].forEach(function (d) {
+    var v = days[d], n = typeof v === 'number' ? Math.floor(v) : NaN;       // 数字だけ（true や '12' は受けつけない）
+    if (isFinite(n) && n > 0) want.push([d, Math.min(n, USAGE.MAX_ADD_SEC)]);
+  });
+  if (!want.length) return { ok: true, recorded: false, added: 0 };
+  var lock = LockService.getScriptLock();
+  lock.waitLock(8000);
+  try {
+    var rec = usageRead_(me.uid) || { t: 0, d: {}, l: 0 };
+    if (!rec.d || typeof rec.d !== 'object') rec.d = {};
+    // 足せる量：前回から経った時間＋90秒（はじめては 15分）。複数の画面から同時に送られても、実際の時間を こえて増えない
+    var cap = rec.l ? Math.min(USAGE.MAX_ADD_SEC, Math.floor((now - Number(rec.l)) / 1000) + USAGE.SLACK_SEC) : USAGE.FIRST_MAX_SEC;
+    if (!(cap > 0)) cap = 0;
+    var added = 0;
+    for (var i = 0; i < want.length && cap > 0; i++) {
+      var d = want[i][0], take = Math.min(want[i][1], cap, USAGE.DAY_MAX_SEC - (Number(rec.d[d]) || 0));
+      if (take <= 0) continue;
+      rec.d[d] = (Number(rec.d[d]) || 0) + take; added += take; cap -= take;
+    }
+    rec.t = (Number(rec.t) || 0) + added;
+    rec.l = now; rec.n = me.name; rec.g = me.seg;
+    if (!rec.f) rec.f = today;
+    var cutoff = usageDay_(now - (USAGE.KEEP_DAYS - 1) * 24 * 3600 * 1000);
+    Object.keys(rec.d).forEach(function (k) { if (k < cutoff) delete rec.d[k]; });
+    var text = JSON.stringify(rec);
+    if (text.length > USAGE.MAX_PROP_CHARS) throw new Error('記録がいっぱいです。');
+    try { PropertiesService.getScriptProperties().setProperty(USAGE.PREFIX + me.uid, text); }
+    catch (e) { return { ok: false, message: '記録の保存先がいっぱいです（スクリプトのプロパティの上限）。' }; }
+    return { ok: true, recorded: true, added: added, today: Number(rec.d[today]) || 0 };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// 匿名の番号：ユーザー番号＋ひみつの塩（スクリプトのプロパティ USAGE_SALT）の SHA-256 の はじめの5文字。番号から ユーザーはわかりません
+function usageSalt_() {
+  var p = PropertiesService.getScriptProperties(), s = p.getProperty('USAGE_SALT');
+  if (!s) { s = Utilities.getUuid() + Utilities.getUuid(); p.setProperty('USAGE_SALT', s); }
+  return s;
+}
+function usageAnon_(uid, salt) { return usageHex_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, salt + ':' + uid)).slice(0, 5).toUpperCase(); }
+
+// 本名を返してよいか：管理者＝ぜんぶ／自分／同じグループ（ただし「その他」は隔離のため 同じでも匿名）
+function usageNameOk_(me, r) {
+  if (me.admin) return true;
+  if (r.uid === me.uid) return true;
+  return me.seg !== 'other' && r.g === me.seg;
+}
+
+function usageRank_(me) {
+  var now = Date.now(), today = usageDay_(now);
+  var d7 = {}, d30 = {}, last7 = [];
+  for (var i = 0; i < 30; i++) {
+    var k = usageDay_(now - i * 24 * 3600 * 1000);
+    d30[k] = 1; if (i < 7) { d7[k] = 1; last7.unshift(k); }
+  }
+  var all = PropertiesService.getScriptProperties().getProperties(), salt = usageSalt_();
+  var rows = [], mine = null;
+  Object.keys(all).forEach(function (key) {
+    if (key.indexOf(USAGE.PREFIX) !== 0) return;
+    var uid = key.slice(USAGE.PREFIX.length), r;
+    try { r = JSON.parse(all[key]); } catch (e) { return; }
+    if (!r || typeof r !== 'object' || r.g === 'home' || !(Number(r.t) > 0)) return;
+    var d = r.d && typeof r.d === 'object' ? r.d : {}, sd = 0, sw = 0, sm = 0;
+    Object.keys(d).forEach(function (day) { var v = Number(d[day]) || 0; if (day === today) sd += v; if (d7[day]) sw += v; if (d30[day]) sm += v; });
+    var row = { uid: uid, g: r.g, n: r.n, d: sd, w: sw, m: sm, t: Number(r.t) || 0 };
+    row.days = d;
+    if (!me.admin && uid === me.uid) mine = row;
+    rows.push(row);
+  });
+  rows.sort(function (a, b) { return b.t - a.t || (a.uid < b.uid ? -1 : 1); });
+  var total = rows.length;
+  var out = [];
+  rows.slice(0, USAGE.MAX_ROWS).forEach(function (r) { out.push(usageOut_(me, r, salt)); });
+  if (mine && out.every(function (x) { return !x.me; })) out.push(usageOut_(me, mine, salt));   // 自分が 300人より下でも、自分の行は入れる
+  var res = { ok: true, now: now, today: today, admin: me.admin, total: total, rows: out };
+  if (mine) res.mine7 = last7.map(function (k) { return [k, Number(mine.days[k]) || 0]; });
+  return res;
+}
+function usageOut_(me, r, salt) {
+  var isMe = !me.admin && r.uid === me.uid, show = usageNameOk_(me, r);
+  var o = { an: usageAnon_(r.uid, salt), d: r.d, w: r.w, m: r.m, t: r.t };
+  if (isMe) o.me = true;
+  if (show) o.nm = String(r.n || '').slice(0, 30);
+  if (me.admin) o.sg = r.g;                                                   // 区分は管理者にだけ見せる
+  return o;
+}
+
+// ドライブへの控え（お好みで 毎日のトリガーに）。ファイル保存フォルダの月フォルダに「利用時間レポート-年月日.csv」を書く。管理者用の控えなので、本名つき
+function usageBackup() {
+  var all = PropertiesService.getScriptProperties().getProperties(), now = Date.now(), today = usageDay_(now);
+  var lines = ['表示名,区分,きょう(秒),累計(秒),最後の記録'];
+  Object.keys(all).forEach(function (key) {
+    if (key.indexOf(USAGE.PREFIX) !== 0) return;
+    var r; try { r = JSON.parse(all[key]); } catch (e) { return; }
+    if (!r) return;
+    // 表計算で式として実行されないよう、= + - @ で始まる文字の前に ' を付ける
+    var q = function (s) { s = String(s == null ? '' : s); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+    lines.push([q(r.n), q(r.g), (r.d && r.d[today]) || 0, r.t || 0, q(r.l ? Utilities.formatDate(new Date(Number(r.l)), CONFIG.TZ, 'yyyy-MM-dd HH:mm:ss') : '')].join(','));
+  });
+  var name = '利用時間レポート-' + today + '.csv', folder = monthFolder_(), it = folder.getFilesByName(name);
+  while (it.hasNext()) it.next().setTrashed(true);
+  folder.createFile(name, '﻿' + lines.join('\r\n'), 'text/csv');
+  return lines.length - 1;
 }
 
 // ===== いざというとき用：Supabase を眠らせない（週1回の軽い呼び出し）=====
