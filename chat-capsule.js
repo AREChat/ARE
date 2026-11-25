@@ -142,6 +142,7 @@ async function onSecretAction(action, node){
             const r = await requireClient().rpc("secret_room_join", {p_code:code, p_phrase:phrase});
             if(r.error) throw r.error;
             const id = r.data;
+            if(!id){ showToast(srMsg({message:"secret_wrong"})); return; }      // まちがい（サーバーは回数を数えて null を返す）
             closeSheet();
             showToast("グループに入りました。");
             // 一覧の読み込み中だと、新しい部屋がまだ入っていないことがあるので、見えるまで数回やりなおす
