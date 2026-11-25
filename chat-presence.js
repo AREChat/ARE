@@ -18,30 +18,16 @@ function offlineText(seen){
     return seen ? "最終" + relativeAgo(Date.now() - seen) + "（" + presenceDateText(seen) + "）" : "オフライン";
 }
 
-// 管理者だけ（日本時間・平日＝月〜金）：
-//   1:00〜3:00  → いつもオンライン表示
-//   8:00〜20:00 → いつもオフライン表示（最後にオンラインだったのは、その日の3:00ということにする）
-//   それ以外・土日 → ふつうの表示。ほかのユーザーは時間に関係なく ふつうの表示
+// 管理者は、いつでも「取り込み中」に見せる（日本時間・曜日・時刻に関係なく／オフラインのときも）。ほかのユーザーはふつうの表示。
+//   ※「取り込み中」は表示だけのもの。通知（プッシュ・ポップアップ・着信）は、在席の状態をいっさい見ずに届ける
+//     （tools/check-busy-notify.js が、通知まわりのファイルが在席の状態を読んでいないことを毎回たしかめる）
 const ADMIN_PRES_ID = "9d660098-27f5-4933-bdce-d0ea7a6f08b4";
 function adminPresence(){
-    const p = {};
-    new Intl.DateTimeFormat("en-GB",{timeZone:"Asia/Tokyo",weekday:"short",hour:"2-digit",hour12:false,year:"numeric",month:"2-digit",day:"2-digit"})
-        .formatToParts(new Date()).forEach((x) => { p[x.type] = x.value; });
-    const hour = parseInt(p.hour,10) % 24;
-    if(["Sat","Sun"].indexOf(p.weekday) >= 0) return null;
-    if(hour >= 1 && hour < 3) return {cls:"online",text:STATUS_LABELS.online || "オンライン"};
-    if(hour >= 8 && hour < 20){
-        const three = new Date(p.year + "-" + p.month + "-" + p.day + "T03:00:00+09:00").getTime();
-        return {cls:"offline",text:offlineText(three)};
-    }
-    return null;
+    return {cls:"busy",text:STATUS_LABELS.busy || "取り込み中"};
 }
 
 function presenceOf(profile){
-    if(profile && profile.id === ADMIN_PRES_ID){
-        const o = adminPresence();
-        if(o) return o;
-    }
+    if(profile && profile.id === ADMIN_PRES_ID) return adminPresence();
     const seen = profile?.last_seen_at ? new Date(profile.last_seen_at).getTime() : 0;
     const age = Date.now() - seen;
     const status = profile?.presence_status;
@@ -81,6 +67,7 @@ function updateHeaderPresence(){
 async function sendPresence(){
     let status = feat.manual;
     if(status === "online" && Date.now() - feat.lastActivity > IDLE_MS) status = "away";
+    if(feat.isAdmin) status = "busy";   // 管理者は、いつでも「取り込み中」（サーバー側でも同じ：sql/admin_busy_v1.sql）
     try{
         const result = await requireClient().rpc("set_my_presence",{p_status:status});
         if(result.error) throw result.error;
