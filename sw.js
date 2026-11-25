@@ -11,7 +11,7 @@
 // ・新しい版が入ったら、古い控えをすべて消す
 
 importScripts("precache-manifest.js", "sw-core.js");
-const CACHE = "are-v264-20261125";
+const CACHE = "are-v265-20261125";
 // オフライン用: 画面の骨組み（html/js/css/json）を 最初に まとめて保存 / 画像・音楽は「オフライン準備」ボタンで are-media に保存（sw-core.js）
 const core = self.areCore({shell: CACHE, root: "./", precache: true, fetch: false});
 const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
@@ -102,6 +102,23 @@ self.addEventListener("fetch", (event) => {
 
 // ===== プッシュ通知（サーバーの send-push 関数から届く）=====
 // ・画面を開いて見ている最中は、アプリ内のポップアップがあるので重ねて出さない（iPhone / iPad は「必ず表示」が決まりなので常に出す）
+// ===== しずかモード（画面側の設定を、are-prefs.json で受け取る）：決めた時間は、通知を「音もバイブもなし」で出す =====
+function quietNow(q){
+    try{
+        if(!q) return false;
+        const now = new Date();
+        if(Number(q.until) > now.getTime()) return true;
+        if(!q.on) return false;
+        const mm = (s) => { const m = /^(\d{1,2}):(\d{2})$/.exec(String(s || "")); return m ? Math.min(23, Number(m[1])) * 60 + Math.min(59, Number(m[2])) : 0; };
+        const mins = now.getHours() * 60 + now.getMinutes(), f = mm(q.from), t = mm(q.to), dow = now.getDay(), days = Array.isArray(q.days) ? q.days : [0, 1, 2, 3, 4, 5, 6];
+        if(f === t) return false;
+        if(f < t) return days.includes(dow) && mins >= f && mins < t;
+        if(mins >= f) return days.includes(dow);
+        if(mins < t) return days.includes((dow + 6) % 7);
+    }catch(_e){}
+    return false;
+}
+
 self.addEventListener("push", (event) => {
     let data = {};
     try{ data = event.data ? event.data.json() : {}; }catch(_e){ data = {body: event.data ? event.data.text() : ""}; }
@@ -143,11 +160,12 @@ self.addEventListener("push", (event) => {
     };
     event.waitUntil((async () => {
         // 管理者・家庭の人は ミュート（音もバイブもなし）。そのほかの人は、アラームのようなバイブ。（画面側が are-prefs に書いている）
-        let muted = false;
+        let muted = false, quiet = false;
         try{
             const c = await caches.open("are-prefs"), r = await c.match(new URL("are-prefs.json", self.registration.scope).href);
-            if(r){ const j = await r.json(); muted = !!(j && j.muted); }
+            if(r){ const j = await r.json(); muted = !!(j && j.muted); quiet = quietNow(j && j.quiet); }
         }catch(_e){ muted = false; }
+        if(quiet) muted = true;      // しずかモード中は、音もバイブもなしの通知にする（通知そのものは出す）
         if(muted){ options.silent = true; }
         else{ options.vibrate = morning ? [400, 150, 400, 150, 400, 150, 400] : [200, 100, 200, 100, 200]; }
         if(morning) options.requireInteraction = !muted;

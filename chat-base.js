@@ -976,7 +976,7 @@ function parseMessageContent(content){
     if(typeof content !== "string") return {type:"text",text:String(content ?? "")};
     try{
         const parsed = JSON.parse(content);
-        if(parsed && typeof parsed === "object" && ["text","image","file","video","audio","poll","location","game","board","contact","live","itin","call"].includes(parsed.type)){
+        if(parsed && typeof parsed === "object" && ["text","image","file","video","audio","poll","location","game","board","contact","live","itin","call","capsule","yosegaki_open","yosegaki","bday","quiz"].includes(parsed.type)){
             return parsed;
         }
     }catch(_error){}
@@ -998,7 +998,7 @@ function renderMessageContent(content){
     if(item.type === "game"){
         return typeof renderGameBubble === "function" ? renderGameBubble(item) : '<div class="bubble">🎮 対戦</div>';
     }
-    if(item.type === "board" || item.type === "contact" || item.type === "live" || item.type === "itin" || item.type === "call"){
+    if(item.type === "board" || item.type === "contact" || item.type === "live" || item.type === "itin" || item.type === "call" || item.type === "capsule" || item.type === "yosegaki_open" || item.type === "yosegaki" || item.type === "bday" || item.type === "quiz"){
         return typeof renderExtraBubble === "function" ? renderExtraBubble(item) : '<div class="bubble">（この版では表示できません）</div>';
     }
     if(item.type === "location"){

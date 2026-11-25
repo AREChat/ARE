@@ -134,6 +134,10 @@ chat-passby-town.js
 chat-postshare.js
 chat-schedcontent.js
 chat-usage.js
+chat-ritems.js
+chat-capsule.js
+chat-daily.js
+chat-calm.js
 chat-main.js
 link-copy.js
 chat-fileopen.js

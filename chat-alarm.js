@@ -29,6 +29,7 @@ function alCtx(){
 /** ピピピッ（アラーム音）。kind: "msg"＝みじかい（新着・未読） / "morning"＝朝のアラーム（長め）。ミュートの人は鳴らさない */
 function alPlay(kind){
     if(alMuted()) return;
+    if(typeof quietActive === "function" && quietActive()) return;   // しずかモード中は、鳴らさない・出さない
     try{
         const ctx = alCtx(); if(!ctx) return;
         if(ctx.state === "suspended") ctx.resume().catch(() => {});
@@ -64,6 +65,7 @@ function alPopup(title, body, onClick, ms){
 }
 /** 画面を見ていないとき、サーバーのプッシュがオフの端末でだけ、ブラウザの通知も出す */
 function alBrowserNotify(title, body, tag){
+    if(typeof quietActive === "function" && quietActive()) return;   // しずかモード中は、鳴らさない・出さない
     try{
         let pushOn = false;
         try{ pushOn = typeof pushState === "function" && pushState() === "on"; }catch(_e){ pushOn = false; }
@@ -75,6 +77,7 @@ function alBrowserNotify(title, body, tag){
 
 // ---------- 未読のお知らせ ----------
 function alUnreadNotify(){
+    if(typeof quietActive === "function" && quietActive()) return;   // しずかモード中は、鳴らさない・出さない
     const total = typeof nfTotal === "function" ? nfTotal() : 0;
     if(!total) return;
     const now = Date.now();
@@ -92,6 +95,7 @@ function alDay(){ const d = new Date(); return d.getFullYear() + "-" + (d.getMon
 function alMorningKey(){ return "are_morning_" + (state.user ? state.user.id : ""); }
 /** force：サーバーからの朝の通知を受け取ったとき（時間の判定は しない） */
 function alMorningCheck(force){
+    if(typeof quietActive === "function" && quietActive()) return;   // しずかモード中は、鳴らさない・出さない
     if(!state.user || alMuted()) return;
     const d = new Date(), mins = d.getHours() * 60 + d.getMinutes();
     if(!force && !(mins >= 420 && mins < 450)) return;   // 7:00〜7:29 のあいだだけ（それより遅く開いたときは 鳴らさない）
@@ -109,7 +113,7 @@ function alMorningCheck(force){
 function alSavePrefs(){
     try{
         if(!("caches" in window) || !state.user) return;
-        const body = JSON.stringify({muted: alMuted(), at: Date.now()});
+        const body = JSON.stringify({muted: alMuted(), at: Date.now(), quiet: (typeof quietCfg === "function" ? quietCfg() : null)});
         caches.open("are-prefs").then((c) => c.put(new Request(new URL("are-prefs.json", location.href).href), new Response(body, {headers:{"Content-Type":"application/json"}}))).catch(() => {});
     }catch(_e){ /* 保存できなくても続ける */ }
 }

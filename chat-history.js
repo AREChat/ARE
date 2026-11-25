@@ -64,6 +64,11 @@ function contentLine(content){
     if(item.type === "contact") return "[連絡先] " + (item.name || "");
     if(item.type === "live") return "[ライブ位置共有]";
     if(item.type === "itin") return "[行動予定表] " + (item.title || "");
+    if(item.type === "capsule") return "[タイムカプセル] " + (item.text || "").slice(0, 40);
+    if(item.type === "yosegaki_open") return "[寄せ書き] " + (item.title || "");
+    if(item.type === "yosegaki") return "[寄せ書きカード] " + (item.title || "");
+    if(item.type === "bday") return "[誕生日] " + (item.name || "");
+    if(item.type === "quiz") return "[ミニ検定] " + (item.title || "");
     return "[" + item.type + "] " + (item.name || "添付ファイル");
 }
 

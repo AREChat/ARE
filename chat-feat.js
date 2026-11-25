@@ -7,6 +7,9 @@ const ONLINE_WINDOW_MS = 2 * 60 * 1000;
 const IDLE_MS = 5 * 60 * 1000;
 
 const FEAT_ERRORS = {
+    item_kind_invalid:"この種類は使えません。", item_title_invalid:"題名・名前は 1〜100文字で入力してください。", item_text_invalid:"本文の長さが正しくありません（ひとこと：1〜200文字／メモ：500文字まで）。", item_data_invalid:"内容が正しくありません。",
+    item_parent_invalid:"もとのカードが見つかりません。", item_closed:"このカードは完成しているので、もう書けません。", capsule_invalid:"タイムカプセルの内容が正しくありません。", capsule_text_invalid:"タイムカプセルの文章は 1〜4000文字です。", too_many_capsules:"封をしたまま たまっているカプセルが多すぎます（10個まで）。",
+    secret_wrong:"部屋コードか合言葉が ちがいます。", secret_phrase_invalid:"合言葉は 4〜30文字で入力してください。", room_full:"この部屋は、いっぱいで入れません。", segment_blocked:"この部屋には、入れません。",
     already_requested:"すでに削除を申請済みです。", not_allowed:"この操作はできません。", only_text_editable:"テキストのメッセージのみ編集できます。",
     room_suspended:"このチャットは停止中です。", send_at_out_of_range:"送信日時は30秒後〜30日以内で指定してください。",
     too_many_scheduled:"予約がいっぱいです（メッセージは50件、投稿とストーリーはそれぞれ30件まで）。先に取り消してください。", forbidden:"管理者権限がありません。", message_length_invalid:"メッセージの長さが正しくありません。", schedule_text_too_long:"予約送信は4,000文字までです。",
@@ -90,6 +93,11 @@ function messageSummary(item){
     if(item.type === "live") return "[ライブ位置共有]";
     if(item.type === "call") return item.result === "ended" ? "[通話] " + Math.floor((Number(item.sec) || 0) / 60) + "分" + ((Number(item.sec) || 0) % 60) + "秒" : "[不在着信]";
     if(item.type === "itin") return "[行動予定表] " + String(item.title || "");
+    if(item.type === "capsule") return "[タイムカプセル] " + String(item.text || "").slice(0, 40);
+    if(item.type === "yosegaki_open") return "[寄せ書き] " + String(item.title || "");
+    if(item.type === "yosegaki") return "[寄せ書きカード] " + String(item.title || "");
+    if(item.type === "bday") return "[誕生日] " + String(item.name || "");
+    if(item.type === "quiz") return "[ミニ検定] " + String(item.title || "");
     const label = {image:"画像",video:"動画",audio:"音声",file:"ファイル"}[item.type] || "添付";
     return "[" + label + "] " + String(item.name || "");
 }

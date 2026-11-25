@@ -1021,3 +1021,37 @@ body.sel-mode .message-row{cursor:pointer;-webkit-user-select:none;user-select:n
 @media (max-width:900px){.person .avatar[data-pres]::after,.room-item .avatar[data-pres]::after,.chat-header .avatar[data-pres]::after{width:14px;height:14px}}
 #chatSubtitle:empty{display:none}
 .mobile-back{font-size:20px;line-height:1;font-weight:700}
+
+/* ===== 12の新機能：寄せ書き・おみくじ・ふりかえり・誕生日・ダイジェスト・しずかモード・やさしい表示 ===== */
+.yo-card,.yo-done .yo-wall,.yo-wall{--yo-bg:#fff4c2}
+.yo-card{background:var(--yo-bg);color:#222;border:1px solid rgba(0,0,0,.15);border-radius:12px;padding:12px;margin:8px 0}
+.yo-title{font-size:1.2em;font-weight:700}.yo-to{opacity:.8;margin-top:2px}
+.yo-wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-top:8px;max-height:46vh;overflow:auto}
+.yo-done .yo-wall{max-height:240px;background:var(--yo-bg);padding:8px;border-radius:10px}
+.yo-note{position:relative;border-radius:6px;padding:8px 10px 6px;color:#222;box-shadow:0 1px 3px rgba(0,0,0,.2);display:flex;flex-direction:column;gap:4px;overflow-wrap:anywhere;white-space:pre-wrap;font-size:14px}
+.yo-note small{align-self:flex-end;opacity:.7;font-size:11px}
+.yo-c0{background:#fff9c4}.yo-c1{background:#ffd9e0}.yo-c2{background:#d6efff}.yo-c3{background:#dcf7d4}.yo-c4{background:#e7dcff}.yo-c5{background:#ffe3c4}
+.yo-x{position:absolute;top:2px;right:2px;border:0;background:rgba(255,255,255,.7);color:#333;border-radius:50%;width:22px;height:22px;line-height:1;cursor:pointer;padding:0}
+.omi-box{text-align:center;padding:12px;border:1px solid var(--line);border-radius:12px;margin:8px 0}
+.omi-mark{font-size:56px}.omi-level{font-size:44px;font-weight:800;letter-spacing:.1em}.omi-ok{color:var(--accent)}.omi-bad{color:var(--danger)}
+.omi-stars{display:grid;gap:4px;margin:8px auto;max-width:300px;text-align:left}.omi-stars div{display:flex;justify-content:space-between;gap:8px}.omi-stars b{color:#f5a623;letter-spacing:2px}.omi-stars i{color:var(--line);font-style:normal}
+.omi-word{font-size:1.1em;margin:8px 0}.omi-pop{animation:omiPop .6s ease-out}
+@keyframes omiPop{0%{transform:scale(.7) rotate(-6deg);opacity:0}60%{transform:scale(1.06) rotate(2deg);opacity:1}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.omi-pop{animation:none}}
+.ol-chart{display:flex;align-items:flex-end;gap:2px;height:96px;margin:8px 0;overflow:hidden}.ol-bar{flex:1;min-width:2px;background:var(--accent);border-radius:2px 2px 0 0}
+.ol-dist{display:flex;gap:10px;align-items:flex-end;margin:6px 0}.ol-dist span{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:34px}.ol-dist i{display:block;width:18px;background:var(--accent);border-radius:3px 3px 0 0;min-height:2px}
+.bd-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin:6px 0;text-align:center}
+.bd-cell{position:relative;border:1px solid var(--line);background:var(--panel2,var(--panel));color:var(--text);border-radius:8px;padding:8px 0;min-height:42px;cursor:pointer}
+.bd-cell i{position:absolute;right:2px;bottom:0;font-style:normal;font-size:12px}.bd-has{border-color:var(--accent);font-weight:700}.bd-today{outline:2px solid var(--accent2,var(--accent))}.bd-sel{background:var(--accent);color:#000}
+.dg-bars{display:flex;gap:6px;align-items:flex-end;margin-top:10px}.dg-bars span{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;justify-content:flex-end}.dg-bars i{display:block;width:100%;max-width:34px;background:var(--accent);border-radius:4px 4px 0 0}
+.quiet-bar{display:block;width:100%;border:0;border-bottom:1px solid var(--line);background:#1d2b4f;color:#dfe8ff;padding:8px 12px;text-align:left;cursor:pointer;font-size:13px}.quiet-bar small{opacity:.75}
+.qt-day{display:inline-flex;gap:3px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.cp-bubble{background:linear-gradient(135deg,rgba(255,236,179,.25),rgba(255,255,255,0))}
+/* やさしい表示：大きな文字・広い行間・大きなボタン・動きを少なく */
+body.cf-easy{line-height:1.7}
+body.cf-easy .bubble,body.cf-easy #messageInput{font-size:20px!important;line-height:1.7}
+body.cf-easy .room-item strong,body.cf-easy .message-sender{font-size:18px!important}
+body.cf-easy .room-item small,body.cf-easy .message-time,body.cf-easy .meta{font-size:15px!important}
+body.cf-easy button,body.cf-easy .button,body.cf-easy .button-secondary,body.cf-easy .tool-button,body.cf-easy select,body.cf-easy input[type=text],body.cf-easy input[type=date],body.cf-easy input[type=time],body.cf-easy textarea{min-height:48px;font-size:17px}
+body.cf-easy .sheet{font-size:18px}
+body.cf-easy *,body.cf-easy *::before,body.cf-easy *::after{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}

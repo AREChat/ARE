@@ -1,0 +1,25 @@
+# ===== 12の新機能（寄せ書き・タイムカプセル・当番表・おみくじ・しおり・日記・しずかモード・秘密の部屋・ダイジェスト・誕生日・やさしい表示・ミニ検定） =====
+寄せ書きカード || Group message card || 留言卡 || 롤링페이퍼 카드
+みんなでひとことずつ書いて、1枚のカードに（画像で保存もできます） || Everyone writes a line to make one card (can also be saved as an image). || 大家各写一句，合成一张卡片（也可保存为图片）。 || 모두가 한마디씩 써서 한 장의 카드로(이미지로 저장도 가능).
+タイムカプセル || Time capsule || 时间胶囊 || 타임캡슐
+未来の日に、このチャットへ自動でとどくメッセージ（最長 約3年） || A message that arrives in this chat automatically on a future day (up to about 3 years). || 在未来的某一天自动送达本聊天的消息（最长约3年）。 || 미래의 날에 이 채팅으로 자동으로 도착하는 메시지(최대 약 3년).
+やること・当番表 || To-dos & duty rota || 待办与值日表 || 할 일·당번표
+このチャットのみんなで共有。担当・期限・順番に回る当番表 || Shared with everyone in this chat. Assignees, due dates and a rotating duty rota. || 本聊天成员共享。负责人、期限和轮流的值日表。 || 이 채팅 모두가 공유. 담당·기한·순서대로 도는 당번표.
+今日のおみくじ || Today's fortune || 今日签 || 오늘의 운세
+1日1回。運勢・ラッキーカラー・おすすめを、友だちに送れます || Once a day. Send your fortune, lucky color and tip to friends. || 每天一次。可把运势、幸运色和建议发给朋友。 || 하루 한 번. 운세·행운의 색·추천을 친구에게 보낼 수 있어요.
+持ち物チェック・旅のしおり || Packing list & trip plan || 行李清单与旅行手册 || 짐 체크·여행 일정표
+みんなで持ち物をチェック。日ごとの予定も共有 || Check packing together and share the plan for each day. || 一起检查行李，并共享每天的计划。 || 함께 짐을 체크하고 날짜별 일정도 공유해요.
+ひとこと日記・ふりかえり || One-line diary & review || 一句话日记与回顾 || 한 줄 일기·돌아보기
+1日ひとこと＋気分。週・月・年のふりかえりと「去年の今日」 || One line and a mood a day. Weekly, monthly and yearly reviews, and "this day last year". || 每天一句话加心情。周、月、年回顾和“去年的今天”。 || 하루 한 줄＋기분. 주·월·연 돌아보기와 '작년 오늘'.
+しずかモード || Quiet mode || 静音模式 || 조용 모드
+決めた時間（曜日つき）は、通知の音やポップアップをお休み || Pause notification sounds and pop-ups during the times (and weekdays) you choose. || 在设定的时间（含星期）暂停通知声音和弹窗。 || 정한 시간(요일 포함)에는 알림 소리와 팝업을 쉽니다.
+合言葉の秘密の部屋 || Secret room with a passphrase || 暗号秘密房间 || 암호 비밀 방
+部屋コードと合言葉を知っている人だけが入れるグループ || A group only people who know the room code and passphrase can join. || 只有知道房间代码和暗号的人才能加入的群组。 || 방 코드와 암호를 아는 사람만 들어올 수 있는 그룹.
+週刊ダイジェスト || Weekly digest || 每周摘要 || 주간 다이제스트
+この1週間のチャットのふりかえり（自分だけに見えます） || A look back at this week's chats (only you can see it). || 回顾这一周的聊天（仅自己可见）。 || 이번 한 주 채팅 돌아보기(나만 볼 수 있어요).
+友だち誕生日カレンダー || Friends' birthday calendar || 朋友生日日历 || 친구 생일 달력
+誕生日を登録して知らせる。お祝いの予約もできます || Save birthdays and get reminded. You can also schedule a greeting. || 登记生日并提醒，还可以预约祝福。 || 생일을 등록해 알려 줍니다. 축하 예약도 가능해요.
+やさしい表示・読み上げ || Easy view & read-aloud || 易读显示与朗读 || 쉬운 화면·읽어 주기
+大きな文字とボタン。新しいメッセージの自動読み上げ || Large text and buttons. New messages can be read aloud automatically. || 大字和大按钮。可自动朗读新消息。 || 큰 글자와 버튼. 새 메시지를 자동으로 읽어 줍니다.
+ミニ検定をつくる || Make a mini quiz || 制作迷你测验 || 미니 퀴즈 만들기
+4択クイズをつくって、チャットに出します || Make a 4-choice quiz and post it to the chat. || 制作四选一测验并发到聊天中。 || 4지선다 퀴즈를 만들어 채팅에 올려요.
