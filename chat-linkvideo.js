@@ -2,8 +2,7 @@
 // ===== 動画のリンクの「プレビュー」自動再生 =====
 // ・メッセージの中の「動画のリンク」を、その場で見られるプレビュー（小さな動画）にします。
 //     ① 大きい動画をドライブに置いて送ったときの「🎬 動画のリンク」（Google ドライブ）
-//     ② YouTube のリンク（youtube.com／youtu.be／shorts）
-//     ③ 動画ファイルそのもののリンク（.mp4 .webm .mov .m4v .ogv）。ただし、画面が読みこめる場所（このアプリの保存先・Google ドライブ）のものだけ
+//     ② 動画ファイルそのもののリンク（.mp4 .webm .mov .m4v .ogv）。ただし、画面が読みこめる場所（このアプリの保存先・Google ドライブ）のものだけ
 // ・はじめから「オン」です。画面に見えているあいだだけ、音つきで自動再生します（見えなくなると止まります）。
 //   ただし、ブラウザの決まりで「まだ一度も画面を押していない」ときは音つきで始められないので、いったん音なしで始め、最初に画面を押した（触った）瞬間に音を出します。
 //   動画は同時に 1 つだけ再生します（新しく始まると、ほかは止まります）。
@@ -32,12 +31,6 @@ function lkvKind(href, bubbleText){
     let u; try{ u = new URL(href); }catch(_e){ return null; }
     if(u.protocol !== "https:") return null;
     const h = u.hostname.toLowerCase();
-    if(h === "youtu.be"){ const id = u.pathname.slice(1).split("/")[0]; return /^[A-Za-z0-9_-]{11}$/.test(id) ? {k:"yt", id} : null; }
-    if(h === "youtube.com" || h === "www.youtube.com" || h === "m.youtube.com" || h === "music.youtube.com"){
-        let id = u.searchParams.get("v") || "";
-        const m = /^\/(?:shorts|embed|live)\/([A-Za-z0-9_-]{11})/.exec(u.pathname); if(m) id = m[1];
-        return /^[A-Za-z0-9_-]{11}$/.test(id) ? {k:"yt", id} : null;
-    }
     const d = LKV_DRIVE_RE.exec(u.href);
     if(d){
         if(/動画のリンク/.test(bubbleText)) return {k:"drive", id:d[1]};
@@ -97,10 +90,6 @@ function lkvFrameEl(src){
     f.title = "動画のプレビュー";
     return f;
 }
-function lkvYtPost(box, fn){
-    const f = box.querySelector("iframe"); if(!f || !f.contentWindow) return;
-    try{ f.contentWindow.postMessage(JSON.stringify({event:"command", func:fn, args:[]}), "https://www.youtube-nocookie.com"); }catch(_e){}
-}
 
 /** 見える位置にきたとき、はじめて動画を読みこむ（見えないあいだは通信しない） */
 function lkvActivate(box){
@@ -108,13 +97,6 @@ function lkvActivate(box){
     let kind; try{ kind = JSON.parse(box.dataset.lv); }catch(_e){ return; }
     const auto = lkvAutoOn();
     box.dataset.on = "1"; box.textContent = "";
-    if(kind.k === "yt"){
-        let active = false; try{ active = !!(navigator.userActivation && navigator.userActivation.hasBeenActive); }catch(_e){}
-        const q = "enablejsapi=1&playsinline=1&rel=0&modestbranding=1" + (auto ? "&autoplay=1" + (active ? "" : "&mute=1") : "");
-        if(auto && !active) box.dataset.ytMuted = "1";
-        box.appendChild(lkvFrameEl("https://www.youtube-nocookie.com/embed/" + kind.id + "?" + q));
-        return;
-    }
     if(kind.k === "dfile"){ box.appendChild(lkvFrameEl("https://drive.google.com/file/d/" + kind.id + "/preview")); box.classList.add("lv-doc"); return; }
     if(kind.k === "audio"){
         const a = document.createElement("audio"); a.controls = true; a.preload = "metadata"; a.src = kind.url; a.className = "lv-audio";
@@ -144,24 +126,19 @@ function lkvPlay(v){
 }
 function lkvUnmuteAll(){
     document.querySelectorAll(".lv-video").forEach((v) => { if(v.__needUnmute){ v.__needUnmute = false; if(!v.paused) lkvSet(v, false); } });
-    document.querySelectorAll(".lv-box").forEach((b) => { if(b.dataset.ytMuted === "1"){ b.dataset.ytMuted = "0"; lkvYtPost(b, "unMute"); } });
 }
 
 function lkvSysPause(v){ if(v && !v.paused){ v.__byView = true; v.pause(); } }
-function lkvIsYt(box){ const f = box.querySelector("iframe"); return !!f && /youtube-nocookie/.test(f.src); }
 function lkvOnView(entries){
     for(const e of entries){
         const box = e.target;
         if(!box.isConnected){ lkv.obs.unobserve(box); continue; }
         if(e.isIntersecting && e.intersectionRatio >= 0.5){
-            const first = box.dataset.on !== "1";
             lkvActivate(box);
             const v = box.querySelector("video");
             if(v && lkvAutoOn() && v.paused && !v.ended && !v.dataset.userPaused) lkvPlay(v);
-            if(!first && lkvIsYt(box) && lkvAutoOn()) lkvYtPost(box, "playVideo");
         }else if(!e.isIntersecting || e.intersectionRatio < 0.2){
             lkvSysPause(box.querySelector("video"));
-            if(lkvIsYt(box)) lkvYtPost(box, "pauseVideo");
         }
     }
 }
