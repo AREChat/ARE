@@ -56,12 +56,26 @@ function presenceHtml(profile){
     return '<span class="dot ' + p.cls + '"></span>' + escapeHtml(p.text);
 }
 
+// 上の名前の下：オンライン・退席中・取り込み中のときだけ文字を出す（オフラインの「最終…前」は出さない）。
+// 状態は、アイコンの右下のマーク（Teams・Slack のような丸）で見せる
+function headerPresenceHtml(profile){
+    const p = presenceOf(profile);
+    return p.cls === "offline" ? "" : '<span class="dot ' + p.cls + '"></span>' + escapeHtml(p.text);
+}
+// アイコンの右下のマーク用：data-pres に online / away / busy / offline を入れる（グループは外す）
+function paintPresenceBadge(node, profile){
+    if(!node) return;
+    if(!profile){ node.removeAttribute("data-pres"); return; }
+    node.setAttribute("data-pres", presenceOf(profile).cls);
+}
 function updateHeaderPresence(){
     if(state.currentRoom && !state.currentRoom.suspended_at){
-        el.chatSubtitle.innerHTML = state.currentRoom.is_group
+        const group = !!state.currentRoom.is_group;
+        el.chatSubtitle.innerHTML = group
             ? 'メンバー ' + (state.currentRoom.memberIds || []).length + '人 ・ タップでグループ情報'
-            : presenceHtml(state.currentPartner);
-    }
+            : headerPresenceHtml(state.currentPartner);
+        paintPresenceBadge(el.chatAvatar, group ? null : state.currentPartner);
+    }else if(el.chatAvatar){ paintPresenceBadge(el.chatAvatar, null); }
 }
 
 async function sendPresence(){

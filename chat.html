@@ -19,7 +19,7 @@
 <title>ARE | チャット</title>
 <!-- 読み込みを速くする：データ置き場（Supabase）への接続の準備を、ページの読み込みと同時に始める -->
 <link rel="preconnect" href="https://kzrrnuzzvwijujhlbtln.supabase.co" crossorigin>
-<link rel="stylesheet" href="./chat.css?v=2a3ab8af85">
+<link rel="stylesheet" href="./chat.css?v=3918185059">
 </head>
 <body>
 <div class="app" id="app">
@@ -96,7 +96,7 @@
 
     <main class="main">
         <header class="chat-header">
-            <button class="button-secondary mobile-back" id="backButton" type="button">← 戻る</button>
+            <button class="button-secondary mobile-back" id="backButton" type="button" aria-label="戻る" title="戻る">←</button>
             <div class="avatar" id="chatAvatar">💬</div>
             <div class="person-text"><h2 id="chatTitle">AREへようこそ</h2><p id="chatSubtitle">チャット相手を選択してください</p></div>
             <button class="button-secondary" id="searchBtn" data-feature="search" type="button" title="メッセージ検索" aria-label="メッセージ検索">🔍</button>
@@ -174,7 +174,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=da9d38ee90"></script>
+<script defer src="./chat.bundle.js?v=3af55f5a67"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

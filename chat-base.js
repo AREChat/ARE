@@ -712,9 +712,10 @@ function renderRecommendations(){
         const name = profileDisplayName(profile);
         const avatar = safeHttpUrl(profile?.avatar_url || profile?.avatarUrl || profile?.photo_url || "");
         const hidden = state.hiddenIds.has(profile.id);
+        const pres1 = ' data-pres="' + presenceOf(profile).cls + '"';
         const avatarHtml = avatar
-            ? '<div class="avatar"><img src="' + escapeHtml(avatar) + '" alt="" loading="lazy" decoding="async"></div>'
-            : '<div class="avatar">' + escapeHtml(shortName(name)) + '</div>';
+            ? '<div class="avatar"' + pres1 + '><img src="' + escapeHtml(avatar) + '" alt="" loading="lazy" decoding="async"></div>'
+            : '<div class="avatar"' + pres1 + '>' + escapeHtml(shortName(name)) + '</div>';
 
         return '<div class="person-wrap' + (hidden ? ' is-hidden' : '') + '"><button class="person" type="button" data-user-id="' + escapeHtml(profile.id) + '" data-ctx-user="' + escapeHtml(profile.id) + '">' +
             avatarHtml +
@@ -800,7 +801,7 @@ function renderRooms(){
         const avatar = group ? "" : safeHttpUrl(room.partner?.avatar_url || room.partner?.avatarUrl || "");
         const avatarHtml = group
             ? '<div class="avatar">👥</div>'
-            : (avatar ? '<div class="avatar"><img src="' + escapeHtml(avatar) + '" alt="" loading="lazy" decoding="async"></div>' : '<div class="avatar">' + escapeHtml(shortName(name)) + '</div>');
+            : (function(){ const pr = room.orphan ? "" : ' data-pres="' + presenceOf(room.partner).cls + '"'; return avatar ? '<div class="avatar"' + pr + '><img src="' + escapeHtml(avatar) + '" alt="" loading="lazy" decoding="async"></div>' : '<div class="avatar"' + pr + '>' + escapeHtml(shortName(name)) + '</div>'; })();
         const active = state.currentRoom?.id === room.id ? " active" : "";
         const sub = group ? 'グループ ・ メンバー ' + (room.memberIds || []).length + '人' : presenceHtml(room.partner);
 
