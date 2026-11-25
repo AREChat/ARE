@@ -32,8 +32,9 @@ for(let i = shell.length - 1; i >= 0; i--) if(/^(QA\.json|vendor\/three\/three\.
 for(const f of shell.slice()) if(/(^|\/)index\.html$/.test(f)) shell.push(f.replace(/index\.html$/, "") || "./");
 shell.sort(); image.sort(); audio.sort();
 const sum = (a) => a.reduce((t, f) => t + (size[f] || 0), 0);
-const v = crypto.createHash("md5").update(shell.map((f) => f + (size[f] || 0)).join("|")).digest("hex").slice(0, 8);
+const h = {}; for(const f of shell){ try{ h[f] = crypto.createHash("md5").update(fs.readFileSync(f.endsWith("/") ? (f + "index.html") : f)).digest("hex").slice(0, 10); }catch(_e){} }
+const v = crypto.createHash("md5").update(shell.map((f) => f + (size[f] || 0) + (h[f] || "")).join("|")).digest("hex").slice(0, 8);
 const data = {v, shell, image, audio, bytes: {shell: sum(shell), image: sum(image), audio: sum(audio)}};
 fs.writeFileSync("precache.json", JSON.stringify(data));
-fs.writeFileSync("precache-manifest.js", "self.ARE_MANIFEST=" + JSON.stringify({v, shell}) + ";\n");
+fs.writeFileSync("precache-manifest.js", "self.ARE_MANIFEST=" + JSON.stringify({v, shell, h}) + ";\n");
 console.log("shell", shell.length, Math.round(data.bytes.shell / 1024) + "KB", "image", image.length, Math.round(data.bytes.image / 1048576) + "MB", "audio", audio.length, Math.round(data.bytes.audio / 1048576) + "MB", "v", v);

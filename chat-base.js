@@ -713,7 +713,7 @@ function renderRecommendations(){
         const avatar = safeHttpUrl(profile?.avatar_url || profile?.avatarUrl || profile?.photo_url || "");
         const hidden = state.hiddenIds.has(profile.id);
         const avatarHtml = avatar
-            ? '<div class="avatar"><img src="' + escapeHtml(avatar) + '" alt=""></div>'
+            ? '<div class="avatar"><img src="' + escapeHtml(avatar) + '" alt="" loading="lazy" decoding="async"></div>'
             : '<div class="avatar">' + escapeHtml(shortName(name)) + '</div>';
 
         return '<div class="person-wrap' + (hidden ? ' is-hidden' : '') + '"><button class="person" type="button" data-user-id="' + escapeHtml(profile.id) + '" data-ctx-user="' + escapeHtml(profile.id) + '">' +
@@ -800,7 +800,7 @@ function renderRooms(){
         const avatar = group ? "" : safeHttpUrl(room.partner?.avatar_url || room.partner?.avatarUrl || "");
         const avatarHtml = group
             ? '<div class="avatar">👥</div>'
-            : (avatar ? '<div class="avatar"><img src="' + escapeHtml(avatar) + '" alt=""></div>' : '<div class="avatar">' + escapeHtml(shortName(name)) + '</div>');
+            : (avatar ? '<div class="avatar"><img src="' + escapeHtml(avatar) + '" alt="" loading="lazy" decoding="async"></div>' : '<div class="avatar">' + escapeHtml(shortName(name)) + '</div>');
         const active = state.currentRoom?.id === room.id ? " active" : "";
         const sub = group ? 'グループ ・ メンバー ' + (room.memberIds || []).length + '人' : presenceHtml(room.partner);
 
@@ -1025,7 +1025,7 @@ function renderMessageContent(content){
     }
 
     if(item.type === "image"){
-        return '<div class="bubble' + (item.stamp ? ' stamp-img' : '') + '"><div class="attachment"><a href="' + (DRIVE_ID_RE.test(String(item.drive || "")) ? escapeHtml(driveViewUrl(String(item.drive))) : safeUrl) + '" target="_blank" rel="noopener noreferrer"' + dataPath + '><img' + dataPath + ' src="' + safeUrl + '" alt="' + safeName + '" loading="lazy" referrerpolicy="no-referrer"></a><div class="file-meta">' + safeName + '</div></div></div>';
+        return '<div class="bubble' + (item.stamp ? ' stamp-img' : '') + '"><div class="attachment"><a href="' + (DRIVE_ID_RE.test(String(item.drive || "")) ? escapeHtml(driveViewUrl(String(item.drive))) : safeUrl) + '" target="_blank" rel="noopener noreferrer"' + dataPath + '><img' + dataPath + ' src="' + safeUrl + '" alt="' + safeName + '" loading="lazy" decoding="async" referrerpolicy="no-referrer"></a><div class="file-meta">' + safeName + '</div></div></div>';
     }
 
     if(item.type === "video"){
@@ -1080,7 +1080,7 @@ function renderMessages(scrollToBottom, onlyIfChanged){
         const name = own ? "あなた" : profileDisplayName(profile);
         const avatarUrl = profile?.avatar_url || profile?.avatarUrl || "";
         const avatar = avatarUrl
-            ? '<div class="message-avatar"><img src="' + escapeHtml(safeHttpUrl(avatarUrl)) + '" alt=""></div>'
+            ? '<div class="message-avatar"><img src="' + escapeHtml(safeHttpUrl(avatarUrl)) + '" alt="" loading="lazy" decoding="async"></div>'
             : '<div class="message-avatar">' + escapeHtml(shortName(name)) + '</div>';
         const id = escapeHtml(message.id);
         const item = parseMessageContent(message.content);

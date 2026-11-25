@@ -11,7 +11,7 @@
 // ・新しい版が入ったら、古い控えをすべて消す
 
 importScripts("precache-manifest.js", "sw-core.js");
-const CACHE = "are-v258-20261125";
+const CACHE = "are-v259-20261125";
 // オフライン用: 画面の骨組み（html/js/css/json）を 最初に まとめて保存 / 画像・音楽は「オフライン準備」ボタンで are-media に保存（sw-core.js）
 const core = self.areCore({shell: CACHE, root: "./", precache: true, fetch: false});
 const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
@@ -41,11 +41,19 @@ function putCopy(request, response){
 }
 
 // ネット優先（HTML・version.json など）
-async function networkFirst(request){
+// soft=true（画面の html）：控えがあるのに ネットが1.5秒たっても返らないとき（電波が弱い・モバイル回線）は、先に控えを出す。
+// ネットの取得は そのまま続けて、控えを新しくする（次に開いたときに最新になる）。
+async function networkFirst(request, soft){
     try{
-        const response = await fetch(request, {cache: "no-cache"});
-        putCopy(request, response);
-        return response;
+        const p = fetch(request, {cache: "no-cache"}).then((response) => { putCopy(request, response); return response; });
+        if(soft){
+            const cachedNow = await caches.match(request);
+            if(cachedNow){
+                p.catch(() => {});
+                return await Promise.race([p, new Promise((res) => setTimeout(() => res(cachedNow), 1500))]);
+            }
+        }
+        return await p;
     }catch(error){
         const cached = await caches.match(request);
         if(cached) return cached;
@@ -85,7 +93,7 @@ self.addEventListener("fetch", (event) => {
     const path = url.pathname;
     const isPage = request.mode === "navigate" || /\.html$/i.test(path) || /\/$/.test(path);
     if(isPage || /\/version\.json$/i.test(path) || !STATIC_RE.test(path)){
-        event.respondWith(networkFirst(request));
+        event.respondWith(networkFirst(request, isPage && !/\/version\.json$/i.test(path)));
         return;
     }
     // ?v=… 付きは中身が変わると URL も変わる → 控えをそのまま使う

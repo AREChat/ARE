@@ -115,9 +115,10 @@ function pushBarPaint(){
     const btn = {off:"オンにする", denied:"なおし方", "need-install":"やり方"}[st] || "設定";
     if(!bar){
         bar = document.createElement("div"); bar.id = "pushBar"; bar.setAttribute("role", "status");
-        bar.style.cssText = "position:fixed;left:6px;right:6px;z-index:41;background:#2b2440;color:#fff;font-size:12px;line-height:1.35;border:1px solid #8a6bff;border-radius:10px;padding:6px 8px;display:flex;gap:6px;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.35)";
-        bar.innerHTML = '<span id="pushBarText" style="flex:1;min-width:0"></span><button type="button" id="pushBarGo" class="button" style="padding:2px 10px;font-size:12px;min-height:0;flex:none"></button><button type="button" id="pushBarX" class="button-secondary" aria-label="とじる" style="padding:2px 8px;font-size:12px;min-height:0;flex:none">✕</button>';
+        bar.style.cssText = "position:fixed;left:6px;right:6px;z-index:41;background:#2b2440;color:#fff;font-size:12px;line-height:1.3;border:1px solid #8a6bff;border-radius:10px;padding:4px 6px;display:flex;gap:6px;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.35);pointer-events:none";
+        bar.innerHTML = '<span id="pushBarText" style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span><button type="button" id="pushBarGo" class="button" style="padding:2px 10px;font-size:12px;min-height:0;flex:none"></button><button type="button" id="pushBarX" class="button-secondary" aria-label="とじる" style="padding:2px 8px;font-size:12px;min-height:0;flex:none">✕</button>';
         document.body.appendChild(bar);
+        bar.querySelector("#pushBarGo").style.pointerEvents = "auto"; bar.querySelector("#pushBarX").style.pointerEvents = "auto";
         bar.querySelector("#pushBarGo").addEventListener("click", async () => {
             const cur = pushState();
             if(cur === "off"){ try{ await pushEnable(); showToast("通知をオンにしました。"); }catch(error){ showToast(featError(error)); openPushSettings(); } pushBarPaint(); }

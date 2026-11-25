@@ -10,21 +10,40 @@ self.areCore = function(opt){
   const isImg = (p) => /\.(webp|png|jpg|jpeg|gif|svg|ico)$/i.test(p);
   const timeout = (ms) => new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), ms));
 
+  // 更新のたびに全部を取り直さない：前の版の控えに「中身が同じ（ハッシュが同じ）」ファイルがあれば、ネットを使わずにコピーする
+  // （モバイル回線では、更新1回につき数MBの通信が、変わったファイルの分だけになる）
   async function precache(){
-    const list = (self.ARE_MANIFEST && self.ARE_MANIFEST.shell) || [];
+    const M = self.ARE_MANIFEST || {}, list = M.shell || [], H = M.h || {};
     const c = await caches.open(SHELL);
+    const olds = [];
+    try{
+      const pre = (/^(.*?-v)\d/.exec(SHELL) || [])[1];
+      if(pre) for(const k of await caches.keys()) if(k !== SHELL && k.indexOf(pre) === 0) olds.push(await caches.open(k));
+    }catch(_e){}
+    const oldH = [];
+    for(const oc of olds){ try{ const r = await oc.match("__shell-hash"); oldH.push(r ? await r.json() : {}); }catch(_e){ oldH.push({}); } }
+    const slow = (() => { try{ const n = self.navigator && self.navigator.connection; return !!(n && (n.saveData || /(^|-)2g$/.test(n.effectiveType || ""))); }catch(_e){ return false; } })();
     let i = 0;
     async function worker(){
       while(i < list.length){
         const f = list[i++];
         try{
           const u = new URL(f, ROOT).href;
+          if(H[f]){
+            let done = false;
+            for(let k = 0; k < olds.length && !done; k++){
+              if(oldH[k][f] === H[f]){ const hit = await olds[k].match(u); if(hit){ await c.put(u, hit); done = true; } }
+            }
+            if(done) continue;
+          }
           const res = await fetch(u, {cache: "no-cache"});
           if(res && res.status === 200 && res.type === "basic") await c.put(u, res);
         }catch(_e){}
       }
     }
-    await Promise.all([worker(), worker(), worker(), worker()]);
+    // データ節約モード・2G のときは、ひとつずつ（画面の読み込みをじゃましない）
+    await Promise.all(slow ? [worker()] : [worker(), worker(), worker(), worker()]);
+    try{ await c.put("__shell-hash", new Response(JSON.stringify(H), {headers: {"Content-Type": "application/json"}})); }catch(_e){}
   }
 
   async function lookup(req, navigate){
@@ -41,7 +60,7 @@ self.areCore = function(opt){
     const cached = await lookup(req, false);
     try{
       const p = fetch(req, {cache: "no-cache"});
-      const res = cached ? await Promise.race([p, timeout(4000)]) : await p;
+      const res = cached ? await Promise.race([p, timeout(1500)]) : await p;
       if(res && res.status === 200 && res.type === "basic"){ const copy = res.clone(); caches.open(SHELL).then((c) => c.put(req, copy)).catch(() => {}); }
       return res;
     }catch(err){
