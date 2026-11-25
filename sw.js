@@ -11,7 +11,7 @@
 // ・新しい版が入ったら、古い控えをすべて消す
 
 importScripts("precache-manifest.js", "sw-core.js");
-const CACHE = "are-v256-20261125";
+const CACHE = "are-v257-20261125";
 // オフライン用: 画面の骨組み（html/js/css/json）を 最初に まとめて保存 / 画像・音楽は「オフライン準備」ボタンで are-media に保存（sw-core.js）
 const core = self.areCore({shell: CACHE, root: "./", precache: true, fetch: false});
 const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
@@ -101,6 +101,28 @@ self.addEventListener("push", (event) => {
     if(data.type === "clear"){
         const tag = String(data.tag || (data.room ? "room-" + data.room : ""));
         if(tag) event.waitUntil(self.registration.getNotifications({tag}).then((list) => list.forEach((n) => n.close())));
+        return;
+    }
+    // 着信（アプリ・ブラウザを閉じていても、電話のように鳴らす）
+    if(data.type === "call"){
+        event.waitUntil((async () => {
+            let muted = !!data.silent;   // 管理者は「ミュートの着信」（音もバイブもなし）
+            try{
+                const c = await caches.open("are-prefs"), r = await c.match(new URL("are-prefs.json", self.registration.scope).href);
+                if(r){ const j = await r.json(); if(j && j.muted) muted = true; }
+            }catch(_e){}
+            const list = await self.clients.matchAll({type: "window", includeUncontrolled: true});
+            const apple = /iPhone|iPad|iPod|Macintosh/i.test(self.navigator.userAgent || "");
+            const seen = list.some((c) => c.visibilityState === "visible" && c.focused);
+            if(seen && !apple) return;   // 画面を見ているときは、アプリ内の着信画面と着信音に任せる
+            const o = {
+                body: String(data.body || "着信です。タップして出る").slice(0, 140), icon: "icon-192.png", badge: "icon-192.png",
+                tag: "are-call", renotify: true, requireInteraction: true,
+                data: {room: typeof data.room === "string" ? data.room : "", call: true}
+            };
+            if(muted) o.silent = true; else o.vibrate = [500, 150, 500, 150, 500, 150, 500, 150, 500];
+            await self.registration.showNotification(String(data.title || "📞 着信").slice(0, 80), o);
+        })());
         return;
     }
     const title = String(data.title || "ARE").slice(0, 80);

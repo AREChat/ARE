@@ -59,9 +59,7 @@ function telNow(){ return typeof window.__telNow === "function" ? Number(window.
 function telQuiet(){
     let admin = false;
     try{ admin = (typeof adIsAdmin === "function" && adIsAdmin()) || !!(typeof feat !== "undefined" && feat.isAdmin); }catch(_e){}
-    if(!admin) return false;
-    const j = new Date(telNow() + 9 * 3600000), day = j.getUTCDay(), h = j.getUTCHours();
-    return day >= 1 && day <= 5 && h >= 7 && h < 20;
+    return admin;   // 管理者は、いつでも「ミュートの着信」（画面には出るが、音もバイブもなし）
 }
 /** "in"＝着信音（にぎやか） ／ "out"＝かけているときの呼び出し音（静か） */
 function telToneStart(kind){
@@ -297,10 +295,11 @@ async function telStart(kind){
         await pc.setLocalDescription(await pc.createOffer());
         await telGather(pc);
         if(tel.call !== call) return;
-        const r = await telSend("ring", call, {kind, sdp:pc.localDescription.sdp}, true);
+        const r = await telSend("ring", call, {kind, uid:(state.user && state.user.id) || "", sdp:pc.localDescription.sdp}, true);
         if(!r || !r.ok){ telEnd("電話をかけられませんでした。" + (r && r.message ? "（" + String(r.message).slice(0, 60) + "）" : "しばらくしてからお試しください。"), {notify:false, noRecord:true}); return; }
         tel.after[call.key] = r.n;
         call.ringAt = Date.now();
+        telPushCall(call, false);   // アプリを閉じている相手にも、通知で知らせる
         telStatus("呼び出し中…"); telToneStart("out"); telPaintLocal();
         call.ringTimer = setTimeout(() => { if(tel.call === call && !call.answered) telEnd("応答がありませんでした。", {result:"missed"}); }, TEL_RING_MS);
         telSchedule(800);
@@ -314,7 +313,7 @@ function telIncoming(room, m, d){
     const u = tel.ui, inc = {id:m.id, room, key:tel.keyOf.get(room.id), m, d, kind:d.kind === "video" ? "video" : "audio", t0:Date.now() - (m.age || 0)};
     tel.incoming = inc;
     u.inName.textContent = telNameOf(room);
-    u.inKind.textContent = (inc.kind === "video" ? "ビデオ通話の着信です" : "音声通話の着信です") + (telQuiet() ? "（平日 7:00〜20:00 は、着信音を消しています）" : "");
+    u.inKind.textContent = (inc.kind === "video" ? "ビデオ通話の着信です" : "音声通話の着信です") + (telQuiet() ? "（管理者は、着信音を消しています）" : "");
     telPaintAvatar(u.inAv, room);
     u.inVideo.hidden = inc.kind !== "video";
     u.inAudio.textContent = inc.kind === "video" ? "🎤 音声だけで出る" : "🎤 出る";
@@ -324,6 +323,15 @@ function telIncoming(room, m, d){
     telTitleFlash(true);
     telNotify(inc, telNameOf(room));
     telAudioHint(u);
+}
+/** 相手のスマホ・PC に、アプリを閉じていても届く通知（Web Push）を頼む。失敗しても通話そのものには影響しない */
+async function telPushCall(call, cancel){
+    try{
+        if(!call || !call.room || !state.user) return;
+        const client = requireClient();
+        const p = client.functions.invoke("call-push", {body:{room_id:call.room.id, kind:call.kind, cancel:!!cancel}});
+        if(p && p.catch) p.catch(() => {});
+    }catch(_e){}
 }
 /** 端末の「通知」で知らせる（スマホ・PC で設定している通知音がそのまま鳴る）。画面が見えているときも出す */
 async function telNotify(inc, who){
@@ -546,6 +554,7 @@ function telEnd(reason, opts){
         try{ if(call.dc && call.dc.readyState === "open") call.dc.send(JSON.stringify({t:"bye"})); }catch(_e){}
         const type = call.answered ? "hangup" : "cancel";
         telPost({op:"send", key:call.key, type, from:tel.dev, id:call.id, data:null});
+        if(call.role === "caller" && !call.answered) telPushCall(call, true);   // 閉じている相手の「着信」通知も消す
     }
     const sec = call.startAt ? Math.round((Date.now() - call.startAt) / 1000) : 0;
     try{ call.stream && call.stream.getTracks().forEach((t) => t.stop()); }catch(_e){}
@@ -607,10 +616,15 @@ function telOnMsg(roomId, key, m){
     const call = tel.call;
     if(call && call.id === m.id){
         if(m.ty === "answer" && call.role === "caller" && !call.answered && d.sdp){
-            call.answered = true; clearTimeout(call.ringTimer); telToneStop(); telStatus("つないでいます…");
+            call.answered = true; call.peerDev = m.f || ""; clearTimeout(call.ringTimer); telToneStop(); telStatus("つないでいます…");
             call.pc.setRemoteDescription({type:"answer", sdp:d.sdp}).catch(() => telEnd("つなげませんでした。", {notify:true}));
+        }else if(m.ty === "answer" && call.role === "caller" && call.answered && m.f && call.peerDev && m.f !== call.peerDev){
+            // 相手の別の端末も出てしまった：先に出た端末とだけつなぎ、あとの端末は切る
+            telPost({op:"send", key, type:"busy", from:tel.dev, id:call.id, data:{to:m.f}});
+        }else if(m.ty === "busy" && call.role === "callee" && !call.startAt && d && d.to === tel.dev){
+            telEnd("ほかの端末が先に出たため、切れました。", {notify:false, noRecord:true});
         }else if(m.ty === "decline" || m.ty === "busy"){
-            if(!call.answered) telEnd(m.ty === "busy" ? "相手は、ほかの通話中です。" : "通話は断られました。", {notify:false, result:"declined"});
+            if(call.role === "caller" && !call.answered) telEnd(m.ty === "busy" ? "相手は、ほかの通話中です。" : "通話は断られました。", {notify:false, result:"declined"});
         }else if(m.ty === "hangup" || m.ty === "cancel"){
             telEnd("相手が切りました。", {notify:false});
         }
@@ -623,6 +637,7 @@ function telOnMsg(roomId, key, m){
     }
     if(m.ty !== "ring" || tel.handled.has(m.id)) return;
     tel.handled.add(m.id);
+    if(d && d.uid && state.user && d.uid === state.user.id) return;   // 自分の別の端末からかけた着信は、こちらでは鳴らさない
     if(!tel.on || (m.age || 0) > TEL_RING_MS || !d.sdp) return;
     const room = (state.rooms || []).find((x) => x.id === roomId);
     if(!room || room.is_group) return;
@@ -655,7 +670,7 @@ async function telTestRing(){
         }
     }catch(_e){}
     const quiet = telQuiet();
-    showToast(quiet ? "（管理者は平日 7:00〜20:00 は着信音が消えます。音は鳴りません）" : (tel.ac && tel.ac.state === "running" ? "着信音をならしています。" : "音が出せません。画面をもう一度さわってください。") + (perm === "granted" ? " 通知も出しました（端末の通知音は、端末の設定どおりです）。" : perm === "denied" ? " 通知が許可されていません（ブラウザの設定で許可すると、端末の通知音でも知らせます）。" : ""));
+    showToast(quiet ? "（管理者は、着信音が消えます。音は鳴りません）" : (tel.ac && tel.ac.state === "running" ? "着信音をならしています。" : "音が出せません。画面をもう一度さわってください。") + (perm === "granted" ? " 通知も出しました（端末の通知音は、端末の設定どおりです）。" : perm === "denied" ? " 通知が許可されていません（ブラウザの設定で許可すると、端末の通知音でも知らせます）。" : ""));
 }
 function telPaintSetting(){
     const b = document.getElementById("telSetItem"); if(!b) return;

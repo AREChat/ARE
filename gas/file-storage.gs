@@ -341,7 +341,10 @@ function callPoll_(body) {
     var list = (box.m || []).filter(function (x) {
       if (x.f === me || now - x.t > CALL.TTL_SEC * 1000) return false;
       if (typeof seen === 'number') return x.n > seen;
-      return x.ty === 'ring' && now - x.t <= CALL.RING_AGE_MS;
+      if (x.ty !== 'ring' || now - x.t > CALL.RING_AGE_MS) return false;
+      // はじめて読む端末には、「もう切られた・出られた・断られた」呼び出しは見せない（幽霊の着信を防ぐ）
+      for (var q = 0; q < (box.m || []).length; q++) { var y = box.m[q]; if (y.id === x.id && y.n > x.n && y.ty !== 'ring' && y.ty !== 'busy') return false; }
+      return true;
     });
     if (list.length || (typeof seen !== 'number')) out[k] = { n: box.n || 0, m: list.map(function (x) { return { n: x.n, age: now - x.t, f: x.f, ty: x.ty, id: x.id, d: x.d }; }) };
   }

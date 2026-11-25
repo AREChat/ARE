@@ -99,6 +99,29 @@ function pushAutoArm(){
     document.addEventListener("click", once, true);
 }
 
+// 着信を「アプリを閉じていても届く」ようにする更新（1台につき1回）。
+// ホーム画面のアプリ（PWA）は、閉じている間は動けません。代わりに、サーバーからの通知（プッシュ）で起こします。
+// すでにアプリ化している人も、この更新で自動的に切りかわります（通知の許可は、画面を触ったときに1回だけ聞きます）
+async function pushBackgroundUpgrade(force){
+    if(!pushSupported() || !state.user) return;
+    const key = "are_bg_call_v1_" + state.user.id;
+    try{
+        if(!force && localStorage.getItem(key) === "1") return;
+        if(localStorage.getItem("are_push_optout_" + state.user.id)) return;
+    }catch(_e){ return; }
+    if(typeof Notification !== "undefined" && Notification.permission === "denied") return;
+    const run = async () => {
+        try{
+            await pushEnable();
+            try{ localStorage.setItem(key, "1"); }catch(_e){}
+            if(pushIsStandalone() || force) showToast("アプリを閉じていても、着信と新着が届くようにしました。");
+        }catch(_e){ /* 断られた・非対応のときは何もしない（次に開いたときに、もう一度やってみる） */ }
+    };
+    if(Notification.permission === "granted"){ await run(); return; }
+    const once = () => { document.removeEventListener("click", once, true); run(); };
+    document.addEventListener("click", once, true);
+}
+
 async function pushDisable(){
     const sub = feat.push.sub;
     feat.push.sub = null;
@@ -253,6 +276,7 @@ function pushOpenFromUrl(){
 function initPush(){
     registerTool("push", onPushAction);
     setTimeout(() => { if(feat.push.ready) pushAutoArm(); else pushRegister().then(pushAutoArm); }, 2500);
+    setTimeout(() => { pushBackgroundUpgrade(false).catch(() => {}); }, 4500);
     // ヘッダーの 🔔 ボタン
     const head = document.querySelector(".chat-header");
     const anchor = document.getElementById("refreshMessagesButton");
@@ -269,7 +293,7 @@ function initPush(){
     }
     // ホーム画面に追加
     window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); feat.push.installEvent = e; });
-    window.addEventListener("appinstalled", () => { feat.push.installEvent = null; });
+    window.addEventListener("appinstalled", () => { feat.push.installEvent = null; setTimeout(() => { pushBackgroundUpgrade(true).catch(() => {}); }, 1500); });
     // 通知をタップして開いたとき
     if("serviceWorker" in navigator){
         navigator.serviceWorker.addEventListener("message", (e) => {
