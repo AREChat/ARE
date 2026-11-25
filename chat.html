@@ -9,7 +9,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="ARE">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com https://*.googleusercontent.com https://drive.google.com https://tile.openstreetmap.org https://*.hf.space https://*.huggingface.co https://huggingface.co; media-src 'self' blob: https://*.supabase.co https://drive.google.com https://docs.google.com https://*.googleusercontent.com https://*.hf.space https://*.huggingface.co https://huggingface.co; connect-src 'self' https://cdn.jsdelivr.net https://api.frankfurter.dev https://*.supabase.co wss://*.supabase.co https://script.google.com https://script.googleusercontent.com https://www.googleapis.com https://api.open-meteo.com https://geocoding-api.open-meteo.com https://huggingface.co https://*.huggingface.co https://*.hf.space wss://*.hf.space; font-src 'self' data:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src 'none'; manifest-src 'self'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval'; worker-src 'self' blob:; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://*.supabase.co https://lh3.googleusercontent.com https://*.googleusercontent.com https://drive.google.com https://tile.openstreetmap.org https://*.hf.space https://*.huggingface.co https://huggingface.co; media-src 'self' blob: https://*.supabase.co https://drive.google.com https://docs.google.com https://*.googleusercontent.com https://*.hf.space https://*.huggingface.co https://huggingface.co; connect-src 'self' https://cdn.jsdelivr.net https://api.frankfurter.dev https://*.supabase.co wss://*.supabase.co https://script.google.com https://script.googleusercontent.com https://www.googleapis.com https://api.open-meteo.com https://geocoding-api.open-meteo.com https://huggingface.co https://*.huggingface.co https://*.hf.space wss://*.hf.space; font-src 'self' data:; form-action 'self'; base-uri 'none'; object-src 'none'; frame-src https://drive.google.com https://www.youtube-nocookie.com; manifest-src 'self'">
 <meta name="referrer" content="no-referrer">
 <script src="./guard.js"></script>
 <script src="./install-capture.js"></script>
@@ -65,6 +65,8 @@
                 <a class="admin-card more-item" href="./help.html" target="_blank" rel="noopener" style="text-decoration:none">📖 操作方法<small class="meta">使い方ガイド（スマホ・パソコン共通）</small></a>
                 <button class="admin-card more-item" id="installAppItem" type="button" hidden>📲 アプリ化<small class="meta">ホーム画面・デスクトップに追加（手順つき）</small></button>
                 <button class="admin-card more-item" id="telSetItem" type="button">📞 着信を受ける：ON<small class="meta">1対1のチャットの 📞（音声）・🎥（ビデオ・画面共有）から電話できます</small></button>
+                <button class="admin-card more-item" id="lkvSetItem" type="button">▶ 動画リンクの自動再生：ON<small class="meta">動画のリンクを、音つきで自動再生します（いやな人はオフに）</small></button>
+                <button class="admin-card more-item" id="lkvFileItem" type="button">📄 ファイルのプレビュー：ON<small class="meta">ドライブに置いた書類・PDF・音声を、その場で見られます</small></button>
                 <button class="admin-card more-item" data-extra="chatbot" data-feature="extras" type="button">🤖 AIチャットボット<small class="meta">よくある質問に自動で答えます</small></button>
                 <button class="admin-card more-item" data-extra="weather" data-feature="extras" type="button">☀️ 天気予報<small class="meta">地名で検索・7日間の予報</small></button>
                 <button class="admin-card more-item" data-extra="transit" data-feature="extras" type="button">🚆 交通情報<small class="meta">乗換案内・運行状況</small></button>
@@ -171,7 +173,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=0bd1365e9c"></script>
+<script defer src="./chat.bundle.js?v=2ab1efb714"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>
