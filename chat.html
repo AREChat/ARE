@@ -19,7 +19,7 @@
 <title>ARE | チャット</title>
 <!-- 読み込みを速くする：データ置き場（Supabase）への接続の準備を、ページの読み込みと同時に始める -->
 <link rel="preconnect" href="https://kzrrnuzzvwijujhlbtln.supabase.co" crossorigin>
-<link rel="stylesheet" href="./chat.css?v=375a0b5dab">
+<link rel="stylesheet" href="./chat.css?v=29dc20a624">
 </head>
 <body>
 <div class="app" id="app">
@@ -64,6 +64,7 @@
                 <div class="section-heading"><h2>🧰 その他</h2></div>
                 <a class="admin-card more-item" href="./help.html" target="_blank" rel="noopener" style="text-decoration:none">📖 操作方法<small class="meta">使い方ガイド（スマホ・パソコン共通）</small></a>
                 <button class="admin-card more-item" id="installAppItem" type="button" hidden>📲 アプリ化<small class="meta">ホーム画面・デスクトップに追加（手順つき）</small></button>
+                <button class="admin-card more-item" id="telSetItem" type="button">📞 着信を受ける：ON<small class="meta">1対1のチャットの 📞（音声）・🎥（ビデオ・画面共有）から電話できます</small></button>
                 <button class="admin-card more-item" data-extra="chatbot" data-feature="extras" type="button">🤖 AIチャットボット<small class="meta">よくある質問に自動で答えます</small></button>
                 <button class="admin-card more-item" data-extra="weather" data-feature="extras" type="button">☀️ 天気予報<small class="meta">地名で検索・7日間の予報</small></button>
                 <button class="admin-card more-item" data-extra="transit" data-feature="extras" type="button">🚆 交通情報<small class="meta">乗換案内・運行状況</small></button>
@@ -170,7 +171,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=65d5239144"></script>
+<script defer src="./chat.bundle.js?v=b976e51df0"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

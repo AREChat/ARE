@@ -117,6 +117,7 @@ chat-rpg.js
 chat-ng.js
 chat-points.js
 chat-ads.js
+chat-call.js
 chat-alarm.js
 chat-prefsync.js
 chat-quick.js

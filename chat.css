@@ -928,9 +928,11 @@ body.sel-mode .message-row{cursor:pointer;-webkit-user-select:none;user-select:n
 #roomLinkBtn{order:1}
 @media(max-width:700px){
  .chat-header .hdr-dots{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:40px;padding:6px 10px;font-size:20px;line-height:1;font-weight:700}
- .chat-header:not(.hdr-open)>button:not(.mobile-back):not(#hdrMoreBtn):not(#roomLinkBtn){display:none!important}
+ .chat-header:not(.hdr-open)>button:not(.mobile-back):not(#hdrMoreBtn):not(#roomLinkBtn):not(#telAudioBtn):not(#telVideoBtn){display:none!important}
  .chat-header .hdr-dots{order:2}
- .chat-header.hdr-open>button:not(.mobile-back):not(#hdrMoreBtn):not(#roomLinkBtn){order:3}
+ .chat-header.hdr-open>button:not(.mobile-back):not(#hdrMoreBtn):not(#roomLinkBtn):not(#telAudioBtn):not(#telVideoBtn){order:3}
+ .chat-header #telAudioBtn,.chat-header #telVideoBtn{order:1;min-width:40px;min-height:40px;padding:6px 8px;font-size:18px}
+ .chat-header #telAudioBtn[hidden],.chat-header #telVideoBtn[hidden]{display:none!important}
  .chat-header.hdr-open .hdr-dots{background:var(--accent,#3a4a8a);color:#fff}
 }
 @media(min-width:701px) and (max-width:1099px){.hdr-help .hdr-long{display:none}.hdr-help .hdr-short{display:inline}.brand{padding-left:14px;padding-right:14px}.brand h1{font-size:20px}}
@@ -949,7 +951,7 @@ body.sel-mode .message-row{cursor:pointer;-webkit-user-select:none;user-select:n
  body.kb-open .app.chat-open .chat-header{min-height:0;padding-top:calc(4px + env(safe-area-inset-top));padding-bottom:4px;gap:8px;flex-wrap:nowrap}
  body.kb-open .chat-header .person-text p{display:none}
  body.kb-open .chat-header .avatar{width:34px;height:34px;flex-basis:34px;font-size:15px}
- body.kb-open .chat-header:not(.hdr-open)>button:not(.mobile-back):not(#hdrMoreBtn):not(#roomLinkBtn){display:none!important}
+ body.kb-open .chat-header:not(.hdr-open)>button:not(.mobile-back):not(#hdrMoreBtn):not(#roomLinkBtn):not(#telAudioBtn):not(#telVideoBtn){display:none!important}
  body.kb-open .chat-header .mobile-back{min-height:36px;padding:4px 10px}
  body.kb-open .composer textarea{padding-top:8px;padding-bottom:8px}
 }

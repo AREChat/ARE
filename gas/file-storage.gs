@@ -13,6 +13,7 @@
  *   ・30日アーカイブ：Supabase に残った古いファイルを、ドライブへ移す（合言葉 ARCHIVE_TOKEN が要ります。写真は share:true で公開リンクにして移せます）
  *   ・広告の映像：ドライブの「広告」フォルダの AD001.mp4〜 を、チャットに渡す（?action=list／?action=part）
  *   ・天気・運行情報：都道府県ごとの天気と都営交通の運行状況を、ここで集めて チャットに渡す（?action=info）。Supabase は使いません
+ *   ・通話：着信のよびだしと、つなぎの相談を、ここの「郵便受け」で受けわたす（action=call）。声や映像は ここを通りません（ブラウザどうしが直接つなぐ）。Supabase は ほぼ使いません
  *   ・いざというとき用：keepAlive（Supabase を眠らせない。週1回のトリガーに設定して使う。ふだんは何もしません）
  *
  * 使い方：このコード全部を、いまの「ファイル保存」プロジェクトに貼り直して保存 → 「デプロイ」→「デプロイを管理」→ えんぴつ →
@@ -42,6 +43,7 @@ var BLOCKED_EXT = /\.(exe|bat|cmd|com|msi|msp|apk|ipa|sh|bash|zsh|ps1|psm1|vbs|v
 function doPost(e) {
   try {
     var body = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    if (body.action === 'call') return json_(callApi_(body));   // 通話の郵便受け
     if (body.action === 'start' || body.action === 'finish') {
       var uid = verifyUser_(body.token);
       return json_(body.action === 'start' ? start_(uid, body) : finish_(uid, body));
@@ -60,7 +62,7 @@ function doGet(e) {
     if (a.action === 'list') return json_(adsList_());
     if (a.action === 'part') return json_(adsPart_(String(a.id || ''), parseInt(a.i, 10)));
     if (a.action === 'info') return json_(infoGet_(String(a.kind || ''), String(a.key || '')));
-    if (a.action === 'ping') return json_({ ok: true, version: '2026-11-24-media', features: ['info', 'archive-share'] });   // どの版が動いているかの確認用
+    if (a.action === 'ping') return json_({ ok: true, version: '2026-11-25-call', features: ['info', 'archive-share', 'call'] });   // どの版が動いているかの確認用
   } catch (err) {
     return json_({ ok: false, error: String(err).slice(0, 200) });
   }
@@ -267,6 +269,93 @@ function infoTransit_(key) {
     return { name: TOEI_NAMES[id] || id, text: (t && t.ja) || '', at: x['dc:date'] || null };
   });
   return { ok: true, payload: { lines: lines, credit: '東京都交通局（公共交通オープンデータセンター・CC BY 4.0）' }, source_url: url, updated_at: new Date().toISOString() };
+}
+
+// ===== 通話（着信・音声・ビデオ・画面共有）の「郵便受け」=====
+// ・声や映像は、ここを通りません。ブラウザどうしが直接つなぎます（WebRTC）。ここは「いま電話するよ」「出たよ」「切ったよ」などの短いメモを受けわたすだけです。
+// ・メモは GAS の一時メモ（CacheService）に 2分だけ置き、古いものから消えます。Supabase は、電話をかけたときの本人確認（1回）でだけ使います。
+// ・部屋の目印（key）は、チャットの部屋の番号を、ブラウザの中で SHA-256 にした 64文字。部屋の番号そのものは、ここには届きません。
+// ・つながりにくい回線のために、無料の中継サーバー（TURN）を使うときは、スクリプトのプロパティに次の3つを入れます。入れなくても動きます（その場合は Google の公開の STUN だけ）
+//     TURN_URLS＝turn:...,turns:...（カンマ区切り） ／ TURN_USER ／ TURN_PASS
+//   中継の合言葉は、電話をかけたり出たりする、ログインした人にだけ返します。
+var CALL = { TTL_SEC: 120, KEEP_SEC: 300, MAX_KEYS: 40, MAX_MSG: 30, MAX_DATA: 14000, POLL_MS: 6000, RING_AGE_MS: 50000 };
+
+function callApi_(body) {
+  var op = String(body.op || '');
+  if (op === 'send') return callSend_(body);
+  if (op === 'poll') return callPoll_(body);
+  if (op === 'ice') return callIce_(body);
+  return { ok: false, message: '不明な操作です。' };
+}
+
+function callKeyOk_(k) { return typeof k === 'string' && /^[0-9a-f]{64}$/.test(k); }
+
+function callRead_(cache, k) {
+  var raw = cache.get('call:' + k);
+  if (!raw) return { n: 0, m: [] };
+  try { var o = JSON.parse(raw); return (o && o.m) ? o : { n: 0, m: [] }; } catch (e) { return { n: 0, m: [] }; }
+}
+
+// メモを1つ置く。type：ring（かけた＋つなぎの相談の1通目）／answer／decline／cancel／hangup／busy
+function callSend_(body) {
+  var k = String(body.key || ''), type = String(body.type || ''), from = String(body.from || '');
+  if (!callKeyOk_(k)) return { ok: false, message: 'key' };
+  if (!/^(ring|answer|decline|cancel|hangup|busy)$/.test(type)) return { ok: false, message: 'type' };
+  if (!/^[A-Za-z0-9_-]{6,40}$/.test(from)) return { ok: false, message: 'from' };
+  var id = String(body.id || '');
+  if (!/^[A-Za-z0-9_-]{6,40}$/.test(id)) return { ok: false, message: 'id' };
+  var data = body.data == null ? '' : JSON.stringify(body.data);
+  if (data.length > CALL.MAX_DATA) return { ok: false, message: 'too large' };
+  // 「かける」は、ログインした人だけ（知らない人が呼び出しを送りつけるのを防ぐ）。Supabase への問い合わせは、電話1回につき1回だけです
+  if (type === 'ring') verifyUser_(body.token);
+  var lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+  try {
+    var cache = CacheService.getScriptCache();
+    var box = callRead_(cache, k), now = Date.now();
+    box.m = box.m.filter(function (x) { return now - x.t < CALL.TTL_SEC * 1000; });
+    box.n = Math.max(now, (box.n || 0) + 1);   // 番号は「時刻」を元にする（一時メモが消えて作り直されても、番号が戻らない）
+    box.m.push({ n: box.n, t: now, f: from, ty: type, id: id, d: data });
+    if (box.m.length > CALL.MAX_MSG) box.m = box.m.slice(box.m.length - CALL.MAX_MSG);
+    cache.put('call:' + k, JSON.stringify(box), CALL.KEEP_SEC);
+    return { ok: true, n: box.n, now: now };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// メモを受け取る。keys：見たい部屋の目印（40まで）／ after：部屋ごとに「ここまで読んだ」番号／ me：この端末の名前（自分が置いたものは返さない）
+// 一度も読んでいない部屋は、「かけた（ring）」の新しいもの（50秒以内）だけを返します
+function callPoll_(body) {
+  var keys = (body.keys || []).slice(0, CALL.MAX_KEYS), after = body.after || {}, me = String(body.me || '');
+  var cache = CacheService.getScriptCache(), now = Date.now(), want = [];
+  for (var i = 0; i < keys.length; i++) if (callKeyOk_(keys[i])) want.push(keys[i]);
+  var raw = want.length ? cache.getAll(want.map(function (k) { return 'call:' + k; })) : {};
+  var out = {};
+  for (var j = 0; j < want.length; j++) {
+    var k = want[j], r = raw['call:' + k];
+    if (!r) continue;
+    var box;
+    try { box = JSON.parse(r); } catch (e) { continue; }
+    var seen = after[k];
+    var list = (box.m || []).filter(function (x) {
+      if (x.f === me || now - x.t > CALL.TTL_SEC * 1000) return false;
+      if (typeof seen === 'number') return x.n > seen;
+      return x.ty === 'ring' && now - x.t <= CALL.RING_AGE_MS;
+    });
+    if (list.length || (typeof seen !== 'number')) out[k] = { n: box.n || 0, m: list.map(function (x) { return { n: x.n, age: now - x.t, f: x.f, ty: x.ty, id: x.id, d: x.d }; }) };
+  }
+  return { ok: true, now: now, pollMs: CALL.POLL_MS, r: out };
+}
+
+// 無料の中継サーバー（TURN）の情報。ログインした人にだけ返します（電話1回につき、本人確認は1回）
+function callIce_(body) {
+  verifyUser_(body.token);
+  var p = PropertiesService.getScriptProperties();
+  var urls = String(p.getProperty('TURN_URLS') || '').split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  var servers = [{ urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302'] }];
+  if (urls.length && p.getProperty('TURN_USER')) servers.push({ urls: urls, username: p.getProperty('TURN_USER'), credential: p.getProperty('TURN_PASS') || '' });
+  return { ok: true, iceServers: servers, turn: urls.length > 0 };
 }
 
 // ===== いざというとき用：Supabase を眠らせない（週1回の軽い呼び出し）=====

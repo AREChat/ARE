@@ -89,6 +89,7 @@ function messageSummary(item){
     if(item.type === "board") return "[日程調整] " + String(item.title || "");
     if(item.type === "contact") return "[連絡先] " + String(item.name || "");
     if(item.type === "live") return "[ライブ位置共有]";
+    if(item.type === "call") return item.result === "ended" ? "[通話] " + Math.floor((Number(item.sec) || 0) / 60) + "分" + ((Number(item.sec) || 0) % 60) + "秒" : "[不在着信]";
     if(item.type === "itin") return "[行動予定表] " + String(item.title || "");
     const label = {image:"画像",video:"動画",audio:"音声",file:"ファイル"}[item.type] || "添付";
     return "[" + label + "] " + String(item.name || "");
