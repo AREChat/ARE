@@ -64,14 +64,60 @@ function updateHeaderPresence(){
     }else if(el.chatAvatar){ paintPresenceBadge(el.chatAvatar, null); }
 }
 
-async function sendPresence(){
-    let status = feat.manual;
-    if(status === "online" && Date.now() - feat.lastActivity > IDLE_MS) status = "away";
-    if(feat.isAdmin) status = "busy";   // 管理者は、いつでも「取り込み中」（サーバー側でも同じ：sql/admin_busy_v1.sql）
+// ===== 在席の状態は、すべて自動（自分では変えられません） =====
+//   アプリを開いている → オンライン（緑）／5分以上さわっていない → 待機中（黄）／通話中 → 取り込み中（赤）／アプリを閉じた → オフライン
+//   管理者は、いつでも 取り込み中（赤）。サーバーの set_my_presence も同じ（sql/admin_busy_v1.sql）
+function autoStatus(){
+    if(feat.isAdmin) return "busy";
+    const t = window.AREtel && window.AREtel.state;
+    if(t && t.call) return "busy";                                   // 電話中（かけている最中・つながったあと）
+    if(Date.now() - feat.lastActivity > IDLE_MS) return "away";      // 5分以上、さわっていない
+    return "online";
+}
+// 自分の「ステータス」の欄：いまの状態を見せるだけ（さわれない）
+function paintMyStatus(status){
     try{
-        const result = await requireClient().rpc("set_my_presence",{p_status:status});
+        if(!el.myStatus) return;
+        el.myStatus.disabled = true;
+        if(el.myStatus.value !== status) el.myStatus.value = status;
+    }catch(_e){}
+}
+
+// 開いているタブの印（同じ人が ARE を複数のタブで開いているとき、1つ閉じただけでオフラインにしないため）
+const PRES_TABS_KEY = "are_pres_tabs", PRES_TAB_ID = Math.random().toString(36).slice(2, 10);
+function presTabsTouch(remove){
+    try{
+        const o = JSON.parse(localStorage.getItem(PRES_TABS_KEY) || "{}"), now = Date.now();
+        Object.keys(o).forEach((k) => { if(!(now - o[k] < 90000)) delete o[k]; });
+        if(remove) delete o[PRES_TAB_ID]; else o[PRES_TAB_ID] = now;
+        localStorage.setItem(PRES_TABS_KEY, JSON.stringify(o));
+        return Object.keys(o).filter((k) => k !== PRES_TAB_ID).length;
+    }catch(_e){ return 0; }
+}
+async function sendPresence(){
+    const status = autoStatus();
+    paintMyStatus(status);
+    feat.wentOffline = false;
+    presTabsTouch(false);
+    try{
+        const client = requireClient();
+        const result = await client.rpc("set_my_presence",{p_status:status});
         if(result.error) throw result.error;
+        try{ const r = await client.auth.getSession(); feat.pTok = (r && r.data && r.data.session && r.data.session.access_token) || feat.pTok || ""; }catch(_e){}   // 閉じるときに使う（通信はしません）
     }catch(error){ console.warn("Presence update failed:",error); }
+}
+// アプリを閉じた（タブを閉じる・ページを離れる）ときは、すぐ「オフライン」にする。ほかのタブで開いているときは、しない。
+// 送れなかったときも、30秒ごとの更新が止まるので、2分でオフライン表示になります（ONLINE_WINDOW_MS）
+function presenceGoOffline(){
+    const others = presTabsTouch(true);
+    if(others > 0) return false;
+    try{
+        const c = window.ARE_CONFIG || {};
+        if(!feat.pTok || !c.supabaseUrl) return false;
+        feat.wentOffline = true;
+        fetch(c.supabaseUrl + "/rest/v1/rpc/set_my_presence",{method:"POST",keepalive:true,headers:{"Content-Type":"application/json",apikey:c.supabasePublishableKey || "",Authorization:"Bearer " + feat.pTok},body:JSON.stringify({p_status:"offline"})}).catch(() => {});
+        return true;
+    }catch(_e){ return false; }
 }
 
 async function refreshPresence(){

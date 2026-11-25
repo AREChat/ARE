@@ -668,6 +668,7 @@ button.vs-ch-c:not(:disabled){cursor:pointer}
 /* ヘッダーの中に置いた select（公開範囲・すべて・ステータス）は、設定画面のものより小さく・1行に収まるように */
 .ba .status-select{max-width:96px;min-height:34px;padding:6px 5px;font-size:11.5px}
 #myStatus.status-select{max-width:122px}
+#myStatus.status-select:disabled{opacity:1;color:var(--text);-webkit-text-fill-color:var(--text);cursor:default;-webkit-appearance:none;appearance:none;padding-right:8px;background-image:none}   /* 在席は自動で決まる：さわれない「表示」 */
 #myStatus{display:none} /* ステータス切替は不要のため非表示（内部の値更新は引き続き動作） */
 
 /* 対戦パネル（盤を画面の上に固定） */

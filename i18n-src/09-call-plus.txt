@@ -1,0 +1,175 @@
+# ===== 通話：録音・録画（自動・管理者のみ停止）と「＋」メニュー15機能（chat-call-rec.js / chat-call-plus.js） =====
+この端末の空き容量が少ないため、録画が途中までになるかもしれません。 || This device is low on storage, so the recording may be cut short. || 此设备的剩余空间不足，录制可能会中途停止。 || 이 기기의 저장 공간이 부족해 녹화가 중간에 끊길 수 있습니다.
+録音・録画を止められるのは、管理者だけです。 || Only an administrator can stop recording. || 只有管理员可以停止录音／录像。 || 녹음·녹화는 관리자만 중지할 수 있습니다.
+録音・録画を止めました。 || Recording stopped. || 已停止录音／录像。 || 녹음·녹화를 중지했습니다.
+録音・録画を再開できるのは、管理者だけです。 || Only an administrator can resume recording. || 只有管理员可以恢复录音／录像。 || 녹음·녹화는 관리자만 재개할 수 있습니다.
+録音・録画を再開しました。 || Recording resumed. || 已恢复录音／录像。 || 녹음·녹화를 재개했습니다.
+管理者が、録音・録画を止めました。 || The administrator stopped recording. || 管理员已停止录音／录像。 || 관리자가 녹음·녹화를 중지했습니다.
+管理者が、録音・録画を再開しました。 || The administrator resumed recording. || 管理员已恢复录音／录像。 || 관리자가 녹음·녹화를 재개했습니다.
+録音・録画中 || Recording || 正在录音／录像 || 녹음·녹화 중
+この端末では録音・録画できません || This device cannot record || 此设备无法录音／录像 || 이 기기에서는 녹음·녹화할 수 없습니다
+録音・録画は止まっています || Recording is stopped || 录音／录像已停止 || 녹음·녹화가 중지되어 있습니다
+通話の記録 || Call recordings || 通话记录 || 통화 기록
+通話の録音・録画は、この端末に残し、ドライブ（ファイル保存と同じフォルダ）へ自動で送ります。ここで削除しても、ドライブに送ったものは消えません。 || Call recordings are kept on this device and sent automatically to the Drive (the same folder as file storage). Deleting here does not delete what was already sent to the Drive. || 通话的录音／录像会保存在此设备上，并自动发送到云端硬盘（与文件存储相同的文件夹）。在此删除不会删除已发送到云端硬盘的内容。 || 통화 녹음·녹화는 이 기기에 남기고, 드라이브(파일 저장과 같은 폴더)로 자동 전송됩니다. 여기서 삭제해도 드라이브로 보낸 것은 지워지지 않습니다.
+まだ記録はありません。 || No recordings yet. || 还没有记录。 || 아직 기록이 없습니다.
+☁ ドライブに保存ずみ || ☁ Saved to the Drive || ☁ 已保存到云端硬盘 || ☁ 드라이브에 저장됨
+⚠ 送れませんでした || ⚠ Could not be sent || ⚠ 发送失败 || ⚠ 전송하지 못했습니다
+⏳ ドライブへ送る順番待ち || ⏳ Waiting to be sent to the Drive || ⏳ 等待发送到云端硬盘 || ⏳ 드라이브 전송 대기 중
+● 記録中 || ● Recording || ● 记录中 || ● 기록 중
+議事録 || Minutes || 会议纪要 || 회의록
+見る || View || 查看 || 보기
+▶ 再生 || ▶ Play || ▶ 播放 || ▶ 재생
+今すぐ送る || Send now || 立即发送 || 지금 전송
+ドライブへ送ります。 || Sending to the Drive. || 正在发送到云端硬盘。 || 드라이브로 전송합니다.
+もう一度で削除 || Press again to delete || 再按一次删除 || 한 번 더 누르면 삭제
+この端末の記録を削除しました。 || Deleted the recording on this device. || 已删除此设备上的记录。 || 이 기기의 기록을 삭제했습니다.
+再生できませんでした。 || Could not play it. || 无法播放。 || 재생하지 못했습니다.
+保存できませんでした。 || Could not save it. || 无法保存。 || 저장하지 못했습니다.
+⚠ この端末に保存できない部分があります || ⚠ Some parts could not be saved on this device || ⚠ 部分内容无法保存到此设备 || ⚠ 이 기기에 저장하지 못한 부분이 있습니다
+相手の端末は、録音・録画していません || The other device is not recording || 对方的设备没有录音／录像 || 상대 기기는 녹음·녹화하지 않고 있습니다
+この通話は、つながると自動で録音・録画されます。 || This call will be recorded (audio and video) automatically once connected. || 通话接通后将自动录音／录像。 || 이 통화는 연결되면 자동으로 녹음·녹화됩니다.
+機能（メモ・しおり・字幕など） || Tools (notes, bookmarks, captions, etc.) || 功能（笔记、书签、字幕等） || 기능(메모·북마크·자막 등)
+機能 || Tools || 功能 || 기능
+もどる || Back || 返回 || 뒤로
+🔒 長押しでロックを解除 || 🔒 Hold to unlock || 🔒 长按解除锁定 || 🔒 길게 눌러 잠금 해제
+録音・録画 || Recording || 录音／录像 || 녹음·녹화
+しおり || Bookmarks || 书签 || 북마크
+ToDo・決定事項 || To-dos & decisions || 待办与决定事项 || 할 일·결정 사항
+字幕 || Captions || 字幕 || 자막
+スクリーンショット || Screenshot || 截图 || 스크린샷
+通信状況 || Connection || 通信状况 || 통신 상태
+音声調整 || Audio || 音频调整 || 음성 조정
+出力先・音量 || Output & volume || 输出设备与音量 || 출력 장치·볼륨
+小窓で見る || Pop-out window || 小窗查看 || 작은 창으로 보기
+挙手 || Raise hand || 举手 || 손들기
+画面の見かた || Screen layout || 画面布局 || 화면 보기
+ロック・画面オン || Lock & keep screen on || 锁定与屏幕常亮 || 잠금·화면 켜 두기
+通話がつながると自動ではじまり、通話中は止められません。止める・再開するのは、管理者だけです。録音・録画は、この端末に残し、ドライブ（ファイル保存と同じフォルダ）へ自動で送ります。 || Recording starts automatically when the call connects and cannot be stopped during the call. Only an administrator can stop or resume it. Recordings are kept on this device and sent automatically to the Drive (the same folder as file storage). || 通话接通后会自动开始录音／录像，通话中无法停止。只有管理员可以停止或恢复。录音／录像会保存在此设备上，并自动发送到云端硬盘（与文件存储相同的文件夹）。 || 통화가 연결되면 자동으로 시작되며 통화 중에는 중지할 수 없습니다. 중지·재개는 관리자만 할 수 있습니다. 녹음·녹화는 이 기기에 남기고 드라이브(파일 저장과 같은 폴더)로 자동 전송됩니다.
+記録した数： || Recordings: || 记录数量： || 기록 수:
+● 録音・録画中 || ● Recording || ● 正在录音／录像 || ● 녹음·녹화 중
+⏹ 録音・録画を止める（管理者のみ） || ⏹ Stop recording (admin only) || ⏹ 停止录音／录像（仅管理员） || ⏹ 녹음·녹화 중지(관리자 전용)
+⏺ 録音・録画を再開する（管理者のみ） || ⏺ Resume recording (admin only) || ⏺ 恢复录音／录像（仅管理员） || ⏺ 녹음·녹화 재개(관리자 전용)
+🎞 通話の記録を開く || 🎞 Open call recordings || 🎞 打开通话记录 || 🎞 통화 기록 열기
+止める・再開するボタンは、管理者だけに表示されます。 || The stop/resume buttons are shown only to administrators. || 停止／恢复按钮仅对管理员显示。 || 중지·재개 버튼은 관리자에게만 표시됩니다.
+ここに書いたメモは、通話が終わると議事録になります。 || Notes you write here become the minutes when the call ends. || 在此写下的笔记会在通话结束后成为会议纪要。 || 여기에 적은 메모는 통화가 끝나면 회의록이 됩니다.
+🕒 いまの時刻を入れる || 🕒 Insert current time || 🕒 插入当前时间 || 🕒 현재 시각 넣기
+メモは、この端末に自動で保存されます。 || Notes are saved automatically on this device. || 笔记会自动保存在此设备上。 || 메모는 이 기기에 자동으로 저장됩니다.
+ひとこと（なくてもOK） || A short note (optional) || 简短备注（可不填） || 한마디(없어도 됩니다)
+しおりのひとこと || Bookmark note || 书签备注 || 북마크 메모
+（しおり） || (bookmark) || （书签） || (북마크)
+しおりを入れました。 || Bookmark added. || 已添加书签。 || 북마크를 넣었습니다.
+🔖 しおりを入れる || 🔖 Add bookmark || 🔖 添加书签 || 🔖 북마크 넣기
+大事なところに、時刻つきの目印を入れます（議事録と、録画の見直しに使えます）。 || Mark important moments with a timestamp (useful for the minutes and for reviewing the recording). || 在重要的地方加上带时间的标记（可用于会议纪要和回看录像）。 || 중요한 부분에 시각이 적힌 표시를 넣습니다(회의록과 녹화 다시 보기에 쓸 수 있습니다).
+決定事項 || Decision || 决定事项 || 결정 사항
+担当 || Owner || 负责人 || 담당
+自分 || Me || 自己 || 나
+相手 || Other person || 对方 || 상대
+みんな || Everyone || 大家 || 모두
+内容 || Details || 内容 || 내용
+できた || Done || 完成 || 완료
+【決定】 || [Decision] || 【决定】 || [결정]
+＋ 追加 || + Add || ＋ 添加 || ＋ 추가
+時間になりました。 || Time is up. || 时间到了。 || 시간이 되었습니다.
+分（1〜600） || Minutes (1–600) || 分钟（1〜600） || 분(1~600)
+{n} 分 || {n} min || {n} 分钟 || {n}분
+スタート || Start || 开始 || 시작
+1〜600 分で入れてください。 || Enter 1 to 600 minutes. || 请输入 1〜600 分钟。 || 1~600분으로 입력해 주세요.
+止める || Stop || 停止 || 중지
+相手の画面にも出す || Show on the other screen too || 同时显示在对方屏幕上 || 상대 화면에도 표시
+残り時間は、画面の右上に出ます。時間になると、音と振動でお知らせします。 || The remaining time appears at the top right of the screen. A sound and vibration tell you when time is up. || 剩余时间显示在屏幕右上角。时间到时会用声音和振动提醒。 || 남은 시간은 화면 오른쪽 위에 표시됩니다. 시간이 되면 소리와 진동으로 알려 드립니다.
+この端末では、字幕（音声認識）が許可されていません。 || Captions (speech recognition) are not allowed on this device. || 此设备未允许字幕（语音识别）。 || 이 기기에서는 자막(음성 인식)이 허용되지 않았습니다.
+字幕の言語 || Caption language || 字幕语言 || 자막 언어
+日本語 || 日本語 || 日本語 || 日本語
+⏹ 字幕を止める || ⏹ Stop captions || ⏹ 停止字幕 || ⏹ 자막 중지
+▶ 字幕をはじめる || ▶ Start captions || ▶ 开始字幕 || ▶ 자막 시작
+自分： || Me: || 自己： || 나:
+相手： || Other: || 对方： || 상대:
+字幕をはじめられませんでした。 || Could not start captions. || 无法开始字幕。 || 자막을 시작하지 못했습니다.
+自分の声を文字にして、相手の画面にも出します。相手の字幕も、ここに出ます。文字にした内容は、議事録に入ります。 || Your voice is turned into text and shown on the other person's screen too. Their captions appear here as well. The text is included in the minutes. || 将您的声音转为文字，并显示在对方屏幕上。对方的字幕也会显示在这里。文字内容会写入会议纪要。 || 내 목소리를 글자로 바꿔 상대 화면에도 표시합니다. 상대의 자막도 여기에 표시됩니다. 글자로 바꾼 내용은 회의록에 들어갑니다.
+このブラウザは、字幕（音声認識）に対応していません（Chrome・Edge・Safari の新しい版で使えます）。 || This browser does not support captions (speech recognition). It works in recent versions of Chrome, Edge and Safari. || 此浏览器不支持字幕（语音识别）（新版 Chrome、Edge、Safari 可以使用）。 || 이 브라우저는 자막(음성 인식)을 지원하지 않습니다(최신 Chrome·Edge·Safari에서 사용할 수 있습니다).
+字幕は、ブラウザの音声認識を使います。端末やブラウザによっては、声が外部のサービスに送られることがあります。 || Captions use the browser's speech recognition. Depending on the device and browser, your voice may be sent to an external service. || 字幕使用浏览器的语音识别。根据设备和浏览器的不同，声音可能会被发送到外部服务。 || 자막은 브라우저의 음성 인식을 사용합니다. 기기나 브라우저에 따라 음성이 외부 서비스로 전송될 수 있습니다.
+いまの通話の画面（相手の映像・自分の映像・画面共有）を、画像として保存します。 || Saves the current call screen (the other person's video, your video, screen sharing) as an image. || 将当前通话画面（对方的视频、自己的视频、屏幕共享）保存为图片。 || 현재 통화 화면(상대 영상·내 영상·화면 공유)을 이미지로 저장합니다.
+📸 いまの画面を保存 || 📸 Save current screen || 📸 保存当前画面 || 📸 현재 화면 저장
+保存した枚数： || Saved: || 已保存张数： || 저장한 장수:
+つながりかたの目安です。「悪い」ときは、Wi-Fi とモバイル通信を切りかえたり、カメラを止めたりすると、よくなることがあります。 || A rough guide to the connection. When it says "Poor", switching between Wi-Fi and mobile data or turning the camera off may help. || 这是连接状况的参考。显示“差”时，切换 Wi-Fi 与移动网络或关闭摄像头可能会有所改善。 || 연결 상태의 기준입니다. '나쁨'일 때는 Wi-Fi와 모바일 데이터를 바꾸거나 카메라를 끄면 좋아질 수 있습니다.
+🟢 良好 || 🟢 Good || 🟢 良好 || 🟢 좋음
+🟡 ふつう || 🟡 Fair || 🟡 一般 || 🟡 보통
+🔴 悪い || 🔴 Poor || 🔴 差 || 🔴 나쁨
+計測中… || Measuring… || 测量中… || 측정 중…
+応答の遅れ || Latency || 响应延迟 || 응답 지연
+声の乱れ（ジッター） || Voice jitter || 声音抖动 || 음성 끊김(지터)
+とどかなかった割合 || Packet loss || 丢包率 || 손실 비율
+受信 || Receive || 接收 || 수신
+相手の映像 || Their video || 对方的视频 || 상대 영상
+つなぎかた || Route || 连接方式 || 연결 방식
+中継サーバー経由 || Via relay server || 经由中继服务器 || 중계 서버 경유
+直接（P2P） || Direct (P2P) || 直连（P2P） || 직접(P2P)
+計測できませんでした。 || Could not measure. || 无法测量。 || 측정하지 못했습니다.
+マイクの処理を切りかえます。まわりがうるさいときは「ノイズ抑制」、スピーカーの音が相手に返るときは「エコー除去」をオンにします。 || Switch microphone processing. Turn on "Noise suppression" in noisy places, and "Echo cancellation" if your speaker sound goes back to the other person. || 切换麦克风处理方式。环境嘈杂时开启“降噪”，扬声器的声音传回对方时开启“回声消除”。 || 마이크 처리를 전환합니다. 주변이 시끄러우면 '노이즈 억제', 스피커 소리가 상대에게 되돌아가면 '에코 제거'를 켜세요.
+マイクが使えません。 || The microphone is not available. || 无法使用麦克风。 || 마이크를 사용할 수 없습니다.
+ノイズ抑制 || Noise suppression || 降噪 || 노이즈 억제
+エコー除去 || Echo cancellation || 回声消除 || 에코 제거
+自動で音量をそろえる || Auto volume leveling || 自动调节音量 || 자동 볼륨 조절
+この端末では、切りかえられません。 || This device cannot switch it. || 此设备无法切换。 || 이 기기에서는 전환할 수 없습니다.
+相手の声の音量 || Other person's voice volume || 对方声音的音量 || 상대 목소리 볼륨
+相手の声の大きさ || Other person's voice volume || 对方声音的大小 || 상대 목소리 크기
+音の出力先 || Audio output || 声音输出设备 || 소리 출력 장치
+音の出る先（スピーカー・イヤホンなど） || Where the sound plays (speaker, earphones, etc.) || 声音输出位置（扬声器、耳机等） || 소리가 나오는 곳(스피커·이어폰 등)
+このブラウザでは、音の出る先は、端末の設定で切りかえます。 || In this browser, change the audio output in the device settings. || 在此浏览器中，请在设备设置里切换声音输出位置。 || 이 브라우저에서는 소리가 나오는 곳을 기기 설정에서 바꿉니다.
+（標準） || (Default) || （默认） || (기본)
+出力 {n} || Output {n} || 输出 {n} || 출력 {n}
+音の出る先を切りかえました。 || Switched the audio output. || 已切换声音输出位置。 || 소리가 나오는 곳을 바꿨습니다.
+切りかえられませんでした。 || Could not switch. || 无法切换。 || 전환하지 못했습니다.
+相手の映像を、ほかのアプリの上に重ねる小さな窓で見ます（相手のカメラ・画面共有があるときに使えます）。 || Watch their video in a small window over other apps (works when they have their camera or screen sharing on). || 在其他应用上方的小窗中查看对方的视频（对方开启摄像头或屏幕共享时可用）。 || 상대 영상을 다른 앱 위에 겹치는 작은 창으로 봅니다(상대가 카메라나 화면 공유를 켰을 때 사용할 수 있습니다).
+このブラウザは、小窓（ピクチャインピクチャ）に対応していません。 || This browser does not support the pop-out window (Picture-in-Picture). || 此浏览器不支持小窗（画中画）。 || 이 브라우저는 작은 창(PIP)을 지원하지 않습니다.
+小窓をとじる || Close pop-out window || 关闭小窗 || 작은 창 닫기
+相手の映像がないときは、使えません。 || Not available when there is no video from the other person. || 对方没有视频时无法使用。 || 상대 영상이 없을 때는 사용할 수 없습니다.
+小窓にできませんでした。 || Could not open the pop-out window. || 无法打开小窗。 || 작은 창으로 만들지 못했습니다.
+🙋 自分 || 🙋 Me || 🙋 自己 || 🙋 나
+🙋 手を下ろす || 🙋 Lower hand || 🙋 放下手 || 🙋 손 내리기
+🙋 手を挙げる || 🙋 Raise hand || 🙋 举手 || 🙋 손들기
+話したいことがあるときに、手を挙げて知らせます（相手の画面に 🙋 が出ます）。 || Raise your hand to let them know you want to speak (🙋 appears on their screen). || 想发言时举手示意（对方屏幕上会显示 🙋）。 || 말하고 싶을 때 손을 들어 알립니다(상대 화면에 🙋가 표시됩니다).
+{name} が手を挙げています。 || {name} is raising a hand. || {name} 正在举手。 || {name} 님이 손을 들었습니다.
+録音・録画を開始 || Recording started || 开始录音／录像 || 녹음·녹화 시작
+録音・録画を再開 || Recording resumed || 恢复录音／录像 || 녹음·녹화 재개
+管理者が録音・録画を止めました || The administrator stopped recording || 管理员停止了录音／录像 || 관리자가 녹음·녹화를 중지했습니다
+この端末では録音・録画できませんでした || This device could not record || 此设备无法录音／录像 || 이 기기에서는 녹음·녹화할 수 없었습니다
+録音・録画をはじめられませんでした || Could not start recording || 无法开始录音／录像 || 녹음·녹화를 시작하지 못했습니다
+タイマーを開始 || Timer started || 开始计时 || 타이머 시작
+タイマーを止めました || Timer stopped || 已停止计时 || 타이머를 중지했습니다
+手が挙がりました || A hand was raised || 有人举手 || 손이 올라갔습니다
+手が下りました || A hand was lowered || 手已放下 || 손이 내려갔습니다
+スクリーンショットを保存 || Saved a screenshot || 保存了截图 || 스크린샷 저장
+字幕をはじめました || Captions started || 开始字幕 || 자막을 시작했습니다
+字幕を止めました || Captions stopped || 已停止字幕 || 자막을 중지했습니다
+画面共有をはじめました || Screen sharing started || 开始屏幕共享 || 화면 공유를 시작했습니다
+画面共有を止めました || Screen sharing stopped || 停止屏幕共享 || 화면 공유를 중지했습니다
+ビデオ通話 || Video call || 视频通话 || 영상 통화
+音声通話 || Voice call || 语音通话 || 음성 통화
+通話の議事録 || Call minutes || 通话会议纪要 || 통화 회의록
+日時 || Date and time || 日期时间 || 일시
+通話時間 || Call duration || 通话时长 || 통화 시간
+字幕（文字おこし） || Captions (transcript) || 字幕（文字记录） || 자막(받아쓰기)
+できごと || Events || 事件 || 일어난 일
+メモ・決定事項・ToDo・しおり・字幕をまとめた文章です。通話が終わると、自動でドライブにも保存します。 || A summary of notes, decisions, to-dos, bookmarks and captions. It is also saved to the Drive automatically when the call ends. || 汇总了笔记、决定事项、待办、书签和字幕的文稿。通话结束后会自动保存到云端硬盘。 || 메모·결정 사항·할 일·북마크·자막을 모은 글입니다. 통화가 끝나면 드라이브에도 자동으로 저장됩니다.
+📋 コピー || 📋 Copy || 📋 复制 || 📋 복사
+選んだ文字をコピーしてください。 || Please copy the selected text. || 请复制选中的文字。 || 선택한 글자를 복사해 주세요.
+💾 ファイルに保存 || 💾 Save as file || 💾 保存为文件 || 💾 파일로 저장
+💬 チャットに送る || 💬 Send to chat || 💬 发送到聊天 || 💬 채팅으로 보내기
+チャットに送りました。 || Sent to the chat. || 已发送到聊天。 || 채팅으로 보냈습니다.
+送れませんでした。 || Could not send. || 发送失败。 || 보내지 못했습니다.
+相手を大きく || Large: other person || 放大对方 || 상대를 크게
+自分を大きく || Large: me || 放大自己 || 나를 크게
+ならべて表示 || Side by side || 并排显示 || 나란히 표시
+映像の並べかたを切りかえます（録画の画面は、いつも「相手を大きく」です）。 || Switch how the videos are arranged (the recording always uses "Large: other person"). || 切换视频的排列方式（录像画面始终为“放大对方”）。 || 영상 배치를 바꿉니다(녹화 화면은 항상 '상대를 크게'입니다).
+全画面にできませんでした。 || Could not go full screen. || 无法进入全屏。 || 전체 화면으로 만들지 못했습니다.
+全画面をやめる || Exit full screen || 退出全屏 || 전체 화면 종료
+全画面にする || Full screen || 全屏 || 전체 화면
+このブラウザでは、全画面にできません。 || This browser cannot go full screen. || 此浏览器无法全屏。 || 이 브라우저에서는 전체 화면으로 만들 수 없습니다.
+ロックすると、画面をさわっても ボタンが押せなくなります（ポケットの中での 誤操作よけ）。解除は、画面の下の ボタンを 長押しします。 || When locked, touching the screen will not press any button (prevents accidental taps in a pocket). To unlock, hold the button at the bottom of the screen. || 锁定后，触摸屏幕不会按到任何按钮（防止在口袋里误触）。解除时请长按屏幕下方的按钮。 || 잠그면 화면을 만져도 버튼이 눌리지 않습니다(주머니 속 오조작 방지). 해제는 화면 아래의 버튼을 길게 누릅니다.
+🔒 画面をロックする || 🔒 Lock the screen || 🔒 锁定屏幕 || 🔒 화면 잠그기
+画面を消さない || Keep screen on || 屏幕常亮 || 화면 켜 두기
+画面を消さない（この端末は非対応） || Keep screen on (not supported on this device) || 屏幕常亮（此设备不支持） || 화면 켜 두기(이 기기는 지원 안 함)
+通話中は、画面が暗くなったり 消えたりしないようにします（初期設定はオン）。 || Keeps the screen from dimming or turning off during the call (on by default). || 通话中防止屏幕变暗或熄灭（默认开启）。 || 통화 중에는 화면이 어두워지거나 꺼지지 않게 합니다(기본값은 켜짐).
+🎞 通話の記録 || 🎞 Call recordings || 🎞 通话记录 || 🎞 통화 기록
+通話の録音・録画（この端末の分）を、見る・保存・削除できます。ドライブへは自動で送られます || View, save or delete the call recordings on this device. They are sent to the Drive automatically. || 可以查看、保存或删除此设备上的通话录音／录像。它们会自动发送到云端硬盘。 || 이 기기의 통화 녹음·녹화를 보거나 저장·삭제할 수 있습니다. 드라이브로는 자동 전송됩니다.

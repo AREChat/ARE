@@ -29,8 +29,7 @@ const FEAT_ERRORS = {
     invalid_timezone:"タイムゾーンを確認してください（例：Asia/Tokyo）。", too_many_auto_reply_rules:"自動応答は最大20件まで登録できます。", invalid_auto_reply_flag:"自動応答の状態が正しくありません。"
 };
 
-const feat = {known:new Map(),readTimes:[],readKey:"",manual:"online",lastActivity:Date.now(),timers:[],partnerReadAt:null,pending:new Set(),editingId:null,isAdmin:false,adminView:"rooms",msgBulkMode:false,msgSelect:new Set(),msgBulkFrom:"",msgBulkTo:""};
-try{ const saved = localStorage.getItem("are_manual_status"); if(STATUS_LABELS[saved]) feat.manual = saved; }catch(_e){}
+const feat = {known:new Map(),readTimes:[],readKey:"",lastActivity:Date.now(),timers:[],partnerReadAt:null,pending:new Set(),editingId:null,isAdmin:false,adminView:"rooms",msgBulkMode:false,msgSelect:new Set(),msgBulkFrom:"",msgBulkTo:""};
 
 /** 指定したチャットへメッセージ（JSON）を送る。「消えるメッセージ」がオンなら、期限つきで送る */
 function sendRpcContent(roomId, content){

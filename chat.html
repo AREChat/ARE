@@ -19,7 +19,7 @@
 <title>ARE | チャット</title>
 <!-- 読み込みを速くする：データ置き場（Supabase）への接続の準備を、ページの読み込みと同時に始める -->
 <link rel="preconnect" href="https://kzrrnuzzvwijujhlbtln.supabase.co" crossorigin>
-<link rel="stylesheet" href="./chat.css?v=3918185059">
+<link rel="stylesheet" href="./chat.css?v=9d271556aa">
 </head>
 <body>
 <div class="app" id="app">
@@ -66,6 +66,7 @@
                 <button class="admin-card more-item" id="installAppItem" type="button" hidden>📲 アプリ化<small class="meta">ホーム画面・デスクトップに追加（手順つき）</small></button>
                 <button class="admin-card more-item" id="telSetItem" type="button">📞 着信を受ける：ON<small class="meta">1対1のチャットの 📞（音声）・🎥（ビデオ・画面共有）から電話できます</small></button>
                 <button class="admin-card more-item" id="telTestItem" type="button">🔔 着信音をためす<small class="meta">大きな着信音を3秒ならします。通知の許可もここで聞きます（許可すると、スマホ・PC で設定している通知音でも着信をお知らせします）</small></button>
+                <button class="admin-card more-item" id="telRecItem" type="button">🎞 通話の記録<small class="meta">通話の録音・録画（この端末の分）を、見る・保存・削除できます。ドライブへは自動で送られます</small></button>
                 <button class="admin-card more-item" id="lkvSetItem" type="button">▶ 動画リンクの自動再生：ON<small class="meta">動画のリンクを、音つきで自動再生します（いやな人はオフに）</small></button>
                 <button class="admin-card more-item" id="lkvFileItem" type="button">📄 ファイルのプレビュー：ON<small class="meta">ドライブに置いた書類・PDF・音声を、その場で見られます</small></button>
                 <button class="admin-card more-item" data-extra="chatbot" data-feature="extras" type="button">🤖 AIチャットボット<small class="meta">よくある質問に自動で答えます</small></button>
@@ -174,7 +175,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=1c28c19535"></script>
+<script defer src="./chat.bundle.js?v=7ded980371"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

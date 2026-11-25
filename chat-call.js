@@ -85,7 +85,7 @@ function telTitleFlash(on){
         if(tel.flash){ clearInterval(tel.flash); tel.flash = null; if(tel.title0 != null){ document.title = tel.title0; tel.title0 = null; } }
         if(!on) return;
         tel.title0 = document.title; let k = 0;
-        tel.flash = setInterval(() => { document.title = (k++ % 2 === 0) ? "📞 着信中！" : tel.title0; }, 700);
+        tel.flash = setInterval(() => { document.title = (k++ % 2 === 0) ? telTr("📞 着信中！") : tel.title0; }, 700);
     }catch(_e){}
 }
 function telToneStop(){ telTitleFlash(false); tel.toneMuted = false; if(tel.tone){ clearInterval(tel.tone); tel.tone = null; } try{ if(navigator.vibrate) navigator.vibrate(0); }catch(_e){} }
@@ -159,6 +159,8 @@ function telBuildUi(){
     u.scrBox.hidden = !(navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia);
     return u;
 }
+/** 通話のはじまり・おわりで、在席の状態（通話中＝取り込み中）をすぐ送る */
+function telPresence(){ try{ if(typeof sendPresence === "function") Promise.resolve(sendPresence()).catch(() => {}); }catch(_e){} }
 function telPartnerOf(room){ return room && !room.is_group ? room.partner : null; }
 function telNameOf(room){ const p = telPartnerOf(room); return p ? profileDisplayName(p) : "相手"; }
 function telPaintAvatar(target, room){
@@ -166,7 +168,9 @@ function telPaintAvatar(target, room){
     target.textContent = "";
     try{ if(p){ setAvatar(target, p); if(!target.textContent && !target.querySelector("img")) target.textContent = "📞"; } else target.textContent = "📞"; }catch(_e){ target.textContent = "📞"; }
 }
-function telStatus(text){ if(tel.ui) tel.ui.st.textContent = text || ""; }
+function telStatus(text){ if(tel.ui){ tel.ui.stBase = text || ""; tel.ui.st.textContent = text || ""; } }   // stBase＝日本語のままの文（表示は i18n が訳す。ここでは訳した文字を読まない）
+/** 通知など「画面の文字ではない」ものを、いまの言語に合わせる（辞書がなければ日本語のまま） */
+function telTr(s){ try{ const I = window.AREI18N; if(I && I.lang && I.lang !== "ja") return I.tr(s, I.lang) || s; }catch(_e){} return s; }
 
 // ===== 通話の準備 =====
 async function telGetMedia(video){
@@ -223,19 +227,20 @@ function telMakePc(call, servers){
         let m = null; try{ m = JSON.parse(ev.data); }catch(_e){}
         if(!m) return;
         if(m.t === "bye"){ telEnd("相手が切りました。", {notify:false}); return; }
-        if(m.t === "st"){ call.peerCam = !!m.cam; call.peerScr = !!m.scr; call.peerMuted = !!m.mic; telPaintRemote(); telPaintPeerMic(); }
+        if(m.t === "st"){ call.peerCam = !!m.cam; call.peerScr = !!m.scr; call.peerMuted = !!m.mic; call.peerRec = typeof m.rec === "boolean" ? m.rec : null; telPaintRemote(); telPaintPeerMic(); try{ telxPaintRec(call); }catch(_e){} }
         if(m.t === "em" && TEL_EMOJIS.includes(m.e)) telFlyEmoji(m.e, telNameOf(call.room));
+        try{ if(typeof telxMsg === "function") telxMsg(call, m); }catch(_e){}   // 録音・録画・挙手・タイマー・字幕（chat-call-plus.js）
     });
     // 音声と映像の「通り道」を、はじめから2つ作る（あとからカメラや画面共有を足しても、つなぎなおしがいらない）
     return pc;
 }
 function telSendState(call){
-    try{ if(call.dc && call.dc.readyState === "open") call.dc.send(JSON.stringify({t:"st", cam:!!call.camOn, scr:!!call.scrOn, mic:!!call.muted})); }catch(_e){}
+    try{ if(call.dc && call.dc.readyState === "open") call.dc.send(JSON.stringify({t:"st", cam:!!call.camOn, scr:!!call.scrOn, mic:!!call.muted, rec:(typeof telxRecOn === "function" ? !!telxRecOn(call) : false)})); }catch(_e){}
 }
 function telPaintPeerMic(){
     const call = tel.call, u = tel.ui; if(!call || !u || !call.startAt) return;
-    const base = u.st.textContent.replace(/ ・ 相手はミュート中$/, "");
-    u.st.textContent = base + (call.peerMuted ? " ・ 相手はミュート中" : "");
+    const base = String(u.stBase == null ? "" : u.stBase).replace(/ ・ 相手はミュート中$/, "");
+    telStatus(base + (call.peerMuted ? " ・ 相手はミュート中" : ""));
 }
 function telPaintRemote(){
     const call = tel.call, u = tel.ui; if(!call || !u) return;
@@ -282,7 +287,7 @@ async function telStart(kind){
     telUnlockAudio();
     const call = telNewCall({room, role:"caller", kind});
     call.key = await telHash(room.id);
-    tel.call = call; telOpenUi(call, "準備中…");
+    tel.call = call; telOpenUi(call, "準備中…"); telPresence();
     try{
         call.stream = await telGetMedia(kind === "video");
         const servers = await telIceServers();
@@ -318,6 +323,7 @@ function telIncoming(room, m, d){
     u.inVideo.hidden = inc.kind !== "video";
     u.inAudio.textContent = inc.kind === "video" ? "🎤 音声だけで出る" : "🎤 出る";
     u.inc.hidden = false;
+    try{ telxIncoming(u); }catch(_e){}   // 「この通話は録音・録画されます」
     telToneStart("in");
     inc.timer = setTimeout(() => { if(tel.incoming === inc) telStopIncoming("不在着信"); }, Math.max(1000, TEL_RING_MS - (m.age || 0)));
     telTitleFlash(true);
@@ -337,8 +343,8 @@ async function telPushCall(call, cancel){
 async function telNotify(inc, who){
     try{
         if(!("Notification" in window) || Notification.permission !== "granted") return;
-        const opts = {body:(inc.kind === "video" ? "ビデオ通話" : "音声通話") + "の着信です。タップして出る", icon:"icon-192.png", tag:"are-call", renotify:true, requireInteraction:true, silent:telQuiet(), vibrate:[500, 150, 500, 150, 500], data:{call:1}};
-        const title = "📞 着信：" + who;
+        const opts = {body:telTr(inc.kind === "video" ? "ビデオ通話の着信です。タップして出る" : "音声通話の着信です。タップして出る"), icon:"icon-192.png", tag:"are-call", renotify:true, requireInteraction:true, silent:telQuiet(), vibrate:[500, 150, 500, 150, 500], data:{call:1}};
+        const title = telTr("📞 着信：") + who;
         let reg = null;
         try{ reg = ("serviceWorker" in navigator) ? await navigator.serviceWorker.getRegistration() : null; }catch(_e){}
         if(reg && reg.showNotification){ await reg.showNotification(title, opts); inc.viaSw = true; }
@@ -360,7 +366,8 @@ function telAudioHint(u){
         const msgs = [];
         if(!tel.ac || tel.ac.state !== "running") msgs.push("🔊 画面をタッチすると、着信音が鳴ります。");
         if("Notification" in window && Notification.permission === "default") msgs.push("🔔 設定の「着信音をためす」で通知を許可すると、端末の通知音でもお知らせします。");
-        h.textContent = msgs.join(" "); h.hidden = !msgs.length;
+        h.textContent = ""; msgs.forEach((m) => { const sp = document.createElement("span"); sp.textContent = m + " "; h.appendChild(sp); });   // 1文ずつ別にして、辞書で訳せるように
+        h.hidden = !msgs.length;
     }catch(_e){}
 }
 function telStopIncoming(why){
@@ -385,7 +392,7 @@ async function telAccept(withVideo){
     tel.incoming = null; tel.ui.inc.hidden = true;
     telUnlockAudio();
     const call = telNewCall({id:inc.id, room:inc.room, key:inc.key, role:"callee", kind:inc.kind});
-    tel.call = call; call.answered = true; telOpenUi(call, "つないでいます…");
+    tel.call = call; call.answered = true; telOpenUi(call, "つないでいます…"); telPresence();
     try{
         call.stream = await telGetMedia(!!withVideo && inc.kind === "video");
         const servers = await telIceServers();
@@ -418,6 +425,7 @@ function telOpenUi(call, status){
     u.mic.textContent = "🎤"; u.spk.textContent = "🔊"; u.spk.classList.remove("off");
     u.ov.hidden = false; telStatus(status);
     try{ document.body.style.overflow = "hidden"; }catch(_e){}
+    try{ telxOpen(call); }catch(_e){}   // 「＋」メニュー・録音・録画の表示（chat-call-plus.js）
 }
 function telLive(call){
     if(call.startAt) return;
@@ -428,6 +436,7 @@ function telLive(call){
         telStatus("通話中 " + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0") + (call.peerMuted ? " ・ 相手はミュート中" : ""));
     }, 1000);
     telSendState(call); telPaintLocal(); telPaintRemote(); telCountCams(call);
+    try{ telxLive(call); }catch(_e){}   // つながったら、自動で録音・録画をはじめる
 }
 
 // ===== 通話中の操作 =====
@@ -529,7 +538,7 @@ async function telToggleScreen(){
         const vt = s.getVideoTracks()[0];
         if(call.camOn){ call.camStream && call.camStream.getVideoTracks().forEach((t) => t.stop()); call.camOn = false; call.camStream = null; }
         await sender.replaceTrack(vt);
-        call.scrOn = true; call.screenStream = s;
+        call.scrOn = true; call.screenStream = s; try{ telxLog(call, "share_on"); }catch(_e){}
         vt.addEventListener("ended", () => { if(tel.call === call && call.scrOn) telStopScreen(false); });
     }catch(e){
         if(e && e.name === "NotAllowedError") showToast("画面共有をとりやめました。"); else showToast("画面共有をはじめられませんでした。");
@@ -539,6 +548,7 @@ async function telToggleScreen(){
 async function telStopScreen(quiet){
     const call = tel.call; if(!call) return;
     try{ call.screenStream && call.screenStream.getTracks().forEach((t) => t.stop()); }catch(_e){}
+    if(call.scrOn){ try{ telxLog(call, "share_off"); }catch(_e){} }
     call.scrOn = false; call.screenStream = null;
     try{ const sender = call.pc && telSender(call.pc, "video"); if(sender) await sender.replaceTrack(null); }catch(_e){}
     if(!quiet){ telSendState(call); telPaintLocal(); }
@@ -548,8 +558,9 @@ async function telStopScreen(quiet){
 function telEnd(reason, opts){
     const call = tel.call; opts = opts || {};
     if(!call || call.ended){ telStopIncoming(); return; }
-    call.ended = true; tel.call = null;
+    call.ended = true; tel.call = null; telPresence();
     clearTimeout(call.ringTimer); clearTimeout(call.dcTimer); clearInterval(call.timer); telToneStop();
+    try{ telxEnd(call); }catch(_e){}   // 録音・録画をしめて、議事録を作る（のこりの送信は、あとでドライブへ）
     if(opts.notify !== false){
         try{ if(call.dc && call.dc.readyState === "open") call.dc.send(JSON.stringify({t:"bye"})); }catch(_e){}
         const type = call.answered ? "hangup" : "cancel";
@@ -670,7 +681,7 @@ async function telTestRing(){
         }
     }catch(_e){}
     const quiet = telQuiet();
-    showToast(quiet ? "（管理者は、着信音が消えます。音は鳴りません）" : (tel.ac && tel.ac.state === "running" ? "着信音をならしています。" : "音が出せません。画面をもう一度さわってください。") + (perm === "granted" ? " 通知も出しました（端末の通知音は、端末の設定どおりです）。" : perm === "denied" ? " 通知が許可されていません（ブラウザの設定で許可すると、端末の通知音でも知らせます）。" : ""));
+    showToast(quiet ? "（管理者は、着信音が消えます。音は鳴りません）" : [(tel.ac && tel.ac.state === "running" ? telTr("着信音をならしています。") : telTr("音が出せません。画面をもう一度さわってください。")), (perm === "granted" ? telTr("通知も出しました（端末の通知音は、端末の設定どおりです）。") : perm === "denied" ? telTr("通知が許可されていません（ブラウザの設定で許可すると、端末の通知音でも知らせます）。") : "")].filter(Boolean).join(" "));
 }
 function telPaintSetting(){
     const b = document.getElementById("telSetItem"); if(!b) return;
@@ -702,6 +713,7 @@ function initCall(){
         });
         telPaintSetting();
     }
+    try{ telxInit(); }catch(_e){}   // 録音・録画のあとしまつ（前回のとちゅうの記録・ドライブへの送りなおし）
     const tt = document.getElementById("telTestItem");
     if(tt) tt.addEventListener("click", telTestRing);
     extraBubbles.call = (item) => {

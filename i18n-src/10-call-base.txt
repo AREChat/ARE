@@ -1,0 +1,92 @@
+# ===== 通話（chat-call.js）の既存の文字：通話の画面・着信・メッセージ =====
+通話 || Call || 通话 || 통화
+ミュート || Mute || 静音 || 음소거
+マイク（押すとミュート） || Microphone (press to mute) || 麦克风（点按静音） || 마이크(누르면 음소거)
+スピーカー || Speaker || 扬声器 || 스피커
+スピーカー（相手の声を出す／止める） || Speaker (turn the other person's voice on/off) || 扬声器（开启／关闭对方的声音） || 스피커(상대 목소리 켜기/끄기)
+カメラ || Camera || 摄像头 || 카메라
+内カメラ・外カメラを切りかえる || Switch between front and back cameras || 切换前置／后置摄像头 || 전면/후면 카메라 전환
+カメラの向きを切りかえる || Switch camera direction || 切换摄像头方向 || 카메라 방향 전환
+外カメラへ || To back camera || 切到后置 || 후면으로
+内カメラへ || To front camera || 切到前置 || 전면으로
+絵文字を送る || Send an emoji || 发送表情 || 이모지 보내기
+絵文字 || Emoji || 表情 || 이모지
+画面共有 || Share screen || 屏幕共享 || 화면 공유
+切る || End || 挂断 || 끊기
+着信 || Incoming call || 来电 || 수신 전화
+拒否 || Decline || 拒绝 || 거부
+🎤 音声で出る || 🎤 Answer with voice || 🎤 语音接听 || 🎤 음성으로 받기
+🎥 ビデオで出る || 🎥 Answer with video || 🎥 视频接听 || 🎥 영상으로 받기
+🎤 音声だけで出る || 🎤 Answer with voice only || 🎤 仅语音接听 || 🎤 음성만으로 받기
+🎤 出る || 🎤 Answer || 🎤 接听 || 🎤 받기
+📞 着信中！ || 📞 Incoming call! || 📞 来电中！ || 📞 전화 수신 중!
+📞 着信： || 📞 Incoming call: || 📞 来电： || 📞 수신 전화:
+ビデオ通話の着信です || Incoming video call || 视频来电 || 영상 통화 수신 중입니다
+音声通話の着信です || Incoming voice call || 语音来电 || 음성 통화 수신 중입니다
+ビデオ通話の着信です（管理者は、着信音を消しています） || Incoming video call (the administrator has the ringtone off) || 视频来电（管理员已关闭铃声） || 영상 통화 수신 중입니다(관리자는 벨소리를 껐습니다)
+音声通話の着信です（管理者は、着信音を消しています） || Incoming voice call (the administrator has the ringtone off) || 语音来电（管理员已关闭铃声） || 음성 통화 수신 중입니다(관리자는 벨소리를 껐습니다)
+ビデオ通話の着信です。タップして出る || Incoming video call. Tap to answer. || 视频来电。点按接听 || 영상 통화 수신 중입니다. 눌러서 받기
+音声通話の着信です。タップして出る || Incoming voice call. Tap to answer. || 语音来电。点按接听 || 음성 통화 수신 중입니다. 눌러서 받기
+準備中… || Getting ready… || 准备中… || 준비 중…
+呼び出し中… || Calling… || 呼叫中… || 호출 중…
+つないでいます… || Connecting… || 正在连接… || 연결 중…
+通話中 {t} || In call {t} || 通话中 {t} || 통화 중 {t}
+通話中 {t} ・ 相手はミュート中 || In call {t} ・ The other person is muted || 通话中 {t} ・ 对方已静音 || 통화 중 {t} ・ 상대는 음소거 중
+切りました || Call ended || 已挂断 || 끊었습니다
+相手が切りました。 || The other person ended the call. || 对方已挂断。 || 상대가 끊었습니다.
+通信がとぎれました。 || The connection was lost. || 通信中断了。 || 통신이 끊겼습니다.
+つながりませんでした。ネットワークをかえて（Wi-Fi／モバイル）、もう一度お試しください。 || Could not connect. Try again after switching networks (Wi-Fi / mobile data). || 无法接通。请切换网络（Wi-Fi／移动网络）后再试一次。 || 연결되지 않았습니다. 네트워크(Wi-Fi/모바일)를 바꿔서 다시 시도해 주세요.
+つなげませんでした。もう一度お試しください。 || Could not connect. Please try again. || 无法连接。请再试一次。 || 연결하지 못했습니다. 다시 시도해 주세요.
+つなげませんでした。 || Could not connect. || 无法连接。 || 연결하지 못했습니다.
+応答がありませんでした。 || There was no answer. || 无人接听。 || 응답이 없었습니다.
+通話は断られました。 || The call was declined. || 通话被拒绝了。 || 통화가 거부되었습니다.
+相手は、ほかの通話中です。 || The other person is on another call. || 对方正在通话中。 || 상대는 다른 통화 중입니다.
+不在着信がありました。 || You missed a call. || 有未接来电。 || 부재중 전화가 있었습니다.
+ほかの端末で応答しました。 || Answered on another device. || 已在其他设备上接听。 || 다른 기기에서 받았습니다.
+ほかの端末が先に出たため、切れました。 || Another device answered first, so this call ended. || 其他设备先接听了，所以通话已结束。 || 다른 기기가 먼저 받아서 통화가 끊어졌습니다.
+不在着信 || Missed call || 未接来电 || 부재중 전화
+通話できるのは、1対1のチャットだけです。 || Calls are available only in one-to-one chats. || 只能在一对一聊天中通话。 || 통화는 1대1 채팅에서만 할 수 있습니다.
+いま通話中（または着信中）です。 || You are already on a call (or a call is coming in). || 当前正在通话（或有来电）。 || 지금 통화 중(또는 수신 중)입니다.
+いま着信中・通話中です。 || A call is coming in or in progress. || 当前有来电或正在通话。 || 지금 수신 중이거나 통화 중입니다.
+通話の準備ができていません（GAS のアドレスが未設定です）。 || Calls are not ready (the GAS address is not set). || 通话尚未就绪（未设置 GAS 地址）。 || 통화 준비가 되지 않았습니다(GAS 주소가 설정되지 않았습니다).
+このブラウザでは通話できません。 || Calls are not available in this browser. || 此浏览器无法通话。 || 이 브라우저에서는 통화할 수 없습니다.
+このブラウザでは通話できません（https で開き、新しいブラウザをお使いください）。 || Calls are not available in this browser (open it over https in a recent browser). || 此浏览器无法通话（请用 https 打开，并使用较新的浏览器）。 || 이 브라우저에서는 통화할 수 없습니다(https로 열고 최신 브라우저를 사용해 주세요).
+ブロック中の相手には、電話できません。 || You cannot call someone you have blocked. || 无法给已屏蔽的人打电话。 || 차단한 상대에게는 전화할 수 없습니다.
+電話をかけられませんでした。しばらくしてからお試しください。 || Could not place the call. Please try again later. || 无法拨打电话。请稍后再试。 || 전화를 걸지 못했습니다. 잠시 후 다시 시도해 주세요.
+電話をかけられませんでした。（{m}） || Could not place the call. ({m}) || 无法拨打电话。（{m}） || 전화를 걸지 못했습니다.({m})
+マイクが許可されていません。ブラウザの設定で許可してください。 || The microphone is not allowed. Please allow it in your browser settings. || 未允许使用麦克风。请在浏览器设置中允许。 || 마이크가 허용되지 않았습니다. 브라우저 설정에서 허용해 주세요.
+マイクとカメラが許可されていません。ブラウザの設定で許可してください。 || The microphone and camera are not allowed. Please allow them in your browser settings. || 未允许使用麦克风和摄像头。请在浏览器设置中允许。 || 마이크와 카메라가 허용되지 않았습니다. 브라우저 설정에서 허용해 주세요.
+マイクが見つかりません。 || No microphone was found. || 找不到麦克风。 || 마이크를 찾을 수 없습니다.
+マイクまたはカメラが見つかりません。 || No microphone or camera was found. || 找不到麦克风或摄像头。 || 마이크 또는 카메라를 찾을 수 없습니다.
+マイクを使えませんでした。 || Could not use the microphone. || 无法使用麦克风。 || 마이크를 사용하지 못했습니다.
+マイク・カメラを使えませんでした。 || Could not use the microphone and camera. || 无法使用麦克风和摄像头。 || 마이크·카메라를 사용하지 못했습니다.
+🔊 画面をタッチすると、着信音が鳴ります。 || 🔊 Touch the screen and the ringtone will play. || 🔊 触摸屏幕后会响起铃声。 || 🔊 화면을 터치하면 벨소리가 울립니다.
+🔔 設定の「着信音をためす」で通知を許可すると、端末の通知音でもお知らせします。 || 🔔 Allow notifications with "Test ringtone" in the settings to be notified with your device's notification sound too. || 🔔 在设置的“试听铃声”中允许通知后，也会用设备的通知音提醒您。 || 🔔 설정의 '벨소리 테스트'에서 알림을 허용하면 기기의 알림음으로도 알려 드립니다.
+スピーカーを止めました（相手の声が聞こえません）。 || Speaker off (you cannot hear the other person). || 已关闭扬声器（听不到对方的声音）。 || 스피커를 껐습니다(상대 목소리가 들리지 않습니다).
+スピーカーをつけました。 || Speaker on. || 已开启扬声器。 || 스피커를 켰습니다.
+つながってから送れます。 || You can send it once connected. || 接通后才能发送。 || 연결된 후에 보낼 수 있습니다.
+切りかえられるカメラがありません。 || There is no other camera to switch to. || 没有可切换的摄像头。 || 전환할 수 있는 카메라가 없습니다.
+外カメラにしました。 || Switched to the back camera. || 已切换为后置摄像头。 || 후면 카메라로 바꿨습니다.
+内カメラにしました。 || Switched to the front camera. || 已切换为前置摄像头。 || 전면 카메라로 바꿨습니다.
+カメラの向きを切りかえられませんでした。 || Could not switch the camera direction. || 无法切换摄像头方向。 || 카메라 방향을 바꾸지 못했습니다.
+カメラを切りかえられませんでした。 || Could not switch the camera. || 无法切换摄像头。 || 카메라를 전환하지 못했습니다.
+このブラウザでは画面共有ができません（パソコンのブラウザで使えます）。 || Screen sharing is not available in this browser (it works in desktop browsers). || 此浏览器无法共享屏幕（电脑浏览器可以使用）。 || 이 브라우저에서는 화면 공유를 할 수 없습니다(컴퓨터 브라우저에서 사용할 수 있습니다).
+画面共有をとりやめました。 || Screen sharing was cancelled. || 已取消屏幕共享。 || 화면 공유를 취소했습니다.
+画面共有をはじめられませんでした。 || Could not start screen sharing. || 无法开始屏幕共享。 || 화면 공유를 시작하지 못했습니다.
+これは着信音のテストです。 || This is a ringtone test. || 这是铃声测试。 || 벨소리 테스트입니다.
+📞 着信のテスト || 📞 Incoming call test || 📞 来电测试 || 📞 수신 전화 테스트
+（管理者は、着信音が消えます。音は鳴りません） || (The administrator's ringtone is off. No sound will play.) || （管理员的铃声已关闭，不会发出声音） || (관리자는 벨소리가 꺼져 있습니다. 소리가 나지 않습니다.)
+着信音をならしています。 || Playing the ringtone. || 正在播放铃声。 || 벨소리를 울리고 있습니다.
+音が出せません。画面をもう一度さわってください。 || Cannot play sound. Please touch the screen again. || 无法发出声音。请再触摸一次屏幕。 || 소리를 낼 수 없습니다. 화면을 한 번 더 터치해 주세요.
+通知も出しました（端末の通知音は、端末の設定どおりです）。 || A notification was shown too (the sound follows your device settings). || 也发送了通知（通知音按设备设置播放）。 || 알림도 표시했습니다(알림음은 기기 설정에 따릅니다).
+通知が許可されていません（ブラウザの設定で許可すると、端末の通知音でも知らせます）。 || Notifications are not allowed (allow them in your browser settings to be notified with your device's sound too). || 未允许通知（在浏览器设置中允许后，也会用设备的通知音提醒）。 || 알림이 허용되지 않았습니다(브라우저 설정에서 허용하면 기기의 알림음으로도 알려 드립니다).
+いま：着信を受けます（ここを押すと、受けない設定に） || Now: receiving calls (press here to turn off) || 当前：接收来电（点按此处改为不接收） || 현재: 수신 전화를 받습니다(여기를 누르면 받지 않음으로 바뀝니다)
+いま：着信を受けません（ここを押すと、受ける設定に） || Now: not receiving calls (press here to turn on) || 当前：不接收来电（点按此处改为接收） || 현재: 수신 전화를 받지 않습니다(여기를 누르면 받음으로 바뀝니다)
+📞 着信を受ける：ON || 📞 Receive calls: ON || 📞 接收来电：开 || 📞 수신 전화 받기: 켜짐
+🔕 着信を受ける：OFF || 🔕 Receive calls: OFF || 🔕 接收来电：关 || 🔕 수신 전화 받기: 꺼짐
+1対1のチャットの 📞（音声）・🎥（ビデオ・画面共有）から電話できます || You can call from 📞 (voice) and 🎥 (video / screen sharing) in a one-to-one chat. || 可以在一对一聊天中通过 📞（语音）和 🎥（视频・屏幕共享）拨打电话 || 1대1 채팅의 📞(음성)·🎥(영상·화면 공유)으로 전화할 수 있습니다
+🔔 着信音をためす || 🔔 Test ringtone || 🔔 试听铃声 || 🔔 벨소리 테스트
+大きな着信音を3秒ならします。通知の許可もここで聞きます（許可すると、スマホ・PC で設定している通知音でも着信をお知らせします） || Plays a loud ringtone for 3 seconds. It also asks for notification permission here (if allowed, you will be notified of calls with the notification sound set on your phone or PC). || 播放 3 秒响亮的铃声。也会在此询问通知权限（允许后，将用手机／电脑设置的通知音提醒来电）。 || 큰 벨소리를 3초간 울립니다. 알림 허용도 여기서 묻습니다(허용하면 스마트폰·PC에 설정된 알림음으로도 수신 전화를 알려 드립니다).
+音声通話（電話） || Voice call (phone) || 语音通话（电话） || 음성 통화(전화)
+ビデオ通話（画面共有もできます） || Video call (screen sharing is available too) || 视频通话（也可以共享屏幕） || 영상 통화(화면 공유도 가능합니다)
+

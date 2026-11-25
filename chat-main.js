@@ -3,12 +3,8 @@
 // ===== 起動（機能ごとに別々に起動します。1つが壊れても、ほかの機能は動きます） =====
 
 function initPresence(){
-    el.myStatus.value = feat.manual;
-    el.myStatus.addEventListener("change",() => {
-        feat.manual = el.myStatus.value;
-        try{ localStorage.setItem("are_manual_status",feat.manual); }catch(_e){ /* 保存できなくても続ける */ }
-        sendPresence();
-    });
+    paintMyStatus(autoStatus());   // 在席の状態は自動。自分では変えられない（欄は、いまの状態を見せるだけ）
+    try{ el.myStatus.title = "ステータスは自動で決まります（開いている：オンライン／5分以上放置：待機中／通話中：取り込み中／閉じている：オフライン）"; }catch(_e){}
     el.readReceiptToggle.addEventListener("change",async () => {
         const wanted = el.readReceiptToggle.checked;
         try{
@@ -23,7 +19,9 @@ function initPresence(){
     ["mousemove","keydown","touchstart","click"].forEach((name) => window.addEventListener(name,onActivity,{passive:true}));
     // 画面にもどってきたとき：次の自動更新（8秒ごと）を待たず、すぐに最新のメッセージを読みこみなおす
     // （スマホがバックグラウンドで リアルタイム通信を止めていたときも、もどってきたら すぐ反映されるように）
-    document.addEventListener("visibilitychange",() => { if(!document.hidden){ onActivity(); markRead(); pollRoom(); } });
+    document.addEventListener("visibilitychange",() => { if(!document.hidden){ onActivity(); markRead(); pollRoom(); if(feat.wentOffline) sendPresence(); } });
+    window.addEventListener("pagehide",presenceGoOffline);
+    window.addEventListener("pageshow",(ev) => { if(ev && ev.persisted) sendPresence(); });
     sendPresence();
     refreshPresence();
     feat.timers.push(setInterval(sendPresence,30000),setInterval(refreshPresence,30000),setInterval(pollRoom,8000));
