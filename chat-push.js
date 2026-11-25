@@ -180,7 +180,7 @@ async function pushServerTest(){
 // すでにアプリ化している人も、この更新で自動的に切りかわります（通知の許可は、画面を触ったときに1回だけ聞きます）
 async function pushBackgroundUpgrade(force){
     if(!pushSupported() || !state.user) return;
-    const key = "are_bg_call_v1_" + state.user.id;
+    const key = "are_bg_call_v2_" + state.user.id;
     try{
         if(!force && localStorage.getItem(key) === "1") return;
         if(localStorage.getItem("are_push_optout_" + state.user.id)) return;
@@ -312,6 +312,8 @@ function openPushSettings(){
         '<div class="meta tp-note" data-quiet-note></div><button type="button" class="button tp-ok" data-t="push:quiet-save">決定</button></div>' +
         '<div class="meta">端末のタイムゾーン：' + escapeHtml(feat.push.quiet.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || "Asia/Tokyo") + '</div>' +
         '<h4 style="margin:12px 0 4px">ホーム画面に追加</h4>' + install +
+        '<h4 style="margin:12px 0 4px">起動と同時に、裏で受けとる</h4>' +
+        '<div class="meta">・スマホ／タブレット：通知をオンにして「ホーム画面に追加」しておけば、アプリを閉じていても着信・新着が届きます（次に開いたとき、自動でこの設定をやりなおします）。<br>・パソコン（Chrome／Edge）：「📲 アプリとして追加」→ ブラウザで about://apps を開き、ARE を右クリック →「ログイン時にアプリを開く（Start app when you sign in）」。さらに、Chrome の設定 → システム →「Google Chrome を閉じてもバックグラウンド アプリの処理を続行する」をオンにすると、画面を閉じていても通知が届きます。<br>・この「ログイン時に開く」は、パソコンごとのブラウザの設定です。ARE のページから自動で切りかえることは、ブラウザの決まりでできません。</div>' +
         '<h4 style="margin:12px 0 4px">ミュート中のチャット</h4>' +
         (muted.length ? muted.map((id) => '<div class="row"><span>🔕 ' + escapeHtml(roomNameById(id)) + '</span><button type="button" class="button-secondary" data-t="push:unmute" data-room="' + escapeHtml(id) + '">再開</button></div>').join("") : '<div class="meta">ありません（チャット画面の 🔔 で切り替えます）</div>') +
         toolClose());
@@ -358,10 +360,33 @@ function pushOpenFromUrl(){
     if(room){ selectRoom(room, room.partner); history.replaceState(null, "", location.pathname); }
 }
 
+
+// ===== 次回から自動で「裏で受けとれる」状態にする（全ユーザー） =====
+// ・通知の登録（アプリを閉じていても着信・新着が届く）を、次に開いたとき自動でやりなおす（pushBackgroundUpgrade）
+// ・対応しているブラウザ（Chrome・Edge のインストール済みアプリ）には、「ときどき裏で目ざめる」登録もする
+// ・パソコンでは「ログインしたら自動で開く」は 端末ごとのブラウザの設定なので、アプリからは切りかえられません。やり方を1回だけ案内します
+function pushIsDesktop(){ return !pushIsIos() && !/Android/i.test(navigator.userAgent) && !(navigator.maxTouchPoints > 1 && matchMedia("(pointer:coarse)").matches); }
+async function pushBgBoot(){
+    if(!state.user) return;
+    try{
+        if(pushIsDesktop() && !localStorage.getItem("are_autostart_tip_v1_" + state.user.id) && typeof alPopup === "function"){
+            localStorage.setItem("are_autostart_tip_v1_" + state.user.id, "1");
+            alPopup("💻 パソコンの起動と同時に、ARE を裏で開けます", pushIsStandalone() ? "Chrome／Edge で about://apps を開き、ARE を右クリック →「ログイン時にアプリを開く（Start app when you sign in）」を選びます。くわしくは 🔔 通知・ホーム画面 に書いてあります。" : "先に「📲 アプリとして追加」をすると、パソコンを起動したときに自動で開けるようになります。くわしくは 🔔 通知・ホーム画面 に書いてあります。", () => openPushSettings(), 15000);
+        }
+    }catch(_e){}
+    if(!("serviceWorker" in navigator)) return;
+    try{ if(navigator.storage && navigator.storage.persist) await navigator.storage.persist(); }catch(_e){}
+    try{
+        const reg = await Promise.race([navigator.serviceWorker.ready, new Promise((res) => setTimeout(() => res(null), 5000))]);
+        if(reg && reg.periodicSync && reg.periodicSync.register) await reg.periodicSync.register("are-bg-refresh", {minInterval: 12 * 3600 * 1000});
+    }catch(_e){ /* 対応していない・許可されていないときは、何もしない */ }
+}
+
 function initPush(){
     registerTool("push", onPushAction);
     setTimeout(() => { if(feat.push.ready) pushAutoArm(); else pushRegister().then(pushAutoArm); }, 2500);
     setTimeout(() => { pushBackgroundUpgrade(false).catch(() => {}); }, 4500);
+    setTimeout(() => { pushBgBoot().catch(() => {}); }, 8000);
     setTimeout(() => { pushBarPaint(); }, 6000);
     setInterval(() => { pushBarPaint(); }, 60000);
     // ヘッダーの 🔔 ボタン

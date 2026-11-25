@@ -5,6 +5,7 @@
  "start_url": "chat.html",
  "scope": "./",
  "display": "standalone",
+ "launch_handler": {"client_mode": "focus-existing"},
  "background_color": "#2563eb",
  "theme_color": "#2563eb",
  "lang": "ja",
