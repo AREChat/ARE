@@ -114,23 +114,86 @@ async function scheduleAttachmentPayload(payload,when){
     }catch(error){ setStatus(featError(error),"error"); return false; }
 }
 
+let msEdit = null;   // いま直している予約 {id, textual, text}
+function msLocalInput(d){ const p = (n) => String(n).padStart(2,"0"); return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()) + "T" + p(d.getHours()) + ":" + p(d.getMinutes()); }
+function msItemHtml(row){
+    const parsed = parseMessageContent(row.content);
+    const isText = !!parsed && parsed.type === "text";
+    const full = isText ? String(parsed.text || "") : messageSummary(parsed);
+    const long = Array.from(full).length > 60;
+    const head = escapeHtml(formatDate(row.send_at)) + (row.status === "failed" ? ' <b style="color:var(--danger)">（送れませんでした' + (row.error ? "：" + escapeHtml(({blocked_by_filter:"送れない内容が含まれていました", not_member:"この部屋のメンバーではありません", room_suspended:"この部屋は停止中です", guest_limit:"お試しの送信上限です", other_limit_user:"送信上限です", other_limit_admin:"送信上限です"})[row.error] || "うまく送れませんでした") : "") + '）</b>' : "");
+    const body = long
+        ? '<details class="sched-full"><summary>' + escapeHtml(Array.from(full).slice(0, 60).join("")) + '… <small>（' + Array.from(full).length + '文字・タップで全文）</small></summary><div class="sched-fulltext" style="white-space:pre-wrap;word-break:break-word;margin-top:4px">' + escapeHtml(full) + '</div></details>'
+        : '<span style="white-space:pre-wrap;word-break:break-word">' + escapeHtml(full) + '</span>';
+    return '<div class="sched-item" data-sid="' + escapeHtml(row.id) + '" style="flex-wrap:wrap"><div style="flex:1;min-width:0"><div class="meta">' + head + '</div>' + body + '</div>' +
+        '<span style="display:flex;gap:6px"><button type="button" class="button-secondary" data-edit="' + escapeHtml(row.id) + '">編集</button><button type="button" class="button-danger" data-cancel="' + escapeHtml(row.id) + '">取消</button></span></div>';
+}
 async function loadScheduled(){
     if(!state.currentRoom) return;
+    if(msEdit && document.getElementById("schedEditBox")) return;   // 直している最中は、一覧を書きかえない（入力が消えないように）
     const roomId = state.currentRoom.id;
-    const result = await requireClient().from("scheduled_messages").select("id,content,send_at").eq("room_id",roomId).eq("status","pending").order("send_at",{ascending:true});
+    const result = await requireClient().from("scheduled_messages").select("id,content,send_at,status,error").eq("room_id",roomId).in("status",["pending","failed"]).order("send_at",{ascending:true});
     if(result.error || state.currentRoom?.id !== roomId) return;
+    if(msEdit && document.getElementById("schedEditBox")) return;
     const rows = result.data || [];
-    el.scheduleList.innerHTML = rows.length
-        ? rows.map((row) => '<div class="sched-item"><span>' + escapeHtml(formatDate(row.send_at)) + '　' + escapeHtml(messageSummary(parseMessageContent(row.content)).slice(0,40)) + '</span><button type="button" class="button-danger" data-cancel="' + escapeHtml(row.id) + '">取消</button></div>').join("")
-        : '<div class="empty-list">予約中のメッセージはありません。</div>';
+    msRows = new Map(rows.map((r) => [r.id, r]));
+    el.scheduleList.innerHTML = rows.length ? rows.map(msItemHtml).join("") : '<div class="empty-list">予約中のメッセージはありません。</div>';
 }
-
+let msRows = new Map();
+function openMsgSchedEdit(id){
+    const row = msRows.get(id); if(!row) return;
+    const item = el.scheduleList.querySelector('[data-sid="' + CSS.escape(id) + '"]'); if(!item) return;
+    const parsed = parseMessageContent(row.content);
+    const isText = !!parsed && parsed.type === "text";
+    msEdit = {id, isText, content: row.content};
+    const min = msLocalInput(new Date(Date.now() + 60000));
+    const cur = msLocalInput(new Date(Math.max(new Date(row.send_at).getTime(), Date.now() + 120000)));
+    item.innerHTML = '<div id="schedEditBox" style="flex:1 1 100%;display:grid;gap:6px">' +
+        (isText ? '<textarea id="schedEditText" rows="6" maxlength="8000" style="width:100%;box-sizing:border-box"></textarea><div class="meta"><span id="schedEditCount">0</span> / 4,000文字</div>'
+                : '<div class="meta">この予約は、写真・動画・ファイルなどです。送る日時だけ変えられます。（中身を変えたいときは、取消してから、もう一度予約してください）</div>') +
+        '<label>送信日時 <input type="datetime-local" id="schedEditAt" min="' + min + '" value="' + cur + '"></label>' +
+        '<div style="display:flex;gap:6px;justify-content:flex-end"><button type="button" class="button-secondary" data-edit-cancel="1">やめる</button><button type="button" class="button" data-edit-save="' + escapeHtml(id) + '">この内容で保存</button></div></div>';
+    if(isText){
+        const ta = document.getElementById("schedEditText"); ta.value = String(parsed.text || "");
+        const cnt = () => { const n = Array.from(ta.value).length; const c = document.getElementById("schedEditCount"); c.textContent = String(n); c.style.color = n > SCHEDULE_MAX_TEXT ? "var(--danger)" : "var(--muted)"; };
+        ta.addEventListener("input", cnt); cnt(); ta.focus();
+    }
+}
+async function saveMsgSchedEdit(id){
+    if(!msEdit || msEdit.id !== id) return;
+    const at = new Date((document.getElementById("schedEditAt") || {}).value || "");
+    if(isNaN(at.getTime()) || at.getTime() < Date.now() + 45000){ showToast("送信日時は1分以上先を指定してください。"); return; }
+    if(at.getTime() > Date.now() + 30 * 86400000){ showToast("予約は30日先までです。"); return; }
+    let content = msEdit.content;
+    if(msEdit.isText){
+        const text = (document.getElementById("schedEditText") || {}).value || "";
+        if(!text.trim()){ showToast("メッセージが空です。"); return; }
+        const n = Array.from(text).length;
+        if(n > SCHEDULE_MAX_TEXT){ showToast("予約送信は4,000文字までです（いま " + n + " 文字）。"); return; }
+        const old = parseMessageContent(msEdit.content) || {};
+        content = JSON.stringify(Object.assign({}, old, {type:"text", text}));
+    }
+    const btn = document.querySelector("[data-edit-save]"); if(btn) btn.disabled = true;
+    try{
+        const result = await requireClient().rpc("update_scheduled_message",{p_id:id,p_content:content,p_send_at:at.toISOString()});
+        if(result.error) throw result.error;
+        msEdit = null;
+        showToast("予約を直しました（" + formatDate(at.toISOString()) + " に送ります）。");
+        await loadScheduled();
+    }catch(error){ setStatus(featError(error),"error"); if(btn) btn.disabled = false; }
+}
 async function onScheduleListClick(event){
+    const ed = event.target.closest("[data-edit]");
+    if(ed){ if(msEdit && document.getElementById("schedEditBox")){ showToast("いま直している予約を、先に保存するか「やめる」を押してください。"); return; } openMsgSchedEdit(ed.dataset.edit); return; }
+    if(event.target.closest("[data-edit-cancel]")){ msEdit = null; await loadScheduled(); return; }
+    const sv = event.target.closest("[data-edit-save]");
+    if(sv){ await saveMsgSchedEdit(sv.dataset.editSave); return; }
     const button = event.target.closest("[data-cancel]");
     if(!button) return;
     try{
         const result = await requireClient().rpc("cancel_scheduled_message",{p_id:button.dataset.cancel});
         if(result.error) throw result.error;
+        if(msEdit && msEdit.id === button.dataset.cancel) msEdit = null;
         await loadScheduled();
     }catch(error){ setStatus(featError(error),"error"); }
 }

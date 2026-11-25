@@ -39,14 +39,19 @@ async function telPost(body, timeout){
 function telUnlockAudio(){
     try{
         if(!tel.ac){ const A = window.AudioContext || window.webkitAudioContext; if(!A) return; tel.ac = new A(); }
-        if(tel.ac.state === "suspended") tel.ac.resume();
+        if(tel.ac.state === "suspended"){
+            const p = tel.ac.resume();
+            // 着信中に 画面をさわって 音が出せるようになったら、すぐに鳴らしなおす
+            if(p && p.then) p.then(() => { if(tel.incoming && tel.ac.state === "running" && !tel.toneMuted){ telToneStart("in"); if(tel.ui) telAudioHint(tel.ui); } }).catch(() => {});
+        }
     }catch(_e){}
 }
-function telBeep(freq, at, dur, vol){
+function telBeep(freq, at, dur, vol, wave){
     const ac = tel.ac; if(!ac || ac.state !== "running") return;
     const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + at;
-    o.type = "sine"; o.frequency.value = freq;
-    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + 0.02); g.gain.setValueAtTime(vol, t + dur - 0.04); g.gain.linearRampToValueAtTime(0, t + dur);
+    o.type = wave || "sine"; o.frequency.value = freq;
+    const e = Math.min(0.02, dur / 4);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + e); g.gain.setValueAtTime(vol, t + dur - e * 2); g.gain.linearRampToValueAtTime(0, t + dur);
     o.connect(g); g.connect(ac.destination); o.start(t); o.stop(t + dur + 0.02);
 }
 /** 管理者の着信音は、平日（月〜金）の日本時間 7:00〜20:00（20:00 ちょうどは鳴る）は、消す。ほかの人・休日・夜は、ふつうに鳴る（祝日は、平日として数えます） */
@@ -65,14 +70,27 @@ function telToneStart(kind){
     telUnlockAudio();
     const cycle = () => {
         if(kind === "in"){
-            [0, 0.5].forEach((o) => { telBeep(880, o, 0.18, 0.28); telBeep(660, o + 0.2, 0.18, 0.28); });
-            try{ if(navigator.vibrate) navigator.vibrate([300, 150, 300]); }catch(_e){}
+            // だれでも気づく、大きくて高い「リリリリ…」（高低2つの音を すばやく6回）。音量は 端末の音量にしたがいます
+            for(let i = 0; i < 6; i++){
+                const o = i * 0.2;
+                telBeep(1319, o, 0.11, 0.55, "square"); telBeep(988, o + 0.1, 0.09, 0.45, "square");
+            }
+            telBeep(1760, 1.35, 0.5, 0.35, "triangle");
+            try{ if(navigator.vibrate) navigator.vibrate([500, 150, 500, 150, 500, 150, 500]); }catch(_e){}
         }else{ telBeep(440, 0, 0.9, 0.12); telBeep(480, 0, 0.9, 0.1); }
     };
     cycle();
-    tel.tone = setInterval(cycle, kind === "in" ? 2600 : 3500);
+    tel.tone = setInterval(cycle, kind === "in" ? 2200 : 3500);
 }
-function telToneStop(){ tel.toneMuted = false; if(tel.tone){ clearInterval(tel.tone); tel.tone = null; } try{ if(navigator.vibrate) navigator.vibrate(0); }catch(_e){} }
+function telTitleFlash(on){
+    try{
+        if(tel.flash){ clearInterval(tel.flash); tel.flash = null; if(tel.title0 != null){ document.title = tel.title0; tel.title0 = null; } }
+        if(!on) return;
+        tel.title0 = document.title; let k = 0;
+        tel.flash = setInterval(() => { document.title = (k++ % 2 === 0) ? "📞 着信中！" : tel.title0; }, 700);
+    }catch(_e){}
+}
+function telToneStop(){ telTitleFlash(false); tel.toneMuted = false; if(tel.tone){ clearInterval(tel.tone); tel.tone = null; } try{ if(navigator.vibrate) navigator.vibrate(0); }catch(_e){} }
 
 // ===== 画面（着信・通話中）=====
 function telCss(){
@@ -96,6 +114,7 @@ function telCss(){
         ".tel-in{position:fixed;left:50%;top:calc(12px + env(safe-area-inset-top));transform:translateX(-50%);z-index:9995;width:min(94vw,380px);background:#141b2d;border:1px solid #7c9cff;border-radius:16px;padding:14px;color:#fff;box-shadow:0 8px 30px rgba(0,0,0,.5)}" +
         ".tel-in .row{display:flex;gap:10px;align-items:center}.tel-in .tel-av{width:54px;height:54px;font-size:22px;flex:none}.tel-in .nm{font-weight:700;font-size:17px}.tel-in small{color:#9aa8c2}" +
         ".tel-in .acts{display:flex;gap:8px;margin-top:12px}.tel-in .acts button{flex:1;border:0;border-radius:10px;padding:11px 6px;font-weight:700;color:#fff}.tel-in .ok{background:#2e9e6b}.tel-in .ng{background:#e0443e}" +
+        ".tel-in{animation:telFlash 1s infinite alternate}@keyframes telFlash{from{border-color:#7c9cff;box-shadow:0 8px 30px rgba(0,0,0,.5)}to{border-color:#ff6b6b;box-shadow:0 0 0 4px rgba(255,107,107,.45),0 8px 30px rgba(0,0,0,.5)}}" +
         "@keyframes telPulse{0%{box-shadow:0 0 0 0 rgba(124,156,255,.5)}100%{box-shadow:0 0 0 9px rgba(124,156,255,0)}}.tel-in .tel-av{animation:telPulse 1.4s infinite}";
     document.head.appendChild(s);
 }
@@ -302,18 +321,45 @@ function telIncoming(room, m, d){
     u.inc.hidden = false;
     telToneStart("in");
     inc.timer = setTimeout(() => { if(tel.incoming === inc) telStopIncoming("不在着信"); }, Math.max(1000, TEL_RING_MS - (m.age || 0)));
+    telTitleFlash(true);
+    telNotify(inc, telNameOf(room));
+    telAudioHint(u);
+}
+/** 端末の「通知」で知らせる（スマホ・PC で設定している通知音がそのまま鳴る）。画面が見えているときも出す */
+async function telNotify(inc, who){
     try{
-        if(document.hidden && "Notification" in window && Notification.permission === "granted"){
-            const n = new Notification("📞 着信：" + telNameOf(room), {body:inc.kind === "video" ? "ビデオ通話" : "音声通話", tag:"are-call", requireInteraction:true, silent:telQuiet()});
-            n.onclick = () => { try{ window.focus(); }catch(_e){} n.close(); };
-            inc.note = n;
-        }
+        if(!("Notification" in window) || Notification.permission !== "granted") return;
+        const opts = {body:(inc.kind === "video" ? "ビデオ通話" : "音声通話") + "の着信です。タップして出る", icon:"icon-192.png", tag:"are-call", renotify:true, requireInteraction:true, silent:telQuiet(), vibrate:[500, 150, 500, 150, 500], data:{call:1}};
+        const title = "📞 着信：" + who;
+        let reg = null;
+        try{ reg = ("serviceWorker" in navigator) ? await navigator.serviceWorker.getRegistration() : null; }catch(_e){}
+        if(reg && reg.showNotification){ await reg.showNotification(title, opts); inc.viaSw = true; }
+        else{ const n = new Notification(title, opts); n.onclick = () => { try{ window.focus(); }catch(_e){} n.close(); }; inc.note = n; }
+        if(tel.incoming !== inc) telCloseNotes();   // 通知を出すまでに 終わっていたとき
+    }catch(_e){}
+}
+async function telCloseNotes(){
+    try{
+        const reg = ("serviceWorker" in navigator) ? await navigator.serviceWorker.getRegistration() : null;
+        if(reg && reg.getNotifications){ (await reg.getNotifications({tag:"are-call"})).forEach((n) => n.close()); }
+    }catch(_e){}
+}
+/** 音が出せない状態（まだ一度も画面を触っていない）のときは、案内を出す */
+function telAudioHint(u){
+    try{
+        let h = u.inc.querySelector(".tel-hint");
+        if(!h){ h = document.createElement("small"); h.className = "tel-hint"; h.style.cssText = "display:block;margin-top:8px;color:#ffd27c"; u.inc.appendChild(h); }
+        const msgs = [];
+        if(!tel.ac || tel.ac.state !== "running") msgs.push("🔊 画面をタッチすると、着信音が鳴ります。");
+        if("Notification" in window && Notification.permission === "default") msgs.push("🔔 設定の「着信音をためす」で通知を許可すると、端末の通知音でもお知らせします。");
+        h.textContent = msgs.join(" "); h.hidden = !msgs.length;
     }catch(_e){}
 }
 function telStopIncoming(why){
     const inc = tel.incoming; if(!inc) return;
     clearTimeout(inc.timer); telToneStop();
     try{ inc.note && inc.note.close(); }catch(_e){}
+    if(inc.viaSw) telCloseNotes();
     tel.incoming = null;
     if(tel.ui) tel.ui.inc.hidden = true;
     if(why) showToast(why);
@@ -327,6 +373,7 @@ async function telAccept(withVideo){
     const inc = tel.incoming; if(!inc) return;
     clearTimeout(inc.timer); telToneStop();
     try{ inc.note && inc.note.close(); }catch(_e){}
+    if(inc.viaSw) telCloseNotes();
     tel.incoming = null; tel.ui.inc.hidden = true;
     telUnlockAudio();
     const call = telNewCall({id:inc.id, room:inc.room, key:inc.key, role:"callee", kind:inc.kind});
@@ -592,6 +639,24 @@ function telSetOn(on){
     telPaintSetting();
     if(!on) telStopIncoming();
 }
+/** 設定の「着信音をためす」：通知の許可を聞き、大きな着信音を 3 秒ならし、通知も1つ出す */
+async function telTestRing(){
+    telUnlockAudio();
+    try{ if("Notification" in window && Notification.permission === "default") await Notification.requestPermission(); }catch(_e){}
+    if(tel.incoming || tel.call){ showToast("いま着信中・通話中です。"); return; }
+    const perm = ("Notification" in window) ? Notification.permission : "unsupported";
+    telToneStart("in");
+    setTimeout(() => { if(!tel.incoming && !tel.call) telToneStop(); }, 3200);
+    try{
+        if(perm === "granted"){
+            const reg = ("serviceWorker" in navigator) ? await navigator.serviceWorker.getRegistration() : null;
+            const o = {body:"これは着信音のテストです。", icon:"icon-192.png", tag:"are-call-test", renotify:true, silent:false, vibrate:[500, 150, 500]};
+            if(reg && reg.showNotification) await reg.showNotification("📞 着信のテスト", o); else new Notification("📞 着信のテスト", o);
+        }
+    }catch(_e){}
+    const quiet = telQuiet();
+    showToast(quiet ? "（管理者は平日 7:00〜20:00 は着信音が消えます。音は鳴りません）" : (tel.ac && tel.ac.state === "running" ? "着信音をならしています。" : "音が出せません。画面をもう一度さわってください。") + (perm === "granted" ? " 通知も出しました（端末の通知音は、端末の設定どおりです）。" : perm === "denied" ? " 通知が許可されていません（ブラウザの設定で許可すると、端末の通知音でも知らせます）。" : ""));
+}
 function telPaintSetting(){
     const b = document.getElementById("telSetItem"); if(!b) return;
     b.querySelector("small").textContent = tel.on ? "いま：着信を受けます（ここを押すと、受けない設定に）" : "いま：着信を受けません（ここを押すと、受ける設定に）";
@@ -622,6 +687,8 @@ function initCall(){
         });
         telPaintSetting();
     }
+    const tt = document.getElementById("telTestItem");
+    if(tt) tt.addEventListener("click", telTestRing);
     extraBubbles.call = (item) => {
         const ico = item.kind === "video" ? "🎥" : "📞", sec = Number(item.sec) || 0;
         const t = item.result === "ended" ? (item.kind === "video" ? "ビデオ通話" : "通話") + " " + Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0")
@@ -629,6 +696,8 @@ function initCall(){
         return '<div class="bubble">' + ico + ' <b>' + escapeHtml(t) + '</b></div>';
     };
     document.addEventListener("pointerdown", telUnlockAudio, {passive:true});
+    document.addEventListener("touchend", telUnlockAudio, {passive:true});
+    document.addEventListener("click", telUnlockAudio, {passive:true});
     document.addEventListener("keydown", telUnlockAudio, {passive:true});
     document.addEventListener("visibilitychange", () => { if(!document.hidden && tel.on && !tel.call) telSchedule(300); });
     window.addEventListener("pagehide", () => {

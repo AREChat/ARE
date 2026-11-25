@@ -65,6 +65,7 @@
                 <a class="admin-card more-item" href="./help.html" target="_blank" rel="noopener" style="text-decoration:none">📖 操作方法<small class="meta">使い方ガイド（スマホ・パソコン共通）</small></a>
                 <button class="admin-card more-item" id="installAppItem" type="button" hidden>📲 アプリ化<small class="meta">ホーム画面・デスクトップに追加（手順つき）</small></button>
                 <button class="admin-card more-item" id="telSetItem" type="button">📞 着信を受ける：ON<small class="meta">1対1のチャットの 📞（音声）・🎥（ビデオ・画面共有）から電話できます</small></button>
+                <button class="admin-card more-item" id="telTestItem" type="button">🔔 着信音をためす<small class="meta">大きな着信音を3秒ならします。通知の許可もここで聞きます（許可すると、スマホ・PC で設定している通知音でも着信をお知らせします）</small></button>
                 <button class="admin-card more-item" id="lkvSetItem" type="button">▶ 動画リンクの自動再生：ON<small class="meta">動画のリンクを、音つきで自動再生します（いやな人はオフに）</small></button>
                 <button class="admin-card more-item" id="lkvFileItem" type="button">📄 ファイルのプレビュー：ON<small class="meta">ドライブに置いた書類・PDF・音声を、その場で見られます</small></button>
                 <button class="admin-card more-item" data-extra="chatbot" data-feature="extras" type="button">🤖 AIチャットボット<small class="meta">よくある質問に自動で答えます</small></button>
@@ -138,7 +139,7 @@
                 <label>送信日時 <input type="datetime-local" id="scheduleAt"></label>
                 <button class="button" id="scheduleSubmit" type="button">この日時に予約（文章）</button>
                 <button class="button-secondary" id="scheduleClose" type="button">閉じる</button>
-                <div class="meta">予約できる文章は <b>4,000文字まで</b>です（ふつうの送信と同じ）。写真・動画・ファイルも予約できます：この日時を決めたまま、上の「📎 ファイルを選択」で選ぶと、すぐアップロードだけ行われ、この日時になったら送信されます。</div>
+                <div class="meta">予約できる文章は <b>4,000文字まで</b>です（ふつうの送信と同じ）。予約した内容は、下の一覧の<b>「編集」</b>で、文章と送る日時を直せます。写真・動画・ファイルも予約できます：この日時を決めたまま、上の「📎 ファイルを選択」で選ぶと、すぐアップロードだけ行われ、この日時になったら送信されます。</div>
                 <div id="scheduleList" class="schedule-list"></div>
             </div>
             <div class="composer-bottom">
@@ -173,7 +174,7 @@
 <script defer src="vendor/supabase/supabase-js-2.45.4.umd.js"></script>
 <!-- 下の chat.bundle.js は tools/chat-bundle-sources.txt の JS をまとめたもの。JS を直したら  node tools/build-bundle.js  で作り直す -->
 <script src="shared/are-intruder.js"></script>
-<script defer src="./chat.bundle.js?v=f7760f6355"></script>
+<script defer src="./chat.bundle.js?v=2b2fbf5518"></script>
 <script defer src="./protect.js"></script>
 <script defer src="shared/are-pad.js"></script>
 <script src="shared/are-offline.js" defer></script>

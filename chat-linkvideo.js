@@ -128,7 +128,7 @@ function lkvUnmuteAll(){
     document.querySelectorAll(".lv-video").forEach((v) => { if(v.__needUnmute){ v.__needUnmute = false; if(!v.paused) lkvSet(v, false); } });
 }
 
-function lkvSysPause(v){ if(v && !v.paused){ v.__byView = true; v.pause(); } }
+function lkvSysPause(v){ if(v && !v.paused){ v.__byView = true; v.__byViewAt = Date.now(); v.pause(); } }
 function lkvOnView(entries){
     for(const e of entries){
         const box = e.target;
@@ -169,7 +169,7 @@ function initLkVideo(){
         lkv.mo = new MutationObserver(() => { clearTimeout(lkv.timer); lkv.timer = setTimeout(lkvDecorate, 250); });
         lkv.mo.observe(root, {childList:true, subtree:true});
     }
-    document.addEventListener("pause", (e) => { const v = e.target; if(!v || !v.classList || !v.classList.contains("lv-video")) return; if(v.__byView){ v.__byView = false; return; } if(!v.ended){ v.dataset.userPaused = "1"; const m = lkv.mem.get(v.currentSrc || v.src) || {}; m.up = true; lkv.mem.set(v.currentSrc || v.src, m); } }, true);
+    document.addEventListener("pause", (e) => { const v = e.target; if(!v || !v.classList || !v.classList.contains("lv-video")) return; if(v.__byView){ const fresh = Date.now() - (v.__byViewAt || 0) < 1000; v.__byView = false; if(fresh) return; } if(!v.ended){ v.dataset.userPaused = "1"; const m = lkv.mem.get(v.currentSrc || v.src) || {}; m.up = true; lkv.mem.set(v.currentSrc || v.src, m); } }, true);
     document.addEventListener("volumechange", (e) => { const v = e.target; if(v && v.classList && v.classList.contains("lv-video") && !v.__self) v.__needUnmute = false; }, true);
     ["pointerdown", "touchend", "keydown", "click"].forEach((t) => document.addEventListener(t, lkvUnmuteAll, {capture:true, passive:true}));
     document.addEventListener("play", (e) => { const v = e.target; if(v && v.classList && v.classList.contains("lv-video")) { delete v.dataset.userPaused; const m = lkv.mem.get(v.currentSrc || v.src); if(m) m.up = false; } }, true);
