@@ -200,6 +200,7 @@ const FEATURES = [
     ["ads","広告",initAds],
     ["call","通話（着信・音声・ビデオ・画面共有）",initCall],
     ["linkvideo","動画リンクのプレビュー自動再生",initLkVideo],
+    ["photopair","写真のまとめ表示（2枚ずつ）",initPhotoPair],
     ["alarm","通知のアラーム音・毎朝7時・未読のお知らせ",initAlarm],
     ["prefsync","端末をまたいだ設定の同期",initPrefSync],
     ["story","ストーリー",initStory],

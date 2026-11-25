@@ -1109,7 +1109,7 @@ function renderMessages(scrollToBottom, onlyIfChanged){
         }
 
         const sep = (msgIdx === 0 || msgDayKey(state.messages[msgIdx - 1].created_at) !== msgDayKey(message.created_at)) ? dateSeparator(message.created_at) : "";
-        return sep + '<article class="message-row' + (own ? ' own' : '') + (bulkPick && feat.msgSelect.has(message.id) ? ' msg-picked' : '') + (bulkPick ? ' msg-pickable' : '') + '" data-mid="' + id + '">' +
+        return sep + '<article class="message-row' + (own ? ' own' : '') + (bulkPick && feat.msgSelect.has(message.id) ? ' msg-picked' : '') + (bulkPick ? ' msg-pickable' : '') + '" data-mid="' + id + '" data-sid="' + escapeHtml(String(message.sender_id || "")) + '" data-ts="' + (new Date(message.created_at).getTime() || 0) + '">' +
             avatar +
             '<div class="message-body"><div class="message-sender">' + escapeHtml(name) + '</div>' +
             body + '<div class="message-time">' + meta + '</div>' + actions + '</div></article>';

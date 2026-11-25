@@ -119,6 +119,7 @@ chat-points.js
 chat-ads.js
 chat-call.js
 chat-linkvideo.js
+chat-photopair.js
 chat-alarm.js
 chat-prefsync.js
 chat-quick.js
