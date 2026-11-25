@@ -300,7 +300,7 @@ async function runOrphanRoomDelete(){
 }
 
 // ===== メッセージの一括選択・一括「管理者として削除」 =====
-// ・ヘッダーの「☑️ 一括削除」で選択モードに入る（管理者のみ・チャットを開いているときだけ表示）
+// ・ヘッダーの「☑️」ボタンで選択モードに入る（管理者のみ・チャットを開いているときだけ表示）
 // ・選択モード中は、メッセージ（相手・自分どちらも）を「タッチするだけ」で 選ぶ／外す。日付（開始日〜終了日）で選ぶこともできる
 // ・削除のときの「理由」は入力しない（監査ログには「管理者による一括削除」と自動で記録）
 const MSG_BULK_REASON = "管理者による一括削除";
@@ -326,14 +326,15 @@ function initMsgBulk(){
     addRoomHook((room) => {
         b.hidden = !(feat.isAdmin && room);
         feat.msgBulkMode = false; feat.msgSelect = new Set(); feat.msgBulkFrom = ""; feat.msgBulkTo = "";
-        b.textContent = "☑️ 一括削除"; b.classList.remove("on"); el.messages.classList.remove("msg-bulk-active");
+        b.textContent = "☑️"; b.title = "複数のメッセージを選んで、まとめて管理者として削除します"; b.classList.remove("on"); el.messages.classList.remove("msg-bulk-active");
     });
     b.addEventListener("click",() => {
         if(!feat.isAdmin || !state.currentRoom) return;
         feat.msgBulkMode = !feat.msgBulkMode;
         if(feat.msgBulkMode && typeof selcExit === "function") selcExit();   // 「選んでコピー」のモードが残っていると、タッチを横取りされるため
         if(!feat.msgBulkMode) feat.msgSelect = new Set();
-        b.textContent = feat.msgBulkMode ? "✖️ 一括削除をやめる" : "☑️ 一括削除";
+        b.textContent = feat.msgBulkMode ? "✖️" : "☑️";
+        b.title = feat.msgBulkMode ? "一括選択をやめる" : "複数のメッセージを選んで、まとめて管理者として削除します";
         b.classList.toggle("on", feat.msgBulkMode);
         el.messages.classList.toggle("msg-bulk-active", feat.msgBulkMode);
         renderMessages(false);
