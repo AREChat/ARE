@@ -151,3 +151,4 @@ chat-aibot.js
 chat-fastboot.js
 chat-frequent.js
 chat-suggest.js
+chat-fullscreen.js
