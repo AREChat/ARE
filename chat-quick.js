@@ -14,9 +14,14 @@ const QK_BY_GROUP = {
     q3: ["tool:itin", "tool:rpg", "tool:album", "tool:split", "tool:board", "shop", "search:more"],
     q4: ["tool:itin", "tool:rpg", "tool:album", "tool:split", "tool:board", "shop", "search:more"]
 };
-function qkTrim(list){ const l = list.slice(); while(l.length > QK_MAX){ const i = l.lastIndexOf("search:more"); l.splice(i >= 0 ? i : l.length - 1, 1); } return l; }
+function qkTrim(list, max){ const l = list.slice(); max = max || QK_MAX; while(l.length > max){ const i = l.lastIndexOf("search:more"); l.splice(i >= 0 ? i : l.length - 1, 1); } return l; }
+/** カスタマイズAIbot（🤖）が つかえる人か（区分「その他」・区分が まだ不明のあいだは つかえない） */
+function qkAibotOk(){ try{ return typeof aibAllowed === "function" && aibAllowed(); }catch(_e){ return false; } }
+/** はじめのショートカット：今までの並び（5つまで）＋ 6つ目に 🤖カスタマイズAIbot */
 function qkDefaultList(){
-    return qkTrim(qkDefaultListRaw());
+    const l = qkTrim(qkDefaultListRaw(), QK_MAX - 1).filter((id) => id !== "tool:aibot");
+    if(qkAibotOk()) l.push("tool:aibot");
+    return l.slice(0, QK_MAX);
 }
 function qkDefaultListRaw(){
     try{
@@ -83,12 +88,15 @@ function qkKey(){ return "are_quick_v1_" + (state && state.user ? state.user.id 
 /** 自分で並べかえていない人は「自動」：はじめは今までのショートカット、使うほど よく使う機能が 自動で入る */
 function qkIsAuto(){ try{ return !Array.isArray(JSON.parse(localStorage.getItem(qkKey()) || "null")); }catch(_e){ return true; } }
 function qkAutoList(){
-    const base = qkDefaultList();
+    const ai = qkAibotOk(), room = ai ? QK_MAX - 1 : QK_MAX;   // 🤖 は 6つ目に ずっと 置く
+    const base = qkDefaultList().filter((id) => id !== "tool:aibot");
     let freq = [];
-    try{ if(typeof qfFrequent === "function") freq = qfFrequent(3).filter((id) => qkFind(id)); }catch(_e){ freq = []; }
-    freq = freq.slice(0, QK_MAX);
+    try{ if(typeof qfFrequent === "function") freq = qfFrequent(3).filter((id) => qkFind(id) && id !== "tool:aibot"); }catch(_e){ freq = []; }
+    freq = freq.slice(0, room);
     // よく使うものを先頭に。のこりの枠は、いままでの（はじめの）ショートカットで うめる
-    return freq.concat(base.filter((id) => !freq.includes(id))).slice(0, QK_MAX);
+    const out = freq.concat(base.filter((id) => !freq.includes(id))).slice(0, room);
+    if(ai) out.push("tool:aibot");
+    return out;
 }
 function qkLoad(){
     let list = null;
@@ -105,7 +113,7 @@ function qkLoad(){
         }catch(_e){ /* 置きかえられなくても使える */ }
     }
     const seen = new Set();
-    return list.filter((id) => typeof id === "string" && qkFind(id) && !seen.has(id) && seen.add(id)).slice(0, QK_MAX);
+    return list.filter((id) => typeof id === "string" && qkFind(id) && (id !== "tool:aibot" || qkAibotOk()) && !seen.has(id) && seen.add(id)).slice(0, QK_MAX);
 }
 function qkSave(list){ try{ localStorage.setItem(qkKey(), JSON.stringify(list)); }catch(_e){ /* 保存できなくても使える */ } }
 

@@ -1,6 +1,6 @@
 "use strict";
 // ===== カスタマイズAIbot（自分専用）=====
-// ・チャット一覧の いちばん上に「📌 カスタマイズAIbot」を ピン止めし、「その他」の ツールにも 入口を おきます。
+// ・入口：いちばん上のショートカットバーの「6つ目（🤖）」（はじめから入っています）と、「その他」の ツール。
 // ・つかえる人：管理者・家庭（家族）・社員・友人。区分「その他」の人には 出さず、動きません（chat-segments.js の区分けを つかいます）。
 //     区分が まだ わからない間（読み込み前・読み込み失敗）も 出しません（安全がわに たおす）。
 // ・ひとりひとり 別々：記録・せってい・GASのURL・合言葉は、アカウントごとに この端末へ 別々に 保存します。
@@ -91,19 +91,11 @@ function initAiBot(){
 
 function aibotSyncEntrances(){
     const show = aibAllowed();
-    let pin = document.getElementById("aibotPin");
-    const list = document.getElementById("roomList");
-    if(show && list && !pin){
-        list.insertAdjacentHTML("beforebegin",
-            '<button type="button" class="admin-card more-item aib-pin" id="aibotPin">📌 ' + escapeHtml(aibName()) +
-            '<small class="meta">自分専用のAI（ほかの人の情報は入りません）</small></button>');
-        pin = document.getElementById("aibotPin");
-        pin.addEventListener("click", () => runTool(() => openAiBot()));
-    }
-    if(show && !feat.aib.shared && !feat.aib.sharedTried) aibLoadShared();
-    if(pin){ pin.style.display = show ? "" : "none"; const t = pin.firstChild; if(t && t.nodeType === 3) t.textContent = "📌 " + aibName() + " "; }
+    const old = document.getElementById("aibotPin"); if(old) old.remove();   // 以前の「チャット一覧の上のカード」は もう出さない（ショートカットの6つ目に入っています）
     const tool = document.querySelector('[data-tool="aibot"]');
     if(tool){ tool.style.display = show ? "" : "none"; }
+    if(show && !feat.aib.shared && !feat.aib.sharedTried) aibLoadShared();
+    if(typeof qkPaintBar === "function") qkPaintBar();   // ショートカットの 6つ目の出し入れ
 }
 function aibName(){ return feat.aib.cfg.name || "カスタマイズAIbot"; }
 
