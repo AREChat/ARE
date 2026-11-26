@@ -149,5 +149,55 @@
         } catch (_e) { /* 何もしない */ }
     })();
 
+    // ===== 7) 開発者ツールを「⋮メニューから」開いた場合も、別ウィンドウで開いた場合も見つけて、画面の中身を消す =====
+    // ・デバッガの「一時停止」にかかる時間をはかる：開発者ツールが開いていると、debugger の行で止まるので、時間がかかる（Chrome・Edge・Firefox・Safari のパソコン版）
+    // ・横や下に開いたときの、ウィンドウの大きさの差（上の 1 つ目の見張りと同じ見かた）もあわせて使う
+    // ・見つけたら、画面の中身を すべて取りのぞき（要素の検査をしても何も出ない）、閉じたら自動で読み込みなおす
+    // ※ ページの側からは、メニューの「デベロッパーツール」そのものを消すことはできません（ブラウザの決まり）。「開けなくする」のではなく「開いても何も見えない」ようにします。
+    (function () {
+        var coarse2 = false;
+        try { coarse2 = window.matchMedia("(pointer:coarse)").matches; } catch (_e) { /* 何もしない */ }
+        if (coarse2) return;
+        var locked = false, hit = 0, clear = 0;
+        function probe() {
+            var t = performance.now();
+            (function () { debugger; })();
+            return performance.now() - t > 180;
+        }
+        function sizeOpen() {
+            var w = window.outerWidth - window.innerWidth, h = window.outerHeight - window.innerHeight;
+            return window.outerWidth > 0 && window.outerHeight > 0 && ((w > 260 && h < 175) || (h > 300 && w < 100));
+        }
+        function lock() {
+            locked = true;
+            try {
+                var body = document.body;
+                if (!body) return;
+                Array.prototype.slice.call(body.childNodes).forEach(function (n) { try { n.remove(); } catch (_e) { /* 何もしない */ } });
+                var v = document.createElement("div");
+                v.id = "dtVeil";
+                v.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#0b1020;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font:16px/1.8 system-ui,sans-serif";
+                v.textContent = "開発者ツールが開いています。閉じてください。閉じると、自動で元の画面に戻ります。";
+                body.appendChild(v);
+                // 閉じるまで、アプリが あとから足す画面の部品も、すぐ取りのぞく
+                var mo = new MutationObserver(function () {
+                    Array.prototype.slice.call(body.childNodes).forEach(function (n) { if (n !== v) { try { n.remove(); } catch (_e) { /* 何もしない */ } } });
+                });
+                mo.observe(body, { childList: true });
+            } catch (_e) { /* 何もしない */ }
+        }
+        setInterval(function () {
+            var open = false;
+            try { open = probe() || sizeOpen(); } catch (_e) { open = false; }
+            if (!locked) {
+                hit = open ? hit + 1 : 0;
+                if (hit >= 2) lock();    // 1回だけの もたつきでは 反応しない（2回つづけて見つけたとき）
+            } else {
+                clear = open ? 0 : clear + 1;
+                if (clear >= 3) location.reload();   // 閉じられたら、読みなおして もどす
+            }
+        }, 700);
+    })();
+
     window.AREProtect = { setExempt: function () { /* 管理者も含め、全員が対象です（何もしません） */ } };
 })();
