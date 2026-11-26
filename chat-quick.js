@@ -4,7 +4,7 @@
 // ・「その他」タブの上に検索バーを付けました（部分一致。ひらがな・カタカナ・全角半角のちがいは気にしません）
 // ・フォロワー／フォロー中を押すと、一覧が開きます（チャットを始める・フォロー解除もできます）
 
-const QK_MAX = 7;
+const QK_MAX = 6;   // ショートカットの数（☰ のほかに 6 つ）
 const QK_DEFAULT = ["tool:study124", "tool:itin", "tool:rpg", "shop", "search:more"];
 // 自分で ショートカットを変えていない人の「はじめのショートカット」を、グループ（q1〜q4）ごとに変える
 //  q1=家庭（ゲームなし）／ q2=社員（ゲームは1つだけ＋仕事に役立つもの）／ q3=友人・q4=その他（ゲームも便利機能も）／ 管理者は今までどおり
@@ -14,7 +14,11 @@ const QK_BY_GROUP = {
     q3: ["tool:itin", "tool:rpg", "tool:album", "tool:split", "tool:board", "shop", "search:more"],
     q4: ["tool:itin", "tool:rpg", "tool:album", "tool:split", "tool:board", "shop", "search:more"]
 };
+function qkTrim(list){ const l = list.slice(); while(l.length > QK_MAX){ const i = l.lastIndexOf("search:more"); l.splice(i >= 0 ? i : l.length - 1, 1); } return l; }
 function qkDefaultList(){
+    return qkTrim(qkDefaultListRaw());
+}
+function qkDefaultListRaw(){
     try{
         const f = typeof segSt !== "undefined" ? segSt.flags : null;
         if(f && !f.is_admin){
@@ -76,10 +80,20 @@ function qkFind(id){ return qkItems().find((x) => x[0] === id) || null; }
 
 // ---- 保存（この端末・ユーザーごと）----
 function qkKey(){ return "are_quick_v1_" + (state && state.user ? state.user.id : "guest"); }
+/** 自分で並べかえていない人は「自動」：はじめは今までのショートカット、使うほど よく使う機能が 自動で入る */
+function qkIsAuto(){ try{ return !Array.isArray(JSON.parse(localStorage.getItem(qkKey()) || "null")); }catch(_e){ return true; } }
+function qkAutoList(){
+    const base = qkDefaultList();
+    let freq = [];
+    try{ if(typeof qfFrequent === "function") freq = qfFrequent(3).filter((id) => qkFind(id)); }catch(_e){ freq = []; }
+    freq = freq.slice(0, QK_MAX);
+    // よく使うものを先頭に。のこりの枠は、いままでの（はじめの）ショートカットで うめる
+    return freq.concat(base.filter((id) => !freq.includes(id))).slice(0, QK_MAX);
+}
 function qkLoad(){
     let list = null;
     try{ list = JSON.parse(localStorage.getItem(qkKey()) || "null"); }catch(_e){ list = null; }
-    if(!Array.isArray(list)) list = qkDefaultList();
+    if(!Array.isArray(list)) list = qkAutoList();
     else{   // 自分で保存していたショートカットの「🎮 ゲーム」を、一度だけ「📋 行動予定表」に置きかえる（ゲームは「その他」にあります）
         try{
             const mk = "are_quick_itin_mig_" + (state && state.user ? state.user.id : "guest");
@@ -116,6 +130,9 @@ function qkRun(id){
 function qkPaintBar(){
     const bar = document.getElementById("quickBar"); if(!bar) return;
     const list = qkLoad();
+    const html0 = list.join(",");
+    if(bar.dataset.sig === html0 && bar.firstChild) return;   // 変わっていなければ 描きなおさない（ちらつき防止）
+    bar.dataset.sig = html0;
     bar.innerHTML = '<button type="button" class="qb qb-menu" data-qk="menu" title="メニュー（ショートカットの編集）" aria-label="メニュー">☰</button>' +
         list.map((id) => { const it = qkFind(id); return '<button type="button" class="qb" data-qk="run:' + escapeHtml(id) + '" title="' + escapeHtml(it[2]) + '" aria-label="' + escapeHtml(it[2]) + '">' + it[1] + '</button>'; }).join("");
 }
@@ -141,15 +158,15 @@ function qkPaintMenu(keepQuery){
     const cur = document.getElementById("qkCur"), all = document.getElementById("qkAll");
     if(cur) cur.innerHTML = qkRowsCur(list);
     if(all) all.innerHTML = qkRowsAll(list, q);
-    const cnt = document.getElementById("qkCount"); if(cnt) cnt.textContent = list.length + " / " + QK_MAX;
+    const cnt = document.getElementById("qkCount"); if(cnt) cnt.textContent = list.length + " / " + QK_MAX + (qkIsAuto() ? "（自動：よく使う順）" : "（自分で設定）");
     qkPaintBar();
 }
 function qkOpenMenu(){
-    openSheet(toolHead("☰ メニュー・ショートカット", "よく使う機能を、ヘッダーの下にアイコンだけで出せます。自分で入れかえできます。") +
+    openSheet(toolHead("☰ メニュー・ショートカット", "ヘッダーの下に、アイコンだけで出ます（6つまで）。はじめは自動で、使うほど「よく使う機能」が入ります。自分で入れかえると、その並びで固定されます。") +
         '<input class="search" id="qkSearch" type="search" placeholder="🔍 機能を検索（部分一致）" autocomplete="off">' +
         '<div class="section-heading"><h2>いまのショートカット</h2><span class="meta" id="qkCount"></span></div><div id="qkCur"></div>' +
         '<div class="section-heading"><h2>すべての機能</h2></div><div class="meta">名前を押すと開きます。☆ を押すとショートカットに入ります。</div><div id="qkAll" class="qk-all"></div>' +
-        '<div class="row"><button type="button" class="button-secondary" data-qk="reset">初期設定にもどす</button><button type="button" class="button" data-pm="close">閉じる</button></div>');
+        '<div class="row"><button type="button" class="button-secondary" data-qk="reset">自動にもどす（よく使う順）</button><button type="button" class="button" data-pm="close">閉じる</button></div>');
     qkPaintMenu("");
 }
 function qkAction(act, id){
@@ -160,7 +177,7 @@ function qkAction(act, id){
         const i = list.indexOf(id), j = act === "up" ? i - 1 : i + 1;
         if(i < 0 || j < 0 || j >= list.length) return;
         const t = list[i]; list[i] = list[j]; list[j] = t;
-    }else if(act === "reset"){ list = QK_DEFAULT.slice(); }
+    }else if(act === "reset"){ try{ localStorage.removeItem(qkKey()); }catch(_e){} qkPaintMenu(); return; }   // 保存を消す＝「自動」にもどる
     qkSave(list); qkPaintMenu();
 }
 

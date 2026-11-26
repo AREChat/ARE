@@ -1,5 +1,5 @@
 "use strict";
-// ===== すれ違いタウンへの入口を、チャット画面の いちばん上の行（グループ作成・友達追加・すべて と同じ行）に、アイコンだけで出す =====
+// ===== すれ違いタウンへの入口を、チャット画面の いちばん上の行（グループ作成・友達追加・すべて と同じ行）に、「📡 タウン」ボタンで出す =====
 // ・実際の「部屋」ではないので、見た目だけ ボタンを差し込む（以前は 一覧の先頭に 文字つきで 出していました）。
 // ・表示する・しない／新しいすれ違いの数のバッジは、chat-passby.js の pbPaintCard() にまかせる
 //   （data-tool="passby" を付けておけば、その他タブの入口と同じ仕組みで自動的に出し分けられる＝ゲストには出ない）。
@@ -15,8 +15,8 @@ function pbPinPaint(){
         btn.dataset.tool = "passby";
         btn.title = "すれ違いタウン（近くにいた人と、自動ですれ違い）";
         btn.setAttribute("aria-label", "すれ違いタウン");
-        btn.textContent = "📡";
-        btn.style.cssText = "position:relative;padding:4px 10px;font-size:18px;line-height:1.2";
+        btn.textContent = "📡 タウン";
+        btn.style.cssText = "position:relative";
         btn.addEventListener("click", () => {
             if(typeof runTool === "function" && typeof openPassby === "function") runTool(() => openPassby());
         });

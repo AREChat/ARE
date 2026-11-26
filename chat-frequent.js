@@ -1,7 +1,7 @@
 "use strict";
 // ===== 最近よく使う機能／おすすめ（どちらもアイコンだけ）=====
-// ・チャット一覧の「📌 カスタマイズAIbot」の すぐ下に、アイコンだけの列を 2 本 出します。
-//     🔥 最近よく使う機能 … 開いた回数が多い順（古い分は だんだん軽くなる＝最近のものが上に来る）
+// ・「最近よく使う機能」は、いちばん上の ショートカットバー（☰ の右）に 自動で入ります（chat-quick.js が、ここの qfFrequent() を使う）。
+// ・チャット一覧の「📌 カスタマイズAIbot」の すぐ下に、アイコンだけの列を 1 本 出します。
 //     💡 おすすめ … 見た画面・開いた機能の履歴から、「まだあまり使っていない 似た機能」を 選ぶ（開くたび・使うたびに 更新）
 // ・数えるのも 選ぶのも、この端末の中だけ。保存先はアカウントごとの localStorage（ほかの人の情報は 入らない／外へは 出ない）。
 // ・ふだんの「ショートカット（☰）」は そのまま（こちらは 自動で 並びかわる もの）。
@@ -60,10 +60,10 @@ function qfAvailable(id){
     return !!b && !b.hidden && b.style.display !== "none";
 }
 
-function qfFrequent(){
+function qfFrequent(min){
     const d = qfLoad(), now = Date.now();
     return Object.keys(d.s).filter((id) => !id.startsWith("tab:") && id !== "follow" && id !== "search:more" && qkFind(id) && qfAvailable(id))
-        .map((id) => [id, qfDecay(d.s[id][0], d.s[id][1], now)]).filter((x) => x[1] >= 0.8).sort((a, b) => b[1] - a[1]).slice(0, QF_MAX).map((x) => x[0]);
+        .map((id) => [id, qfDecay(d.s[id][0], d.s[id][1], now)]).filter((x) => x[1] >= (min || 0.8)).sort((a, b) => b[1] - a[1]).slice(0, QF_MAX).map((x) => x[0]);
 }
 function qfRecommend(freq){
     const d = qfLoad(), now = Date.now();
@@ -120,12 +120,14 @@ function qfPaint(){
         if(!state || !state.user || typeof qkFind !== "function") return;
         qfEnsureCss();
         const w = qfWrap(); if(!w) return;
-        const freq = qfFrequent(), rec = qfRecommend(freq);
-        const sig = freq.join(",") + "|" + rec.join(",");
-        w.hidden = !freq.length && !rec.length;
+        if(typeof qkPaintBar === "function") qkPaintBar();   // 上のショートカットバー（自動のときは よく使う順に 入れかわる）
+        const shown = typeof qkLoad === "function" ? qkLoad() : qfFrequent();
+        const rec = qfRecommend(shown);
+        const sig = rec.join(",");
+        w.hidden = !rec.length;
         if(sig !== qf.sig || !w.firstChild){
             qf.sig = sig;
-            w.innerHTML = qfRow("qf-freq", "🔥", "最近よく使う機能", freq) + qfRow("qf-rec", "💡", "おすすめ（見た履歴から更新）", rec);
+            w.innerHTML = qfRow("qf-rec", "💡", "おすすめ（見た履歴から更新）", rec);
         }
     }catch(error){ console.error("[ARE frequent]", error); }
 }
