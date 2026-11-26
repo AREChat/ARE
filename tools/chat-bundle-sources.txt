@@ -147,3 +147,4 @@ chat-guest.js
 chat-longtext.js
 chat-copyblock.js
 chat-offlinegame.js
+chat-aibot.js

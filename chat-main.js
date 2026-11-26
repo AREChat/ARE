@@ -124,6 +124,7 @@ const FEATURES = [
     ["avatar","アバター",initAvatar],
     ["quicksend","スクショ・PDFのかんたん送信",initQuickSend],
     ["myai","マイAI",initMyAi],
+    ["aibot","カスタマイズAIbot（自分専用・その他の区分は使えない）",initAiBot],
     ["notify","未読バッジ・新着通知",initNotify],
     ["presence","在席状況・既読",initPresence],
     ["messages","メッセージの編集・削除申請・予約送信",initMessageTools],
