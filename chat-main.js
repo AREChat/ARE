@@ -278,6 +278,7 @@ function startFeatures(){
         }
     });
     window.AREFeatures.banner();
+    if(typeof window.AREFeatures.markReady === "function") window.AREFeatures.markReady();
 }
 
 initialize().catch((error) => {

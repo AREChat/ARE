@@ -10,6 +10,14 @@
     var lastNotice = 0;
     var status = {};
     var labels = {};
+    // 読み込み中は「未実装」と言わない：画面は一瞬で出るが、ボタンに機能がつながるのは、そのあと（数秒）。
+    // チャット画面は startFeatures の最後に markReady() で合図。それ以外の画面は、読み込み完了の少しあと。
+    // 合図が来ないまま 20 秒たったら、本当に つながっていないとみなして、いままで通り「未実装」と出す。
+    var booted = false;
+    var isChatPage = /\/chat(\.html)?$/.test(location.pathname);
+    function markReady() { booted = true; }
+    if (isChatPage) { setTimeout(markReady, 20000); }
+    else { window.addEventListener("load", function () { setTimeout(markReady, 400); }); setTimeout(markReady, 20000); }
 
     function notify(message) {
         var now = Date.now();
@@ -104,6 +112,7 @@
         if (!btn || btn.disabled || btn.hasAttribute("data-keep")) return;
         var wired = (clickInfo && clickInfo.btn === btn) ? clickInfo.wired : isWired(btn);
         if (wired) return;
+        if (!booted) { notify("いま読み込み中です。1〜2秒待ってから、もう一度押してください。"); return; }
         notify("この機能は未実装です。");
     }, false);
 
@@ -116,6 +125,7 @@
         ok: function (id) { return status[id] !== false; },
         failed: function () { return Object.keys(status).filter(function (id) { return status[id] === false; }).map(function (id) { return labels[id]; }); },
         notify: notify,
+        markReady: markReady,
         banner: function () {
             var failed = window.AREFeatures.failed();
             var bar = document.getElementById("featureBanner");
