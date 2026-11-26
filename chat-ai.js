@@ -98,7 +98,7 @@ function aiClassify(msgs){
 function openAi(){
     if(!state.currentRoom){ showToast("分析するチャットを、先に開いてください。"); return; }
     const msgs = textMessages().slice(-300);
-    if(msgs.length < 3){ openSheet(toolHead("🤖 会話の分析（かんたん）") + '<div class="empty-list">分析するには、文字のメッセージが3件以上必要です。</div>' + toolClose()); return; }
+    if(msgs.length < 3){ openSheet(toolHead("🧐 会話の分析（かんたん）") + '<div class="empty-list">分析するには、文字のメッセージが3件以上必要です。</div>' + toolClose()); return; }
     const keywords = aiKeywords(msgs, 10), summary = aiSummary(msgs, aiKeywords(msgs, 30)), sent = aiSentiment(msgs), cats = aiClassify(msgs);
     const who = (id) => id === state.user.id ? "あなた" : profileDisplayName(feat.known.get(id) || (state.currentPartner && state.currentPartner.id === id ? state.currentPartner : null));
     const hours = new Array(24).fill(0);
@@ -106,7 +106,7 @@ function openAi(){
     const busy = hours.indexOf(Math.max(...hours));
     const total = [...sent.values()].reduce((a, p) => ({pos:a.pos + p.pos, neg:a.neg + p.neg, n:a.n + p.n}), {pos:0, neg:0, n:0});
     const all = sentimentLabel(total);
-    openSheet(toolHead("🤖 会話の分析（かんたん）", escapeHtml(roomTitle(state.currentRoom)) + " の直近の文字メッセージ " + msgs.length + " 件を、この端末の中だけで調べました（外部には送りません）。精度は限定的です。") +
+    openSheet(toolHead("🧐 会話の分析（かんたん）", escapeHtml(roomTitle(state.currentRoom)) + " の直近の文字メッセージ " + msgs.length + " 件を、この端末の中だけで調べました（外部には送りません）。精度は限定的です。") +
         '<div class="admin-card"><b>📝 要約（重要そうな文）</b>' + (summary.length ? '<ul>' + summary.map((s) => '<li>' + escapeHtml(s) + '</li>').join("") + '</ul>' : '<div class="meta">要約できる文が見つかりませんでした。</div>') + '</div>' +
         '<div class="admin-card"><b>🔑 キーワード</b><div class="memo-chips">' + (keywords.length ? keywords.map(([w, n]) => '<span class="chip">' + escapeHtml(w) + ' ×' + n + '</span>').join("") : '<span class="meta">見つかりませんでした。</span>') + '</div></div>' +
         '<div class="admin-card"><b>💗 感情（文章からの簡易判定）</b><div>全体：' + all.text + '</div><div class="ai-meter"><i style="width:' + all.pct + '%"></i></div>' +

@@ -68,7 +68,7 @@
         return best;
     }
     async function renderBot() {
-        title.textContent = "🤖 AIチャットボット";
+        title.textContent = "🙋 AIチャットボット";
         body.innerHTML = '<div class="eb-note">あらかじめ登録された質問と部分一致で、自動的に回答します（人工知能が考えて答えるものではありません）。</div><div class="eb-log" id="botLog"></div><div class="eb-chips" id="botChips"></div><form class="eb-form" id="botForm"><input id="botInput" maxlength="100" placeholder="質問を入力（例：使い方）" autocomplete="off"><button>送信</button></form>';
         const log = $("botLog");
         const add = (text, me) => { const d = document.createElement("div"); d.className = "eb-msg" + (me ? " me" : ""); d.textContent = text; log.appendChild(d); log.scrollTop = log.scrollHeight; };
