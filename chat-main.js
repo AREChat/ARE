@@ -282,6 +282,8 @@ function startFeatures(){
     window.AREFeatures.banner();
     if(typeof window.AREFeatures.markReady === "function") window.AREFeatures.markReady();
     watchProtect();
+    // C++（WASM）の高速部品を、画面が落ちついてから読みこむ（失敗しても、これまでの JS の計算で動く）
+    if(window.AREFast && typeof window.AREFast.load === "function") setTimeout(() => { try{ window.AREFast.load("./are-fast.wasm?v=1"); }catch(_e){ /* 何もしない */ } }, 2500);
 }
 
 // 見張り（protect.js）が、はずされたり・差しかえられたりしていないかを、チャット本体の側からも たしかめる。

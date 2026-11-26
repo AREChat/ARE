@@ -112,7 +112,9 @@ function renderEdit(){
     if(s.bright || s.contrast || s.gray || (s.filter && s.filter !== "none")){
         const data = ctx.getImageData(0, 0, cw, ch), px = data.data;
         const c = s.contrast * 2.55, f = (259 * (c + 255)) / (255 * (259 - c)), add = s.bright * 2.55;
-        for(let i = 0; i < px.length; i += 4){
+        // C++（WASM）が使えるときは、そちらで速く計算する（結果は JS と1画素も違わない）。使えないときは、これまでの JS の計算
+        const fastDone = !!(window.AREFast && window.AREFast.ready() && window.AREFast.adjust(data, s.bright, s.contrast, s.gray, Math.max(0, IE_FILTERS.findIndex((x) => x[0] === (s.filter || "none")))));
+        for(let i = 0; !fastDone && i < px.length; i += 4){
             let r = px[i], g = px[i + 1], b = px[i + 2];
             if(s.gray){ r = g = b = 0.299 * r + 0.587 * g + 0.114 * b; }
             if(s.filter && s.filter !== "none"){ const o = ieApplyFilter(s.filter, r, g, b); r = o[0]; g = o[1]; b = o[2]; }

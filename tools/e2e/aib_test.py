@@ -26,11 +26,11 @@ with sync_playwright() as p:
     pg.evaluate("openAiBot()"); print('sheet shown:', not pg.evaluate("el.profileModal.hidden"))
     # settings
     pg.evaluate("aibRenderSettings()")
-    pg.fill('#aibUrl','https://script.google.com/macros/s/ABC123/exec'); pg.fill('#aibToken','bad')
+    pg.evaluate("feat.aib.shared={url:'https://script.google.com/macros/s/ABC123/exec', token:'bad'}")
     pg.click('[data-t="aibot:save"]'); pg.wait_for_timeout(200)
     pg.fill('#aibIn','テスト'); pg.click('#aibSend'); pg.wait_for_timeout(600)
     print('log after bad token:', pg.inner_text('#aibLog')[-60:])
-    pg.click('[data-t="aibot:settings"]'); pg.fill('#aibToken','good'); pg.click('[data-t="aibot:save"]')
+    pg.evaluate("feat.aib.shared={url:'https://script.google.com/macros/s/ABC123/exec', token:'good'}")
     pg.fill('#aibIn','こんにちは'); pg.click('#aibSend'); pg.wait_for_timeout(600)
     print('log after good:', pg.inner_text('#aibLog')[-40:])
     print('payload keys:', sorted(calls[-1].keys()), 'msgs', calls[-1]['messages'])

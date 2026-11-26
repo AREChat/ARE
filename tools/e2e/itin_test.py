@@ -181,7 +181,7 @@ with sync_playwright() as p:
     # ---- 8) 書き出し 10種類 + 共有系
     page.evaluate("() => { const b = document.getElementById('itnPops'); if(b) b.innerHTML = ''; }")
     page.locator('#itnRoot .itn-ic[data-t="itin:export"]').click(); page.wait_for_timeout(300)
-    check("書き出し画面：10種類のボタン", page.locator('#itnRoot .itn-xgrid button').count() == 10)
+    check("書き出し画面：11種類のボタン（PowerPoint を含む）", page.locator('#itnRoot .itn-xgrid button').count() == 11 and page.locator('#itnRoot .itn-xgrid [data-k="pptx"]').count() == 1)
     # 内容をそろえる
     page.evaluate("() => { const p = itnPlan(); p.items.forEach((x,i)=>{ if(i===2){ x.st='x'; x.aw=28; x.w=35; x.as='09:10'; x.ae='09:50'; x.nt='ふつう'; x.r=3; } }); itnTouch(p); }")
     files = {}
@@ -190,6 +190,12 @@ with sync_playwright() as p:
             page.locator('#itnRoot .itn-xgrid [data-k="%s"]' % k).click()
         d = dl.value; path = OUT + "/out." + ext; d.save_as(path); files[k] = path
         check("書き出し：%s が保存される（名前 %s）" % (k, d.suggested_filename), os.path.getsize(path) > 100, os.path.getsize(path))
+    # PowerPoint：GAS ハブに作ってもらう（ここでは偽の GAS が返事をする）
+    page.evaluate("() => { window.__hub = []; window.andHubUrl = () => 'https://script.google.com/macros/s/TEST/exec'; const rf = window.fetch; window.fetch = function(u, o){ if(String(u).indexOf('script.google.com/macros/s/TEST') >= 0){ window.__hub.push(JSON.parse(o.body)); return Promise.resolve(new Response(JSON.stringify({ok:true,name:'テスト.pptx',download:'about:blank#dl',url:'about:blank#v',left:29}), {status:200})); } return rf.apply(this, arguments); }; }")
+    page.locator('#itnRoot .itn-xgrid [data-k="pptx"]').click(); page.wait_for_timeout(1200)
+    hub = page.evaluate("() => window.__hub")
+    check("PowerPoint：GAS ハブに、表（列・行・まとめ）とログインの合いかぎが送られる", len(hub) == 1 and hub[0].get("action") == "office" and hub[0].get("format") == "pptx" and len(hub[0].get("columns", [])) == 13 and len(hub[0].get("rows", [])) >= 3 and hub[0].get("token") and hub[0].get("slideCols") == [0, 1, 3, 4, 10], str(hub)[:160])
+    check("PowerPoint：作れたお知らせが出る", "作りました" in page.evaluate("() => (document.getElementById('toast')||{}).textContent||''"))
     json.dump(files, open(OUT + "/files.json", "w"))
     page.evaluate("() => { window.__copied = ''; navigator.clipboard.writeText = (t) => { window.__copied = t; return Promise.resolve(); }; }")
     page.locator('#itnRoot [data-k="copy"]').click(); page.wait_for_timeout(300)

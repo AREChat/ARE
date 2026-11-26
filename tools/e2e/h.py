@@ -47,6 +47,7 @@ def new_page(p, width=390, height=700, extra_fx="", touch=True, neutral_console=
     if neutral_console: ctx.add_init_script("console.debug=function(){}")   # 自動操作ツールがコンソールの中身を読む＝見張りのおとりに反応するのを防ぐ
     ctx.add_init_script(fixtures_js(extra_fx))
     if os.environ.get('ARE_TIPS') != 'on': ctx.add_init_script("try{localStorage.setItem('are_tips_off_u-me','1');localStorage.setItem('are_gtips_off','1');localStorage.setItem('ll_tips_off','1')}catch(e){}")
+    if os.environ.get('ARE_HDR') != 'on': ctx.add_init_script("try{localStorage.setItem('are_install_taps','3')}catch(e){}")   # 「アプリ化のお願い」の全画面が、テストのクリックをさえぎらないように（ARE_HDR=on で、出す）
     ctx.add_init_script(FAKE_JS)
     page = ctx.new_page()
     logs = []

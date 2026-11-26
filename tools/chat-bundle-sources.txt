@@ -153,3 +153,4 @@ chat-frequent.js
 chat-suggest.js
 chat-fullscreen.js
 chat-android.js
+chat-fast.js

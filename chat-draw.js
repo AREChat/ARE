@@ -148,7 +148,8 @@ function stpDraw(){
     ctx.restore();
     if(stp.bg){
         const d = ctx.getImageData(0, 0, S, S), px = d.data, t = 255 - stp.thr;
-        for(let i = 0; i < px.length; i += 4){ if(px[i] >= t && px[i + 1] >= t && px[i + 2] >= t) px[i + 3] = 0; }
+        const fastDone = !!(window.AREFast && window.AREFast.ready() && window.AREFast.removeLight(d, t));   // C++（WASM）で速く。使えないときは、これまでの JS
+        for(let i = 0; !fastDone && i < px.length; i += 4){ if(px[i] >= t && px[i + 1] >= t && px[i + 2] >= t) px[i + 3] = 0; }
         ctx.putImageData(d, 0, 0);
     }
 }

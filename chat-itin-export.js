@@ -1,5 +1,5 @@
 "use strict";
-// ===== 行動予定表：書き出し（10種類）=====
+// ===== 行動予定表：書き出し（11種類：PowerPoint は GAS ハブ経由）=====
 // PDF／Excel(.xlsx)／Word(.docx)／テキスト／JPEG／PNG／CSV／Webページ(HTML)／カレンダー(.ics)／バックアップ(JSON)
 // ほかに「共有」「コピー」「印刷」。すべて この端末の中で作ります（外のサービスには送りません）。
 // ・PDFと画像は「見た目そのまま」を画像で作ります（日本語の文字が どの端末でも 同じ形になります。文字の選択はできません）。
@@ -245,6 +245,29 @@ function itnPrint(plan){
     const done = () => { document.body.classList.remove("itn-printing"); if(div.parentNode) div.parentNode.removeChild(div); window.removeEventListener("afterprint", done); };
     window.addEventListener("afterprint", done); setTimeout(() => { try{ window.print(); }catch(_e){ done(); } }, 150); setTimeout(done, 60000);
 }
+// PowerPoint(.pptx) は、GAS ハブ（Google の無料の仕組み）に作ってもらい、できたファイルを開く。ログインしている人だけ・1日 30回まで
+async function itnHubOffice(fmt, plan){
+    try{
+        if(typeof aibLoadShared === "function") await aibLoadShared();
+        const url = typeof andHubUrl === "function" ? andHubUrl() : "";
+        if(!url){ showToast("PowerPoint の書き出しは、GAS ハブの設定がすむと 使えます（いまは Excel・Word・PDF を お使いください）。"); return; }
+        const ses = await requireClient().auth.getSession();
+        const token = ses && ses.data && ses.data.session && ses.data.session.access_token;
+        if(!token){ showToast("ログインが確認できません。ログインしなおしてください。"); return; }
+        showToast("PowerPoint を作っています…（数秒かかります）");
+        const body = {action: "office", token, format: fmt, title: plan.title + (plan.date ? " " + plan.date : ""), columns: ITN_COLS, rows: itnRowsOf(plan), summary: itnSummary(plan), slideCols: [0, 1, 3, 4, 10]};
+        const r = await fetch(url, {method: "POST", headers: {"Content-Type": "text/plain;charset=utf-8"}, body: JSON.stringify(body)});
+        const j = await r.json();
+        if(!j || !j.ok){ showToast((j && j.message) || "作れませんでした。しばらくしてから もう一度おためしください。"); return; }
+        showToast("「" + j.name + "」を作りました（ドライブの ARE-ハブ に保存）。ひらきます。きょうは あと " + j.left + " 回。");
+        const a = document.createElement("a");
+        a.href = j.download || j.url; a.target = "_blank"; a.rel = "noopener noreferrer";
+        document.body.appendChild(a); a.click(); a.remove();
+    }catch(_e){
+        showToast("PowerPoint を作れませんでした。通信を確かめて、もう一度おためしください。");
+    }
+}
+
 async function itnExport(kind, plan){
     if(!plan || !plan.items.length){ showToast("書き出す予定がありません。"); return; }
     const base = itnFileBase(plan);
@@ -256,6 +279,7 @@ async function itnExport(kind, plan){
     if(kind === "ics") return save(new Blob([itnIcs(plan)], {type: "text/calendar;charset=utf-8"}), "ics");
     if(kind === "json") return save(new Blob([JSON.stringify({app: "ARE-itin", v: 1, plan: itnPackPlan(plan)}, null, 1)], {type: "application/json"}), "json");
     if(kind === "xlsx") return save(new Blob([itnXlsx(plan)], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}), "xlsx");
+    if(kind === "pptx") return itnHubOffice("pptx", plan);
     if(kind === "docx") return save(new Blob([itnDocx(plan)], {type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"}), "docx");
     if(kind === "jpg" || kind === "png"){ showToast("画像を作っています…"); return save(await itnImage(plan, kind === "jpg" ? "image/jpeg" : "image/png"), kind); }
     if(kind === "pdf"){ showToast("PDFを作っています…"); return save(await itnPdf(plan), "pdf"); }

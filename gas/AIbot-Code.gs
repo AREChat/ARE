@@ -8,7 +8,7 @@
  *
  * スクリプト プロパティ（＝この GAS の金庫）に入れるもの
  *   XAI_API_KEY : xAI の APIキー（必須）
- *   APP_TOKEN   : 合言葉（必須。16文字以上の ランダムな文字。アプリの せっていにも 同じものを入れる）
+ *   APP_TOKEN   : 合言葉（必須。6文字以上。長くて推測されにくいほど安全。アプリの せっていにも 同じものを入れる）
  *   XAI_MODEL   : 使うモデル名（任意。空なら grok-4.7）
  *   DAILY_LIMIT : 1日の上限回数（任意。空なら 60。無料枠を まもるための ブレーキ）
  *
@@ -34,7 +34,7 @@ function doPost(e) {
     var props = PropertiesService.getScriptProperties();
     var apiKey = props.getProperty('XAI_API_KEY');
     var appToken = props.getProperty('APP_TOKEN');
-    if (!apiKey || !appToken || appToken.length < 8) return out_({ ok: false, code: 'setup' });
+    if (!apiKey || !appToken || appToken.length < 6) return out_({ ok: false, code: 'setup' });
 
     var body = parse_(e);
     if (!body) return out_({ ok: false, code: 'input' });
