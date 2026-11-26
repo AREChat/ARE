@@ -310,7 +310,7 @@ function hubxParse_(e) {
   if (c.charAt(0) !== '{' || c.indexOf('"action"') < 0 || c.indexOf('"action"') > 200) return null;   // action が先頭にないものは AIbot のもの
   try { var o = JSON.parse(c); return o && typeof o === 'object' ? o : null; } catch (err) { return null; }
 }
-function hubxIsAction_(body) { return !!body && typeof body === 'object' && /^(push|office|ci)$/.test(String(body.action || '')); }
+function hubxIsAction_(body) { return !!body && typeof body === 'object' && /^(push|office|ci|sync)$/.test(String(body.action || '')); }
 
 function hubxRoute_(body) {
   try {
@@ -318,6 +318,7 @@ function hubxRoute_(body) {
     if (a === 'push') return hubxOut_(pushApi_(body));
     if (a === 'office') return hubxOut_(officeApi_(body));
     if (a === 'ci') return hubxOut_(ciApi_(body));
+    if (a === 'sync') return hubxOut_(syncApi_(body));
   } catch (err) {
     return hubxOut_({ ok: false, message: String(err && err.message ? err.message : err).slice(0, 200) });
   }
@@ -328,8 +329,86 @@ function hubxRoute_(body) {
 function hubxGet_(params) {
   var a = String((params && params.action) || '');
   if (a === 'ci') return hubxOut_(ciStatus_());
-  if (a === 'hub') return hubxOut_({ ok: true, name: 'hub-extra', version: '2026-11-26', features: ['push', 'office', 'ci'] });
+  if (a === 'hub') return hubxOut_({ ok: true, name: 'hub-extra', version: '2026-11-26', features: ['push', 'office', 'ci', 'sync'] });
   return null;
+}
+
+// ============================================================
+//  ④ 引き継ぎ（sync）：ゲーム・学習アプリの保存データを、同じアカウントのどの端末でも使えるようにする
+// ============================================================
+//  Supabase（SQL）は容量が少ないので、Googleドライブ（GAS）に置く。1人・1アプリごとに1つのファイル：
+//    ARE-ハブ/引き継ぎ/<ユーザー番号>/<アプリ名>.json   中身：{ キー名: {t:更新時刻, v:文字列} または {t, del:1} }
+//  body: { action:'sync', op:'pull'|'push', token, app, have:{キー名:t,…}, items:{キー名:{t,v}|{t,del:1},…} }
+//   pull … 手元より新しい項目だけを返す（have に無いキーは、すべて返す）
+//   push … 項目ごとに「新しいほうが勝つ」で取り込む。サーバーのほうが新しかった項目は、そのまま返す（手元を直してもらう）
+//  ログインの確認は、他と同じ Supabase の合いかぎ。自分の分しか読めない・書けない（ユーザー番号は合いかぎから決まる）
+var SYNC = { MAX_VALUE: 900 * 1024, MAX_KEYS: 400, MAX_FILE: 6 * 1024 * 1024, MAX_PUSH_KEYS: 120, PER_MIN: 40 };
+function syncApi_(body) {
+  var uid = hubxVerify_(body.token);
+  var app = String(body.app || '');
+  if (!/^[a-z0-9][a-z0-9_-]{0,23}$/.test(app)) return { ok: false, message: 'アプリの名前が正しくありません。' };
+  var op = String(body.op || '');
+  if (op !== 'pull' && op !== 'push') return { ok: false, message: '操作が正しくありません。' };
+  if (!syncRate_(uid)) return { ok: false, message: 'すこし多すぎます。1分ほど待ってから、もう一度おためしください。', busy: true };
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    var file = syncFile_(uid, app, op === 'push');
+    var map = syncRead_(file);
+    if (op === 'pull') {
+      var have = body.have && typeof body.have === 'object' ? body.have : {}, out = {}, n = 0;
+      var only = Array.isArray(body.keys) ? body.keys.slice(0, SYNC.MAX_PUSH_KEYS) : null;      // keys があれば、その項目だけ（手元の時刻に関係なく）返す
+      if (only) only.forEach(function (k) { k = String(k); if (map[k]) { out[k] = map[k]; n++; } });
+      else Object.keys(map).forEach(function (k) { var h = Number(have[k]); if (!(h >= map[k].t)) { out[k] = map[k]; n++; } });
+      return { ok: true, items: out, count: n, total: Object.keys(map).length, now: Date.now() };
+    }
+    var items = body.items && typeof body.items === 'object' ? body.items : {}, keys = Object.keys(items);
+    if (keys.length > SYNC.MAX_PUSH_KEYS) return { ok: false, message: '1回に送れる項目は ' + SYNC.MAX_PUSH_KEYS + ' までです。' };
+    var accepted = [], newer = {}, changed = false;
+    for (var i = 0; i < keys.length; i++) {
+      var k = keys[i], it = items[k];
+      if (!/^[A-Za-z0-9_:.\-]{1,80}$/.test(k) || !it || typeof it !== 'object') continue;
+      var t = Number(it.t);
+      if (!(t > 0) || t > Date.now() + 24 * 3600 * 1000) continue;      // 時刻がおかしい（大きく未来）ものは取り込まない
+      var cur = map[k];
+      if (cur && cur.t >= t) { if (cur.t > t || cur.v !== it.v || !!cur.del !== !!it.del) newer[k] = cur; continue; }
+      if (it.del) { map[k] = { t: t, del: 1 }; }
+      else {
+        if (typeof it.v !== 'string' || it.v.length > SYNC.MAX_VALUE) continue;
+        map[k] = { t: t, v: it.v };
+      }
+      accepted.push(k); changed = true;
+    }
+    if (Object.keys(map).length > SYNC.MAX_KEYS) return { ok: false, message: '保存できる項目の数をこえました。' };
+    if (changed) {
+      var text = JSON.stringify(map);
+      if (text.length > SYNC.MAX_FILE) return { ok: false, message: '保存できる大きさをこえました。' };
+      syncWrite_(file, text);
+    }
+    return { ok: true, accepted: accepted, newer: newer, now: Date.now() };
+  } finally {
+    lock.releaseLock();
+  }
+}
+function syncRate_(uid) {
+  var c = CacheService.getScriptCache(), k = 'syr:' + uid.slice(0, 12) + ':' + Math.floor(Date.now() / 60000), n = parseInt(c.get(k) || '0', 10) || 0;
+  if (n >= SYNC.PER_MIN) return false;
+  c.put(k, String(n + 1), 120);
+  return true;
+}
+function syncFile_(uid, app, create) {
+  var base = hubxFolder_('引き継ぎ'), it = base.getFoldersByName(uid), dir = it.hasNext() ? it.next() : (create ? base.createFolder(uid) : null);
+  if (!dir) return { dir: null, file: null, name: app + '.json' };
+  var fi = dir.getFilesByName(app + '.json');
+  return { dir: dir, file: fi.hasNext() ? fi.next() : null, name: app + '.json' };
+}
+function syncRead_(f) {
+  if (!f.file) return {};
+  try { var o = JSON.parse(f.file.getBlob().getDataAsString('UTF-8')); return o && typeof o === 'object' ? o : {}; } catch (e) { return {}; }
+}
+function syncWrite_(f, text) {
+  if (f.file) f.file.setContent(text);
+  else f.file = f.dir.createFile(f.name, text, 'application/json');
 }
 
 // ============================================================

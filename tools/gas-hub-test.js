@@ -45,7 +45,7 @@ function makeGas(propsInit) {
     fetch: (url, o) => {
       log.fetch.push({ url, o });
       if (responders.fetch) { const r = responders.fetch(url, o); if (r) return r; }
-      if (/\/auth\/v1\/user$/.test(url)) { const t = String(o.headers.Authorization).replace("Bearer ", ""); return t === "good" ? R(200, '{"id":"user-1"}') : R(401, "{}"); }
+      if (/\/auth\/v1\/user$/.test(url)) { const t = String(o.headers.Authorization).replace("Bearer ", ""); return t === "good" ? R(200, '{"id":"user-1"}') : t === "good2" ? R(200, '{"id":"user-2"}') : R(401, "{}"); }
       if (/oauth2\.googleapis\.com\/token/.test(url)) return R(200, '{"access_token":"fcm-at"}');
       if (/\/files\/.+\/export/.test(url)) return R(200, "", { setName(n) { this.name = n; return this; } });
       if (/keepalive_v1/.test(url)) return R(200, "{}");
@@ -60,9 +60,10 @@ function makeGas(propsInit) {
     f.getFoldersByName = (n) => { const a = f.folders.filter((x) => x.name === n); let i = 0; return { hasNext: () => i < a.length, next: () => a[i++] }; };
     f.createFolder = (n) => { const x = mkFolder(n); f.folders.push(x); return x; };
     f.createFile = (a, b, c) => { const isBlob = typeof a === "object"; const x = { id: "f" + (log.files.length + 1), name: isBlob ? a.name : a, content: isBlob ? a.bytes : b, shared: false, trashed: false, created: new Date(nowMs + log.files.length),
-      getId() { return this.id; }, getUrl() { return "https://drive.google.com/file/d/" + this.id; }, setSharing() { this.shared = true; return this; }, setTrashed(v) { this.trashed = v; log.trashed.push(this.id); return this; }, getDateCreated() { return this.created; } };
+      getBlob() { const me = this; return { getDataAsString: () => String(me.content) }; }, setContent(t) { this.content = t; return this; }, getId() { return this.id; }, getUrl() { return "https://drive.google.com/file/d/" + this.id; }, setSharing() { this.shared = true; return this; }, setTrashed(v) { this.trashed = v; log.trashed.push(this.id); return this; }, getDateCreated() { return this.created; } };
       f.files.push(x); log.files.push(x); return x; };
     f.getFiles = () => { const a = f.files.filter((x) => !x.trashed); let i = 0; return { hasNext: () => i < a.length, next: () => a[i++] }; };
+    f.getFilesByName = (n) => { const a = f.files.filter((x) => !x.trashed && x.name === n); let i = 0; return { hasNext: () => i < a.length, next: () => a[i++] }; };
     return f;
   };
   const roots = [];
@@ -91,6 +92,7 @@ function makeGas(propsInit) {
     get: (p) => out(sandbox.doGet({ parameter: p || {} })), run: (c) => vm.runInContext(c, sandbox) };
 }
 
+if (require.main !== module) { module.exports = { makeGas }; return; }      // 別の試験（ブラウザの試験）から、本物の GAS コードを動かすために 読みこまれたとき
 // ===== 1. AIbot の動きが 変わっていないこと =====
 {
   const g = makeGas({ XAI_API_KEY: "k", APP_TOKEN: "secret-secret-1234" });
@@ -181,6 +183,50 @@ function makeGas(propsInit) {
   check(w === "fail" && g.log.mail.length === 1 && /1 件/.test(g.log.mail[0].sub), "見張り：サイトがこわれていたら、持ち主にメールで知らせる");
   g.responders.fetch = null;
   check(g.run("hubxDailyWatch()") === "pass" && g.log.mail.length === 1, "見張り：すべて正常ならメールは出さない");
+}
+// ===== 5. 引き継ぎ（sync）=====
+{
+  const g = makeGas({});
+  const S = (o) => g.post(Object.assign({ action: "sync", token: "good", app: "games" }, o));
+  check(S({ op: "pull", token: "bad" }).ok === false, "引き継ぎ：ログインが確認できないと断る");
+  check(S({ op: "pull", app: "../x" }).ok === false && S({ op: "pull", app: "" }).ok === false, "引き継ぎ：アプリ名のかたちが違うと断る");
+  check(S({ op: "zzz" }).ok === false, "引き継ぎ：知らない操作は断る");
+  const e = S({ op: "pull" });
+  check(e.ok && e.count === 0 && e.total === 0 && g.log.files.length === 0, "引き継ぎ：何も無いときは空を返し、ファイルは作らない");
+  const p1 = S({ op: "push", items: { kaaa: { t: 1000, v: "A" }, kbbb: { t: 1000, v: "B".repeat(5000) } } });
+  check(p1.ok && p1.accepted.length === 2 && p1.accepted.includes("kaaa") && Object.keys(p1.newer).length === 0, "引き継ぎ：送ると取りこまれる " + JSON.stringify(p1).slice(0, 100));
+  check(g.log.files.length === 1 && /games\.json$/.test(g.log.files[0].name), "引き継ぎ：1人・1アプリで 1ファイル");
+  const pl = S({ op: "pull" });
+  check(pl.ok && pl.count === 2 && pl.items.kaaa.v === "A" && pl.items.kbbb.v.length === 5000, "引き継ぎ：取り出せる");
+  check(S({ op: "pull", have: { kaaa: 1000, kbbb: 999 } }).count === 1, "引き継ぎ：手元と同じか新しいものは 返さない（古いものだけ返す）");
+  check(S({ op: "pull", keys: ["kaaa"], have: { kaaa: 99999 } }).count === 1, "引き継ぎ：keys を指定すると その項目だけ返す");
+  check(Object.keys(S({ op: "pull", keys: ["nothing"] }).items).length === 0, "引き継ぎ：keys にない項目は 返さない");
+  const p2 = S({ op: "push", items: { kaaa: { t: 900, v: "OLD" } } });
+  check(p2.ok && p2.accepted.length === 0 && p2.newer.kaaa && p2.newer.kaaa.v === "A", "引き継ぎ：古い時刻のものは 取りこまず、サーバーのものを返す");
+  check(S({ op: "pull" }).items.kaaa.v === "A", "引き継ぎ：古い送信で 上書きされない");
+  const p3 = S({ op: "push", items: { kaaa: { t: 2000, del: 1 } } });
+  check(p3.accepted.includes("kaaa") && S({ op: "pull" }).items.kaaa.del === 1 && S({ op: "pull" }).items.kaaa.v === undefined, "引き継ぎ：消した印（del）も 時刻つきで残る");
+  check(S({ op: "push", items: { kaaa: { t: 1500, v: "ZZ" } } }).accepted.length === 0, "引き継ぎ：消した後に 古い値が戻ってこない");
+  const bad = S({ op: "push", items: { "bad key!": { t: 5, v: "x" }, "../etc": { t: 5, v: "x" }, kneg: { t: -1, v: "x" }, kfuture: { t: Date.now() + 99 * 24 * 3600 * 1000, v: "x" }, knum: { t: 5, v: 12 }, kbig: { t: 5, v: "x".repeat(900 * 1024 + 1) }, kok: { t: 5, v: "ok" } } });
+  check(bad.ok && bad.accepted.length === 1 && bad.accepted[0] === "kok", "引き継ぎ：おかしな名前・時刻・大きさ・型は 取りこまない " + JSON.stringify(bad.accepted));
+  check(S({ op: "push", items: Object.fromEntries(Array.from({ length: 121 }, (_, i) => ["k" + i, { t: 5, v: "x" }])) }).ok === false, "引き継ぎ：1回に送れる数に上限（120）");
+  // 別の人の分とは混ざらない
+  g.responders.fetch = null;
+  const other = g.post({ action: "sync", op: "pull", token: "good2", app: "games" });
+  check(other.ok && other.count === 0, "引き継ぎ：ほかの人の記録は 見えない");
+  g.post({ action: "sync", op: "push", token: "good2", app: "games", items: { kaaa: { t: 3000, v: "OTHER" } } });
+  check(S({ op: "pull" }).items.kaaa.del === 1 && g.post({ action: "sync", op: "pull", token: "good2", app: "games" }).items.kaaa.v === "OTHER", "引き継ぎ：人ごとに 別々に 保存される");
+  check(g.post({ action: "sync", op: "pull", token: "good", app: "learn" }).count === 0, "引き継ぎ：アプリごとにも 別々");
+  // 回数の上限（1分40回）
+  let last; for (let i = 0; i < 45; i++) last = S({ op: "pull" });
+  check(last.ok === false && last.busy === true, "引き継ぎ：1分に40回をこえると 待つように言う");
+  g.advance(61000);
+  check(S({ op: "pull" }).ok === true, "引き継ぎ：1分たつと また使える");
+  // 大きさの上限
+  const g2 = makeGas({});
+  const res = []; for (let i = 0; i < 8; i++) { res.push(g2.post({ action: "sync", op: "push", token: "good", app: "games", items: { ["kb" + i]: { t: 10 + i, v: "y".repeat(800 * 1024) } } }).ok); g2.advance(61000); }
+  check(res.slice(0, 6).every(Boolean) && res[7] === false, "引き継ぎ：1つのファイルが 6MB をこえるときは 断る " + res.join(","));
+  check(g.get({ action: "hub" }).features.includes("sync"), "引き継ぎ：?action=hub に sync が出る");
 }
 console.log(ok + " / " + (ok + ng) + (ng ? "  ← NG あり" : "  すべて OK"));
 process.exit(ng ? 1 : 0);
