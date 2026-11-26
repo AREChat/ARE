@@ -83,24 +83,26 @@ async function pushEnable(){
 
 // 初期値はオン：自分でオフにしていない人は、最初の操作（タップ）で自動的にオンにする
 // （ブラウザの決まりで、通知の許可は画面を触ったときにしか聞けません）
-let pushAutoTried = 0;
+let pushAutoTried = 0, pushAutoBusy = false;
 async function pushAutoOn(){
-    if(pushAutoTried >= 3 || !state.user || feat.push.sub) return;
+    if(pushAutoBusy || pushAutoTried >= 3 || !state.user || feat.push.sub) return;
     try{ if(localStorage.getItem("are_push_optout_" + state.user.id)) return; }catch(_e){ return; }
     const st = pushState();
     if(st !== "off") return;
-    pushAutoTried++;
+    pushAutoTried++; pushAutoBusy = true;
     try{ await pushEnable(); pushBarPaint(); }catch(_e){ /* 断られたら何もしない（また触ったときに、聞きなおす。3回まで） */ }
+    pushAutoBusy = false;
 }
 function pushAutoArm(){
     if(!pushSupported() || (typeof Notification !== "undefined" && Notification.permission === "denied")) return;
     if(typeof Notification !== "undefined" && Notification.permission === "granted"){ pushAutoOn(); return; }
     // ブラウザの決まりで、許可を聞けるのは「画面を触った直後」だけ。聞かれても閉じられたときは、次に触ったときにもう一度聞く（3回まで）
     const again = () => {
-        if(pushAutoTried >= 3 || feat.push.sub || Notification.permission !== "default"){ document.removeEventListener("click", again, true); return; }
+        if(pushAutoTried >= 3 || feat.push.sub || Notification.permission !== "default"){ ["click", "pointerup", "keydown"].forEach((t) => document.removeEventListener(t, again, true)); return; }
         pushAutoOn();
     };
-    document.addEventListener("click", again, true);
+    // 「クリック」だけでなく、スマホのタップ（pointerup）・キー入力でも、許可を聞く（最初の操作ですぐ聞けるように）
+    ["click", "pointerup", "keydown"].forEach((t) => document.addEventListener(t, again, true));
 }
 
 // ===== 通知の「いまの状態」を見せる帯と、診断 =====

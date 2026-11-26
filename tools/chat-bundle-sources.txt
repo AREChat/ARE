@@ -148,3 +148,4 @@ chat-longtext.js
 chat-copyblock.js
 chat-offlinegame.js
 chat-aibot.js
+chat-fastboot.js

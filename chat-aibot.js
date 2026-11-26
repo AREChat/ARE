@@ -21,7 +21,7 @@ const AIB_TONES = [
     ["元気なコーチ", "あなたは「カスタマイズAIbot」。明るく 元気な コーチです。小さな 一歩を ほめて、次に やることを 1つだけ 提案します。短く、前向きに。"]
 ];
 
-feat.aib = {busy:false, uid:"", hist:[], cfg:{url:"", token:"", persona:AIB_DEFAULT_PERSONA, name:"カスタマイズAIbot"}, loaded:false};
+feat.aib = {busy:false, uid:"", shared:null, sharedTried:false, hist:[], cfg:{url:"", token:"", persona:AIB_DEFAULT_PERSONA, name:"カスタマイズAIbot"}, loaded:false};
 
 /** つかってよい人か：管理者／家庭／社員／友人。区分「その他」・区分が不明のあいだは false */
 function aibAllowed(){
@@ -50,9 +50,32 @@ function aibLoad(){
     a.loaded = true; a.uid = aibUid();
 }
 /** アカウントが かわったら、そのアカウントの きろくを 読みなおす（ほかの人の きろくが 見えないように） */
-function aibEnsure(){ if(!feat.aib.loaded || feat.aib.uid !== aibUid()){ feat.aib.busy = false; aibLoad(); } }
+function aibEnsure(){ if(!feat.aib.loaded || feat.aib.uid !== aibUid()){ feat.aib.busy = false; feat.aib.shared = null; feat.aib.sharedTried = false; aibLoad(); } }
 function aibSaveCfg(){ try{ localStorage.setItem(aibCfgKey(), JSON.stringify(feat.aib.cfg)); }catch(_e){ showToast("保存できませんでした（ブラウザの保存容量がいっぱいかもしれません）。"); } }
 function aibSaveHist(){ try{ localStorage.setItem(aibHistKey(), JSON.stringify(feat.aib.hist.slice(-AIB_MAX_SAVE))); }catch(_e){ /* 続行 */ } }
+
+/** 共通の設定（URL・合言葉）を サーバーから受け取る。区分「その他」には サーバーが渡さない。メモリにだけ置き、端末には 保存しない */
+async function aibLoadShared(){
+    const a = feat.aib;
+    if(a.shared || a.sharedTried && a.sharedUid === aibUid()) return;
+    if(a.sharedBusy) return;
+    a.sharedBusy = true;
+    try{
+        const r = await requireClient().rpc("my_aibot_config");
+        if(!r.error){                                   // 答えが返った（渡さない人には null）。通信しっぱいのときは、あとで もういちど ためす
+            a.sharedTried = true; a.sharedUid = aibUid();
+            if(r.data && aibUrlOk(r.data.url) && typeof r.data.token === "string" && r.data.token) a.shared = {url:r.data.url, token:r.data.token};
+        }
+    }catch(_e){ /* 通信しっぱい：自分の設定だけで つかう */ }
+    a.sharedBusy = false;
+}
+/** いま つかう URL と 合言葉（自分で入れたものが あれば それ。なければ 共通の設定） */
+function aibConn(){
+    const a = feat.aib;
+    if(aibUrlOk(a.cfg.url) && a.cfg.token) return {url:a.cfg.url.trim(), token:a.cfg.token, own:true};
+    if(a.shared) return {url:a.shared.url, token:a.shared.token, own:false};
+    return null;
+}
 
 /** GAS の URL か（https://script.google.com/macros/s/…/exec の形だけ ゆるす） */
 function aibUrlOk(u){ return /^https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]+\/exec$/.test(String(u || "").trim()); }
@@ -77,6 +100,7 @@ function aibotSyncEntrances(){
         pin = document.getElementById("aibotPin");
         pin.addEventListener("click", () => runTool(() => openAiBot()));
     }
+    if(show && !feat.aib.shared && !feat.aib.sharedTried) aibLoadShared();
     if(pin){ pin.style.display = show ? "" : "none"; const t = pin.firstChild; if(t && t.nodeType === 3) t.textContent = "📌 " + aibName() + " "; }
     const tool = document.querySelector('[data-tool="aibot"]');
     if(tool){ tool.style.display = show ? "" : "none"; }
@@ -101,11 +125,12 @@ function openAiBot(){
     if(!aibAllowed()){ showToast("この機能は、いまのアカウントでは つかえません。"); return; }
     aibEnsure();
     aibRenderMain();
+    if(!aibConn()) aibLoadShared().then(() => { if(aibConn() && document.getElementById("aibLog") && !el.profileModal.hidden) aibRenderMain(); });
 }
 function aibRenderMain(){
-    const a = feat.aib, ready = aibUrlOk(a.cfg.url) && a.cfg.token;
+    const a = feat.aib, ready = !!aibConn();
     openSheet(toolHead("🤖 " + escapeHtml(aibName()), "自分専用。ここで 打った 文章だけが AI に 送られます（ほかの人の 会話・情報は 送りません）。") +
-        (ready ? "" : '<div class="meta" style="color:#ff9a4a">⚠ まず「⚙ せってい」で、GASの URL と 合言葉を 入れてください。</div>') +
+        (ready ? "" : '<div class="meta" style="color:#ff9a4a">⚠ じゅんび中です。少し まってから もういちど ひらくか、「⚙ せってい」で 自分の GAS の URL と 合言葉を 入れてください。</div>') +
         '<div class="aib-log" id="aibLog" aria-live="polite"></div>' +
         '<textarea id="aibIn" class="aib-in" maxlength="' + AIB_MAX_INPUT + '" placeholder="ここに 書いて「送る」（Ctrl+Enter でも 送れます）"></textarea>' +
         '<div class="row"><button type="button" class="button" id="aibSend" data-t="aibot:send">送る</button>' +
@@ -127,6 +152,7 @@ function aibAppend(role, text){
 function aibRenderSettings(){
     const c = feat.aib.cfg;
     openSheet(toolHead("⚙ " + escapeHtml(aibName()) + " の せってい", "ここに 入れた 内容は、この端末の ブラウザにだけ 保存されます。") +
+        '<div class="meta">' + (feat.aib.shared ? "✅ 共通の じゅんびが できています。URL と 合言葉は、自分の GAS を つかいたいときだけ 入れます（空なら 共通のものを つかいます）。" : "URL と 合言葉を 入れてください。") + "</div>" +
         '<label for="aibName">bot の 名前（20文字まで）</label><input id="aibName" type="text" maxlength="20" value="' + escapeHtml(c.name) + '">' +
         '<label for="aibUrl">GAS の URL（…/exec で おわるもの）</label><input id="aibUrl" type="url" inputmode="url" placeholder="https://script.google.com/macros/s/…/exec" value="' + escapeHtml(c.url) + '">' +
         '<label for="aibToken">合言葉（GAS の APP_TOKEN と おなじもの）</label><input id="aibToken" type="password" autocomplete="off" value="' + escapeHtml(c.token) + '">' +
@@ -149,6 +175,7 @@ function onAiBotAction(act, node){
         if(url && !aibUrlOk(url)){ showToast("URL が 違うようです。https://script.google.com/macros/s/…/exec の 形で 入れてください。"); return; }
         c.name = document.getElementById("aibName").value.trim().slice(0, 20) || "カスタマイズAIbot";
         c.url = url; c.token = document.getElementById("aibToken").value;
+        if((c.url && !c.token) || (!c.url && c.token)){ showToast("自分の GAS を つかうときは、URL と 合言葉の 両方を 入れてください（どちらも空なら 共通のものを つかいます）。"); return; }
         c.persona = document.getElementById("aibPersona").value.trim().slice(0, AIB_MAX_PERSONA) || AIB_DEFAULT_PERSONA;
         aibSaveCfg(); aibotSyncEntrances(); showToast("保存しました。"); aibRenderMain();
     }
@@ -161,16 +188,18 @@ function onAiBotAction(act, node){
 async function aibSend(){
     const a = feat.aib, inp = document.getElementById("aibIn"); if(!inp || a.busy) return;
     const text = inp.value.trim(); if(!text) return;
-    if(!aibUrlOk(a.cfg.url) || !a.cfg.token){ showToast("先に「⚙ せってい」で GAS の URL と 合言葉を 入れてください。"); return; }
+    let conn = aibConn();
+    if(!conn){ await aibLoadShared(); conn = aibConn(); }
+    if(!conn){ showToast("まだ じゅんびが できていません。少し まってから もういちど。または「⚙ せってい」で 入れてください。"); return; }
     a.busy = true; const btn = document.getElementById("aibSend"); if(btn) btn.disabled = true;
     inp.value = ""; aibAppend("user", text); a.hist.push({role:"user", content:text}); aibSaveHist();
     const wait = aibAppend("assistant", "…考え中…");
     // 送るのは「このbotの画面の会話（さいごの数件）」と「キャラ設定」だけ。チャットの部屋・ほかの人の情報は 一切 入れない。
-    const body = {token:a.cfg.token, system:a.cfg.persona, messages:a.hist.slice(-AIB_SEND_LAST).map((m) => ({role:m.role, content:m.content.slice(0, AIB_MAX_INPUT)}))};
+    const body = {token:conn.token, system:a.cfg.persona, messages:a.hist.slice(-AIB_SEND_LAST).map((m) => ({role:m.role, content:m.content.slice(0, AIB_MAX_INPUT)}))};
     let reply = "", failed = "";
     try{
         const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 45000);
-        const res = await fetch(a.cfg.url.trim(), {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), redirect:"follow", credentials:"omit", referrerPolicy:"no-referrer", signal:ctl.signal});
+        const res = await fetch(conn.url, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(body), redirect:"follow", credentials:"omit", referrerPolicy:"no-referrer", signal:ctl.signal});
         clearTimeout(timer);
         const j = await res.json();
         if(j && j.ok && typeof j.reply === "string") reply = j.reply;

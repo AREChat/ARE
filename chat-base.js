@@ -736,7 +736,13 @@ function renderRecommendations(){
 async function loadRooms(){
     if(state.loadingRooms) return;
     state.loadingRooms = true;
-    el.roomList.innerHTML = '<div class="empty-list">チャットを読み込んでいます...</div>';
+    // 前回の一覧が この端末にあれば、すぐ出す（通信のあとで 静かに最新へ入れ替える）
+    let shownCached = false;
+    if(!(state.rooms && state.rooms.length) && typeof fbLoadRooms === "function"){
+        const cachedRooms = fbLoadRooms();
+        if(cachedRooms){ state.allRooms = cachedRooms; state.rooms = cachedRooms.filter((room) => !room.orphan || feat.isAdmin); renderRooms(); shownCached = true; }
+    }
+    if(!shownCached) el.roomList.innerHTML = '<div class="empty-list">チャットを読み込んでいます...</div>';
 
     try{
         const client = requireClient();
@@ -746,6 +752,7 @@ async function loadRooms(){
         const roomIds = [...new Set((membershipResult.data || []).map((row) => row.room_id).filter(Boolean))];
         if(!roomIds.length){
             state.rooms = []; state.allRooms = [];
+            if(typeof fbSaveRooms === "function") fbSaveRooms([]);
             renderRooms();
             return;
         }
@@ -778,9 +785,11 @@ async function loadRooms(){
         });
         state.rooms = state.allRooms.filter((room) => !room.orphan || feat.isAdmin);   // 削除ずみユーザーとのチャットは、管理者以外には 出さない（他の画面の一覧にも出ない）
 
+        if(typeof fbSaveRooms === "function") fbSaveRooms(state.allRooms);
         renderRooms();
     }catch(error){
         console.error("Room list error:",error);
+        if(shownCached){ try{ showToast("通信が弱いため、前回のチャット一覧を表示しています。"); }catch(_e){} return; }   // 前回の一覧を そのまま残す（電波が弱くても使える）
         el.roomList.innerHTML = '<div class="empty-list">チャット一覧を取得できませんでした。<br>' + escapeHtml(getErrorMessage(error)) + '</div>';
     }finally{
         state.loadingRooms = false;
@@ -1406,6 +1415,7 @@ async function logout(){
             state.authSubscription.unsubscribe();
             state.authSubscription = null;
         }
+        try{ if(typeof fbClearRooms === "function") fbClearRooms(); }catch(_e){}   // 前回の一覧の控えも消す
         await window.AREAuth.logout({deleteGuest:true});
         redirectToIndex();
     }catch(error){

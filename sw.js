@@ -3,6 +3,7 @@
 // ・GET 以外（POST/HEAD など）は一切さわらない → 「Cache.put: Request method 'POST' is unsupported」を防ぐ
 // ・Supabase など他のサイトへの通信にはさわらない
 // ・HTML（画面の骨組み）は「ネット優先」：つながるときは常に最新を取得（オフラインのときだけ控えを使う）
+//   ただし chat.html だけは「控え先」（pageFast）：すぐ開いて、裏で最新を確かめ、変わっていたら画面へ知らせる
 // ・JS / CSS / 画像などは「控え先・裏で更新」：控えがあればすぐ表示し、裏で最新を取り直して次回に備える
 //   → 2回目以降の表示が速い。更新したのに古い画面のまま、を防ぐために、更新したら下の CACHE の数字を1つ上げる
 //     （数字を上げると古い控えがまとめて消えて、全部が新しく入れ替わる）
@@ -11,7 +12,7 @@
 // ・新しい版が入ったら、古い控えをすべて消す
 
 importScripts("precache-manifest.js", "sw-core.js");
-const CACHE = "are-v268-20261126";
+const CACHE = "are-v270-20261126";
 // オフライン用: 画面の骨組み（html/js/css/json）を 最初に まとめて保存 / 画像・音楽は「オフライン準備」ボタンで are-media に保存（sw-core.js）
 const core = self.areCore({shell: CACHE, root: "./", precache: true, fetch: false});
 const STATIC_RE = /\.(?:js|css|png|webp|jpe?g|gif|svg|ico|json|webmanifest|txt|woff2?|ttf|mp3|mp4)$/i;
@@ -65,6 +66,28 @@ async function networkFirst(request, soft){
     }
 }
 
+// チャット画面（chat.html）だけ：控えがあれば すぐ出す（ネットの確認を待たない＝スマホの回線だけでも一瞬で開く）。
+// 裏で最新を取り直し、中身が変わっていたら 控えを入れ替えて、開いている画面に「新しい版が入った」と知らせる
+// （画面側 chat-fastboot.js が、まだ何も触っていなければ 自動で開き直し、触っていたら お知らせだけ出す）。
+async function pageFast(event, request){
+    const cached = await caches.match(request, {ignoreSearch: true});
+    if(!cached) return networkFirst(request, true);
+    const forCompare = cached.clone();     // ※ 画面にわたす前（同期的）に複製しておく。あとからだと本文が使用ずみで失敗する
+    event.waitUntil((async () => {
+        try{
+            const fresh = await fetch(request, {cache: "no-cache"});
+            if(!fresh || fresh.status !== 200) return;
+            const copy = fresh.clone();
+            const [a, b] = await Promise.all([forCompare.text(), fresh.text()]);
+            if(a === b) return;
+            await putCopy(request, copy);
+            const list = await self.clients.matchAll({type: "window"});
+            list.forEach((c) => { try{ c.postMessage({type: "are-html-updated"}); }catch(_e){} });
+        }catch(_e){ /* 電波が弱いときは そのまま。次に開いたときに また確かめる */ }
+    })());
+    return cached;
+}
+
 // 控え先・裏で更新（JS / CSS / 画像など）
 async function cacheFirst(event, request, revalidate){
     const cached = await caches.match(request);
@@ -92,6 +115,7 @@ self.addEventListener("fetch", (event) => {
 
     const path = url.pathname;
     const isPage = request.mode === "navigate" || /\.html$/i.test(path) || /\/$/.test(path);
+    if(request.mode === "navigate" && /\/chat\.html$/i.test(path)){ event.respondWith(pageFast(event, request)); return; }
     if(isPage || /\/version\.json$/i.test(path) || !STATIC_RE.test(path)){
         event.respondWith(networkFirst(request, isPage && !/\/version\.json$/i.test(path)));
         return;
