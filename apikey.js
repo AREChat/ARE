@@ -17,6 +17,8 @@
         videoUploadUrl: "https://script.google.com/macros/s/AKfycbzkKv7KJVTXZKR_sp70KLbu5j1AaSKiRpNwG8xRIMs2CQl5lVgrLuCmPgInHr7OrWdH3A/exec",
         // 広告の映像（Googleドライブの「広告」フォルダ）を配る GAS のURL（ファイル保存と同じ GAS）。空のままなら、ads/ フォルダの映像を使います。
         adsUrl: "https://script.google.com/macros/s/AKfycbzkKv7KJVTXZKR_sp70KLbu5j1AaSKiRpNwG8xRIMs2CQl5lVgrLuCmPgInHr7OrWdH3A/exec",
+        // GAS ハブ（AIbot と同じ GAS の /exec）の URL。Android アプリの通知・Office 書き出しで使う。空なら、AIbot の共通設定の URL を使う
+        hubUrl: "",
         requestTimeoutMs: 20000
     });
 })();

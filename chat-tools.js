@@ -23,7 +23,8 @@ const TOOL_LIST = [
     ["avatar", "🧑‍🎤", "アバター", "自分のキャラを作って画像として送る", "openAvatar"],
     ["profile3d", "🧊", "3Dプロフィールカード", "Three.jsのキャラクターを自分用に設定します", "openProfile3D"],
     ["myai", "🧠", "AREbot", "教えると覚える・自分の返し方を学ぶ（APIキー不要・無料）", "openMyAi"],
-    ["fullscreen", "🖥️", "全画面にする", "ブラウザのタブ・⋮メニュー・ツールバーを隠して、ARE だけを大きく映す（やめるときは Esc）", "openFullscreenTool"],
+    ["andapp", "📱", "アプリの通知", "Android アプリの中だけ：通知を強く届ける設定とテスト", "openAndroidApp"],
+    ["fullscreen", "🖥️", "全画面にする", "ブラウザのタブ・⋮メニュー・ツールバーを隠して、ARE だけを大きく映す（初期設定はオン。切りかえはここ）", "openFullscreenTool"],
     ["suggest", "⌨️", "予測変換（自分専用）", "打つ言葉の続きを候補に出す。自分の送信と、取り込んだ検索履歴から（端末の中だけ／家族の区分は使えません）", "openSuggest"],
     ["aibot", "🤖", "カスタマイズAIbot", "自分専用のAI（Grok）。キャラを自由に設定。ほかの人の情報は入りません（区分「その他」は使えません）", "openAiBot"],
     ["ai", "🧐", "会話の分析", "要約・キーワード・感情・分類（端末内だけで処理）", "openAi"],
@@ -107,7 +108,7 @@ function initTools(){
     const pane = document.querySelector(".pane-more");
     if(!pane) throw new Error("「その他」タブが見つかりません。");
     pane.insertAdjacentHTML("beforeend", '<div class="section-heading" style="margin-top:10px"><h2>🧩 ツール</h2></div>' +
-        TOOL_LIST.map((t) => '<button type="button" class="admin-card more-item" data-tool="' + t[0] + '" data-feature="' + t[0] + '"' + (t[0] === "usage" || t[0] === "aibot" || t[0] === "suggest" ? ' style="display:none"' : "") + '>' + t[1] + ' ' + t[2] + '<small class="meta">' + t[3] + '</small></button>').join(""));
+        TOOL_LIST.map((t) => '<button type="button" class="admin-card more-item" data-tool="' + t[0] + '" data-feature="' + t[0] + '"' + (t[0] === "usage" || t[0] === "aibot" || t[0] === "suggest" || t[0] === "andapp" ? ' style="display:none"' : "") + '>' + t[1] + ' ' + t[2] + '<small class="meta">' + t[3] + '</small></button>').join(""));
     pane.addEventListener("click", (event) => {
         const button = event.target.closest("[data-tool]");
         if(!button) return;

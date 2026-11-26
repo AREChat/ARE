@@ -159,6 +159,7 @@ const FEATURES = [
     ["stamps","絵文字・スタンプ",initStamps],
     ["mention","メンション",initMention],
     ["tools","ツール入口",initTools],
+    ["andapp","Android アプリの通知（アプリの中だけ）",initAndroidApp],
     ["aistudio","AI画像・動画生成",initAiStudio],
     ["push","通知・ホーム画面",initPush],
     ["drafts","下書きの自動保存",initDrafts],
@@ -280,6 +281,29 @@ function startFeatures(){
     });
     window.AREFeatures.banner();
     if(typeof window.AREFeatures.markReady === "function") window.AREFeatures.markReady();
+    watchProtect();
+}
+
+// 見張り（protect.js）が、はずされたり・差しかえられたりしていないかを、チャット本体の側からも たしかめる。
+// 見つからないときは、いちど だけ 読みこみなおす。それでも ない（＝はずされている）ときは、画面の中身を消して、使えなくする。
+function watchProtect(){
+    const alive = () => { try{ return typeof window.AREProtectAlive === "function" && window.AREProtectAlive() > 0; }catch(_e){ return false; } };
+    let bad = 0;
+    setInterval(() => {
+        if(alive()){ bad = 0; return; }
+        if(++bad < 3) return;   // 1〜2回の もたつきでは 反応しない
+        let tried = false;
+        try{ tried = sessionStorage.getItem("are_prot_retry") === "1"; sessionStorage.setItem("are_prot_retry", "1"); }catch(_e){ /* 何もしない */ }
+        if(!tried){ location.reload(); return; }
+        try{
+            document.body.textContent = "";
+            const m = document.createElement("div");
+            m.style.cssText = "position:fixed;inset:0;background:#0b1020;color:#fff;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font:16px/1.8 system-ui,sans-serif";
+            m.textContent = "安全のための仕組みが読み込めませんでした。ページを読みこみなおしてください。";
+            document.body.appendChild(m);
+        }catch(_e){ /* 何もしない */ }
+    }, 3000);
+    setTimeout(() => { if(alive()){ try{ sessionStorage.removeItem("are_prot_retry"); }catch(_e){ /* 何もしない */ } } }, 4000);
 }
 
 initialize().catch((error) => {

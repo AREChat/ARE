@@ -1415,6 +1415,7 @@ async function logout(){
             state.authSubscription.unsubscribe();
             state.authSubscription = null;
         }
+        try{ if(typeof andOff === "function") await andOff(); }catch(_e){}   // Android アプリ：この端末の通知の登録を消す
         try{ if(typeof fbClearRooms === "function") fbClearRooms(); }catch(_e){}   // 前回の一覧の控えも消す
         await window.AREAuth.logout({deleteGuest:true});
         redirectToIndex();

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ARE</string>
+    <string name="ch_msg">メッセージ</string>
+    <string name="ch_msg_desc">新しいメッセージのお知らせ（画面の上にポップアップで出ます）</string>
+    <string name="ch_call">着信</string>
+    <string name="ch_call_desc">電話のように、鳴りつづけて知らせます</string>
+    <string name="ch_morning">朝のお知らせ</string>
+    <string name="ch_morning_desc">朝の予定のお知らせ（アラームの音）</string>
+    <string name="ch_quiet">しずかな通知</string>
+    <string name="ch_quiet_desc">音もバイブもなしで、そっと知らせます</string>
+    <string name="call_accept">出る</string>
+    <string name="call_decline">切る</string>
+</resources>

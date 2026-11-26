@@ -1,0 +1,40 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'app.arechat.android'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'app.arechat.android'
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName '1.0.0'
+        // 開くチャットの住所（変えたいときは、ここだけ）
+        buildConfigField 'String', 'SITE_URL', '"https://arechat.github.io/ARE/chat.html"'
+        buildConfigField 'String', 'SITE_HOST', '"arechat.github.io"'
+    }
+
+    buildFeatures { buildConfig true }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+    lint { abortOnError false }
+}
+
+dependencies {
+    implementation 'androidx.core:core:1.13.1'
+    // 通知の受け取り（Firebase Cloud Messaging：無料）。設定ファイル（google-services.json）は使わず、
+    // 接続の値は、ARE の GAS から受け取って、アプリの中で組み立てます。
+    implementation 'com.google.firebase:firebase-messaging:24.0.1'
+}

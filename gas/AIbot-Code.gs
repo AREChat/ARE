@@ -25,6 +25,12 @@ var MAX_AUTH_FAILS = 40;   // 合言葉の まちがいが 1日で これを こ
 
 function doPost(e) {
   try {
+    // ★ ハブ追加分（hub-extra.gs）：通知・Office書き出し・テスト結果の受け口。action がついているものだけ、ここで渡す。
+    //   hub-extra.gs を入れていなくても、AIbot の動きは 変わりません。
+    if (typeof hubxParse_ === 'function') {
+      var hb = hubxParse_(e);
+      if (hb && hubxIsAction_(hb)) return hubxRoute_(hb);
+    }
     var props = PropertiesService.getScriptProperties();
     var apiKey = props.getProperty('XAI_API_KEY');
     var appToken = props.getProperty('APP_TOKEN');
@@ -92,7 +98,10 @@ function doPost(e) {
 }
 
 // ブラウザで URL を 開いたときの かんたんな 返事（動作確認用。中身は 何も 見せません）
-function doGet() { return out_({ ok: true, name: 'AIbot' }); }
+function doGet(e) {
+  if (typeof hubxGet_ === 'function') { var h = hubxGet_(e && e.parameter); if (h) return h; }   // ハブ追加分（?action=ci など）
+  return out_({ ok: true, name: 'AIbot' });
+}
 
 function parse_(e) {
   if (!e || !e.postData || !e.postData.contents) return null;

@@ -1,0 +1,27 @@
+import sys, os, json
+sys.path.insert(0, __import__("os").path.dirname(__import__("os").path.abspath(__file__)))
+from h import *
+srv = ensure_server()
+EXTRA = open(HERE + "/chat_test.py", encoding="utf-8").read().split('EXTRA = """')[1].split('"""')[0]
+with sync_playwright() as p:
+    browser, ctx, page, logs = new_page(p, width=420, height=800, extra_fx=EXTRA)
+    page.goto(BASE + "/chat.html"); page.wait_for_selector("#roomList"); page.wait_for_timeout(1500)
+    page.click("[data-tab=more]"); page.wait_for_timeout(600)
+    page.evaluate("() => document.querySelector('[data-tool=autoreply]').click()"); page.wait_for_timeout(800)
+    print("opened:", page.evaluate("() => !!document.getElementById('arNew')"))
+    page.evaluate("() => document.getElementById('arNew').click()"); page.wait_for_timeout(500)
+    page.select_option("#arKind", "schedule"); page.wait_for_timeout(300)
+    vis = page.evaluate("() => ({sched: !document.getElementById('arScheduleFields').hidden, start: tpValue(document, 'ar-start'), end: tpValue(document, 'ar-end'), startVisible: !!document.querySelector('[data-tp=ar-start]').offsetParent})")
+    print("schedule fields:", vis)
+    page.fill("#arName", "テスト"); page.fill("#arResponse", "ただいま不在です")
+    page.select_option("[data-tp=ar-start] .tp-h", "12"); page.select_option("[data-tp=ar-start] .tp-m", "34")
+    page.select_option("[data-tp=ar-end] .tp-h", "13"); page.select_option("[data-tp=ar-end] .tp-m", "45")
+    page.evaluate("() => document.getElementById('arTimeOk').click()")
+    print("after select:", page.evaluate("() => [tpValue(document, 'ar-start'), tpValue(document, 'ar-end')]"))
+    page.evaluate("() => document.getElementById('arSave').click()"); page.wait_for_timeout(800)
+    calls = page.evaluate("() => window.__calls.filter(c => c.from === 'auto_reply_rules')")
+    print("calls:", json.dumps(calls, ensure_ascii=False))
+    print("logs:", [l for l in logs if 'favicon' not in l[1]][:5])
+    page.screenshot(path="/tmp/are-e2e/t.png")
+    browser.close()
+if srv: srv.terminate()
