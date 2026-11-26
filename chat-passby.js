@@ -59,7 +59,11 @@ function pbPaintCard(){
         let tag = b.querySelector(".pb-badge");
         if(pb.avail && pb.unseen > 0){
             if(!tag){ tag = document.createElement("span"); tag.className = "pb-badge"; b.appendChild(tag); }
-            tag.textContent = "新しいすれ違い " + pb.unseen;
+            if(b.classList.contains("pb-pin-icon")){   // アイコンだけの入口：赤い丸に 数字だけ
+                tag.textContent = String(pb.unseen > 99 ? "99+" : pb.unseen);
+                tag.style.cssText = "position:absolute;top:-6px;right:-6px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#e5484d;color:#fff;font-size:11px;line-height:18px;text-align:center;font-weight:700";
+                tag.title = "新しいすれ違い " + pb.unseen;
+            }else tag.textContent = "新しいすれ違い " + pb.unseen;
         }else if(tag) tag.remove();
     });
 }
