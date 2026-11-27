@@ -33,12 +33,12 @@ try:
         br = p.chromium.launch()
         ctx, pg, errs = open_page(br, ms(2026, 12, 3, 7))
         ids = pg.evaluate("import('./js/df-board.js').then(m=>m.BOARD_IDS)")
-        check(len(ids) == 20, f"演出のある のりもの 20こ {len(ids)}")
+        check(len(ids) == 21, f"演出のある のりもの 21こ {len(ids)}")
         atts = pg.evaluate("window.__df.att.map(a=>a.id)")
         for i in ids: check(i in atts, f"{i} は のりものに ある")
         moves = pg.evaluate("import('./js/df-board.js').then(m=>Object.values(m.BOARD).filter(b=>b.s==='move').length)")
         stops = pg.evaluate("import('./js/df-board.js').then(m=>Object.values(m.BOARD).filter(b=>b.s==='stop').length)")
-        check(moves == 8 and stops == 12, f"うごく床 8・とまる 12 {moves}/{stops}")
+        check(moves == 9 and stops == 12, f"うごく床 9・とまる 12 {moves}/{stops}")
         # 1) ぜんぶの のりもので：演出 → のりこむ（1回目は ぜんぶ見せる）
         for i in ids:
             reset_walk(pg); c0 = pg.evaluate("(()=>{const g=window.__df.game; return g.sv.coins})()")
